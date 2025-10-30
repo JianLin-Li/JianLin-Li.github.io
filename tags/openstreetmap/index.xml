@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>OpenStreetMap on 浩瀚天空</title>
+    <link>https://jianlin-li.github.io/tags/openstreetmap/</link>
+    <description>Recent content in OpenStreetMap on 浩瀚天空</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <copyright>Copyright © 1989–2025, 李建林 </copyright>
+    <lastBuildDate>Wed, 29 Oct 2025 18:42:29 +0800</lastBuildDate><atom:link href="https://jianlin-li.github.io/tags/openstreetmap/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Hugo的有关简易教程</title>
+      <link>https://jianlin-li.github.io/post/course/</link>
+      <pubDate>Wed, 29 Oct 2025 18:42:29 +0800</pubDate>
+      
+      <guid>https://jianlin-li.github.io/post/course/</guid>
+      <description>
+        
+          
+            &lt;h1 id=&#34;using-hugo-page-bundles&#34;&gt;Using Hugo page bundles&lt;/h1&gt;
+&lt;p&gt;&lt;a href=&#34;https://gohugo.io/content-management/page-bundles/&#34;&gt;Page bundles&lt;/a&gt; are an optional way to &lt;a href=&#34;https://gohugo.io/content-management/page-resources/&#34;&gt;organize page resources&lt;/a&gt; within Hugo.&lt;/p&gt;
+&lt;p&gt;You can opt-in to using page bundles in Hugo Clarity with &lt;code&gt;usePageBundles&lt;/code&gt; in your site configuration or in a page&#39;s front matter. &lt;a href=&#34;https://github.com/chipzoller/hugo-clarity#organizing-page-resources&#34;&gt;Read more about &lt;code&gt;usePageBundles&lt;/code&gt;.&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;With page bundles, resources for a page or section, like images or attached files, live &lt;strong&gt;in the same directory as the content itself&lt;/strong&gt; rather than in your &lt;code&gt;static&lt;/code&gt; directory.&lt;/p&gt;
+&lt;p&gt;Hugo Clarity supports the use of &lt;a href=&#34;https://gohugo.io/content-management/page-bundles/#leaf-bundles&#34;&gt;leaf bundles&lt;/a&gt;, which are any directories within the &lt;code&gt;content&lt;/code&gt; directory that contain an &lt;code&gt;index.md&lt;/code&gt; file. Hugo&#39;s documentation gives this example:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-text&#34; data-lang=&#34;text&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt; 1&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;content
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt; 2&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;├── about
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt; 3&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;│   ├── index.md
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt; 4&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;├── posts
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt; 5&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;│   ├── my-post
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt; 6&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;│   │   ├── content1.md
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt; 7&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;│   │   ├── content2.md
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt; 8&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;│   │   ├── image1.jpg
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt; 9&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;│   │   ├── image2.png
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt;10&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;│   │   └── index.md
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt;11&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;│   └── my-other-post
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt;12&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;│       └── index.md
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt;13&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;│
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt;14&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;└── another-section
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt;15&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;    ├── ..
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt;16&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;    └── not-a-leaf-bundle
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt;17&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;        ├── ..
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt;18&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;        └── another-leaf-bundle
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt;19&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;            └── index.md
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;blockquote&gt;
+In the above example `content` directory, there are four leaf
+bundles:
+&lt;p&gt;&lt;strong&gt;about&lt;/strong&gt;: This leaf bundle is at the root level (directly under
+&lt;code&gt;content&lt;/code&gt; directory) and has only the &lt;code&gt;index.md&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;my-post&lt;/strong&gt;: This leaf bundle has the &lt;code&gt;index.md&lt;/code&gt;, two other content
+Markdown files and two image files. &lt;strong&gt;image1&lt;/strong&gt; is a page resource of &lt;code&gt;my-post&lt;/code&gt;
+and only available in &lt;code&gt;my-post/index.md&lt;/code&gt; resources. &lt;strong&gt;image2&lt;/strong&gt; is a page resource of &lt;code&gt;my-post&lt;/code&gt;
+and only available in &lt;code&gt;my-post/index.md&lt;/code&gt; resources.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;my-other-post&lt;/strong&gt;: This leaf bundle has only the &lt;code&gt;index.md&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;another-leaf-bundle&lt;/strong&gt;: This leaf bundle is nested under couple of
+directories. This bundle also has only the &lt;code&gt;index.md&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;The hierarchy depth at which a leaf bundle is created does not matter,
+as long as it is not inside another &lt;strong&gt;leaf&lt;/strong&gt; bundle.&lt;/em&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h3 id=&#34;advantages-to-using-page-bundles&#34;&gt;Advantages to using page bundles&lt;/h3&gt;
+&lt;p&gt;The image below is part of the bundle of this page, and is located at &lt;code&gt;content/post/bundle/building.png&lt;/code&gt;. Because it&#39;s within this page&#39;s bundle, the markup for the image only has to specify the image&#39;s filename, &lt;code&gt;building.png&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;
+  &lt;figure&gt;
+  &lt;picture&gt;
+
+    
+      
+        
+        
+        
+        &lt;source srcset=&#34;https://jianlin-li.github.io/post/course/building.webp&#34; type=&#34;image/webp&#34;&gt;
+        
+        
+    &lt;img
+      loading=&#34;lazy&#34;
+      decoding=&#34;async&#34;
+      alt=&#34;A building&#34;
+      
+        class=&#34;image_figure image_internal image_processed&#34;
+        width=&#34;200&#34;
+        height=&#34;200&#34;
+        src=&#34;https://jianlin-li.github.io/post/course/building.png&#34;
+      
+      
+    /&gt;
+
+    &lt;/picture&gt;
+&lt;/figure&gt;
+&lt;/p&gt;
+&lt;p&gt;If you ever change the name of the directory in which this Markdown file and the image reside, the reference to the image would not need to be updated.&lt;/p&gt;
+&lt;p&gt;In addition to more cleanly organizing your content and related assets, when using page bundles, &lt;strong&gt;Hugo Clarity will automatically generate markup for modern image formats&lt;/strong&gt;, which are smaller in file size.&lt;/p&gt;
+&lt;p&gt;For instance, when you reference an image like &lt;code&gt;building.png&lt;/code&gt;, Hugo Clarity will check to see if the same image (based on filename) exists in &lt;a href=&#34;https://en.wikipedia.org/wiki/WebP&#34;&gt;WebP&lt;/a&gt;, &lt;a href=&#34;https://en.wikipedia.org/wiki/AVIF&#34;&gt;AVIF&lt;/a&gt; or &lt;a href=&#34;https://en.wikipedia.org/wiki/JPEG_XL&#34;&gt;JXL&lt;/a&gt; formats. If you inspect the image above, you&#39;ll see a &lt;code&gt;&amp;lt;source&amp;gt;&lt;/code&gt; element for &lt;code&gt;building.webp&lt;/code&gt;, because that file is also present. Hugo Clarity will only include the markup if these images exist.&lt;/p&gt;
+&lt;p&gt;Browsers that &lt;a href=&#34;https://developer.mozilla.org/en-US/docs/Web/HTML/Element/picture#the_type_attribute&#34;&gt;support these formats and the &lt;code&gt;&amp;lt;picture&amp;gt;&lt;/code&gt; element&lt;/a&gt; will load them, while browsers that do not will fall-back to the default image. &lt;a href=&#34;https://github.com/chipzoller/hugo-clarity#support-for-modern-image-formats&#34;&gt;Read more about this process.&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;Finally, note that page assets can be further managed and refined &lt;a href=&#34;https://gohugo.io/content-management/page-resources/#page-resources-metadata&#34;&gt;within the page&#39;s front matter&lt;/a&gt; if you wish, and are not limited to images alone.&lt;/p&gt;
+&lt;h3 id=&#34;disadvantages-to-using-page-bundles&#34;&gt;Disadvantages to using page bundles&lt;/h3&gt;
+&lt;p&gt;Page resources in a bundle are only available to the page with which they are bundled — that means you can&#39;t include an image with one page and then reference it from another.&lt;/p&gt;
+&lt;p&gt;Images that are being used in multiple places are more appropriate for your &lt;a href=&#34;https://gohugo.io/hugo-pipes/introduction/&#34;&gt;Hugo &lt;code&gt;assets&lt;/code&gt; directory&lt;/a&gt;. Unlike files in the Hugo &lt;code&gt;static&lt;/code&gt; directory, files in the &lt;code&gt;assets&lt;/code&gt; directory can be run through Hugo Pipes, which &lt;a href=&#34;https://gohugo.io/content-management/image-processing/&#34;&gt;includes image processing&lt;/a&gt;.&lt;/p&gt;
+&lt;hr&gt;
+&lt;hr&gt;
+&lt;hr&gt;
+&lt;h1 id=&#34;emoji-support&#34;&gt;Emoji Support&lt;/h1&gt;
+&lt;p&gt;Emoji can be enabled in a Hugo project in a number of ways.&lt;/p&gt;
+          
+          
+        
+      </description>
+    </item>
+    
+  </channel>
+</rss>
