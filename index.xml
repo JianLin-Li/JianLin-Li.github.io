@@ -2,24 +2,27 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>浩瀚天空</title>
-    <link>https://jianlin-li.github.io/</link>
+    <link>jianlin-li.github.io/</link>
     <description>Recent content on 浩瀚天空</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
     <copyright>Copyright © 1989–2025, 李建林 </copyright>
-    <lastBuildDate>Thu, 30 Oct 2025 15:04:49 +0800</lastBuildDate><atom:link href="https://jianlin-li.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Thu, 30 Oct 2025 15:04:49 +0800</lastBuildDate><atom:link href="jianlin-li.github.io/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Go语言的知识点</title>
-      <link>https://jianlin-li.github.io/post/go_review/</link>
+      <link>jianlin-li.github.io/post/go_review/</link>
       <pubDate>Thu, 30 Oct 2025 15:04:49 +0800</pubDate>
       
-      <guid>https://jianlin-li.github.io/post/go_review/</guid>
+      <guid>jianlin-li.github.io/post/go_review/</guid>
       <description>
         
           
             &lt;h1 id=&#34;go语言的基本数据类型&#34;&gt;Go语言的基本数据类型&lt;/h1&gt;
 &lt;ol&gt;
 &lt;li&gt;整型&lt;/li&gt;
+&lt;/ol&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-go&#34; data-lang=&#34;go&#34;&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;ol start=&#34;2&#34;&gt;
+&lt;li&gt;浮点型&lt;/li&gt;
 &lt;/ol&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-go&#34; data-lang=&#34;go&#34;&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
           
@@ -30,10 +33,10 @@
     
     <item>
       <title>本地环境相关配置信息</title>
-      <link>https://jianlin-li.github.io/post/local_enviroment_info/</link>
+      <link>jianlin-li.github.io/post/local_enviroment_info/</link>
       <pubDate>Thu, 30 Oct 2025 12:15:27 +0800</pubDate>
       
-      <guid>https://jianlin-li.github.io/post/local_enviroment_info/</guid>
+      <guid>jianlin-li.github.io/post/local_enviroment_info/</guid>
       <description>
         
           
@@ -123,10 +126,10 @@
     
     <item>
       <title>本地hosts的开发环境备份</title>
-      <link>https://jianlin-li.github.io/post/local_hosts_bak/</link>
+      <link>jianlin-li.github.io/post/local_hosts_bak/</link>
       <pubDate>Thu, 30 Oct 2025 11:42:37 +0800</pubDate>
       
-      <guid>https://jianlin-li.github.io/post/local_hosts_bak/</guid>
+      <guid>jianlin-li.github.io/post/local_hosts_bak/</guid>
       <description>
         
           
@@ -201,10 +204,10 @@
     
     <item>
       <title>罗茜公司相关脚本解决方案</title>
-      <link>https://jianlin-li.github.io/post/luoxi/</link>
+      <link>jianlin-li.github.io/post/luoxi/</link>
       <pubDate>Thu, 30 Oct 2025 08:50:12 +0800</pubDate>
       
-      <guid>https://jianlin-li.github.io/post/luoxi/</guid>
+      <guid>jianlin-li.github.io/post/luoxi/</guid>
       <description>
         
           
@@ -803,10 +806,10 @@
     
     <item>
       <title>Hugo的有关简易教程</title>
-      <link>https://jianlin-li.github.io/post/course/</link>
+      <link>jianlin-li.github.io/post/course/</link>
       <pubDate>Wed, 29 Oct 2025 18:42:29 +0800</pubDate>
       
-      <guid>https://jianlin-li.github.io/post/course/</guid>
+      <guid>jianlin-li.github.io/post/course/</guid>
       <description>
         
           
@@ -881,7 +884,7 @@ as long as it is not inside another &lt;strong&gt;leaf&lt;/strong&gt; bundle.&lt
         
         
         
-        &lt;source srcset=&#34;https://jianlin-li.github.io/post/course/building.webp&#34; type=&#34;image/webp&#34;&gt;
+        &lt;source srcset=&#34;jianlin-li.github.io/post/course/building.webp&#34; type=&#34;image/webp&#34;&gt;
         
         
     &lt;img
@@ -892,7 +895,7 @@ as long as it is not inside another &lt;strong&gt;leaf&lt;/strong&gt; bundle.&lt
         class=&#34;image_figure image_internal image_processed&#34;
         width=&#34;200&#34;
         height=&#34;200&#34;
-        src=&#34;https://jianlin-li.github.io/post/course/building.png&#34;
+        src=&#34;jianlin-li.github.io/jianlin-li.github.io/post/course/building.png&#34;
       
       
     /&gt;
