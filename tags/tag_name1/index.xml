@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Tag_name1 on 浩瀚天空</title>
+    <link>https://jianlin-li.github.io/tags/tag_name1/</link>
+    <description>Recent content in Tag_name1 on 浩瀚天空</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <copyright>Copyright © 1989–2025, 李建林 </copyright>
+    <lastBuildDate>Thu, 30 Oct 2025 12:15:27 +0800</lastBuildDate><atom:link href="https://jianlin-li.github.io/tags/tag_name1/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>本地环境相关配置信息</title>
+      <link>https://jianlin-li.github.io/post/local_enviroment_info/</link>
+      <pubDate>Thu, 30 Oct 2025 12:15:27 +0800</pubDate>
+      
+      <guid>https://jianlin-li.github.io/post/local_enviroment_info/</guid>
+      <description>
+        
+          
+            &lt;h1 id=&#34;本地环境相关配置信息&#34;&gt;本地环境相关配置信息&lt;/h1&gt;
+          
+          
+        
+      </description>
+    </item>
+    
+  </channel>
+</rss>
