@@ -2,10 +2,10 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Series on 浩瀚天空</title>
-    <link>jianlin-li.github.io/series/</link>
+    <link>https://jianlin-li.github.io/series/</link>
     <description>Recent content in Series on 浩瀚天空</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
-    <copyright>Copyright © 1989–2025, 李建林 </copyright><atom:link href="jianlin-li.github.io/series/index.xml" rel="self" type="application/rss+xml" />
+    <copyright>Copyright © 1989–2025, 李建林 </copyright><atom:link href="https://jianlin-li.github.io/series/index.xml" rel="self" type="application/rss+xml" />
   </channel>
 </rss>
