@@ -619,7 +619,28 @@
       <description>
         
           
-            &lt;h1 id=&#34;using-hugo-page-bundles&#34;&gt;Using Hugo page bundles&lt;/h1&gt;
+            &lt;h1 id=&#34;hugohugo--github-免费部署自己的博客&#34;&gt;【Hugo】Hugo + Github 免费部署自己的博客&lt;/h1&gt;
+&lt;h3 id=&#34;使用hugo工具生成静态页面然后在github上部署静态页面来免费搭建自己的博客&#34;&gt;使用hugo工具生成静态页面，然后在github上部署静态页面，来免费搭建自己的博客&lt;/h3&gt;
+&lt;p&gt;
+&lt;div class=&#34;notices tip&#34;&gt;
+    &lt;div class=&#34;label&#34;&gt;提示&lt;/div&gt;
+    &lt;p&gt;&lt;code&gt;详细请查看链接&lt;/code&gt;
+&lt;a href=&#34;https://letere-gzj.github.io/hugo-stack/p/hugo/custom-blog/&#34;&gt;【Hugo + Github 免费部署自己的博客】&lt;/a&gt;&lt;/p&gt;
+
+  &lt;/div&gt;
+
+
+&lt;div class=&#34;notices tip&#34;&gt;
+    &lt;div class=&#34;label&#34;&gt;提示&lt;/div&gt;
+    &lt;p&gt;&lt;code&gt;视频地址&lt;/code&gt;
+&lt;a href=&#34;https://www.bilibili.com/video/BV1bovfeaEtQ?spm_id_from=333.788.videopod.episodes&amp;amp;vd_source=cdf40e2cff5189945ee348fcaf09406f&#34;&gt;【Hugo + Github免费搭建博客，并实现自动化部署】&lt;/a&gt;&lt;/p&gt;
+
+  &lt;/div&gt;
+&lt;/p&gt;
+&lt;hr&gt;
+&lt;hr&gt;
+&lt;hr&gt;
+&lt;h1 id=&#34;using-hugo-page-bundles&#34;&gt;Using Hugo page bundles&lt;/h1&gt;
 &lt;p&gt;&lt;a href=&#34;https://gohugo.io/content-management/page-bundles/&#34;&gt;Page bundles&lt;/a&gt; are an optional way to &lt;a href=&#34;https://gohugo.io/content-management/page-resources/&#34;&gt;organize page resources&lt;/a&gt; within Hugo.&lt;/p&gt;
 &lt;p&gt;You can opt-in to using page bundles in Hugo Clarity with &lt;code&gt;usePageBundles&lt;/code&gt; in your site configuration or in a page&#39;s front matter. &lt;a href=&#34;https://github.com/chipzoller/hugo-clarity#organizing-page-resources&#34;&gt;Read more about &lt;code&gt;usePageBundles&lt;/code&gt;.&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;With page bundles, resources for a page or section, like images or attached files, live &lt;strong&gt;in the same directory as the content itself&lt;/strong&gt; rather than in your &lt;code&gt;static&lt;/code&gt; directory.&lt;/p&gt;
