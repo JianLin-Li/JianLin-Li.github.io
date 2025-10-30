@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Go on 浩瀚天空</title>
+    <link>https://jianlin-li.github.io/tags/go/</link>
+    <description>Recent content in Go on 浩瀚天空</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <copyright>Copyright © 1989–2025, 李建林 </copyright>
+    <lastBuildDate>Thu, 30 Oct 2025 15:04:49 +0800</lastBuildDate><atom:link href="https://jianlin-li.github.io/tags/go/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Go语言的知识点</title>
+      <link>https://jianlin-li.github.io/post/go_review/</link>
+      <pubDate>Thu, 30 Oct 2025 15:04:49 +0800</pubDate>
+      
+      <guid>https://jianlin-li.github.io/post/go_review/</guid>
+      <description>
+        
+          
+            &lt;h1 id=&#34;go语言的基本数据类型&#34;&gt;Go语言的基本数据类型&lt;/h1&gt;
+&lt;ol&gt;
+&lt;li&gt;整型&lt;/li&gt;
+&lt;/ol&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-go&#34; data-lang=&#34;go&#34;&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+          
+          
+        
+      </description>
+    </item>
+    
+  </channel>
+</rss>
