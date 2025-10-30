@@ -70,32 +70,30 @@
 &lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt;50&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt;51&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;local.cacheadmin.com
 &lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt;52&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;　　　ljl-maci9   nginx  /usr/local/opt/phpCacheAdmin
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt;53&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;qq邮箱的授权码
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt;54&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;　　　POP3/IMAP/SMTP/Exchange/CardDAV 授权码已生成
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt;55&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;　　　在第三方客户端登录时，密码框请输入以下授权码：
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt;56&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;　　　omoivzpoltzjhfjc
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt;57&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt;58&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt;59&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;Deepseek
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt;60&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;　　　API: sk-cdc80c986d6144a89560efde0695052d
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt;53&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt;54&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt;55&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt;56&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt;57&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;Deepseek
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt;58&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;　　　API: sk-cdc80c986d6144a89560efde0695052d
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt;59&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt;60&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt;61&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt;62&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt;63&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt;64&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt;65&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;个人博客  博客项目源码路径：/Users/lijianlin/www/local/local.hugo.com
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt;66&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;本地域名：local.hugo.com
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt;67&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;（需要修改博客本地项目源码config/_default/hugo.toml中的baseurl，然后在终端里面先进入博客项目源码根目录，
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt;68&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;  然后执行：hugo -D；或者在phpstorm\Goland里面打开博客项目源码，修改config/_default/hugo.toml中的baseurl，
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt;69&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;  然后点击运行(需要安装好的Hugo Integration插件并且在项目运行中配置好hugo运行配置)）
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt;70&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt;71&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;线上域名：jianlin-li.github.io
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt;72&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;博客项目本地git和github上的远程关联项目：https://github.com/JianLin-Li/local.hugo.com.git
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt;73&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;博客域名对应的github page项目：https://github.com/JianLin-Li/JianLin-Li.github.io.git
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt;74&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt;75&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;新增博文步骤
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt;76&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;在本地博客项目源码	/Users/lijianlin/www/local/local.hugo.com/content/post 目录里面新增.md文件
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt;77&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;(最好是能在phpstorm\Goland中新建，在安装好hugo Integration插	件在IDE里面新建选择hugo new，这样新建的md会自动生成一些配置)，
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt;78&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;修改后提交，推送到GitHub远程main分支时触发github action，自动部署博文public目录到https://github.com/JianLin-Li/JianLin-Li.github.io.git
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt;63&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;个人博客  博客项目源码路径：/Users/lijianlin/www/local/local.hugo.com
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt;64&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;本地域名：local.hugo.com
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt;65&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;（需要修改博客本地项目源码config/_default/hugo.toml中的baseurl，然后在终端里面先进入博客项目源码根目录，
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt;66&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;  然后执行：hugo -D；或者在phpstorm\Goland里面打开博客项目源码，修改config/_default/hugo.toml中的baseurl，
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt;67&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;  然后点击运行(需要安装好的Hugo Integration插件并且在项目运行中配置好hugo运行配置)）
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt;68&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt;69&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;线上域名：jianlin-li.github.io
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt;70&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;博客项目本地git和github上的远程关联项目：https://github.com/JianLin-Li/local.hugo.com.git
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt;71&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;博客域名对应的github page项目：https://github.com/JianLin-Li/JianLin-Li.github.io.git
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt;72&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt;73&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;新增博文步骤
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt;74&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;在本地博客项目源码	/Users/lijianlin/www/local/local.hugo.com/content/post 目录里面新增.md文件
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt;75&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;(最好是能在phpstorm\Goland中新建，在安装好hugo Integration插	件在IDE里面新建选择hugo new，这样新建的md会自动生成一些配置)，
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt;76&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;修改后提交，推送到GitHub远程main分支时触发github action，自动部署博文public目录到https://github.com/JianLin-Li/JianLin-Li.github.io.git
 &lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
           
           
