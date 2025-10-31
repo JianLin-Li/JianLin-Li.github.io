@@ -9,7 +9,7 @@
     <copyright>Copyright © 1989–2025, 李建林 </copyright>
     <lastBuildDate>Thu, 30 Oct 2025 15:04:49 +0800</lastBuildDate><atom:link href="https://jianlin-li.github.io/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>Go语言的知识点</title>
+      <title>Go语言的知识点--GOPATH和Go Modules</title>
       <link>https://jianlin-li.github.io/post/go_review/</link>
       <pubDate>Thu, 30 Oct 2025 15:04:49 +0800</pubDate>
       
@@ -17,14 +17,49 @@
       <description>
         
           
-            &lt;h1 id=&#34;go语言的基本数据类型&#34;&gt;Go语言的基本数据类型&lt;/h1&gt;
-&lt;ol&gt;
-&lt;li&gt;整型&lt;/li&gt;
-&lt;/ol&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-go&#34; data-lang=&#34;go&#34;&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;ol start=&#34;2&#34;&gt;
-&lt;li&gt;浮点型&lt;/li&gt;
-&lt;/ol&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-go&#34; data-lang=&#34;go&#34;&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+            &lt;p&gt;在 Go 语言的发展历程中，&lt;strong&gt;&lt;code&gt;GOPATH&lt;/code&gt;&lt;/strong&gt; 和 &lt;strong&gt;Go Modules（模块系统）&lt;/strong&gt; 是两种不同的依赖管理和项目组织方式。它们代表了 Go 在不同阶段对“如何构建和管理项目”的哲学演变。&lt;/p&gt;
+&lt;p&gt;下面是对 &lt;code&gt;GOPATH&lt;/code&gt; 和 Go Modules 的&lt;strong&gt;详细对比分析&lt;/strong&gt;，包括设计思想、工作机制、优缺点、使用场景以及当前的主流趋势。&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2 id=&#34;一背景go-的依赖管理演进&#34;&gt;一、背景：Go 的依赖管理演进&lt;/h2&gt;
+&lt;table&gt;
+  &lt;thead&gt;
+      &lt;tr&gt;
+          &lt;th&gt;时间&lt;/th&gt;
+          &lt;th&gt;版本&lt;/th&gt;
+          &lt;th&gt;依赖管理方式&lt;/th&gt;
+      &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+      &lt;tr&gt;
+          &lt;td&gt;2009–2018&lt;/td&gt;
+          &lt;td&gt;Go 1.0 – Go 1.10&lt;/td&gt;
+          &lt;td&gt;GOPATH 模式&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;2018 年起&lt;/td&gt;
+          &lt;td&gt;Go 1.11+&lt;/td&gt;
+          &lt;td&gt;引入 Go Modules&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;2020 年起&lt;/td&gt;
+          &lt;td&gt;Go 1.14+&lt;/td&gt;
+          &lt;td&gt;Modules 成为推荐方式&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;2021 年起&lt;/td&gt;
+          &lt;td&gt;Go 1.16+&lt;/td&gt;
+          &lt;td&gt;&lt;strong&gt;Modules 默认启用&lt;/strong&gt;&lt;/td&gt;
+      &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;blockquote&gt;
+&lt;p&gt;📌 自 Go 1.16 起，&lt;code&gt;GO111MODULE=on&lt;/code&gt; 成为默认行为，标志着 &lt;strong&gt;Go Modules 正式取代 GOPATH 成为主流&lt;/strong&gt;。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;hr&gt;
+&lt;h2 id=&#34;二gopath-模式详解&#34;&gt;二、GOPATH 模式详解&lt;/h2&gt;
+&lt;h3 id=&#34;1-什么是-gopath&#34;&gt;1. 什么是 &lt;code&gt;GOPATH&lt;/code&gt;？&lt;/h3&gt;
+&lt;p&gt;&lt;code&gt;GOPATH&lt;/code&gt; 是一个环境变量，指向你的 Go 工作目录。它定义了 Go 工具链查找包的位置。&lt;/p&gt;
+&lt;p&gt;典型结构：&lt;/p&gt;
           
           
         
