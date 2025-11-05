@@ -9,6 +9,162 @@
     <copyright>Copyright © 1989–2025, 李建林 </copyright>
     <lastBuildDate>Thu, 30 Oct 2025 15:04:49 +0800</lastBuildDate><atom:link href="https://jianlin-li.github.io/index.xml" rel="self" type="application/rss+xml" />
     <item>
+      <title>Go语言的知识点</title>
+      <link>https://jianlin-li.github.io/post/go_review_1/</link>
+      <pubDate>Thu, 30 Oct 2025 15:04:49 +0800</pubDate>
+      
+      <guid>https://jianlin-li.github.io/post/go_review_1/</guid>
+      <description>
+        
+          
+            &lt;h1 id=&#34;基本类型介绍&#34;&gt;基本类型介绍&lt;/h1&gt;
+&lt;p&gt;Golang 更明确的数字类型命名，支持 Unicode，支持常用数据结构。&lt;/p&gt;
+&lt;table&gt;
+  &lt;thead&gt;
+      &lt;tr&gt;
+          &lt;th style=&#34;text-align: left&#34;&gt;类型&lt;/th&gt;
+          &lt;th style=&#34;text-align: left&#34;&gt;长度(字节)&lt;/th&gt;
+          &lt;th style=&#34;text-align: left&#34;&gt;默认值&lt;/th&gt;
+          &lt;th style=&#34;text-align: left&#34;&gt;说明&lt;/th&gt;
+      &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;bool&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;1&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;false&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;byte&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;1&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;0&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;uint8&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;rune&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;4&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;0&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;Unicode Code Point, int32&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;int, uint&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;4或8&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;0&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;32 或 64 位&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;int8, uint8&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;1&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;0&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;-128 ~ 127, 0 ~ 255，byte是uint8 的别名&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;int16, uint16&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;2&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;0&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;-32768 ~ 32767, 0 ~ 65535&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;int32, uint32&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;4&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;0&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;-21亿~ 21亿, 0 ~ 42亿，rune是int32 的别名&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;int64, uint64&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;8&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;0&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;float32&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;4&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;0.0&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;float64&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;8&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;0.0&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;complex64&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;8&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;complex128&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;16&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;uintptr&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;4或8&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;以存储指针的 uint32 或 uint64 整数&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;array&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;值类型&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;struct&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;值类型&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;string&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;“”&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;UTF-8 字符串&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;slice&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;nil&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;引用类型&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;map&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;nil&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;引用类型&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;channel&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;nil&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;引用类型&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;interface&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;nil&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;接口&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;function&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;nil&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;函数&lt;/td&gt;
+      &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;支持八进制、 六进制，以及科学记数法。标准库 math 定义了各数字类型取值范围。&lt;/p&gt;
+          
+          
+        
+      </description>
+    </item>
+    
+    <item>
       <title>Go语言的知识点--GOPATH和Go Modules</title>
       <link>https://jianlin-li.github.io/post/go_review/</link>
       <pubDate>Thu, 30 Oct 2025 15:04:49 +0800</pubDate>
