@@ -168,7 +168,7 @@
     <span class="post_date">
       2025-10-30	  
     </span>
-    <span class="post_time"> · 38 分钟阅读</span><span>&nbsp;· <a href='https://jianlin-li.github.io/tags/go/' title="Go" class="post_tag button button_translucent">Go
+    <span class="post_time"> · 40 分钟阅读</span><span>&nbsp;· <a href='https://jianlin-li.github.io/tags/go/' title="Go" class="post_tag button button_translucent">Go
         </a>
     </span>
     <span class="page_only">&nbsp;·
@@ -4074,6 +4074,289 @@ Method Expression = “这个类型的方法”（普通函数）</strong></p>
 周期性任务它最牛，context 控制更风流。”</strong></p>
 </blockquote>
 <p>只要记住 <strong>创建必 Stop，退出靠 defer</strong>，你就能安全高效地使用 <code>time.Ticker</code>！</p>
+<hr>
+<hr>
+<hr>
+<h1 id="在-go-语言中scanner-是标准库-bufio-包提供的一个高效易用的文本扫描器主要用于从输入流如文件标准输入字符串等中按行或按-token-读取数据它特别适合处理逐行读取大文件解析日志读取用户输入等场景">在 Go 语言中，<code>Scanner</code> 是标准库 <code>bufio</code> 包提供的一个<strong>高效、易用的文本扫描器</strong>，主要用于<strong>从输入流（如文件、标准输入、字符串等）中按行或按 token 读取数据</strong>。它特别适合处理<strong>逐行读取大文件、解析日志、读取用户输入</strong>等场景。</h1>
+<hr>
+<h2 id="一核心类型bufioscanner">一、核心类型：<code>bufio.Scanner</code></h2>
+<h3 id="-基本特点">✅ 基本特点：</h3>
+<ul>
+<li><strong>自动缓冲</strong>：内部使用缓冲区，减少系统调用</li>
+<li><strong>按“token”分割</strong>：默认按行（<code>\n</code>）分割，也可自定义分隔符</li>
+<li><strong>内存安全</strong>：自动处理大行（但有默认上限）</li>
+<li><strong>简单 API</strong>：只需 <code>Scan()</code> + <code>Text()</code> / <code>Bytes()</code></li>
+</ul>
+<hr>
+<h2 id="二基本用法逐行读取">二、基本用法：逐行读取</h2>
+<h3 id="示例-1从标准输入读取">示例 1：从标准输入读取</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="kn">package</span><span class="w"> </span><span class="nx">main</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="w"></span><span class="kn">import</span><span class="w"> </span><span class="p">(</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="w">	</span><span class="s">&#34;bufio&#34;</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="w">	</span><span class="s">&#34;fmt&#34;</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 6</span><span class="cl"><span class="w">	</span><span class="s">&#34;os&#34;</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="w"></span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="ln"> 9</span><span class="cl"><span class="w"></span><span class="kd">func</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="w">	</span><span class="nx">scanner</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">bufio</span><span class="p">.</span><span class="nf">NewScanner</span><span class="p">(</span><span class="nx">os</span><span class="p">.</span><span class="nx">Stdin</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="ln">11</span><span class="cl"><span class="w">	</span><span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;Enter lines (type &#39;quit&#39; to exit):&#34;</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="ln">12</span><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="ln">13</span><span class="cl"><span class="w">	</span><span class="k">for</span><span class="w"> </span><span class="nx">scanner</span><span class="p">.</span><span class="nf">Scan</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="ln">14</span><span class="cl"><span class="w">		</span><span class="nx">line</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">scanner</span><span class="p">.</span><span class="nf">Text</span><span class="p">()</span><span class="w">
+</span></span></span><span class="line"><span class="ln">15</span><span class="cl"><span class="w">		</span><span class="k">if</span><span class="w"> </span><span class="nx">line</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s">&#34;quit&#34;</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="ln">16</span><span class="cl"><span class="w">			</span><span class="k">break</span><span class="w">
+</span></span></span><span class="line"><span class="ln">17</span><span class="cl"><span class="w">		</span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="ln">18</span><span class="cl"><span class="w">		</span><span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;You entered:&#34;</span><span class="p">,</span><span class="w"> </span><span class="nx">line</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="ln">19</span><span class="cl"><span class="w">	</span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="ln">20</span><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="ln">21</span><span class="cl"><span class="w">	</span><span class="k">if</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">scanner</span><span class="p">.</span><span class="nf">Err</span><span class="p">();</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">nil</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="ln">22</span><span class="cl"><span class="w">		</span><span class="nx">fmt</span><span class="p">.</span><span class="nf">Fprintln</span><span class="p">(</span><span class="nx">os</span><span class="p">.</span><span class="nx">Stderr</span><span class="p">,</span><span class="w"> </span><span class="s">&#34;Reading error:&#34;</span><span class="p">,</span><span class="w"> </span><span class="nx">err</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="ln">23</span><span class="cl"><span class="w">	</span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="ln">24</span><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></div><h3 id="示例-2读取文件">示例 2：读取文件</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="nx">file</span><span class="p">,</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">os</span><span class="p">.</span><span class="nf">Open</span><span class="p">(</span><span class="s">&#34;data.txt&#34;</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="w"></span><span class="k">if</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">nil</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="w">	</span><span class="nx">log</span><span class="p">.</span><span class="nf">Fatal</span><span class="p">(</span><span class="nx">err</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="w"></span><span class="k">defer</span><span class="w"> </span><span class="nx">file</span><span class="p">.</span><span class="nf">Close</span><span class="p">()</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 6</span><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="w"></span><span class="nx">scanner</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">bufio</span><span class="p">.</span><span class="nf">NewScanner</span><span class="p">(</span><span class="nx">file</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="w"></span><span class="k">for</span><span class="w"> </span><span class="nx">scanner</span><span class="p">.</span><span class="nf">Scan</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 9</span><span class="cl"><span class="w">	</span><span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="nx">scanner</span><span class="p">.</span><span class="nf">Text</span><span class="p">())</span><span class="w">
+</span></span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="ln">11</span><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="ln">12</span><span class="cl"><span class="w"></span><span class="k">if</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">scanner</span><span class="p">.</span><span class="nf">Err</span><span class="p">();</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">nil</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="ln">13</span><span class="cl"><span class="w">	</span><span class="nx">log</span><span class="p">.</span><span class="nf">Fatal</span><span class="p">(</span><span class="s">&#34;Scan error:&#34;</span><span class="p">,</span><span class="w"> </span><span class="nx">err</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="ln">14</span><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></div><blockquote>
+<p>🔑 <strong>关键步骤</strong>：</p>
+<ol>
+<li>创建 <code>Scanner</code></li>
+<li>循环调用 <code>Scan()</code>（返回 <code>false</code> 表示 EOF 或出错）</li>
+<li>用 <code>Text()</code> 获取当前行（字符串）或 <code>Bytes()</code>（字节切片）</li>
+<li>最后检查 <code>Err()</code> 是否有错误</li>
+</ol>
+</blockquote>
+<hr>
+<h2 id="三scanner-的工作原理">三、Scanner 的工作原理</h2>
+<h3 id="扫描流程">扫描流程：</h3>
+<ol>
+<li>调用 <code>Scan()</code> → 尝试读取下一个 token</li>
+<li>如果成功：
+<ul>
+<li>内部缓存该 token</li>
+<li>返回 <code>true</code></li>
+</ul>
+</li>
+<li>如果遇到 EOF：
+<ul>
+<li>返回 <code>false</code>，且 <code>Err()</code> 返回 <code>nil</code></li>
+</ul>
+</li>
+<li>如果发生 I/O 错误：
+<ul>
+<li>返回 <code>false</code>，且 <code>Err()</code> 返回具体错误</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h2 id="四自定义分隔符splitfunc">四、自定义分隔符（SplitFunc）</h2>
+<p>默认按行分割（<code>\n</code>），但可通过 <code>Scanner.Split()</code> 改变行为。</p>
+<h3 id="常见-splitfunc">常见 SplitFunc：</h3>
+<table>
+  <thead>
+      <tr>
+          <th>函数</th>
+          <th>说明</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>bufio.ScanLines</code></td>
+          <td>按行（默认）</td>
+      </tr>
+      <tr>
+          <td><code>bufio.ScanWords</code></td>
+          <td>按空白字符分割单词</td>
+      </tr>
+      <tr>
+          <td><code>bufio.ScanRunes</code></td>
+          <td>按 Unicode 字符（rune）</td>
+      </tr>
+      <tr>
+          <td><code>bufio.ScanBytes</code></td>
+          <td>按单个字节</td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="示例按单词读取">示例：按单词读取</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="ln">1</span><span class="cl"><span class="nx">scanner</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">bufio</span><span class="p">.</span><span class="nf">NewScanner</span><span class="p">(</span><span class="nx">strings</span><span class="p">.</span><span class="nf">NewReader</span><span class="p">(</span><span class="s">&#34;Go is awesome!&#34;</span><span class="p">))</span><span class="w">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="w"></span><span class="nx">scanner</span><span class="p">.</span><span class="nf">Split</span><span class="p">(</span><span class="nx">bufio</span><span class="p">.</span><span class="nx">ScanWords</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="w"></span><span class="k">for</span><span class="w"> </span><span class="nx">scanner</span><span class="p">.</span><span class="nf">Scan</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="w">	</span><span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="nx">scanner</span><span class="p">.</span><span class="nf">Text</span><span class="p">())</span><span class="w"> </span><span class="c1">// 输出: Go \n is \n awesome!</span><span class="w">
+</span></span></span><span class="line"><span class="ln">6</span><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></div><h3 id="自定义-splitfunc高级">自定义 SplitFunc（高级）</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="c1">// 按分号 ; 分割</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="w"></span><span class="nx">scanner</span><span class="p">.</span><span class="nf">Split</span><span class="p">(</span><span class="kd">func</span><span class="p">(</span><span class="nx">data</span><span class="w"> </span><span class="p">[]</span><span class="kt">byte</span><span class="p">,</span><span class="w"> </span><span class="nx">atEOF</span><span class="w"> </span><span class="kt">bool</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="nx">advance</span><span class="w"> </span><span class="kt">int</span><span class="p">,</span><span class="w"> </span><span class="nx">token</span><span class="w"> </span><span class="p">[]</span><span class="kt">byte</span><span class="p">,</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="kt">error</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="w">	</span><span class="k">if</span><span class="w"> </span><span class="nx">i</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">bytes</span><span class="p">.</span><span class="nf">IndexByte</span><span class="p">(</span><span class="nx">data</span><span class="p">,</span><span class="w"> </span><span class="sc">&#39;;&#39;</span><span class="p">);</span><span class="w"> </span><span class="nx">i</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="w">		</span><span class="k">return</span><span class="w"> </span><span class="nx">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="nx">data</span><span class="p">[:</span><span class="nx">i</span><span class="p">],</span><span class="w"> </span><span class="kc">nil</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="w">	</span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 6</span><span class="cl"><span class="w">	</span><span class="k">if</span><span class="w"> </span><span class="nx">atEOF</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">len</span><span class="p">(</span><span class="nx">data</span><span class="p">)</span><span class="w"> </span><span class="p">&gt;</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="w">		</span><span class="k">return</span><span class="w"> </span><span class="nb">len</span><span class="p">(</span><span class="nx">data</span><span class="p">),</span><span class="w"> </span><span class="nx">data</span><span class="p">,</span><span class="w"> </span><span class="kc">nil</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="w">	</span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 9</span><span class="cl"><span class="w">	</span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="kc">nil</span><span class="p">,</span><span class="w"> </span><span class="kc">nil</span><span class="w">
+</span></span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="w"></span><span class="p">})</span><span class="w">
+</span></span></span></code></pre></div><hr>
+<h2 id="五处理大行超过-64kb">五、处理大行（超过 64KB）</h2>
+<h3 id="-默认限制">⚠️ 默认限制：</h3>
+<ul>
+<li><code>Scanner</code> 默认最大 token 大小为 <strong>64KB</strong></li>
+<li>超过会报错：<code>bufio.Scanner: token too long</code></li>
+</ul>
+<h3 id="-解决方案增大缓冲区">✅ 解决方案：增大缓冲区</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="ln">1</span><span class="cl"><span class="nx">scanner</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">bufio</span><span class="p">.</span><span class="nf">NewScanner</span><span class="p">(</span><span class="nx">file</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="w"></span><span class="nx">buf</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nb">make</span><span class="p">([]</span><span class="kt">byte</span><span class="p">,</span><span class="w"> </span><span class="mi">1024</span><span class="o">*</span><span class="mi">1024</span><span class="p">)</span><span class="w"> </span><span class="c1">// 1MB buffer</span><span class="w">
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="w"></span><span class="nx">scanner</span><span class="p">.</span><span class="nf">Buffer</span><span class="p">(</span><span class="nx">buf</span><span class="p">,</span><span class="w"> </span><span class="mi">1024</span><span class="o">*</span><span class="mi">1024</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="w"></span><span class="k">for</span><span class="w"> </span><span class="nx">scanner</span><span class="p">.</span><span class="nf">Scan</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="ln">6</span><span class="cl"><span class="w">	</span><span class="c1">// 可处理长达 1MB 的行</span><span class="w">
+</span></span></span><span class="line"><span class="ln">7</span><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></div><blockquote>
+<p>📌 <code>Buffer(buf, max)</code>：</p>
+<ul>
+<li><code>buf</code>：初始缓冲区（可复用）</li>
+<li><code>max</code>：最大 token 长度</li>
+</ul>
+</blockquote>
+<hr>
+<h2 id="六scanner-vs-其他读取方式">六、Scanner vs 其他读取方式</h2>
+<table>
+  <thead>
+      <tr>
+          <th>方式</th>
+          <th>适用场景</th>
+          <th>优点</th>
+          <th>缺点</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>bufio.Scanner</code></td>
+          <td><strong>按行/词读取文本</strong></td>
+          <td>简单、高效、内存安全</td>
+          <td>不能处理超大 token（需配置）、不支持回退</td>
+      </tr>
+      <tr>
+          <td><code>bufio.Reader.ReadLine</code></td>
+          <td>需要原始行控制</td>
+          <td>可获取是否截断</td>
+          <td>API 繁琐</td>
+      </tr>
+      <tr>
+          <td><code>io.ReadAll</code></td>
+          <td>一次性读完整个文件</td>
+          <td>简单</td>
+          <td>内存占用高，不适合大文件</td>
+      </tr>
+      <tr>
+          <td><code>os.ReadFile</code></td>
+          <td>小文件全读入内存</td>
+          <td>极简</td>
+          <td>同上</td>
+      </tr>
+  </tbody>
+</table>
+<blockquote>
+<p>✅ <strong>推荐</strong>：<br>
+<strong>90% 的文本行读取场景，优先用 <code>Scanner</code></strong></p>
+</blockquote>
+<hr>
+<h2 id="七常见陷阱与最佳实践">七、常见陷阱与最佳实践</h2>
+<h3 id="-陷阱-1忽略-scannererr">❌ 陷阱 1：忽略 <code>scanner.Err()</code></h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="ln">1</span><span class="cl"><span class="c1">// 错误：只检查 Scan() 返回值</span><span class="w">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="w"></span><span class="k">for</span><span class="w"> </span><span class="nx">scanner</span><span class="p">.</span><span class="nf">Scan</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="w">	</span><span class="c1">// ...</span><span class="w">
+</span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="w"></span><span class="c1">// 如果中间出错，这里无法感知！</span><span class="w">
+</span></span></span></code></pre></div><p>✅ 正确：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="ln">1</span><span class="cl"><span class="k">for</span><span class="w"> </span><span class="nx">scanner</span><span class="p">.</span><span class="nf">Scan</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="w">	</span><span class="c1">// process</span><span class="w">
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="w"></span><span class="k">if</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">scanner</span><span class="p">.</span><span class="nf">Err</span><span class="p">();</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">nil</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="w">	</span><span class="nx">log</span><span class="p">.</span><span class="nf">Fatal</span><span class="p">(</span><span class="nx">err</span><span class="p">)</span><span class="w"> </span><span class="c1">// 必须检查！</span><span class="w">
+</span></span></span><span class="line"><span class="ln">6</span><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></div><hr>
+<h3 id="-陷阱-2在循环中重用-text-返回值">❌ 陷阱 2：在循环中重用 <code>Text()</code> 返回值</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="ln">1</span><span class="cl"><span class="kd">var</span><span class="w"> </span><span class="nx">lines</span><span class="w"> </span><span class="p">[][]</span><span class="kt">byte</span><span class="w">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="w"></span><span class="k">for</span><span class="w"> </span><span class="nx">scanner</span><span class="p">.</span><span class="nf">Scan</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="w">	</span><span class="nx">lines</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nb">append</span><span class="p">(</span><span class="nx">lines</span><span class="p">,</span><span class="w"> </span><span class="nx">scanner</span><span class="p">.</span><span class="nf">Bytes</span><span class="p">())</span><span class="w"> </span><span class="c1">// ❌ 危险！底层 buffer 会被覆盖</span><span class="w">
+</span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></div><p>✅ 正确（需要拷贝）：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="ln">1</span><span class="cl"><span class="k">for</span><span class="w"> </span><span class="nx">scanner</span><span class="p">.</span><span class="nf">Scan</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="w">	</span><span class="nx">buf</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nb">make</span><span class="p">([]</span><span class="kt">byte</span><span class="p">,</span><span class="w"> </span><span class="nb">len</span><span class="p">(</span><span class="nx">scanner</span><span class="p">.</span><span class="nf">Bytes</span><span class="p">()))</span><span class="w">
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="w">	</span><span class="nb">copy</span><span class="p">(</span><span class="nx">buf</span><span class="p">,</span><span class="w"> </span><span class="nx">scanner</span><span class="p">.</span><span class="nf">Bytes</span><span class="p">())</span><span class="w">
+</span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="w">	</span><span class="nx">lines</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nb">append</span><span class="p">(</span><span class="nx">lines</span><span class="p">,</span><span class="w"> </span><span class="nx">buf</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="ln">6</span><span class="cl"><span class="w"></span><span class="c1">// 或直接用 Text() + 存 string（string 在 Go 中不可变，安全）</span><span class="w">
+</span></span></span><span class="line"><span class="ln">7</span><span class="cl"><span class="w"></span><span class="nx">lines</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nb">append</span><span class="p">(</span><span class="nx">lines</span><span class="p">,</span><span class="w"> </span><span class="nx">scanner</span><span class="p">.</span><span class="nf">Text</span><span class="p">())</span><span class="w"> </span><span class="c1">// ✅ 安全</span><span class="w">
+</span></span></span></code></pre></div><blockquote>
+<p>💡 <strong>规则</strong>：<br>
+<code>scanner.Bytes()</code> 返回的是<strong>内部 buffer 的切片</strong>，下次 <code>Scan()</code> 会覆盖！<br>
+如需保留，必须 <code>copy</code> 或转为 <code>string</code>。</p>
+</blockquote>
+<hr>
+<h3 id="-最佳实践总结-2">✅ 最佳实践总结</h3>
+<ol>
+<li><strong>总是检查 <code>scanner.Err()</code></strong></li>
+<li><strong>处理大行时调用 <code>Buffer()</code> 设置足够大小</strong></li>
+<li><strong>不要存储 <code>Bytes()</code> 的引用，要拷贝或转 string</strong></li>
+<li><strong>优先用 <code>Text()</code> 而非 <code>Bytes()</code>（除非需要原始字节）</strong></li>
+<li><strong>文件记得 <code>defer file.Close()</code></strong></li>
+</ol>
+<hr>
+<h2 id="八真实应用场景">八、真实应用场景</h2>
+<table>
+  <thead>
+      <tr>
+          <th>场景</th>
+          <th>代码要点</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><strong>日志分析</strong></td>
+          <td><code>Scanner</code> + <code>ScanLines</code> 逐行解析</td>
+      </tr>
+      <tr>
+          <td><strong>CSV 简易解析</strong></td>
+          <td>按行读，再用 <code>strings.Split</code></td>
+      </tr>
+      <tr>
+          <td><strong>命令行交互</strong></td>
+          <td><code>Scanner</code> 读 <code>os.Stdin</code></td>
+      </tr>
+      <tr>
+          <td><strong>配置文件加载</strong></td>
+          <td>读 key=value 行</td>
+      </tr>
+      <tr>
+          <td><strong>网络流解析</strong></td>
+          <td>从 <code>net.Conn</code> 包装 <code>bufio.Reader</code></td>
+      </tr>
+  </tbody>
+</table>
+<hr>
+<h2 id="-总结-4">✅ 总结</h2>
+<blockquote>
+<p><strong><code>bufio.Scanner</code> 是 Go 中读取文本流的首选工具</strong> —— 简单、高效、安全。</p>
+</blockquote>
+<p>记住三步口诀：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="ln">1</span><span class="cl"><span class="nx">scanner</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">bufio</span><span class="p">.</span><span class="nf">NewScanner</span><span class="p">(</span><span class="nx">input</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="w"></span><span class="k">for</span><span class="w"> </span><span class="nx">scanner</span><span class="p">.</span><span class="nf">Scan</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="cm">/* process scanner.Text() */</span><span class="w"> </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="w"></span><span class="k">if</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">scanner</span><span class="p">.</span><span class="nf">Err</span><span class="p">();</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">nil</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="cm">/* handle error */</span><span class="w"> </span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></div><p>合理使用 <code>Split()</code> 和 <code>Buffer()</code>，你就能轻松应对各种文本解析任务！</p>
 
     </div><div class="post_comments">
   
