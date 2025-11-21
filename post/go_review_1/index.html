@@ -168,7 +168,7 @@
     <span class="post_date">
       2025-10-30	  
     </span>
-    <span class="post_time"> · 40 分钟阅读</span><span>&nbsp;· <a href='https://jianlin-li.github.io/tags/go/' title="Go" class="post_tag button button_translucent">Go
+    <span class="post_time"> · 43 分钟阅读</span><span>&nbsp;· <a href='https://jianlin-li.github.io/tags/go/' title="Go" class="post_tag button button_translucent">Go
         </a>
     </span>
     <span class="page_only">&nbsp;·
@@ -4357,6 +4357,274 @@ Method Expression = “这个类型的方法”（普通函数）</strong></p>
 </span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="w"></span><span class="k">for</span><span class="w"> </span><span class="nx">scanner</span><span class="p">.</span><span class="nf">Scan</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="cm">/* process scanner.Text() */</span><span class="w"> </span><span class="p">}</span><span class="w">
 </span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="w"></span><span class="k">if</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">scanner</span><span class="p">.</span><span class="nf">Err</span><span class="p">();</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">nil</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="cm">/* handle error */</span><span class="w"> </span><span class="p">}</span><span class="w">
 </span></span></span></code></pre></div><p>合理使用 <code>Split()</code> 和 <code>Buffer()</code>，你就能轻松应对各种文本解析任务！</p>
+<hr>
+<hr>
+<hr>
+<h1 id="在-go-语言中strconvstring-convert包是标准库中用于在字符串与基本数据类型之间高效安全地相互转换的核心工具它提供了比-fmt-包更轻量更可控的转换方式广泛应用于解析配置处理用户输入序列化反序列化等场景">在 Go 语言中，<code>strconv</code>（string convert）包是标准库中用于<strong>在字符串与基本数据类型之间高效、安全地相互转换</strong>的核心工具。它提供了比 <code>fmt</code> 包更轻量、更可控的转换方式，广泛应用于解析配置、处理用户输入、序列化/反序列化等场景。</h1>
+<hr>
+<h2 id="一核心功能分类">一、核心功能分类</h2>
+<p><code>strconv</code> 包的函数主要分为两大类：</p>
+<table>
+  <thead>
+      <tr>
+          <th>类别</th>
+          <th>功能</th>
+          <th>典型函数</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><strong>字符串 → 基本类型</strong></td>
+          <td>解析（Parse）</td>
+          <td><code>ParseInt</code>, <code>ParseUint</code>, <code>ParseFloat</code>, <code>ParseBool</code></td>
+      </tr>
+      <tr>
+          <td><strong>基本类型 → 字符串</strong></td>
+          <td>格式化（Format / Append）</td>
+          <td><code>FormatInt</code>, <code>FormatFloat</code>, <code>FormatBool</code>, <code>AppendInt</code>, <code>AppendFloat</code> 等</td>
+      </tr>
+  </tbody>
+</table>
+<blockquote>
+<p>✅ 所有函数都<strong>显式返回 error</strong>，避免 panic，适合健壮性要求高的程序。</p>
+</blockquote>
+<hr>
+<h2 id="二字符串--基本类型parse-系列">二、字符串 → 基本类型（Parse 系列）</h2>
+<h3 id="1-parseints-string-base-int-bitsize-int-i-int64-err-error">1. <code>ParseInt(s string, base int, bitSize int) (i int64, err error)</code></h3>
+<ul>
+<li>将字符串解析为 <strong>有符号整数</strong></li>
+<li><code>base</code>：进制（2~36），0 表示自动识别（如 <code>0x</code> → 16，<code>0</code> → 8）</li>
+<li><code>bitSize</code>：结果位宽（0, 8, 16, 32, 64），用于溢出检查</li>
+</ul>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="ln">1</span><span class="cl"><span class="nx">n</span><span class="p">,</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">strconv</span><span class="p">.</span><span class="nf">ParseInt</span><span class="p">(</span><span class="s">&#34;42&#34;</span><span class="p">,</span><span class="w"> </span><span class="mi">10</span><span class="p">,</span><span class="w"> </span><span class="mi">64</span><span class="p">)</span><span class="w">      </span><span class="c1">// n = 42</span><span class="w">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="w"></span><span class="nx">n</span><span class="p">,</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nx">strconv</span><span class="p">.</span><span class="nf">ParseInt</span><span class="p">(</span><span class="s">&#34;-0xFF&#34;</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">64</span><span class="p">)</span><span class="w">    </span><span class="c1">// n = -255（自动识别十六进制）</span><span class="w">
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="w"></span><span class="nx">n</span><span class="p">,</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nx">strconv</span><span class="p">.</span><span class="nf">ParseInt</span><span class="p">(</span><span class="s">&#34;100&#34;</span><span class="p">,</span><span class="w"> </span><span class="mi">10</span><span class="p">,</span><span class="w"> </span><span class="mi">8</span><span class="p">)</span><span class="w">      </span><span class="c1">// err: value out of range（int8 最大 127）</span><span class="w">
+</span></span></span></code></pre></div><h3 id="2-parseuints-string-base-int-bitsize-int-uint64-error">2. <code>ParseUint(s string, base int, bitSize int) (uint64, error)</code></h3>
+<ul>
+<li>解析为 <strong>无符号整数</strong></li>
+<li>不接受负号</li>
+</ul>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="ln">1</span><span class="cl"><span class="nx">n</span><span class="p">,</span><span class="w"> </span><span class="nx">_</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">strconv</span><span class="p">.</span><span class="nf">ParseUint</span><span class="p">(</span><span class="s">&#34;255&#34;</span><span class="p">,</span><span class="w"> </span><span class="mi">10</span><span class="p">,</span><span class="w"> </span><span class="mi">8</span><span class="p">)</span><span class="w">      </span><span class="c1">// ok</span><span class="w">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="w"></span><span class="nx">n</span><span class="p">,</span><span class="w"> </span><span class="nx">_</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">strconv</span><span class="p">.</span><span class="nf">ParseUint</span><span class="p">(</span><span class="s">&#34;FF&#34;</span><span class="p">,</span><span class="w"> </span><span class="mi">16</span><span class="p">,</span><span class="w"> </span><span class="mi">64</span><span class="p">)</span><span class="w">      </span><span class="c1">// n = 255</span><span class="w">
+</span></span></span></code></pre></div><h3 id="3-parsefloats-string-bitsize-int-float64-error">3. <code>ParseFloat(s string, bitSize int) (float64, error)</code></h3>
+<ul>
+<li>解析浮点数</li>
+<li><code>bitSize</code>：32 或 64（结果会转为 float64，但会检查是否超出 float32 范围）</li>
+</ul>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="ln">1</span><span class="cl"><span class="nx">f</span><span class="p">,</span><span class="w"> </span><span class="nx">_</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">strconv</span><span class="p">.</span><span class="nf">ParseFloat</span><span class="p">(</span><span class="s">&#34;3.1415&#34;</span><span class="p">,</span><span class="w"> </span><span class="mi">64</span><span class="p">)</span><span class="w">     </span><span class="c1">// f = 3.1415</span><span class="w">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="w"></span><span class="nx">f</span><span class="p">,</span><span class="w"> </span><span class="nx">_</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">strconv</span><span class="p">.</span><span class="nf">ParseFloat</span><span class="p">(</span><span class="s">&#34;1e5&#34;</span><span class="p">,</span><span class="w"> </span><span class="mi">64</span><span class="p">)</span><span class="w">        </span><span class="c1">// f = 100000</span><span class="w">
+</span></span></span></code></pre></div><h3 id="4-parseboolstr-string-bool-error">4. <code>ParseBool(str string) (bool, error)</code></h3>
+<ul>
+<li>严格解析布尔值</li>
+<li><strong>只接受</strong>：<code>&quot;true&quot;</code>, <code>&quot;false&quot;</code>（不区分大小写）</li>
+</ul>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="ln">1</span><span class="cl"><span class="nx">b</span><span class="p">,</span><span class="w"> </span><span class="nx">_</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">strconv</span><span class="p">.</span><span class="nf">ParseBool</span><span class="p">(</span><span class="s">&#34;TRUE&#34;</span><span class="p">)</span><span class="w">   </span><span class="c1">// true</span><span class="w">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="w"></span><span class="nx">b</span><span class="p">,</span><span class="w"> </span><span class="nx">_</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">strconv</span><span class="p">.</span><span class="nf">ParseBool</span><span class="p">(</span><span class="s">&#34;1&#34;</span><span class="p">)</span><span class="w">      </span><span class="c1">// error!（不像某些语言）</span><span class="w">
+</span></span></span></code></pre></div><blockquote>
+<p>⚠️ 注意：<code>&quot;1&quot;</code>、<code>&quot;yes&quot;</code>、<code>&quot;on&quot;</code> 等<strong>不会被识别为 true</strong></p>
+</blockquote>
+<hr>
+<h2 id="三基本类型--字符串format-系列">三、基本类型 → 字符串（Format 系列）</h2>
+<h3 id="1-formatinti-int64-base-int-string">1. <code>FormatInt(i int64, base int) string</code></h3>
+<ul>
+<li>整数转字符串</li>
+<li><code>base</code>：2~36</li>
+</ul>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="ln">1</span><span class="cl"><span class="nx">s</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">strconv</span><span class="p">.</span><span class="nf">FormatInt</span><span class="p">(</span><span class="mi">42</span><span class="p">,</span><span class="w"> </span><span class="mi">10</span><span class="p">)</span><span class="w">       </span><span class="c1">// &#34;42&#34;</span><span class="w">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="w"></span><span class="nx">s</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nx">strconv</span><span class="p">.</span><span class="nf">FormatInt</span><span class="p">(</span><span class="mi">255</span><span class="p">,</span><span class="w"> </span><span class="mi">16</span><span class="p">)</span><span class="w">       </span><span class="c1">// &#34;ff&#34;</span><span class="w">
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="w"></span><span class="nx">s</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nx">strconv</span><span class="p">.</span><span class="nf">FormatInt</span><span class="p">(</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span><span class="w">        </span><span class="c1">// &#34;-1010&#34;</span><span class="w">
+</span></span></span></code></pre></div><h3 id="2-formatuinti-uint64-base-int-string">2. <code>FormatUint(i uint64, base int) string</code></h3>
+<ul>
+<li>无符号整数转字符串</li>
+</ul>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="ln">1</span><span class="cl"><span class="nx">s</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">strconv</span><span class="p">.</span><span class="nf">FormatUint</span><span class="p">(</span><span class="mi">255</span><span class="p">,</span><span class="w"> </span><span class="mi">16</span><span class="p">)</span><span class="w">     </span><span class="c1">// &#34;ff&#34;</span><span class="w">
+</span></span></span></code></pre></div><h3 id="3-formatfloatf-float64-fmt-byte-prec-bitsize-int-string">3. <code>FormatFloat(f float64, fmt byte, prec, bitSize int) string</code></h3>
+<ul>
+<li>浮点数转字符串</li>
+<li><code>fmt</code>：格式标记（<code>'f'</code>, <code>'e'</code>, <code>'g'</code>, <code>'E'</code>, <code>'G'</code>）</li>
+<li><code>prec</code>：精度（-1 表示最短无损表示）</li>
+<li><code>bitSize</code>：32 或 64（影响舍入）</li>
+</ul>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="ln">1</span><span class="cl"><span class="nx">s</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">strconv</span><span class="p">.</span><span class="nf">FormatFloat</span><span class="p">(</span><span class="mf">3.14159</span><span class="p">,</span><span class="w"> </span><span class="sc">&#39;f&#39;</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">64</span><span class="p">)</span><span class="w">   </span><span class="c1">// &#34;3.14&#34;</span><span class="w">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="w"></span><span class="nx">s</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nx">strconv</span><span class="p">.</span><span class="nf">FormatFloat</span><span class="p">(</span><span class="mf">123456.0</span><span class="p">,</span><span class="w"> </span><span class="sc">&#39;e&#39;</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="mi">64</span><span class="p">)</span><span class="w">   </span><span class="c1">// &#34;1.235e+05&#34;</span><span class="w">
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="w"></span><span class="nx">s</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nx">strconv</span><span class="p">.</span><span class="nf">FormatFloat</span><span class="p">(</span><span class="mf">1.23</span><span class="p">,</span><span class="w"> </span><span class="sc">&#39;g&#39;</span><span class="p">,</span><span class="w"> </span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">64</span><span class="p">)</span><span class="w">      </span><span class="c1">// &#34;1.23&#34;（最短表示）</span><span class="w">
+</span></span></span></code></pre></div><h3 id="4-formatboolb-bool-string">4. <code>FormatBool(b bool) string</code></h3>
+<ul>
+<li>布尔值转字符串</li>
+</ul>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="ln">1</span><span class="cl"><span class="nx">s</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">strconv</span><span class="p">.</span><span class="nf">FormatBool</span><span class="p">(</span><span class="kc">true</span><span class="p">)</span><span class="w">  </span><span class="c1">// &#34;true&#34;</span><span class="w">
+</span></span></span></code></pre></div><hr>
+<h2 id="四高性能追加append-系列">四、高性能追加（Append 系列）✅</h2>
+<blockquote>
+<p>这些函数将结果<strong>直接追加到 <code>[]byte</code> 末尾</strong>，避免中间字符串分配，<strong>零 GC 压力</strong>。</p>
+</blockquote>
+<table>
+  <thead>
+      <tr>
+          <th>函数</th>
+          <th>说明</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>AppendInt(dst []byte, i int64, base int) []byte</code></td>
+          <td>追加整数</td>
+      </tr>
+      <tr>
+          <td><code>AppendUint(dst []byte, i uint64, base int) []byte</code></td>
+          <td>追加无符号整数</td>
+      </tr>
+      <tr>
+          <td><code>AppendFloat(dst []byte, f float64, fmt byte, prec, bitSize int) []byte</code></td>
+          <td>追加浮点数</td>
+      </tr>
+      <tr>
+          <td><code>AppendBool(dst []byte, b bool) []byte</code></td>
+          <td>追加布尔值</td>
+      </tr>
+      <tr>
+          <td><code>AppendQuote(dst []byte, s string) []byte</code></td>
+          <td>追加带引号和转义的字符串</td>
+      </tr>
+  </tbody>
+</table>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="ln">1</span><span class="cl"><span class="nx">buf</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nb">make</span><span class="p">([]</span><span class="kt">byte</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">32</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="w"></span><span class="nx">buf</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nb">append</span><span class="p">(</span><span class="nx">buf</span><span class="p">,</span><span class="w"> </span><span class="s">&#34;ID=&#34;</span><span class="o">...</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="w"></span><span class="nx">buf</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nx">strconv</span><span class="p">.</span><span class="nf">AppendInt</span><span class="p">(</span><span class="nx">buf</span><span class="p">,</span><span class="w"> </span><span class="mi">123</span><span class="p">,</span><span class="w"> </span><span class="mi">10</span><span class="p">)</span><span class="w">        </span><span class="c1">// buf = []byte(&#34;ID=123&#34;)</span><span class="w">
+</span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="w"></span><span class="nx">buf</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nx">strconv</span><span class="p">.</span><span class="nf">AppendQuote</span><span class="p">(</span><span class="nx">buf</span><span class="p">,</span><span class="w"> </span><span class="s">&#34;hello\n&#34;</span><span class="p">)</span><span class="w">    </span><span class="c1">// buf = []byte(&#34;ID=123\&#34;hello\\n\&#34;&#34;)</span><span class="w">
+</span></span></span></code></pre></div><blockquote>
+<p>🌟 <strong>适用场景</strong>：日志库、JSON 序列化、网络协议组装等高频操作。</p>
+</blockquote>
+<hr>
+<h2 id="五其他实用函数">五、其他实用函数</h2>
+<h3 id="1-atois-string-int-error">1. <code>Atoi(s string) (int, error)</code></h3>
+<ul>
+<li>快捷函数：<code>ParseInt(s, 10, 0)</code> 的封装（返回 <code>int</code>）</li>
+<li>名字来自 C 语言 &quot;ASCII to integer&quot;</li>
+</ul>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="ln">1</span><span class="cl"><span class="nx">n</span><span class="p">,</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">strconv</span><span class="p">.</span><span class="nf">Atoi</span><span class="p">(</span><span class="s">&#34;42&#34;</span><span class="p">)</span><span class="w">  </span><span class="c1">// n = 42 (int)</span><span class="w">
+</span></span></span></code></pre></div><h3 id="2-itoai-int-string">2. <code>Itoa(i int) string</code></h3>
+<ul>
+<li>快捷函数：<code>FormatInt(int64(i), 10)</code> 的封装</li>
+</ul>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="ln">1</span><span class="cl"><span class="nx">s</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">strconv</span><span class="p">.</span><span class="nf">Itoa</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span><span class="w">  </span><span class="c1">// &#34;42&#34;</span><span class="w">
+</span></span></span></code></pre></div><blockquote>
+<p>💡 提示：<code>Atoi</code> / <code>Itoa</code> 是最常用的整数转换快捷方式。</p>
+</blockquote>
+<hr>
+<h2 id="六错误处理">六、错误处理</h2>
+<p>所有 Parse 函数在失败时返回非 nil error，常见错误：</p>
+<table>
+  <thead>
+      <tr>
+          <th>错误类型</th>
+          <th>触发条件</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>strconv.NumError</code></td>
+          <td>数字格式错误、溢出</td>
+      </tr>
+      <tr>
+          <td><code>syntax error</code></td>
+          <td>非法字符（如 <code>&quot;12abc&quot;</code>）</td>
+      </tr>
+      <tr>
+          <td><code>value out of range</code></td>
+          <td>超出目标类型范围</td>
+      </tr>
+  </tbody>
+</table>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="ln">1</span><span class="cl"><span class="k">if</span><span class="w"> </span><span class="nx">_</span><span class="p">,</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">strconv</span><span class="p">.</span><span class="nf">ParseInt</span><span class="p">(</span><span class="s">&#34;999999999999999999999&#34;</span><span class="p">,</span><span class="w"> </span><span class="mi">10</span><span class="p">,</span><span class="w"> </span><span class="mi">64</span><span class="p">);</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">nil</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="nx">numErr</span><span class="p">,</span><span class="w"> </span><span class="nx">ok</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">err</span><span class="p">.(</span><span class="o">*</span><span class="nx">strconv</span><span class="p">.</span><span class="nx">NumError</span><span class="p">);</span><span class="w"> </span><span class="nx">ok</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="w">        </span><span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;Func:&#34;</span><span class="p">,</span><span class="w"> </span><span class="nx">numErr</span><span class="p">.</span><span class="nx">Func</span><span class="p">)</span><span class="w">   </span><span class="c1">// &#34;ParseInt&#34;</span><span class="w">
+</span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="w">        </span><span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;Value:&#34;</span><span class="p">,</span><span class="w"> </span><span class="nx">numErr</span><span class="p">.</span><span class="nx">Num</span><span class="p">)</span><span class="w">   </span><span class="c1">// &#34;999999999999999999999&#34;</span><span class="w">
+</span></span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="w">        </span><span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;Err:&#34;</span><span class="p">,</span><span class="w"> </span><span class="nx">numErr</span><span class="p">.</span><span class="nx">Err</span><span class="p">)</span><span class="w">     </span><span class="c1">// &#34;value out of range&#34;</span><span class="w">
+</span></span></span><span class="line"><span class="ln">6</span><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="ln">7</span><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></div><hr>
+<h2 id="七strconv-vs-fmt">七、strconv vs fmt</h2>
+<table>
+  <thead>
+      <tr>
+          <th>特性</th>
+          <th><code>strconv</code></th>
+          <th><code>fmt</code></th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><strong>性能</strong></td>
+          <td>⚡ 极高（无反射、无接口）</td>
+          <td>较低（使用 interface{} 和反射）</td>
+      </tr>
+      <tr>
+          <td><strong>控制粒度</strong></td>
+          <td>精细（进制、精度、位宽）</td>
+          <td>通过格式字符串（<code>%d</code>, <code>%f</code>）</td>
+      </tr>
+      <tr>
+          <td><strong>内存分配</strong></td>
+          <td>Format 有分配，Append 可零分配</td>
+          <td>总是分配新字符串</td>
+      </tr>
+      <tr>
+          <td><strong>适用场景</strong></td>
+          <td>高频转换、底层库</td>
+          <td>通用格式化、调试输出</td>
+      </tr>
+  </tbody>
+</table>
+<blockquote>
+<p>✅ <strong>建议</strong>：</p>
+<ul>
+<li><strong>解析/生成结构化数据</strong>（如 JSON、协议）→ 用 <code>strconv</code></li>
+<li><strong>调试打印、简单格式</strong> → 用 <code>fmt.Sprintf</code></li>
+</ul>
+</blockquote>
+<hr>
+<h2 id="八最佳实践总结">八、最佳实践总结</h2>
+<ol>
+<li><strong>优先使用 <code>strconv</code> 而非 <code>fmt.Sscanf</code> / <code>fmt.Sprintf</code> 进行类型转换</strong></li>
+<li><strong>高频路径使用 <code>Append</code> 系列减少 GC</strong></li>
+<li><strong>始终检查 error，不要忽略</strong></li>
+<li><strong>整数转换常用 <code>Atoi</code> / <code>Itoa</code> 快捷函数</strong></li>
+<li><strong>注意进制和位宽参数，避免溢出</strong></li>
+</ol>
+<hr>
+<h2 id="-终极速查表">✅ 终极速查表</h2>
+<table>
+  <thead>
+      <tr>
+          <th>转换方向</th>
+          <th>推荐函数</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>string → int</code></td>
+          <td><code>strconv.Atoi</code> 或 <code>ParseInt(..., 10, 0)</code></td>
+      </tr>
+      <tr>
+          <td><code>int → string</code></td>
+          <td><code>strconv.Itoa</code> 或 <code>FormatInt(..., 10)</code></td>
+      </tr>
+      <tr>
+          <td><code>string → float64</code></td>
+          <td><code>strconv.ParseFloat(s, 64)</code></td>
+      </tr>
+      <tr>
+          <td><code>float64 → string</code></td>
+          <td><code>strconv.FormatFloat(f, 'g', -1, 64)</code></td>
+      </tr>
+      <tr>
+          <td>`高性能拼接**</td>
+          <td><code>strconv.AppendInt(buf, x, 10)</code></td>
+      </tr>
+  </tbody>
+</table>
+<p>掌握 <code>strconv</code> 包，你就能写出<strong>高效、安全、专业级</strong>的 Go 数据转换代码！</p>
 
     </div><div class="post_comments">
   
