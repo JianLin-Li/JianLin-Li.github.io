@@ -2,18 +2,18 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Hosts on 浩瀚天空</title>
-    <link>/tags/hosts/</link>
+    <link>https://jianlin-li.github.io/tags/hosts/</link>
     <description>Recent content in Hosts on 浩瀚天空</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
     <copyright>Copyright © 1989–2025, 李建林 </copyright>
-    <lastBuildDate>Thu, 30 Oct 2025 11:42:37 +0800</lastBuildDate><atom:link href="/tags/hosts/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Thu, 30 Oct 2025 11:42:37 +0800</lastBuildDate><atom:link href="https://jianlin-li.github.io/tags/hosts/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>本地hosts的开发环境备份</title>
-      <link>/post/local_hosts_bak/</link>
+      <link>https://jianlin-li.github.io/post/local_hosts_bak/</link>
       <pubDate>Thu, 30 Oct 2025 11:42:37 +0800</pubDate>
       
-      <guid>/post/local_hosts_bak/</guid>
+      <guid>https://jianlin-li.github.io/post/local_hosts_bak/</guid>
       <description>
         
           

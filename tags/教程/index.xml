@@ -2,18 +2,18 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>教程 on 浩瀚天空</title>
-    <link>/tags/%E6%95%99%E7%A8%8B/</link>
+    <link>https://jianlin-li.github.io/tags/%E6%95%99%E7%A8%8B/</link>
     <description>Recent content in 教程 on 浩瀚天空</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
     <copyright>Copyright © 1989–2025, 李建林 </copyright>
-    <lastBuildDate>Wed, 29 Oct 2025 18:42:29 +0800</lastBuildDate><atom:link href="/tags/%E6%95%99%E7%A8%8B/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Wed, 29 Oct 2025 18:42:29 +0800</lastBuildDate><atom:link href="https://jianlin-li.github.io/tags/%E6%95%99%E7%A8%8B/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Hugo的有关简易教程</title>
-      <link>/post/course/</link>
+      <link>https://jianlin-li.github.io/post/course/</link>
       <pubDate>Wed, 29 Oct 2025 18:42:29 +0800</pubDate>
       
-      <guid>/post/course/</guid>
+      <guid>https://jianlin-li.github.io/post/course/</guid>
       <description>
         
           
@@ -88,7 +88,7 @@ as long as it is not inside another &lt;strong&gt;leaf&lt;/strong&gt; bundle.&lt
         
         
         
-        &lt;source srcset=&#34;/post/course/building.webp&#34; type=&#34;image/webp&#34;&gt;
+        &lt;source srcset=&#34;https://jianlin-li.github.io/post/course/building.webp&#34; type=&#34;image/webp&#34;&gt;
         
         
     &lt;img
@@ -99,7 +99,7 @@ as long as it is not inside another &lt;strong&gt;leaf&lt;/strong&gt; bundle.&lt
         class=&#34;image_figure image_internal image_processed&#34;
         width=&#34;200&#34;
         height=&#34;200&#34;
-        src=&#34;/post/course/building.png&#34;
+        src=&#34;https://jianlin-li.github.io/post/course/building.png&#34;
       
       
     /&gt;
