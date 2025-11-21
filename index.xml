@@ -2,18 +2,18 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>浩瀚天空</title>
-    <link>https://jianlin-li.github.io/</link>
+    <link>/</link>
     <description>Recent content on 浩瀚天空</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
     <copyright>Copyright © 1989–2025, 李建林 </copyright>
-    <lastBuildDate>Thu, 30 Oct 2025 15:04:49 +0800</lastBuildDate><atom:link href="https://jianlin-li.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Thu, 30 Oct 2025 15:04:49 +0800</lastBuildDate><atom:link href="/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Go语言的知识点</title>
-      <link>https://jianlin-li.github.io/post/go_review_1/</link>
+      <link>/post/go_review_1/</link>
       <pubDate>Thu, 30 Oct 2025 15:04:49 +0800</pubDate>
       
-      <guid>https://jianlin-li.github.io/post/go_review_1/</guid>
+      <guid>/post/go_review_1/</guid>
       <description>
         
           
@@ -166,10 +166,10 @@
     
     <item>
       <title>Go语言的知识点--GOPATH和Go Modules</title>
-      <link>https://jianlin-li.github.io/post/go_review/</link>
+      <link>/post/go_review/</link>
       <pubDate>Thu, 30 Oct 2025 15:04:49 +0800</pubDate>
       
-      <guid>https://jianlin-li.github.io/post/go_review/</guid>
+      <guid>/post/go_review/</guid>
       <description>
         
           
@@ -224,10 +224,10 @@
     
     <item>
       <title>本地环境相关配置信息</title>
-      <link>https://jianlin-li.github.io/post/local_enviroment_info/</link>
+      <link>/post/local_enviroment_info/</link>
       <pubDate>Thu, 30 Oct 2025 12:15:27 +0800</pubDate>
       
-      <guid>https://jianlin-li.github.io/post/local_enviroment_info/</guid>
+      <guid>/post/local_enviroment_info/</guid>
       <description>
         
           
@@ -317,10 +317,10 @@
     
     <item>
       <title>本地hosts的开发环境备份</title>
-      <link>https://jianlin-li.github.io/post/local_hosts_bak/</link>
+      <link>/post/local_hosts_bak/</link>
       <pubDate>Thu, 30 Oct 2025 11:42:37 +0800</pubDate>
       
-      <guid>https://jianlin-li.github.io/post/local_hosts_bak/</guid>
+      <guid>/post/local_hosts_bak/</guid>
       <description>
         
           
@@ -395,10 +395,10 @@
     
     <item>
       <title>罗茜公司相关脚本解决方案</title>
-      <link>https://jianlin-li.github.io/post/luoxi/</link>
+      <link>/post/luoxi/</link>
       <pubDate>Thu, 30 Oct 2025 08:50:12 +0800</pubDate>
       
-      <guid>https://jianlin-li.github.io/post/luoxi/</guid>
+      <guid>/post/luoxi/</guid>
       <description>
         
           
@@ -997,10 +997,10 @@
     
     <item>
       <title>Hugo的有关简易教程</title>
-      <link>https://jianlin-li.github.io/post/course/</link>
+      <link>/post/course/</link>
       <pubDate>Wed, 29 Oct 2025 18:42:29 +0800</pubDate>
       
-      <guid>https://jianlin-li.github.io/post/course/</guid>
+      <guid>/post/course/</guid>
       <description>
         
           
@@ -1075,7 +1075,7 @@ as long as it is not inside another &lt;strong&gt;leaf&lt;/strong&gt; bundle.&lt
         
         
         
-        &lt;source srcset=&#34;https://jianlin-li.github.io/post/course/building.webp&#34; type=&#34;image/webp&#34;&gt;
+        &lt;source srcset=&#34;/post/course/building.webp&#34; type=&#34;image/webp&#34;&gt;
         
         
     &lt;img
@@ -1086,7 +1086,7 @@ as long as it is not inside another &lt;strong&gt;leaf&lt;/strong&gt; bundle.&lt
         class=&#34;image_figure image_internal image_processed&#34;
         width=&#34;200&#34;
         height=&#34;200&#34;
-        src=&#34;https://jianlin-li.github.io/post/course/building.png&#34;
+        src=&#34;/post/course/building.png&#34;
       
       
     /&gt;
