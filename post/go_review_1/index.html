@@ -168,7 +168,7 @@
     <span class="post_date">
       2025-10-30	  
     </span>
-    <span class="post_time"> · 47 分钟阅读</span><span>&nbsp;· <a href='https://jianlin-li.github.io/tags/go/' title="Go" class="post_tag button button_translucent">Go
+    <span class="post_time"> · 48 分钟阅读</span><span>&nbsp;· <a href='https://jianlin-li.github.io/tags/go/' title="Go" class="post_tag button button_translucent">Go
         </a>
     </span>
     <span class="page_only">&nbsp;·
@@ -5129,6 +5129,169 @@ Method Expression = “这个类型的方法”（普通函数）</strong></p>
   </tbody>
 </table>
 <p>掌握 Go 的 <code>template</code>，你就能高效、安全地生成任何结构化文本！</p>
+<hr>
+<hr>
+<hr>
+<h1 id="在-go-语言的-texttemplate-和-htmltemplate-包中模板里的--是一个非常核心的概念它代表-当前上下文current-context-或-当前数据对象current-data-value">在 Go 语言的 <code>text/template</code> 和 <code>html/template</code> 包中，模板里的 <strong><code>.</code>（点号）</strong> 是一个非常核心的概念，它代表 <strong>当前上下文（current context）</strong> 或 <strong>当前数据对象（current data value）</strong>。</h1>
+<hr>
+<h2 id="一-的基本含义">一、<code>.</code> 的基本含义</h2>
+<blockquote>
+<p><strong><code>.</code> 表示传给模板的“根数据”或当前作用域中的“当前值”</strong></p>
+</blockquote>
+<p>当你调用：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="ln">1</span><span class="cl"><span class="nx">t</span><span class="p">.</span><span class="nf">Execute</span><span class="p">(</span><span class="nx">os</span><span class="p">.</span><span class="nx">Stdout</span><span class="p">,</span><span class="w"> </span><span class="nx">data</span><span class="p">)</span><span class="w">
+</span></span></span></code></pre></div><p>那么在模板顶层，<code>.</code> 就等于 <code>data</code>。</p>
+<hr>
+<h2 id="二具体场景详解">二、具体场景详解</h2>
+<h3 id="场景-1顶层字段访问">场景 1：顶层字段访问</h3>
+<p>假设数据是一个 struct：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="ln">1</span><span class="cl"><span class="kd">type</span><span class="w"> </span><span class="nx">User</span><span class="w"> </span><span class="kd">struct</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="w">    </span><span class="nx">Name</span><span class="w">  </span><span class="kt">string</span><span class="w">
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="w">    </span><span class="nx">Email</span><span class="w"> </span><span class="kt">string</span><span class="w">
+</span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="w"></span><span class="nx">data</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">User</span><span class="p">{</span><span class="nx">Name</span><span class="p">:</span><span class="w"> </span><span class="s">&#34;Alice&#34;</span><span class="p">,</span><span class="w"> </span><span class="nx">Email</span><span class="p">:</span><span class="w"> </span><span class="s">&#34;alice@example.com&#34;</span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></div><p>模板：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="ln">1</span><span class="cl"><span class="nx">Name</span><span class="p">:</span><span class="w"> </span><span class="p">{{.</span><span class="nx">Name</span><span class="p">}}</span><span class="w">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="w"></span><span class="nx">Email</span><span class="p">:</span><span class="w"> </span><span class="p">{{.</span><span class="nx">Email</span><span class="p">}}</span><span class="w">
+</span></span></span></code></pre></div><ul>
+<li>这里的 <code>.</code> 就是 <code>data</code>（即 <code>User</code> 实例）</li>
+<li><code>{{.Name}}</code> 等价于 <code>data.Name</code></li>
+</ul>
+<hr>
+<h3 id="场景-2嵌套结构">场景 2：嵌套结构</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="ln">1</span><span class="cl"><span class="kd">type</span><span class="w"> </span><span class="nx">Profile</span><span class="w"> </span><span class="kd">struct</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="w">    </span><span class="nx">City</span><span class="w"> </span><span class="kt">string</span><span class="w">
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="w"></span><span class="kd">type</span><span class="w"> </span><span class="nx">User</span><span class="w"> </span><span class="kd">struct</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="w">    </span><span class="nx">Name</span><span class="w">    </span><span class="kt">string</span><span class="w">
+</span></span></span><span class="line"><span class="ln">6</span><span class="cl"><span class="w">    </span><span class="nx">Profile</span><span class="w"> </span><span class="nx">Profile</span><span class="w">
+</span></span></span><span class="line"><span class="ln">7</span><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></div><p>模板：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="ln">1</span><span class="cl"><span class="nx">City</span><span class="p">:</span><span class="w"> </span><span class="p">{{.</span><span class="nx">Profile</span><span class="p">.</span><span class="nx">City</span><span class="p">}}</span><span class="w">
+</span></span></span></code></pre></div><ul>
+<li><code>.</code> → <code>User</code></li>
+<li><code>.Profile</code> → <code>Profile{City: &quot;...&quot;}</code></li>
+<li><code>.Profile.City</code> → 字符串</li>
+</ul>
+<hr>
+<h3 id="场景-3在-range-循环中-会改变">场景 3：在 <code>range</code> 循环中，<code>.</code> 会改变！</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="ln">1</span><span class="cl"><span class="nx">data</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="p">[]</span><span class="kt">string</span><span class="p">{</span><span class="s">&#34;apple&#34;</span><span class="p">,</span><span class="w"> </span><span class="s">&#34;banana&#34;</span><span class="p">,</span><span class="w"> </span><span class="s">&#34;cherry&#34;</span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></div><p>模板：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="ln">1</span><span class="cl"><span class="p">{{</span><span class="k">range</span><span class="w"> </span><span class="p">.}}</span><span class="w">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="w"></span><span class="o">-</span><span class="w"> </span><span class="nx">Item</span><span class="p">:</span><span class="w"> </span><span class="p">{{.}}</span><span class="w">
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="w"></span><span class="p">{{</span><span class="nx">end</span><span class="p">}}</span><span class="w">
+</span></span></span></code></pre></div><p>输出：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="ln">1</span><span class="cl">- Item: apple
+</span></span><span class="line"><span class="ln">2</span><span class="cl">- Item: banana
+</span></span><span class="line"><span class="ln">3</span><span class="cl">- Item: cherry
+</span></span></code></pre></div><p>✅ 解释：</p>
+<ul>
+<li>外层 <code>.</code> 是整个 slice</li>
+<li>在 <code>{{range .}}</code> 内部，<code>.</code> <strong>自动变为当前遍历的元素</strong>
+<ul>
+<li>第一次循环：<code>.</code> = <code>&quot;apple&quot;</code></li>
+<li>第二次：<code>.</code> = <code>&quot;banana&quot;</code></li>
+<li>以此类推</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>🔁 <strong><code>range</code> 会改变当前上下文（<code>.</code> 的值）</strong></p>
+</blockquote>
+<hr>
+<h3 id="场景-4在-range-中访问外层数据使用-">场景 4：在 <code>range</code> 中访问外层数据（使用 <code>$</code>）</h3>
+<p>如果想在循环中同时访问<strong>当前元素</strong>和<strong>外层字段</strong>，需要用 <strong><code>$</code> 表示根上下文</strong>：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="ln">1</span><span class="cl"><span class="kd">type</span><span class="w"> </span><span class="nx">Page</span><span class="w"> </span><span class="kd">struct</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="w">    </span><span class="nx">Title</span><span class="w"> </span><span class="kt">string</span><span class="w">
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="w">    </span><span class="nx">Items</span><span class="w"> </span><span class="p">[]</span><span class="kt">string</span><span class="w">
+</span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="w"></span><span class="nx">data</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">Page</span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="ln">6</span><span class="cl"><span class="w">    </span><span class="nx">Title</span><span class="p">:</span><span class="w"> </span><span class="s">&#34;Fruits&#34;</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="ln">7</span><span class="cl"><span class="w">    </span><span class="nx">Items</span><span class="p">:</span><span class="w"> </span><span class="p">[]</span><span class="kt">string</span><span class="p">{</span><span class="s">&#34;apple&#34;</span><span class="p">,</span><span class="w"> </span><span class="s">&#34;banana&#34;</span><span class="p">},</span><span class="w">
+</span></span></span><span class="line"><span class="ln">8</span><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></div><p>模板：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="ln">1</span><span class="cl"><span class="p">&lt;</span><span class="nx">h1</span><span class="p">&gt;{{</span><span class="err">$</span><span class="p">.</span><span class="nx">Title</span><span class="p">}}&lt;</span><span class="o">/</span><span class="nx">h1</span><span class="p">&gt;</span><span class="w">  </span><span class="p">&lt;!</span><span class="o">--</span><span class="w"> </span><span class="err">$</span><span class="w"> </span><span class="nx">指向根</span><span class="w"> </span><span class="nx">data</span><span class="w"> </span><span class="o">--</span><span class="p">&gt;</span><span class="w">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="w"></span><span class="p">&lt;</span><span class="nx">ul</span><span class="p">&gt;</span><span class="w">
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="w"></span><span class="p">{{</span><span class="k">range</span><span class="w"> </span><span class="p">.</span><span class="nx">Items</span><span class="p">}}</span><span class="w">
+</span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="w">  </span><span class="p">&lt;</span><span class="nx">li</span><span class="p">&gt;{{</span><span class="err">$</span><span class="p">.</span><span class="nx">Title</span><span class="p">}}:</span><span class="w"> </span><span class="p">{{.}}&lt;</span><span class="o">/</span><span class="nx">li</span><span class="p">&gt;</span><span class="w">  </span><span class="p">&lt;!</span><span class="o">--</span><span class="w"> </span><span class="p">.</span><span class="w"> </span><span class="nx">是当前</span><span class="w"> </span><span class="nx">item</span><span class="err">，$</span><span class="p">.</span><span class="nx">Title</span><span class="w"> </span><span class="nx">是外层标题</span><span class="w"> </span><span class="o">--</span><span class="p">&gt;</span><span class="w">
+</span></span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="w"></span><span class="p">{{</span><span class="nx">end</span><span class="p">}}</span><span class="w">
+</span></span></span><span class="line"><span class="ln">6</span><span class="cl"><span class="w"></span><span class="p">&lt;</span><span class="o">/</span><span class="nx">ul</span><span class="p">&gt;</span><span class="w">
+</span></span></span></code></pre></div><p>输出：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-html" data-lang="html"><span class="line"><span class="ln">1</span><span class="cl"><span class="p">&lt;</span><span class="nt">h1</span><span class="p">&gt;</span>Fruits<span class="p">&lt;/</span><span class="nt">h1</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="p">&lt;</span><span class="nt">ul</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="ln">3</span><span class="cl">  <span class="p">&lt;</span><span class="nt">li</span><span class="p">&gt;</span>Fruits: apple<span class="p">&lt;/</span><span class="nt">li</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="ln">4</span><span class="cl">  <span class="p">&lt;</span><span class="nt">li</span><span class="p">&gt;</span>Fruits: banana<span class="p">&lt;/</span><span class="nt">li</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="p">&lt;/</span><span class="nt">ul</span><span class="p">&gt;</span>
+</span></span></code></pre></div><blockquote>
+<p>✅ <strong><code>$</code> 始终指向模板执行时传入的根数据对象</strong></p>
+</blockquote>
+<hr>
+<h3 id="场景-5在-with-块中-也会改变">场景 5：在 <code>with</code> 块中，<code>.</code> 也会改变</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="ln">1</span><span class="cl"><span class="p">{{</span><span class="nx">with</span><span class="w"> </span><span class="p">.</span><span class="nx">Profile</span><span class="p">}}</span><span class="w">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="w">  </span><span class="nx">City</span><span class="p">:</span><span class="w"> </span><span class="p">{{.</span><span class="nx">City</span><span class="p">}}</span><span class="w">     </span><span class="p">&lt;!</span><span class="o">--</span><span class="w"> </span><span class="p">.</span><span class="w"> </span><span class="nx">现在是</span><span class="w"> </span><span class="p">.</span><span class="nx">Profile</span><span class="w"> </span><span class="o">--</span><span class="p">&gt;</span><span class="w">
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="w">  </span><span class="nx">Country</span><span class="p">:</span><span class="w"> </span><span class="p">{{.</span><span class="nx">Country</span><span class="p">}}</span><span class="w">
+</span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="w"></span><span class="p">{{</span><span class="nx">end</span><span class="p">}}</span><span class="w">
+</span></span></span></code></pre></div><ul>
+<li><code>with</code> 会将 <code>.</code> 设置为 <code>{{with .Profile}}</code> 中的 <code>.Profile</code></li>
+<li>如果 <code>.Profile</code> 为 nil 或 zero value，整个块不执行</li>
+</ul>
+<hr>
+<h2 id="三总结-的行为规则">三、总结：<code>.</code> 的行为规则</h2>
+<table>
+  <thead>
+      <tr>
+          <th>上下文</th>
+          <th><code>.</code> 的值</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><strong>模板顶层</strong></td>
+          <td>传给 <code>Execute()</code> 的整个数据对象</td>
+      </tr>
+      <tr>
+          <td><strong><code>{{range .Field}}</code> 内部</strong></td>
+          <td>当前遍历的元素</td>
+      </tr>
+      <tr>
+          <td><strong><code>{{with .Field}}</code> 内部</strong></td>
+          <td><code>.Field</code> 的值</td>
+      </tr>
+      <tr>
+          <td><strong>任何地方使用 <code>$.Field</code></strong></td>
+          <td>始终是根数据对象的字段（<code>$</code> = 根）</td>
+      </tr>
+  </tbody>
+</table>
+<hr>
+<h2 id="四记忆口诀">四、记忆口诀</h2>
+<blockquote>
+<p><strong>“点随境转，美元不变”</strong></p>
+<ul>
+<li><code>.</code> 会随着 <code>range</code>、<code>with</code> 改变上下文</li>
+<li><code>$</code> 永远指向最初传入的数据根对象</li>
+</ul>
+</blockquote>
+<hr>
+<h2 id="五常见错误示例">五、常见错误示例</h2>
+<h3 id="-错误在-range-中直接访问外层字段">❌ 错误：在 range 中直接访问外层字段</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="ln">1</span><span class="cl"><span class="c1">// 数据: {Title: &#34;List&#34;, Items: [1,2,3]}</span><span class="w">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="w"></span><span class="p">{{</span><span class="k">range</span><span class="w"> </span><span class="p">.</span><span class="nx">Items</span><span class="p">}}</span><span class="w">
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="w"></span><span class="p">{{.</span><span class="nx">Title</span><span class="p">}}:</span><span class="w"> </span><span class="p">{{.}}</span><span class="w">   </span><span class="p">&lt;!</span><span class="o">--</span><span class="w"> </span><span class="nx">错</span><span class="err">！</span><span class="nx">此时</span><span class="w"> </span><span class="p">.</span><span class="w"> </span><span class="nx">是数字</span><span class="err">，</span><span class="nx">没有</span><span class="w"> </span><span class="nx">Title</span><span class="w"> </span><span class="nx">字段</span><span class="w"> </span><span class="o">--</span><span class="p">&gt;</span><span class="w">
+</span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="w"></span><span class="p">{{</span><span class="nx">end</span><span class="p">}}</span><span class="w">
+</span></span></span></code></pre></div><h3 id="-正确用--访问外层">✅ 正确：用 <code>$</code> 访问外层</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="ln">1</span><span class="cl"><span class="p">{{</span><span class="k">range</span><span class="w"> </span><span class="p">.</span><span class="nx">Items</span><span class="p">}}</span><span class="w">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="w"></span><span class="p">{{</span><span class="err">$</span><span class="p">.</span><span class="nx">Title</span><span class="p">}}:</span><span class="w"> </span><span class="p">{{.}}</span><span class="w">
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="w"></span><span class="p">{{</span><span class="nx">end</span><span class="p">}}</span><span class="w">
+</span></span></span></code></pre></div><hr>
+<h2 id="六扩展-也可以是-mapslice指针等">六、扩展：<code>.</code> 也可以是 map、slice、指针等</h2>
+<ul>
+<li>如果 data 是 <code>map[string]interface{}</code>，则 <code>{{.name}}</code> 访问 key <code>&quot;name&quot;</code></li>
+<li>如果是 <code>[]int</code>，顶层 <code>{{.}}</code> 输出整个 slice（但通常配合 <code>range</code> 使用）</li>
+<li>指针会自动解引用</li>
+</ul>
+<hr>
+<p>✅ <strong>掌握 <code>.</code> 和 <code>$</code>，你就掌握了 Go 模板上下文的核心！</strong></p>
 
     </div><div class="post_comments">
   
