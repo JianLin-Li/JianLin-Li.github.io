@@ -168,7 +168,7 @@
     <span class="post_date">
       2025-11-24	  
     </span>
-    <span class="post_time"> · 5 分钟阅读</span><span>&nbsp;· <a href='https://jianlin-li.github.io/tags/go/' title="Go" class="post_tag button button_translucent">Go
+    <span class="post_time"> · 8 分钟阅读</span><span>&nbsp;· <a href='https://jianlin-li.github.io/tags/go/' title="Go" class="post_tag button button_translucent">Go
         </a>
     </span>
     <span class="page_only">&nbsp;·
@@ -731,6 +731,225 @@
 <li>在高频日志、JSON 构造、模板渲染等场景，<code>Builder</code> 是首选。</li>
 </ul>
 <hr>
+<hr>
+<hr>
+<hr>
+<h1 id="在-go-语言中jsonnewdecoder-和-jsonnewencoder-是标准库-encodingjson-包提供的两个高效工具用于直接从-或向-它们特别适合处理网络请求文件-io-或-http-接口中的-json-编解码">在 Go 语言中，<code>json.NewDecoder()</code> 和 <code>json.NewEncoder()</code> 是标准库 <code>encoding/json</code> 包提供的两个高效工具，用于<strong>直接从 <code>io.Reader</code> 流式读取 JSON 数据</strong>或<strong>向 <code>io.Writer</code> 流式写入 JSON 数据</strong>。它们特别适合处理网络请求、文件 I/O 或 HTTP 接口中的 JSON 编解码。</h1>
+<hr>
+<h2 id="-一核心概念对比">🧩 一、核心概念对比</h2>
+<table>
+  <thead>
+      <tr>
+          <th>方法</th>
+          <th>用途</th>
+          <th>输入/输出</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>json.NewDecoder(r io.Reader)</code></td>
+          <td><strong>解码（反序列化）JSON</strong></td>
+          <td>从 <code>io.Reader</code>（如 <code>http.Response.Body</code>、<code>os.File</code>）读取并解析为 Go 结构体</td>
+      </tr>
+      <tr>
+          <td><code>json.NewEncoder(w io.Writer)</code></td>
+          <td><strong>编码（序列化）JSON</strong></td>
+          <td>将 Go 结构体写入 <code>io.Writer</code>（如 <code>http.ResponseWriter</code>、<code>os.File</code>）</td>
+      </tr>
+  </tbody>
+</table>
+<blockquote>
+<p>✅ 它们操作的是<strong>流（stream）</strong>，而不是整个字符串或字节切片，因此内存效率高，适合大 JSON 或持续数据流。</p>
+</blockquote>
+<hr>
+<h2 id="-二jsonnewdecoder--从流中读取-json">🔽 二、<code>json.NewDecoder</code> —— 从流中读取 JSON</h2>
+<h3 id="基本用法">基本用法</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="kd">type</span><span class="w"> </span><span class="nx">Person</span><span class="w"> </span><span class="kd">struct</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="w">    </span><span class="nx">Name</span><span class="w"> </span><span class="kt">string</span><span class="w"> </span><span class="s">`json:&#34;name&#34;`</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="w">    </span><span class="nx">Age</span><span class="w">  </span><span class="kt">int</span><span class="w">    </span><span class="s">`json:&#34;age&#34;`</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="ln"> 6</span><span class="cl"><span class="w"></span><span class="kd">func</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="w">    </span><span class="c1">// 模拟一个 io.Reader（比如 HTTP 响应体或文件）</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="w">    </span><span class="nx">r</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">strings</span><span class="p">.</span><span class="nf">NewReader</span><span class="p">(</span><span class="s">`{&#34;name&#34;: &#34;Alice&#34;, &#34;age&#34;: 30}`</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 9</span><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="w">    </span><span class="kd">var</span><span class="w"> </span><span class="nx">p</span><span class="w"> </span><span class="nx">Person</span><span class="w">
+</span></span></span><span class="line"><span class="ln">11</span><span class="cl"><span class="w">    </span><span class="nx">dec</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">json</span><span class="p">.</span><span class="nf">NewDecoder</span><span class="p">(</span><span class="nx">r</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="ln">12</span><span class="cl"><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">dec</span><span class="p">.</span><span class="nf">Decode</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">p</span><span class="p">);</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">nil</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="ln">13</span><span class="cl"><span class="w">        </span><span class="nx">log</span><span class="p">.</span><span class="nf">Fatal</span><span class="p">(</span><span class="nx">err</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="ln">14</span><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="ln">15</span><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="ln">16</span><span class="cl"><span class="w">    </span><span class="nx">fmt</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;Decoded: %+v\n&#34;</span><span class="p">,</span><span class="w"> </span><span class="nx">p</span><span class="p">)</span><span class="w"> </span><span class="c1">// Decoded: {Name:Alice Age:30}</span><span class="w">
+</span></span></span><span class="line"><span class="ln">17</span><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></div><h3 id="典型应用场景">典型应用场景</h3>
+<h4 id="1-解析-http-请求体服务端">1. 解析 HTTP 请求体（服务端）</h4>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="ln">1</span><span class="cl"><span class="kd">func</span><span class="w"> </span><span class="nf">handleUser</span><span class="p">(</span><span class="nx">w</span><span class="w"> </span><span class="nx">http</span><span class="p">.</span><span class="nx">ResponseWriter</span><span class="p">,</span><span class="w"> </span><span class="nx">r</span><span class="w"> </span><span class="o">*</span><span class="nx">http</span><span class="p">.</span><span class="nx">Request</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="w">    </span><span class="kd">var</span><span class="w"> </span><span class="nx">user</span><span class="w"> </span><span class="nx">User</span><span class="w">
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">json</span><span class="p">.</span><span class="nf">NewDecoder</span><span class="p">(</span><span class="nx">r</span><span class="p">.</span><span class="nx">Body</span><span class="p">).</span><span class="nf">Decode</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">user</span><span class="p">);</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">nil</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="w">        </span><span class="nx">http</span><span class="p">.</span><span class="nf">Error</span><span class="p">(</span><span class="nx">w</span><span class="p">,</span><span class="w"> </span><span class="s">&#34;Invalid JSON&#34;</span><span class="p">,</span><span class="w"> </span><span class="nx">http</span><span class="p">.</span><span class="nx">StatusBadRequest</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="w">        </span><span class="k">return</span><span class="w">
+</span></span></span><span class="line"><span class="ln">6</span><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="ln">7</span><span class="cl"><span class="w">    </span><span class="c1">// 处理 user...</span><span class="w">
+</span></span></span><span class="line"><span class="ln">8</span><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></div><h4 id="2-读取-json-文件">2. 读取 JSON 文件</h4>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="ln">1</span><span class="cl"><span class="nx">file</span><span class="p">,</span><span class="w"> </span><span class="nx">_</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">os</span><span class="p">.</span><span class="nf">Open</span><span class="p">(</span><span class="s">&#34;data.json&#34;</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="w"></span><span class="k">defer</span><span class="w"> </span><span class="nx">file</span><span class="p">.</span><span class="nf">Close</span><span class="p">()</span><span class="w">
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="w"></span><span class="kd">var</span><span class="w"> </span><span class="nx">config</span><span class="w"> </span><span class="nx">Config</span><span class="w">
+</span></span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="w"></span><span class="k">if</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">json</span><span class="p">.</span><span class="nf">NewDecoder</span><span class="p">(</span><span class="nx">file</span><span class="p">).</span><span class="nf">Decode</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">config</span><span class="p">);</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">nil</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="ln">6</span><span class="cl"><span class="w">    </span><span class="nx">log</span><span class="p">.</span><span class="nf">Fatal</span><span class="p">(</span><span class="nx">err</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="ln">7</span><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></div><blockquote>
+<p>💡 相比 <code>ioutil.ReadAll + json.Unmarshal</code>，<code>NewDecoder</code> 不需要一次性加载整个文件到内存，更省内存。</p>
+</blockquote>
+<hr>
+<h2 id="-三jsonnewencoder--向流中写入-json">🔼 三、<code>json.NewEncoder</code> —— 向流中写入 JSON</h2>
+<h3 id="基本用法-1">基本用法</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="kd">func</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="w">    </span><span class="kd">var</span><span class="w"> </span><span class="nx">buf</span><span class="w"> </span><span class="nx">bytes</span><span class="p">.</span><span class="nx">Buffer</span><span class="w"> </span><span class="c1">// 实现 io.Writer</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="w">    </span><span class="nx">p</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">Person</span><span class="p">{</span><span class="nx">Name</span><span class="p">:</span><span class="w"> </span><span class="s">&#34;Bob&#34;</span><span class="p">,</span><span class="w"> </span><span class="nx">Age</span><span class="p">:</span><span class="w"> </span><span class="mi">25</span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="w">    </span><span class="nx">enc</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">json</span><span class="p">.</span><span class="nf">NewEncoder</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">buf</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 6</span><span class="cl"><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">enc</span><span class="p">.</span><span class="nf">Encode</span><span class="p">(</span><span class="nx">p</span><span class="p">);</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">nil</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="w">        </span><span class="nx">log</span><span class="p">.</span><span class="nf">Fatal</span><span class="p">(</span><span class="nx">err</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 9</span><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="w">    </span><span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="nx">buf</span><span class="p">.</span><span class="nf">String</span><span class="p">())</span><span class="w"> </span><span class="c1">// {&#34;name&#34;:&#34;Bob&#34;,&#34;age&#34;:25}\n</span><span class="w">
+</span></span></span><span class="line"><span class="ln">11</span><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></div><blockquote>
+<p>⚠️ 注意：<code>Encode()</code> 会在 JSON 后自动添加换行符 <code>\n</code>（符合 JSON Lines 格式）。</p>
+</blockquote>
+<h3 id="典型应用场景-1">典型应用场景</h3>
+<h4 id="1-返回-json-响应http-服务端">1. 返回 JSON 响应（HTTP 服务端）</h4>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="ln">1</span><span class="cl"><span class="kd">func</span><span class="w"> </span><span class="nf">getUser</span><span class="p">(</span><span class="nx">w</span><span class="w"> </span><span class="nx">http</span><span class="p">.</span><span class="nx">ResponseWriter</span><span class="p">,</span><span class="w"> </span><span class="nx">r</span><span class="w"> </span><span class="o">*</span><span class="nx">http</span><span class="p">.</span><span class="nx">Request</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="w">    </span><span class="nx">user</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">User</span><span class="p">{</span><span class="nx">ID</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="nx">Name</span><span class="p">:</span><span class="w"> </span><span class="s">&#34;Charlie&#34;</span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="w">    </span><span class="nx">w</span><span class="p">.</span><span class="nf">Header</span><span class="p">().</span><span class="nf">Set</span><span class="p">(</span><span class="s">&#34;Content-Type&#34;</span><span class="p">,</span><span class="w"> </span><span class="s">&#34;application/json&#34;</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">json</span><span class="p">.</span><span class="nf">NewEncoder</span><span class="p">(</span><span class="nx">w</span><span class="p">).</span><span class="nf">Encode</span><span class="p">(</span><span class="nx">user</span><span class="p">);</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">nil</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="w">        </span><span class="nx">http</span><span class="p">.</span><span class="nf">Error</span><span class="p">(</span><span class="nx">w</span><span class="p">,</span><span class="w"> </span><span class="s">&#34;Server error&#34;</span><span class="p">,</span><span class="w"> </span><span class="nx">http</span><span class="p">.</span><span class="nx">StatusInternalServerError</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="ln">6</span><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="ln">7</span><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></div><h4 id="2-写入-json-文件">2. 写入 JSON 文件</h4>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="ln">1</span><span class="cl"><span class="nx">file</span><span class="p">,</span><span class="w"> </span><span class="nx">_</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">os</span><span class="p">.</span><span class="nf">Create</span><span class="p">(</span><span class="s">&#34;output.json&#34;</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="w"></span><span class="k">defer</span><span class="w"> </span><span class="nx">file</span><span class="p">.</span><span class="nf">Close</span><span class="p">()</span><span class="w">
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="w"></span><span class="nx">data</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="kt">int</span><span class="p">{</span><span class="s">&#34;count&#34;</span><span class="p">:</span><span class="w"> </span><span class="mi">42</span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="w"></span><span class="k">if</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">json</span><span class="p">.</span><span class="nf">NewEncoder</span><span class="p">(</span><span class="nx">file</span><span class="p">).</span><span class="nf">Encode</span><span class="p">(</span><span class="nx">data</span><span class="p">);</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">nil</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="ln">6</span><span class="cl"><span class="w">    </span><span class="nx">log</span><span class="p">.</span><span class="nf">Fatal</span><span class="p">(</span><span class="nx">err</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="ln">7</span><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></div><hr>
+<h2 id="-四流式处理多个-json-对象json-lines--ndjson">🔁 四、流式处理多个 JSON 对象（JSON Lines / NDJSON）</h2>
+<p><code>Decoder</code> 支持连续读取多个独立的 JSON 对象（每行一个），非常适合日志或批量数据：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="nx">input</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="s">`{&#34;name&#34;:&#34;A&#34;}
+</span></span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="s">{&#34;name&#34;:&#34;B&#34;}
+</span></span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="s">{&#34;name&#34;:&#34;C&#34;}`</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="w"></span><span class="nx">r</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">strings</span><span class="p">.</span><span class="nf">NewReader</span><span class="p">(</span><span class="nx">input</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 6</span><span class="cl"><span class="w"></span><span class="nx">dec</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">json</span><span class="p">.</span><span class="nf">NewDecoder</span><span class="p">(</span><span class="nx">r</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="w"></span><span class="kd">var</span><span class="w"> </span><span class="nx">person</span><span class="w"> </span><span class="nx">Person</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 9</span><span class="cl"><span class="w"></span><span class="k">for</span><span class="w"> </span><span class="nx">dec</span><span class="p">.</span><span class="nf">More</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="c1">// 可选：检查是否还有更多 token</span><span class="w">
+</span></span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">dec</span><span class="p">.</span><span class="nf">Decode</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">person</span><span class="p">);</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="nx">io</span><span class="p">.</span><span class="nx">EOF</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="ln">11</span><span class="cl"><span class="w">        </span><span class="k">break</span><span class="w">
+</span></span></span><span class="line"><span class="ln">12</span><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">nil</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="ln">13</span><span class="cl"><span class="w">        </span><span class="nx">log</span><span class="p">.</span><span class="nf">Fatal</span><span class="p">(</span><span class="nx">err</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="ln">14</span><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="ln">15</span><span class="cl"><span class="w">    </span><span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="nx">person</span><span class="p">.</span><span class="nx">Name</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="ln">16</span><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="ln">17</span><span class="cl"><span class="w"></span><span class="c1">// 输出: A B C</span><span class="w">
+</span></span></span></code></pre></div><blockquote>
+<p>这种格式称为 <strong>JSON Lines</strong> 或 <strong>NDJSON</strong>（Newline Delimited JSON）。</p>
+</blockquote>
+<hr>
+<h2 id="-五与-jsonmarshal--jsonunmarshal-对比">🆚 五、与 <code>json.Marshal</code> / <code>json.Unmarshal</code> 对比</h2>
+<table>
+  <thead>
+      <tr>
+          <th>方法</th>
+          <th>输入/输出</th>
+          <th>适用场景</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>json.Unmarshal([]byte, &amp;v)</code></td>
+          <td>字节切片 → Go 对象</td>
+          <td>已有完整 JSON 字符串/字节</td>
+      </tr>
+      <tr>
+          <td><code>json.Marshal(v)</code></td>
+          <td>Go 对象 → <code>[]byte</code></td>
+          <td>需要生成 JSON 字符串</td>
+      </tr>
+      <tr>
+          <td><code>json.NewDecoder(r).Decode(&amp;v)</code></td>
+          <td><code>io.Reader</code> → Go 对象</td>
+          <td><strong>流式读取</strong>（网络、文件）</td>
+      </tr>
+      <tr>
+          <td><code>json.NewEncoder(w).Encode(v)</code></td>
+          <td>Go 对象 → <code>io.Writer</code></td>
+          <td><strong>流式写入</strong>（响应、文件）</td>
+      </tr>
+  </tbody>
+</table>
+<p>✅ <strong>推荐原则</strong>：</p>
+<ul>
+<li>如果你已经有 <code>[]byte</code> 或 <code>string</code>，用 <code>Unmarshal</code>/<code>Marshal</code>。</li>
+<li>如果你在处理 <code>http.Request.Body</code>、<code>os.File</code>、<code>bytes.Buffer</code> 等 <strong>流式 I/O</strong>，用 <code>Decoder</code>/<code>Encoder</code>。</li>
+</ul>
+<hr>
+<h2 id="-六注意事项">⚠️ 六、注意事项</h2>
+<ol>
+<li>
+<p><strong>记得关闭 <code>io.ReadCloser</code></strong><br>
+如 <code>resp.Body</code>，使用后要 <code>defer resp.Body.Close()</code>。</p>
+</li>
+<li>
+<p><strong><code>Encode()</code> 自动加换行</strong><br>
+若不需要 <code>\n</code>，可改用 <code>json.Marshal</code> + <code>w.Write()</code>。</p>
+</li>
+<li>
+<p><strong>错误处理不可省略</strong><br>
+<code>Decode</code>/<code>Encode</code> 返回的 <code>error</code> 必须检查。</p>
+</li>
+<li>
+<p><strong>结构体字段需导出且带 tag</strong></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="ln">1</span><span class="cl"><span class="kd">type</span><span class="w"> </span><span class="nx">User</span><span class="w"> </span><span class="kd">struct</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="w">    </span><span class="nx">Name</span><span class="w"> </span><span class="kt">string</span><span class="w"> </span><span class="s">`json:&#34;name&#34;`</span><span class="w"> </span><span class="c1">// 必须大写 + json tag</span><span class="w">
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></div></li>
+</ol>
+<hr>
+<h2 id="-总结">✅ 总结</h2>
+<table>
+  <thead>
+      <tr>
+          <th>工具</th>
+          <th>优势</th>
+          <th>典型用途</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>json.NewDecoder</code></td>
+          <td>流式解析，省内存</td>
+          <td>HTTP 请求体、大 JSON 文件</td>
+      </tr>
+      <tr>
+          <td><code>json.NewEncoder</code></td>
+          <td>流式生成，高效写入</td>
+          <td>HTTP 响应、日志输出、配置保存</td>
+      </tr>
+  </tbody>
+</table>
+<p>它们是 Go 中处理 JSON I/O 的<strong>最佳实践</strong>，尤其在 Web 开发和系统编程中无处不在。</p>
+<hr>
+<p>如果你需要：</p>
+<ul>
+<li>自定义 JSON 编解码行为（实现 <code>json.Marshaler</code>/<code>Unmarshaler</code>）</li>
+<li>处理时间格式（如 RFC3339）</li>
+<li>忽略未知字段（<code>Decoder.DisallowUnknownFields()</code>）</li>
+</ul>
 
     </div><div class="post_comments">
   
