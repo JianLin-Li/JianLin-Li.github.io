@@ -168,7 +168,7 @@
     <span class="post_date">
       2025-11-24	  
     </span>
-    <span class="post_time"> · 8 分钟阅读</span><span>&nbsp;· <a href='https://jianlin-li.github.io/tags/go/' title="Go" class="post_tag button button_translucent">Go
+    <span class="post_time"> · 10 分钟阅读</span><span>&nbsp;· <a href='https://jianlin-li.github.io/tags/go/' title="Go" class="post_tag button button_translucent">Go
         </a>
     </span>
     <span class="page_only">&nbsp;·
@@ -950,6 +950,283 @@
 <li>处理时间格式（如 RFC3339）</li>
 <li>忽略未知字段（<code>Decoder.DisallowUnknownFields()</code>）</li>
 </ul>
+<hr>
+<hr>
+<hr>
+<h1 id="在-go-语言中context上下文是标准库-context-包提供的一个强大机制用于在-goroutine-之间传递请求范围的值取消信号和截止时间deadline它是构建可取消可超时可追踪的并发程序的核心工具尤其在-web-服务微服务数据库操作等场景中至关重要">在 Go 语言中，<code>context</code>（上下文）是标准库 <code>context</code> 包提供的一个强大机制，用于<strong>在 goroutine 之间传递请求范围的值、取消信号和截止时间（deadline）</strong>。它是构建可取消、可超时、可追踪的并发程序的核心工具，尤其在 Web 服务、微服务、数据库操作等场景中至关重要。</h1>
+<hr>
+<h2 id="-一为什么需要-context">🧠 一、为什么需要 Context？</h2>
+<p>Go 程序大量使用 goroutine 实现并发。但当一个请求被取消（如客户端断开）、超时或需要传递用户身份等信息时，如何：</p>
+<ul>
+<li><strong>通知所有相关 goroutine 停止工作？</strong></li>
+<li><strong>避免资源泄漏（如未关闭的数据库连接、HTTP 请求）？</strong></li>
+<li><strong>在调用链中传递请求元数据（如 trace ID、user ID）？</strong></li>
+</ul>
+<p><code>context.Context</code> 正是为解决这些问题而设计的。</p>
+<blockquote>
+<p>✅ 它是 Go 并发编程的“最佳实践”之一，也是官方推荐的控制流管理方式。</p>
+</blockquote>
+<hr>
+<h2 id="-二context-的核心特性">📦 二、Context 的核心特性</h2>
+<table>
+  <thead>
+      <tr>
+          <th>特性</th>
+          <th>说明</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><strong>取消（Cancellation）</strong></td>
+          <td>通过 <code>cancel()</code> 函数或超时自动触发，通知下游停止</td>
+      </tr>
+      <tr>
+          <td><strong>截止时间（Deadline）</strong></td>
+          <td>设置操作的最大执行时间</td>
+      </tr>
+      <tr>
+          <td><strong>携带值（Value）</strong></td>
+          <td>在请求链路中传递请求作用域的数据（如用户 ID、trace ID）</td>
+      </tr>
+      <tr>
+          <td><strong>树形传播</strong></td>
+          <td>子 context 继承父 context，取消信号自上而下传播</td>
+      </tr>
+      <tr>
+          <td><strong>不可变性</strong></td>
+          <td>每次派生新 context 都返回新实例，原 context 不变</td>
+      </tr>
+  </tbody>
+</table>
+<hr>
+<h2 id="-三核心接口与函数">🔑 三、核心接口与函数</h2>
+<h3 id="1-contextcontext-接口">1. <code>context.Context</code> 接口</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="ln">1</span><span class="cl"><span class="kd">type</span><span class="w"> </span><span class="nx">Context</span><span class="w"> </span><span class="kd">interface</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="w">    </span><span class="nf">Deadline</span><span class="p">()</span><span class="w"> </span><span class="p">(</span><span class="nx">deadline</span><span class="w"> </span><span class="nx">time</span><span class="p">.</span><span class="nx">Time</span><span class="p">,</span><span class="w"> </span><span class="nx">ok</span><span class="w"> </span><span class="kt">bool</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="w">    </span><span class="nf">Done</span><span class="p">()</span><span class="w"> </span><span class="o">&lt;-</span><span class="kd">chan</span><span class="w"> </span><span class="kd">struct</span><span class="p">{}</span><span class="w">
+</span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="w">    </span><span class="nf">Err</span><span class="p">()</span><span class="w"> </span><span class="kt">error</span><span class="w">
+</span></span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="w">    </span><span class="nf">Value</span><span class="p">(</span><span class="nx">key</span><span class="w"> </span><span class="kt">any</span><span class="p">)</span><span class="w"> </span><span class="kt">any</span><span class="w">
+</span></span></span><span class="line"><span class="ln">6</span><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></div><ul>
+<li><code>Done()</code>：返回一个只读 channel，当 context 被取消或超时时关闭。</li>
+<li><code>Err()</code>：返回取消原因（<code>context.Canceled</code> 或 <code>context.DeadlineExceeded</code>）。</li>
+<li><code>Value(key)</code>：获取绑定到 context 的值（仅用于传递请求作用域数据，<strong>不要传函数参数！</strong>）</li>
+</ul>
+<hr>
+<h3 id="2-创建-context-的工厂函数">2. 创建 Context 的工厂函数</h3>
+<table>
+  <thead>
+      <tr>
+          <th>函数</th>
+          <th>用途</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>context.Background()</code></td>
+          <td>主动创建 context 的根（main、init、测试中使用）</td>
+      </tr>
+      <tr>
+          <td><code>context.TODO()</code></td>
+          <td>不确定用什么 context 时的占位符（后期应替换）</td>
+      </tr>
+      <tr>
+          <td><code>context.WithCancel(parent)</code></td>
+          <td>返回可手动取消的子 context</td>
+      </tr>
+      <tr>
+          <td><code>context.WithTimeout(parent, timeout)</code></td>
+          <td>带超时自动取消的 context</td>
+      </tr>
+      <tr>
+          <td><code>context.WithDeadline(parent, d)</code></td>
+          <td>带绝对截止时间的 context</td>
+      </tr>
+      <tr>
+          <td><code>context.WithValue(parent, key, val)</code></td>
+          <td>携带键值对的 context（<strong>key 应为自定义未导出类型</strong>）</td>
+      </tr>
+  </tbody>
+</table>
+<hr>
+<h2 id="-四常用示例">💡 四、常用示例</h2>
+<h3 id="示例-1手动取消withcancel">示例 1：手动取消（WithCancel）</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="kd">func</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="w">    </span><span class="nx">ctx</span><span class="p">,</span><span class="w"> </span><span class="nx">cancel</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">context</span><span class="p">.</span><span class="nf">WithCancel</span><span class="p">(</span><span class="nx">context</span><span class="p">.</span><span class="nf">Background</span><span class="p">())</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="w">    </span><span class="k">defer</span><span class="w"> </span><span class="nf">cancel</span><span class="p">()</span><span class="w"> </span><span class="c1">// 确保资源释放</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="w">    </span><span class="k">go</span><span class="w"> </span><span class="nf">doWork</span><span class="p">(</span><span class="nx">ctx</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 6</span><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="w">    </span><span class="nx">time</span><span class="p">.</span><span class="nf">Sleep</span><span class="p">(</span><span class="mi">2</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="nx">time</span><span class="p">.</span><span class="nx">Second</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="w">    </span><span class="nf">cancel</span><span class="p">()</span><span class="w"> </span><span class="c1">// 发送取消信号</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 9</span><span class="cl"><span class="w">    </span><span class="nx">time</span><span class="p">.</span><span class="nf">Sleep</span><span class="p">(</span><span class="mi">1</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="nx">time</span><span class="p">.</span><span class="nx">Second</span><span class="p">)</span><span class="w"> </span><span class="c1">// 等待 goroutine 退出</span><span class="w">
+</span></span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="ln">11</span><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="ln">12</span><span class="cl"><span class="w"></span><span class="kd">func</span><span class="w"> </span><span class="nf">doWork</span><span class="p">(</span><span class="nx">ctx</span><span class="w"> </span><span class="nx">context</span><span class="p">.</span><span class="nx">Context</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="ln">13</span><span class="cl"><span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="ln">14</span><span class="cl"><span class="w">        </span><span class="k">select</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="ln">15</span><span class="cl"><span class="w">        </span><span class="k">case</span><span class="w"> </span><span class="o">&lt;-</span><span class="nx">ctx</span><span class="p">.</span><span class="nf">Done</span><span class="p">():</span><span class="w">
+</span></span></span><span class="line"><span class="ln">16</span><span class="cl"><span class="w">            </span><span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;Work cancelled:&#34;</span><span class="p">,</span><span class="w"> </span><span class="nx">ctx</span><span class="p">.</span><span class="nf">Err</span><span class="p">())</span><span class="w">
+</span></span></span><span class="line"><span class="ln">17</span><span class="cl"><span class="w">            </span><span class="k">return</span><span class="w">
+</span></span></span><span class="line"><span class="ln">18</span><span class="cl"><span class="w">        </span><span class="k">default</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln">19</span><span class="cl"><span class="w">            </span><span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;Working...&#34;</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="ln">20</span><span class="cl"><span class="w">            </span><span class="nx">time</span><span class="p">.</span><span class="nf">Sleep</span><span class="p">(</span><span class="mi">500</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="nx">time</span><span class="p">.</span><span class="nx">Millisecond</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="ln">21</span><span class="cl"><span class="w">        </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="ln">22</span><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="ln">23</span><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></div><hr>
+<h3 id="示例-2超时控制withtimeout">示例 2：超时控制（WithTimeout）</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="kd">func</span><span class="w"> </span><span class="nf">fetchUserData</span><span class="p">(</span><span class="nx">ctx</span><span class="w"> </span><span class="nx">context</span><span class="p">.</span><span class="nx">Context</span><span class="p">,</span><span class="w"> </span><span class="nx">userID</span><span class="w"> </span><span class="kt">string</span><span class="p">)</span><span class="w"> </span><span class="kt">error</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="w">    </span><span class="c1">// 模拟耗时操作（如 HTTP 请求、DB 查询）</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="w">    </span><span class="nx">ch</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nb">make</span><span class="p">(</span><span class="kd">chan</span><span class="w"> </span><span class="kt">error</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="w">    </span><span class="k">go</span><span class="w"> </span><span class="kd">func</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="w">        </span><span class="nx">time</span><span class="p">.</span><span class="nf">Sleep</span><span class="p">(</span><span class="mi">3</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="nx">time</span><span class="p">.</span><span class="nx">Second</span><span class="p">)</span><span class="w"> </span><span class="c1">// 模拟慢响应</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 6</span><span class="cl"><span class="w">        </span><span class="nx">ch</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="kc">nil</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="w">    </span><span class="p">}()</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="ln"> 9</span><span class="cl"><span class="w">    </span><span class="k">select</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="w">    </span><span class="k">case</span><span class="w"> </span><span class="o">&lt;-</span><span class="nx">ctx</span><span class="p">.</span><span class="nf">Done</span><span class="p">():</span><span class="w">
+</span></span></span><span class="line"><span class="ln">11</span><span class="cl"><span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="nx">ctx</span><span class="p">.</span><span class="nf">Err</span><span class="p">()</span><span class="w"> </span><span class="c1">// 超时或取消</span><span class="w">
+</span></span></span><span class="line"><span class="ln">12</span><span class="cl"><span class="w">    </span><span class="k">case</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="o">&lt;-</span><span class="nx">ch</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln">13</span><span class="cl"><span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="nx">err</span><span class="w">
+</span></span></span><span class="line"><span class="ln">14</span><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="ln">15</span><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="ln">16</span><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="ln">17</span><span class="cl"><span class="w"></span><span class="kd">func</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="ln">18</span><span class="cl"><span class="w">    </span><span class="nx">ctx</span><span class="p">,</span><span class="w"> </span><span class="nx">cancel</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">context</span><span class="p">.</span><span class="nf">WithTimeout</span><span class="p">(</span><span class="nx">context</span><span class="p">.</span><span class="nf">Background</span><span class="p">(),</span><span class="w"> </span><span class="mi">2</span><span class="o">*</span><span class="nx">time</span><span class="p">.</span><span class="nx">Second</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="ln">19</span><span class="cl"><span class="w">    </span><span class="k">defer</span><span class="w"> </span><span class="nf">cancel</span><span class="p">()</span><span class="w">
+</span></span></span><span class="line"><span class="ln">20</span><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="ln">21</span><span class="cl"><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nf">fetchUserData</span><span class="p">(</span><span class="nx">ctx</span><span class="p">,</span><span class="w"> </span><span class="s">&#34;123&#34;</span><span class="p">);</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">nil</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="ln">22</span><span class="cl"><span class="w">        </span><span class="nx">log</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;Error:&#34;</span><span class="p">,</span><span class="w"> </span><span class="nx">err</span><span class="p">)</span><span class="w"> </span><span class="c1">// context deadline exceeded</span><span class="w">
+</span></span></span><span class="line"><span class="ln">23</span><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="ln">24</span><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></div><hr>
+<h3 id="示例-3传递请求作用域的值withvalue">示例 3：传递请求作用域的值（WithValue）</h3>
+<blockquote>
+<p>⚠️ 注意：<strong>仅用于跨 API 边界的请求数据（如 trace ID），不要替代函数参数！</strong></p>
+</blockquote>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="kd">type</span><span class="w"> </span><span class="nx">contextKey</span><span class="w"> </span><span class="kt">string</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="w"></span><span class="kd">const</span><span class="w"> </span><span class="nx">UserIDKey</span><span class="w"> </span><span class="nx">contextKey</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s">&#34;userID&#34;</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="w"></span><span class="kd">func</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 6</span><span class="cl"><span class="w">    </span><span class="nx">ctx</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">context</span><span class="p">.</span><span class="nf">WithValue</span><span class="p">(</span><span class="nx">context</span><span class="p">.</span><span class="nf">Background</span><span class="p">(),</span><span class="w"> </span><span class="nx">UserIDKey</span><span class="p">,</span><span class="w"> </span><span class="s">&#34;user-789&#34;</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="w">    </span><span class="nf">handleRequest</span><span class="p">(</span><span class="nx">ctx</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 9</span><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="ln">11</span><span class="cl"><span class="w"></span><span class="kd">func</span><span class="w"> </span><span class="nf">handleRequest</span><span class="p">(</span><span class="nx">ctx</span><span class="w"> </span><span class="nx">context</span><span class="p">.</span><span class="nx">Context</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="ln">12</span><span class="cl"><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="nx">userID</span><span class="p">,</span><span class="w"> </span><span class="nx">ok</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">ctx</span><span class="p">.</span><span class="nf">Value</span><span class="p">(</span><span class="nx">UserIDKey</span><span class="p">).(</span><span class="kt">string</span><span class="p">);</span><span class="w"> </span><span class="nx">ok</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="ln">13</span><span class="cl"><span class="w">        </span><span class="nx">log</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;Handling request for user: %s&#34;</span><span class="p">,</span><span class="w"> </span><span class="nx">userID</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="ln">14</span><span class="cl"><span class="w">        </span><span class="c1">// 调用 DB、RPC 等，继续传递 ctx</span><span class="w">
+</span></span></span><span class="line"><span class="ln">15</span><span class="cl"><span class="w">        </span><span class="nf">processOrder</span><span class="p">(</span><span class="nx">ctx</span><span class="p">,</span><span class="w"> </span><span class="nx">userID</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="ln">16</span><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="ln">17</span><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="ln">18</span><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="ln">19</span><span class="cl"><span class="w"></span><span class="kd">func</span><span class="w"> </span><span class="nf">processOrder</span><span class="p">(</span><span class="nx">ctx</span><span class="w"> </span><span class="nx">context</span><span class="p">.</span><span class="nx">Context</span><span class="p">,</span><span class="w"> </span><span class="nx">userID</span><span class="w"> </span><span class="kt">string</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="ln">20</span><span class="cl"><span class="w">    </span><span class="c1">// 继续使用 ctx...</span><span class="w">
+</span></span></span><span class="line"><span class="ln">21</span><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></div><blockquote>
+<p>🔒 <strong>安全建议</strong>：<code>key</code> 应为<strong>未导出的自定义类型</strong>（如 <code>contextKey</code>），避免与其他包冲突。</p>
+</blockquote>
+<hr>
+<h2 id="-五在-http-服务中的典型应用">🌐 五、在 HTTP 服务中的典型应用</h2>
+<p>Go 的 <code>net/http</code> 包天然支持 context：</p>
+<ul>
+<li>每个 <code>*http.Request</code> 自带 <code>Context()</code> 方法</li>
+<li>可通过 <code>r.Context()</code> 获取，并传递给下游逻辑</li>
+<li>客户端断开连接时，该 context 会自动取消</li>
+</ul>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="kd">func</span><span class="w"> </span><span class="nf">handler</span><span class="p">(</span><span class="nx">w</span><span class="w"> </span><span class="nx">http</span><span class="p">.</span><span class="nx">ResponseWriter</span><span class="p">,</span><span class="w"> </span><span class="nx">r</span><span class="w"> </span><span class="o">*</span><span class="nx">http</span><span class="p">.</span><span class="nx">Request</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="w">    </span><span class="nx">ctx</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">r</span><span class="p">.</span><span class="nf">Context</span><span class="p">()</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="w">    </span><span class="c1">// 设置总处理时间不超过 5 秒</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="w">    </span><span class="nx">ctx</span><span class="p">,</span><span class="w"> </span><span class="nx">cancel</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">context</span><span class="p">.</span><span class="nf">WithTimeout</span><span class="p">(</span><span class="nx">ctx</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="o">*</span><span class="nx">time</span><span class="p">.</span><span class="nx">Second</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 6</span><span class="cl"><span class="w">    </span><span class="k">defer</span><span class="w"> </span><span class="nf">cancel</span><span class="p">()</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="w">    </span><span class="nx">result</span><span class="p">,</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nf">expensiveOperation</span><span class="p">(</span><span class="nx">ctx</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 9</span><span class="cl"><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">nil</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="w">        </span><span class="nx">http</span><span class="p">.</span><span class="nf">Error</span><span class="p">(</span><span class="nx">w</span><span class="p">,</span><span class="w"> </span><span class="nx">err</span><span class="p">.</span><span class="nf">Error</span><span class="p">(),</span><span class="w"> </span><span class="nx">http</span><span class="p">.</span><span class="nx">StatusGatewayTimeout</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="ln">11</span><span class="cl"><span class="w">        </span><span class="k">return</span><span class="w">
+</span></span></span><span class="line"><span class="ln">12</span><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="ln">13</span><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="ln">14</span><span class="cl"><span class="w">    </span><span class="nx">w</span><span class="p">.</span><span class="nf">Write</span><span class="p">([]</span><span class="nb">byte</span><span class="p">(</span><span class="nx">result</span><span class="p">))</span><span class="w">
+</span></span></span><span class="line"><span class="ln">15</span><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></div><hr>
+<h2 id="-六常见误区与最佳实践">🚫 六、常见误区与最佳实践</h2>
+<table>
+  <thead>
+      <tr>
+          <th>误区</th>
+          <th>正确做法</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>用 context 传递函数参数</td>
+          <td>❌ 仅用于<strong>请求作用域元数据</strong>（如 trace ID）</td>
+      </tr>
+      <tr>
+          <td>忽略 <code>Done()</code> 通道</td>
+          <td>✅ 在长时间运行的 goroutine 中必须监听 <code>ctx.Done()</code></td>
+      </tr>
+      <tr>
+          <td>复用 context 而不派生</td>
+          <td>❌ 每个逻辑步骤应基于父 context 派生新 context</td>
+      </tr>
+      <tr>
+          <td>使用字符串/整数作为 Value 的 key</td>
+          <td>❌ 使用<strong>未导出的自定义类型</strong>避免冲突</td>
+      </tr>
+      <tr>
+          <td>不调用 <code>cancel()</code></td>
+          <td>✅ 即使有超时，也应 <code>defer cancel()</code> 防止资源泄漏</td>
+      </tr>
+  </tbody>
+</table>
+<hr>
+<h2 id="-七context-的底层原理简要">🧩 七、Context 的底层原理（简要）</h2>
+<ul>
+<li><code>context</code> 是一个<strong>不可变的树形结构</strong>，每个子 context 指向父 context。</li>
+<li>取消信号通过内部 channel 广播，所有监听 <code>Done()</code> 的 goroutine 会被通知。</li>
+<li><code>WithValue</code> 创建的新 context 会保存 key-value 对，并在 <code>Value()</code> 被调用时沿父链查找。</li>
+</ul>
+<hr>
+<h2 id="-总结-1">✅ 总结</h2>
+<table>
+  <thead>
+      <tr>
+          <th>场景</th>
+          <th>推荐 Context 类型</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>主函数、测试</td>
+          <td><code>context.Background()</code></td>
+      </tr>
+      <tr>
+          <td>未知上下文</td>
+          <td><code>context.TODO()</code>（临时）</td>
+      </tr>
+      <tr>
+          <td>需要手动取消</td>
+          <td><code>context.WithCancel</code></td>
+      </tr>
+      <tr>
+          <td>接口调用、HTTP 处理</td>
+          <td><code>context.WithTimeout</code></td>
+      </tr>
+      <tr>
+          <td>传递 trace ID / user ID</td>
+          <td><code>context.WithValue</code>（谨慎使用）</td>
+      </tr>
+  </tbody>
+</table>
+<blockquote>
+<p>📌 <strong>黄金法则</strong>：<strong>任何可能阻塞或启动 goroutine 的函数，都应接受 <code>context.Context</code> 作为第一个参数。</strong></p>
+</blockquote>
+<hr>
 
     </div><div class="post_comments">
   
