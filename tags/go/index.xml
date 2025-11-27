@@ -7,11 +7,11 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
     <copyright>Copyright © 1989–2025, 李建林 </copyright>
-    <lastBuildDate>Mon, 24 Nov 2025 11:36:29 +0800</lastBuildDate><atom:link href="https://jianlin-li.github.io/tags/go/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sun, 24 Aug 2025 11:36:29 +0800</lastBuildDate><atom:link href="https://jianlin-li.github.io/tags/go/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Go语言的知识点-2</title>
       <link>https://jianlin-li.github.io/post/go_review_2/</link>
-      <pubDate>Mon, 24 Nov 2025 11:36:29 +0800</pubDate>
+      <pubDate>Sun, 24 Aug 2025 11:36:29 +0800</pubDate>
       
       <guid>https://jianlin-li.github.io/post/go_review_2/</guid>
       <description>
@@ -52,7 +52,7 @@
     <item>
       <title>Go语言的知识点-1</title>
       <link>https://jianlin-li.github.io/post/go_review_1/</link>
-      <pubDate>Fri, 31 Oct 2025 15:04:49 +0800</pubDate>
+      <pubDate>Thu, 31 Jul 2025 15:04:49 +0800</pubDate>
       
       <guid>https://jianlin-li.github.io/post/go_review_1/</guid>
       <description>
@@ -208,7 +208,7 @@
     <item>
       <title>Go语言的知识点--GOPATH和Go Modules</title>
       <link>https://jianlin-li.github.io/post/go_review/</link>
-      <pubDate>Thu, 30 Oct 2025 15:04:49 +0800</pubDate>
+      <pubDate>Mon, 30 Jun 2025 15:04:49 +0800</pubDate>
       
       <guid>https://jianlin-li.github.io/post/go_review/</guid>
       <description>
