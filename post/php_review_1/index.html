@@ -42,8 +42,8 @@
       "headline": "PHP语言的知识点-1",
       "description": "Article description.",
       "url": "https:\/\/jianlin-li.github.io\/post\/php_review_1\/",
-      "datePublished": "2025-06-29T15:04:49+08:00",
-      "dateModified": "2025-06-29T15:04:49+08:00",
+      "datePublished": "2025-06-01T15:04:49+08:00",
+      "dateModified": "2025-06-01T15:04:49+08:00",
       "keywords": ["PHP"],
         "articleSection": ["PHP语言"],
       "author": {
@@ -166,9 +166,9 @@
 </svg>
 </span>
     <span class="post_date">
-      2025-06-29	  
+      2025-06-01	  
     </span>
-    <span class="post_time"> · 5 分钟阅读</span><span>&nbsp;· <a href='https://jianlin-li.github.io/tags/php/' title="PHP" class="post_tag button button_translucent">PHP
+    <span class="post_time"> · 7 分钟阅读</span><span>&nbsp;· <a href='https://jianlin-li.github.io/tags/php/' title="PHP" class="post_tag button button_translucent">PHP
         </a>
     </span>
     <span class="page_only">&nbsp;·
@@ -206,206 +206,433 @@
   </span>
   </div>
 
-    <div class="post_body"><h1 id="下面是将你提供的-go-语言代码http-状态码常量和-statustext-函数完整转换为-php-语言的实现php-中没有原生的-const-块但我们可以使用-define-或-class-中的-const-来定义常量推荐使用类封装的方式更清晰">下面是将你提供的 Go 语言代码（HTTP 状态码常量和 <code>StatusText</code> 函数）<strong>完整转换为 PHP 语言</strong>的实现。PHP 中没有原生的 <code>const</code> 块，但我们可以使用 <code>define()</code> 或 <code>class</code> 中的 <code>const</code> 来定义常量，推荐使用类封装的方式更清晰。</h1>
+    <div class="post_body"><h1 id="以下是-php-70-到-php-84-每个主要版本所有关键变更的完整清单每项均以-清晰独立可运行或说明性的代码块形式呈现便于你逐条复制测试和复习">以下是 <strong>PHP 7.0 到 PHP 8.4 每个主要版本所有关键变更的完整清单</strong>，每项均以 <strong>清晰、独立、可运行（或说明性）的代码块形式呈现</strong>，便于你逐条复制、测试和复习。</h1>
 <hr>
-<h3 id="-php-实现http-状态码常量--状态文本函数">✅ PHP 实现：HTTP 状态码常量 + 状态文本函数</h3>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln">  1</span><span class="cl"><span class="o">&lt;?</span><span class="nx">php</span>
-</span></span><span class="line"><span class="ln">  2</span><span class="cl">
-</span></span><span class="line"><span class="ln">  3</span><span class="cl"><span class="k">class</span> <span class="nc">HttpStatus</span>
-</span></span><span class="line"><span class="ln">  4</span><span class="cl"><span class="p">{</span>
-</span></span><span class="line"><span class="ln">  5</span><span class="cl">    <span class="c1">// 1xx Informational
-</span></span></span><span class="line"><span class="ln">  6</span><span class="cl"><span class="c1"></span>    <span class="k">const</span> <span class="no">StatusContinue</span>                   <span class="o">=</span> <span class="mi">100</span><span class="p">;</span>
-</span></span><span class="line"><span class="ln">  7</span><span class="cl">    <span class="k">const</span> <span class="no">StatusSwitchingProtocols</span>         <span class="o">=</span> <span class="mi">101</span><span class="p">;</span>
-</span></span><span class="line"><span class="ln">  8</span><span class="cl">    <span class="k">const</span> <span class="no">StatusProcessing</span>                 <span class="o">=</span> <span class="mi">102</span><span class="p">;</span>
-</span></span><span class="line"><span class="ln">  9</span><span class="cl">    <span class="k">const</span> <span class="no">StatusEarlyHints</span>                 <span class="o">=</span> <span class="mi">103</span><span class="p">;</span>
-</span></span><span class="line"><span class="ln"> 10</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 11</span><span class="cl">    <span class="c1">// 2xx Success
-</span></span></span><span class="line"><span class="ln"> 12</span><span class="cl"><span class="c1"></span>    <span class="k">const</span> <span class="no">StatusOK</span>                         <span class="o">=</span> <span class="mi">200</span><span class="p">;</span>
-</span></span><span class="line"><span class="ln"> 13</span><span class="cl">    <span class="k">const</span> <span class="no">StatusCreated</span>                    <span class="o">=</span> <span class="mi">201</span><span class="p">;</span>
-</span></span><span class="line"><span class="ln"> 14</span><span class="cl">    <span class="k">const</span> <span class="no">StatusAccepted</span>                   <span class="o">=</span> <span class="mi">202</span><span class="p">;</span>
-</span></span><span class="line"><span class="ln"> 15</span><span class="cl">    <span class="k">const</span> <span class="no">StatusNonAuthoritativeInfo</span>       <span class="o">=</span> <span class="mi">203</span><span class="p">;</span>
-</span></span><span class="line"><span class="ln"> 16</span><span class="cl">    <span class="k">const</span> <span class="no">StatusNoContent</span>                  <span class="o">=</span> <span class="mi">204</span><span class="p">;</span>
-</span></span><span class="line"><span class="ln"> 17</span><span class="cl">    <span class="k">const</span> <span class="no">StatusResetContent</span>               <span class="o">=</span> <span class="mi">205</span><span class="p">;</span>
-</span></span><span class="line"><span class="ln"> 18</span><span class="cl">    <span class="k">const</span> <span class="no">StatusPartialContent</span>             <span class="o">=</span> <span class="mi">206</span><span class="p">;</span>
-</span></span><span class="line"><span class="ln"> 19</span><span class="cl">    <span class="k">const</span> <span class="no">StatusMultiStatus</span>                <span class="o">=</span> <span class="mi">207</span><span class="p">;</span>
-</span></span><span class="line"><span class="ln"> 20</span><span class="cl">    <span class="k">const</span> <span class="no">StatusAlreadyReported</span>            <span class="o">=</span> <span class="mi">208</span><span class="p">;</span>
-</span></span><span class="line"><span class="ln"> 21</span><span class="cl">    <span class="k">const</span> <span class="no">StatusIMUsed</span>                     <span class="o">=</span> <span class="mi">226</span><span class="p">;</span>
-</span></span><span class="line"><span class="ln"> 22</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 23</span><span class="cl">    <span class="c1">// 3xx Redirection
-</span></span></span><span class="line"><span class="ln"> 24</span><span class="cl"><span class="c1"></span>    <span class="k">const</span> <span class="no">StatusMultipleChoices</span>            <span class="o">=</span> <span class="mi">300</span><span class="p">;</span>
-</span></span><span class="line"><span class="ln"> 25</span><span class="cl">    <span class="k">const</span> <span class="no">StatusMovedPermanently</span>           <span class="o">=</span> <span class="mi">301</span><span class="p">;</span>
-</span></span><span class="line"><span class="ln"> 26</span><span class="cl">    <span class="k">const</span> <span class="no">StatusFound</span>                      <span class="o">=</span> <span class="mi">302</span><span class="p">;</span>
-</span></span><span class="line"><span class="ln"> 27</span><span class="cl">    <span class="k">const</span> <span class="no">StatusSeeOther</span>                   <span class="o">=</span> <span class="mi">303</span><span class="p">;</span>
-</span></span><span class="line"><span class="ln"> 28</span><span class="cl">    <span class="k">const</span> <span class="no">StatusNotModified</span>                <span class="o">=</span> <span class="mi">304</span><span class="p">;</span>
-</span></span><span class="line"><span class="ln"> 29</span><span class="cl">    <span class="k">const</span> <span class="no">StatusUseProxy</span>                   <span class="o">=</span> <span class="mi">305</span><span class="p">;</span>
-</span></span><span class="line"><span class="ln"> 30</span><span class="cl">    <span class="c1">// 306 is unused, skipped
-</span></span></span><span class="line"><span class="ln"> 31</span><span class="cl"><span class="c1"></span>    <span class="k">const</span> <span class="no">StatusTemporaryRedirect</span>          <span class="o">=</span> <span class="mi">307</span><span class="p">;</span>
-</span></span><span class="line"><span class="ln"> 32</span><span class="cl">    <span class="k">const</span> <span class="no">StatusPermanentRedirect</span>          <span class="o">=</span> <span class="mi">308</span><span class="p">;</span>
-</span></span><span class="line"><span class="ln"> 33</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 34</span><span class="cl">    <span class="c1">// 4xx Client Error
-</span></span></span><span class="line"><span class="ln"> 35</span><span class="cl"><span class="c1"></span>    <span class="k">const</span> <span class="no">StatusBadRequest</span>                 <span class="o">=</span> <span class="mi">400</span><span class="p">;</span>
-</span></span><span class="line"><span class="ln"> 36</span><span class="cl">    <span class="k">const</span> <span class="no">StatusUnauthorized</span>               <span class="o">=</span> <span class="mi">401</span><span class="p">;</span>
-</span></span><span class="line"><span class="ln"> 37</span><span class="cl">    <span class="k">const</span> <span class="no">StatusPaymentRequired</span>            <span class="o">=</span> <span class="mi">402</span><span class="p">;</span>
-</span></span><span class="line"><span class="ln"> 38</span><span class="cl">    <span class="k">const</span> <span class="no">StatusForbidden</span>                  <span class="o">=</span> <span class="mi">403</span><span class="p">;</span>
-</span></span><span class="line"><span class="ln"> 39</span><span class="cl">    <span class="k">const</span> <span class="no">StatusNotFound</span>                   <span class="o">=</span> <span class="mi">404</span><span class="p">;</span>
-</span></span><span class="line"><span class="ln"> 40</span><span class="cl">    <span class="k">const</span> <span class="no">StatusMethodNotAllowed</span>           <span class="o">=</span> <span class="mi">405</span><span class="p">;</span>
-</span></span><span class="line"><span class="ln"> 41</span><span class="cl">    <span class="k">const</span> <span class="no">StatusNotAcceptable</span>              <span class="o">=</span> <span class="mi">406</span><span class="p">;</span>
-</span></span><span class="line"><span class="ln"> 42</span><span class="cl">    <span class="k">const</span> <span class="no">StatusProxyAuthRequired</span>          <span class="o">=</span> <span class="mi">407</span><span class="p">;</span>
-</span></span><span class="line"><span class="ln"> 43</span><span class="cl">    <span class="k">const</span> <span class="no">StatusRequestTimeout</span>             <span class="o">=</span> <span class="mi">408</span><span class="p">;</span>
-</span></span><span class="line"><span class="ln"> 44</span><span class="cl">    <span class="k">const</span> <span class="no">StatusConflict</span>                   <span class="o">=</span> <span class="mi">409</span><span class="p">;</span>
-</span></span><span class="line"><span class="ln"> 45</span><span class="cl">    <span class="k">const</span> <span class="no">StatusGone</span>                       <span class="o">=</span> <span class="mi">410</span><span class="p">;</span>
-</span></span><span class="line"><span class="ln"> 46</span><span class="cl">    <span class="k">const</span> <span class="no">StatusLengthRequired</span>             <span class="o">=</span> <span class="mi">411</span><span class="p">;</span>
-</span></span><span class="line"><span class="ln"> 47</span><span class="cl">    <span class="k">const</span> <span class="no">StatusPreconditionFailed</span>         <span class="o">=</span> <span class="mi">412</span><span class="p">;</span>
-</span></span><span class="line"><span class="ln"> 48</span><span class="cl">    <span class="k">const</span> <span class="no">StatusRequestEntityTooLarge</span>      <span class="o">=</span> <span class="mi">413</span><span class="p">;</span>
-</span></span><span class="line"><span class="ln"> 49</span><span class="cl">    <span class="k">const</span> <span class="no">StatusRequestURITooLong</span>          <span class="o">=</span> <span class="mi">414</span><span class="p">;</span>
-</span></span><span class="line"><span class="ln"> 50</span><span class="cl">    <span class="k">const</span> <span class="no">StatusUnsupportedMediaType</span>       <span class="o">=</span> <span class="mi">415</span><span class="p">;</span>
-</span></span><span class="line"><span class="ln"> 51</span><span class="cl">    <span class="k">const</span> <span class="no">StatusRequestedRangeNotSatisfiable</span> <span class="o">=</span> <span class="mi">416</span><span class="p">;</span>
-</span></span><span class="line"><span class="ln"> 52</span><span class="cl">    <span class="k">const</span> <span class="no">StatusExpectationFailed</span>          <span class="o">=</span> <span class="mi">417</span><span class="p">;</span>
-</span></span><span class="line"><span class="ln"> 53</span><span class="cl">    <span class="k">const</span> <span class="no">StatusTeapot</span>                     <span class="o">=</span> <span class="mi">418</span><span class="p">;</span>
-</span></span><span class="line"><span class="ln"> 54</span><span class="cl">    <span class="k">const</span> <span class="no">StatusMisdirectedRequest</span>         <span class="o">=</span> <span class="mi">421</span><span class="p">;</span>
-</span></span><span class="line"><span class="ln"> 55</span><span class="cl">    <span class="k">const</span> <span class="no">StatusUnprocessableEntity</span>        <span class="o">=</span> <span class="mi">422</span><span class="p">;</span>
-</span></span><span class="line"><span class="ln"> 56</span><span class="cl">    <span class="k">const</span> <span class="no">StatusLocked</span>                     <span class="o">=</span> <span class="mi">423</span><span class="p">;</span>
-</span></span><span class="line"><span class="ln"> 57</span><span class="cl">    <span class="k">const</span> <span class="no">StatusFailedDependency</span>           <span class="o">=</span> <span class="mi">424</span><span class="p">;</span>
-</span></span><span class="line"><span class="ln"> 58</span><span class="cl">    <span class="k">const</span> <span class="no">StatusTooEarly</span>                   <span class="o">=</span> <span class="mi">425</span><span class="p">;</span>
-</span></span><span class="line"><span class="ln"> 59</span><span class="cl">    <span class="k">const</span> <span class="no">StatusUpgradeRequired</span>            <span class="o">=</span> <span class="mi">426</span><span class="p">;</span>
-</span></span><span class="line"><span class="ln"> 60</span><span class="cl">    <span class="k">const</span> <span class="no">StatusPreconditionRequired</span>       <span class="o">=</span> <span class="mi">428</span><span class="p">;</span>
-</span></span><span class="line"><span class="ln"> 61</span><span class="cl">    <span class="k">const</span> <span class="no">StatusTooManyRequests</span>            <span class="o">=</span> <span class="mi">429</span><span class="p">;</span>
-</span></span><span class="line"><span class="ln"> 62</span><span class="cl">    <span class="k">const</span> <span class="no">StatusRequestHeaderFieldsTooLarge</span> <span class="o">=</span> <span class="mi">431</span><span class="p">;</span>
-</span></span><span class="line"><span class="ln"> 63</span><span class="cl">    <span class="k">const</span> <span class="no">StatusUnavailableForLegalReasons</span> <span class="o">=</span> <span class="mi">451</span><span class="p">;</span>
-</span></span><span class="line"><span class="ln"> 64</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 65</span><span class="cl">    <span class="c1">// 5xx Server Error
-</span></span></span><span class="line"><span class="ln"> 66</span><span class="cl"><span class="c1"></span>    <span class="k">const</span> <span class="no">StatusInternalServerError</span>        <span class="o">=</span> <span class="mi">500</span><span class="p">;</span>
-</span></span><span class="line"><span class="ln"> 67</span><span class="cl">    <span class="k">const</span> <span class="no">StatusNotImplemented</span>             <span class="o">=</span> <span class="mi">501</span><span class="p">;</span>
-</span></span><span class="line"><span class="ln"> 68</span><span class="cl">    <span class="k">const</span> <span class="no">StatusBadGateway</span>                 <span class="o">=</span> <span class="mi">502</span><span class="p">;</span>
-</span></span><span class="line"><span class="ln"> 69</span><span class="cl">    <span class="k">const</span> <span class="no">StatusServiceUnavailable</span>         <span class="o">=</span> <span class="mi">503</span><span class="p">;</span>
-</span></span><span class="line"><span class="ln"> 70</span><span class="cl">    <span class="k">const</span> <span class="no">StatusGatewayTimeout</span>             <span class="o">=</span> <span class="mi">504</span><span class="p">;</span>
-</span></span><span class="line"><span class="ln"> 71</span><span class="cl">    <span class="k">const</span> <span class="no">StatusHTTPVersionNotSupported</span>    <span class="o">=</span> <span class="mi">505</span><span class="p">;</span>
-</span></span><span class="line"><span class="ln"> 72</span><span class="cl">    <span class="k">const</span> <span class="no">StatusVariantAlsoNegotiates</span>      <span class="o">=</span> <span class="mi">506</span><span class="p">;</span>
-</span></span><span class="line"><span class="ln"> 73</span><span class="cl">    <span class="k">const</span> <span class="no">StatusInsufficientStorage</span>        <span class="o">=</span> <span class="mi">507</span><span class="p">;</span>
-</span></span><span class="line"><span class="ln"> 74</span><span class="cl">    <span class="k">const</span> <span class="no">StatusLoopDetected</span>               <span class="o">=</span> <span class="mi">508</span><span class="p">;</span>
-</span></span><span class="line"><span class="ln"> 75</span><span class="cl">    <span class="k">const</span> <span class="no">StatusNotExtended</span>                <span class="o">=</span> <span class="mi">510</span><span class="p">;</span>
-</span></span><span class="line"><span class="ln"> 76</span><span class="cl">    <span class="k">const</span> <span class="no">StatusNetworkAuthenticationRequired</span> <span class="o">=</span> <span class="mi">511</span><span class="p">;</span>
-</span></span><span class="line"><span class="ln"> 77</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 78</span><span class="cl">    <span class="sd">/**
-</span></span></span><span class="line"><span class="ln"> 79</span><span class="cl"><span class="sd">     * Returns the reason phrase for the given HTTP status code.
-</span></span></span><span class="line"><span class="ln"> 80</span><span class="cl"><span class="sd">     *
-</span></span></span><span class="line"><span class="ln"> 81</span><span class="cl"><span class="sd">     * @param int $code HTTP status code
-</span></span></span><span class="line"><span class="ln"> 82</span><span class="cl"><span class="sd">     * @return string The reason phrase, or empty string if unknown.
-</span></span></span><span class="line"><span class="ln"> 83</span><span class="cl"><span class="sd">     */</span>
-</span></span><span class="line"><span class="ln"> 84</span><span class="cl">    <span class="k">public</span> <span class="k">static</span> <span class="k">function</span> <span class="nf">statusText</span><span class="p">(</span><span class="nx">int</span> <span class="nv">$code</span><span class="p">)</span><span class="o">:</span> <span class="nx">string</span>
-</span></span><span class="line"><span class="ln"> 85</span><span class="cl">    <span class="p">{</span>
-</span></span><span class="line"><span class="ln"> 86</span><span class="cl">        <span class="k">return</span> <span class="nx">match</span> <span class="p">(</span><span class="nv">$code</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="ln"> 87</span><span class="cl">            <span class="nx">self</span><span class="o">::</span><span class="na">StatusContinue</span> <span class="o">=&gt;</span> <span class="s1">&#39;Continue&#39;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln"> 88</span><span class="cl">            <span class="nx">self</span><span class="o">::</span><span class="na">StatusSwitchingProtocols</span> <span class="o">=&gt;</span> <span class="s1">&#39;Switching Protocols&#39;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln"> 89</span><span class="cl">            <span class="nx">self</span><span class="o">::</span><span class="na">StatusProcessing</span> <span class="o">=&gt;</span> <span class="s1">&#39;Processing&#39;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln"> 90</span><span class="cl">            <span class="nx">self</span><span class="o">::</span><span class="na">StatusEarlyHints</span> <span class="o">=&gt;</span> <span class="s1">&#39;Early Hints&#39;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln"> 91</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 92</span><span class="cl">            <span class="nx">self</span><span class="o">::</span><span class="na">StatusOK</span> <span class="o">=&gt;</span> <span class="s1">&#39;OK&#39;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln"> 93</span><span class="cl">            <span class="nx">self</span><span class="o">::</span><span class="na">StatusCreated</span> <span class="o">=&gt;</span> <span class="s1">&#39;Created&#39;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln"> 94</span><span class="cl">            <span class="nx">self</span><span class="o">::</span><span class="na">StatusAccepted</span> <span class="o">=&gt;</span> <span class="s1">&#39;Accepted&#39;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln"> 95</span><span class="cl">            <span class="nx">self</span><span class="o">::</span><span class="na">StatusNonAuthoritativeInfo</span> <span class="o">=&gt;</span> <span class="s1">&#39;Non-Authoritative Information&#39;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln"> 96</span><span class="cl">            <span class="nx">self</span><span class="o">::</span><span class="na">StatusNoContent</span> <span class="o">=&gt;</span> <span class="s1">&#39;No Content&#39;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln"> 97</span><span class="cl">            <span class="nx">self</span><span class="o">::</span><span class="na">StatusResetContent</span> <span class="o">=&gt;</span> <span class="s1">&#39;Reset Content&#39;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln"> 98</span><span class="cl">            <span class="nx">self</span><span class="o">::</span><span class="na">StatusPartialContent</span> <span class="o">=&gt;</span> <span class="s1">&#39;Partial Content&#39;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln"> 99</span><span class="cl">            <span class="nx">self</span><span class="o">::</span><span class="na">StatusMultiStatus</span> <span class="o">=&gt;</span> <span class="s1">&#39;Multi-Status&#39;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">100</span><span class="cl">            <span class="nx">self</span><span class="o">::</span><span class="na">StatusAlreadyReported</span> <span class="o">=&gt;</span> <span class="s1">&#39;Already Reported&#39;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">101</span><span class="cl">            <span class="nx">self</span><span class="o">::</span><span class="na">StatusIMUsed</span> <span class="o">=&gt;</span> <span class="s1">&#39;IM Used&#39;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">102</span><span class="cl">
-</span></span><span class="line"><span class="ln">103</span><span class="cl">            <span class="nx">self</span><span class="o">::</span><span class="na">StatusMultipleChoices</span> <span class="o">=&gt;</span> <span class="s1">&#39;Multiple Choices&#39;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">104</span><span class="cl">            <span class="nx">self</span><span class="o">::</span><span class="na">StatusMovedPermanently</span> <span class="o">=&gt;</span> <span class="s1">&#39;Moved Permanently&#39;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">105</span><span class="cl">            <span class="nx">self</span><span class="o">::</span><span class="na">StatusFound</span> <span class="o">=&gt;</span> <span class="s1">&#39;Found&#39;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">106</span><span class="cl">            <span class="nx">self</span><span class="o">::</span><span class="na">StatusSeeOther</span> <span class="o">=&gt;</span> <span class="s1">&#39;See Other&#39;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">107</span><span class="cl">            <span class="nx">self</span><span class="o">::</span><span class="na">StatusNotModified</span> <span class="o">=&gt;</span> <span class="s1">&#39;Not Modified&#39;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">108</span><span class="cl">            <span class="nx">self</span><span class="o">::</span><span class="na">StatusUseProxy</span> <span class="o">=&gt;</span> <span class="s1">&#39;Use Proxy&#39;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">109</span><span class="cl">            <span class="nx">self</span><span class="o">::</span><span class="na">StatusTemporaryRedirect</span> <span class="o">=&gt;</span> <span class="s1">&#39;Temporary Redirect&#39;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">110</span><span class="cl">            <span class="nx">self</span><span class="o">::</span><span class="na">StatusPermanentRedirect</span> <span class="o">=&gt;</span> <span class="s1">&#39;Permanent Redirect&#39;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">111</span><span class="cl">
-</span></span><span class="line"><span class="ln">112</span><span class="cl">            <span class="nx">self</span><span class="o">::</span><span class="na">StatusBadRequest</span> <span class="o">=&gt;</span> <span class="s1">&#39;Bad Request&#39;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">113</span><span class="cl">            <span class="nx">self</span><span class="o">::</span><span class="na">StatusUnauthorized</span> <span class="o">=&gt;</span> <span class="s1">&#39;Unauthorized&#39;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">114</span><span class="cl">            <span class="nx">self</span><span class="o">::</span><span class="na">StatusPaymentRequired</span> <span class="o">=&gt;</span> <span class="s1">&#39;Payment Required&#39;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">115</span><span class="cl">            <span class="nx">self</span><span class="o">::</span><span class="na">StatusForbidden</span> <span class="o">=&gt;</span> <span class="s1">&#39;Forbidden&#39;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">116</span><span class="cl">            <span class="nx">self</span><span class="o">::</span><span class="na">StatusNotFound</span> <span class="o">=&gt;</span> <span class="s1">&#39;Not Found&#39;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">117</span><span class="cl">            <span class="nx">self</span><span class="o">::</span><span class="na">StatusMethodNotAllowed</span> <span class="o">=&gt;</span> <span class="s1">&#39;Method Not Allowed&#39;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">118</span><span class="cl">            <span class="nx">self</span><span class="o">::</span><span class="na">StatusNotAcceptable</span> <span class="o">=&gt;</span> <span class="s1">&#39;Not Acceptable&#39;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">119</span><span class="cl">            <span class="nx">self</span><span class="o">::</span><span class="na">StatusProxyAuthRequired</span> <span class="o">=&gt;</span> <span class="s1">&#39;Proxy Authentication Required&#39;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">120</span><span class="cl">            <span class="nx">self</span><span class="o">::</span><span class="na">StatusRequestTimeout</span> <span class="o">=&gt;</span> <span class="s1">&#39;Request Timeout&#39;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">121</span><span class="cl">            <span class="nx">self</span><span class="o">::</span><span class="na">StatusConflict</span> <span class="o">=&gt;</span> <span class="s1">&#39;Conflict&#39;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">122</span><span class="cl">            <span class="nx">self</span><span class="o">::</span><span class="na">StatusGone</span> <span class="o">=&gt;</span> <span class="s1">&#39;Gone&#39;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">123</span><span class="cl">            <span class="nx">self</span><span class="o">::</span><span class="na">StatusLengthRequired</span> <span class="o">=&gt;</span> <span class="s1">&#39;Length Required&#39;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">124</span><span class="cl">            <span class="nx">self</span><span class="o">::</span><span class="na">StatusPreconditionFailed</span> <span class="o">=&gt;</span> <span class="s1">&#39;Precondition Failed&#39;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">125</span><span class="cl">            <span class="nx">self</span><span class="o">::</span><span class="na">StatusRequestEntityTooLarge</span> <span class="o">=&gt;</span> <span class="s1">&#39;Request Entity Too Large&#39;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">126</span><span class="cl">            <span class="nx">self</span><span class="o">::</span><span class="na">StatusRequestURITooLong</span> <span class="o">=&gt;</span> <span class="s1">&#39;Request URI Too Long&#39;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">127</span><span class="cl">            <span class="nx">self</span><span class="o">::</span><span class="na">StatusUnsupportedMediaType</span> <span class="o">=&gt;</span> <span class="s1">&#39;Unsupported Media Type&#39;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">128</span><span class="cl">            <span class="nx">self</span><span class="o">::</span><span class="na">StatusRequestedRangeNotSatisfiable</span> <span class="o">=&gt;</span> <span class="s1">&#39;Requested Range Not Satisfiable&#39;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">129</span><span class="cl">            <span class="nx">self</span><span class="o">::</span><span class="na">StatusExpectationFailed</span> <span class="o">=&gt;</span> <span class="s1">&#39;Expectation Failed&#39;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">130</span><span class="cl">            <span class="nx">self</span><span class="o">::</span><span class="na">StatusTeapot</span> <span class="o">=&gt;</span> <span class="s2">&#34;I&#39;m a teapot&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">131</span><span class="cl">            <span class="nx">self</span><span class="o">::</span><span class="na">StatusMisdirectedRequest</span> <span class="o">=&gt;</span> <span class="s1">&#39;Misdirected Request&#39;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">132</span><span class="cl">            <span class="nx">self</span><span class="o">::</span><span class="na">StatusUnprocessableEntity</span> <span class="o">=&gt;</span> <span class="s1">&#39;Unprocessable Entity&#39;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">133</span><span class="cl">            <span class="nx">self</span><span class="o">::</span><span class="na">StatusLocked</span> <span class="o">=&gt;</span> <span class="s1">&#39;Locked&#39;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">134</span><span class="cl">            <span class="nx">self</span><span class="o">::</span><span class="na">StatusFailedDependency</span> <span class="o">=&gt;</span> <span class="s1">&#39;Failed Dependency&#39;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">135</span><span class="cl">            <span class="nx">self</span><span class="o">::</span><span class="na">StatusTooEarly</span> <span class="o">=&gt;</span> <span class="s1">&#39;Too Early&#39;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">136</span><span class="cl">            <span class="nx">self</span><span class="o">::</span><span class="na">StatusUpgradeRequired</span> <span class="o">=&gt;</span> <span class="s1">&#39;Upgrade Required&#39;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">137</span><span class="cl">            <span class="nx">self</span><span class="o">::</span><span class="na">StatusPreconditionRequired</span> <span class="o">=&gt;</span> <span class="s1">&#39;Precondition Required&#39;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">138</span><span class="cl">            <span class="nx">self</span><span class="o">::</span><span class="na">StatusTooManyRequests</span> <span class="o">=&gt;</span> <span class="s1">&#39;Too Many Requests&#39;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">139</span><span class="cl">            <span class="nx">self</span><span class="o">::</span><span class="na">StatusRequestHeaderFieldsTooLarge</span> <span class="o">=&gt;</span> <span class="s1">&#39;Request Header Fields Too Large&#39;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">140</span><span class="cl">            <span class="nx">self</span><span class="o">::</span><span class="na">StatusUnavailableForLegalReasons</span> <span class="o">=&gt;</span> <span class="s1">&#39;Unavailable For Legal Reasons&#39;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">141</span><span class="cl">
-</span></span><span class="line"><span class="ln">142</span><span class="cl">            <span class="nx">self</span><span class="o">::</span><span class="na">StatusInternalServerError</span> <span class="o">=&gt;</span> <span class="s1">&#39;Internal Server Error&#39;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">143</span><span class="cl">            <span class="nx">self</span><span class="o">::</span><span class="na">StatusNotImplemented</span> <span class="o">=&gt;</span> <span class="s1">&#39;Not Implemented&#39;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">144</span><span class="cl">            <span class="nx">self</span><span class="o">::</span><span class="na">StatusBadGateway</span> <span class="o">=&gt;</span> <span class="s1">&#39;Bad Gateway&#39;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">145</span><span class="cl">            <span class="nx">self</span><span class="o">::</span><span class="na">StatusServiceUnavailable</span> <span class="o">=&gt;</span> <span class="s1">&#39;Service Unavailable&#39;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">146</span><span class="cl">            <span class="nx">self</span><span class="o">::</span><span class="na">StatusGatewayTimeout</span> <span class="o">=&gt;</span> <span class="s1">&#39;Gateway Timeout&#39;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">147</span><span class="cl">            <span class="nx">self</span><span class="o">::</span><span class="na">StatusHTTPVersionNotSupported</span> <span class="o">=&gt;</span> <span class="s1">&#39;HTTP Version Not Supported&#39;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">148</span><span class="cl">            <span class="nx">self</span><span class="o">::</span><span class="na">StatusVariantAlsoNegotiates</span> <span class="o">=&gt;</span> <span class="s1">&#39;Variant Also Negotiates&#39;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">149</span><span class="cl">            <span class="nx">self</span><span class="o">::</span><span class="na">StatusInsufficientStorage</span> <span class="o">=&gt;</span> <span class="s1">&#39;Insufficient Storage&#39;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">150</span><span class="cl">            <span class="nx">self</span><span class="o">::</span><span class="na">StatusLoopDetected</span> <span class="o">=&gt;</span> <span class="s1">&#39;Loop Detected&#39;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">151</span><span class="cl">            <span class="nx">self</span><span class="o">::</span><span class="na">StatusNotExtended</span> <span class="o">=&gt;</span> <span class="s1">&#39;Not Extended&#39;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">152</span><span class="cl">            <span class="nx">self</span><span class="o">::</span><span class="na">StatusNetworkAuthenticationRequired</span> <span class="o">=&gt;</span> <span class="s1">&#39;Network Authentication Required&#39;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">153</span><span class="cl">
-</span></span><span class="line"><span class="ln">154</span><span class="cl">            <span class="k">default</span> <span class="o">=&gt;</span> <span class="s1">&#39;&#39;</span>
-</span></span><span class="line"><span class="ln">155</span><span class="cl">        <span class="p">};</span>
-</span></span><span class="line"><span class="ln">156</span><span class="cl">    <span class="p">}</span>
-</span></span><span class="line"><span class="ln">157</span><span class="cl"><span class="p">}</span>
-</span></span><span class="line"><span class="ln">158</span><span class="cl">
-</span></span><span class="line"><span class="ln">159</span><span class="cl"><span class="c1">// --- 使用示例 ---
-</span></span></span><span class="line"><span class="ln">160</span><span class="cl"><span class="c1">// echo HttpStatus::statusText(200); // 输出: OK
-</span></span></span><span class="line"><span class="ln">161</span><span class="cl"><span class="c1">// echo HttpStatus::statusText(404); // 输出: Not Found
-</span></span></span><span class="line"><span class="ln">162</span><span class="cl"><span class="c1">// echo HttpStatus::statusText(999); // 输出: (空字符串)
+<h1 id="-php-70--84-各版本新增功能与重要变更带完整代码示例">📘 PHP 7.0 – 8.4 各版本新增功能与重要变更（带完整代码示例）</h1>
+<hr>
+<h2 id="-php-70">🔹 PHP 7.0</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="c1">// 1. 标量类型声明（需 strict_types）
+</span></span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="c1"></span><span class="k">declare</span><span class="p">(</span><span class="nx">strict_types</span><span class="o">=</span><span class="mi">1</span><span class="p">);</span>
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="k">function</span> <span class="nf">add</span><span class="p">(</span><span class="nx">int</span> <span class="nv">$a</span><span class="p">,</span> <span class="nx">int</span> <span class="nv">$b</span><span class="p">)</span><span class="o">:</span> <span class="nx">int</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl">    <span class="k">return</span> <span class="nv">$a</span> <span class="o">+</span> <span class="nv">$b</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl"><span class="k">echo</span> <span class="nx">add</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">);</span> <span class="c1">// 5
+</span></span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="c1">// 2. 返回类型声明
+</span></span></span><span class="line"><span class="ln"> 9</span><span class="cl"><span class="c1"></span><span class="k">function</span> <span class="nf">getName</span><span class="p">()</span><span class="o">:</span> <span class="nx">string</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">10</span><span class="cl">    <span class="k">return</span> <span class="s2">&#34;Alice&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln">11</span><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="ln">12</span><span class="cl">
+</span></span><span class="line"><span class="ln">13</span><span class="cl"><span class="c1">// 3. Null 合并运算符
+</span></span></span><span class="line"><span class="ln">14</span><span class="cl"><span class="c1"></span><span class="nv">$username</span> <span class="o">=</span> <span class="nv">$_GET</span><span class="p">[</span><span class="s1">&#39;user&#39;</span><span class="p">]</span> <span class="o">??</span> <span class="s1">&#39;guest&#39;</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln">15</span><span class="cl">
+</span></span><span class="line"><span class="ln">16</span><span class="cl"><span class="c1">// 4. 太空船运算符
+</span></span></span><span class="line"><span class="ln">17</span><span class="cl"><span class="c1"></span><span class="k">echo</span> <span class="mi">1</span> <span class="o">&lt;=&gt;</span> <span class="mi">2</span><span class="p">;</span> <span class="c1">// -1
+</span></span></span><span class="line"><span class="ln">18</span><span class="cl"><span class="c1"></span><span class="k">echo</span> <span class="mi">2</span> <span class="o">&lt;=&gt;</span> <span class="mi">2</span><span class="p">;</span> <span class="c1">// 0
+</span></span></span><span class="line"><span class="ln">19</span><span class="cl"><span class="c1"></span><span class="k">echo</span> <span class="mi">3</span> <span class="o">&lt;=&gt;</span> <span class="mi">2</span><span class="p">;</span> <span class="c1">// 1
+</span></span></span><span class="line"><span class="ln">20</span><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="ln">21</span><span class="cl"><span class="c1">// 5. 匿名类
+</span></span></span><span class="line"><span class="ln">22</span><span class="cl"><span class="c1"></span><span class="nv">$logger</span> <span class="o">=</span> <span class="k">new</span> <span class="k">class</span> <span class="err">{</span>
+</span></span><span class="line"><span class="ln">23</span><span class="cl">    <span class="k">public</span> <span class="k">function</span> <span class="nf">log</span><span class="p">(</span><span class="nx">string</span> <span class="nv">$msg</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">24</span><span class="cl">        <span class="k">echo</span> <span class="s2">&#34;[LOG] </span><span class="si">$msg\n</span><span class="s2">&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln">25</span><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="ln">26</span><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="ln">27</span><span class="cl"><span class="nv">$logger</span><span class="o">-&gt;</span><span class="na">log</span><span class="p">(</span><span class="s2">&#34;Hello&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="ln">28</span><span class="cl">
+</span></span><span class="line"><span class="ln">29</span><span class="cl"><span class="c1">// 6. Group use
+</span></span></span><span class="line"><span class="ln">30</span><span class="cl"><span class="c1"></span><span class="k">use</span> <span class="nx">Some\Namespace\</span><span class="p">{</span><span class="nx">ClassA</span><span class="p">,</span> <span class="nx">ClassB</span> <span class="k">as</span> <span class="nx">B</span><span class="p">};</span>
+</span></span><span class="line"><span class="ln">31</span><span class="cl">
+</span></span><span class="line"><span class="ln">32</span><span class="cl"><span class="c1">// 7. 移除 mysql_*（以下代码在 PHP 7+ 报错）
+</span></span></span><span class="line"><span class="ln">33</span><span class="cl"><span class="c1">// $conn = mysql_connect(); // ❌ Fatal error
+</span></span></span><span class="line"><span class="ln">34</span><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="ln">35</span><span class="cl"><span class="c1">// 8. 安全随机数
+</span></span></span><span class="line"><span class="ln">36</span><span class="cl"><span class="c1"></span><span class="nv">$bytes</span> <span class="o">=</span> <span class="nx">random_bytes</span><span class="p">(</span><span class="mi">16</span><span class="p">);</span>
+</span></span><span class="line"><span class="ln">37</span><span class="cl"><span class="nv">$int</span> <span class="o">=</span> <span class="nx">random_int</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">100</span><span class="p">);</span>
+</span></span><span class="line"><span class="ln">38</span><span class="cl">
+</span></span><span class="line"><span class="ln">39</span><span class="cl"><span class="c1">// 9. Closure::call()
+</span></span></span><span class="line"><span class="ln">40</span><span class="cl"><span class="c1"></span><span class="nv">$obj</span> <span class="o">=</span> <span class="p">(</span><span class="nx">object</span><span class="p">)[</span><span class="s1">&#39;x&#39;</span> <span class="o">=&gt;</span> <span class="mi">42</span><span class="p">];</span>
+</span></span><span class="line"><span class="ln">41</span><span class="cl"><span class="p">(</span><span class="k">function</span><span class="p">()</span> <span class="p">{</span> <span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">x</span><span class="p">;</span> <span class="p">})</span><span class="o">-&gt;</span><span class="na">call</span><span class="p">(</span><span class="nv">$obj</span><span class="p">);</span> <span class="c1">// 42
 </span></span></span></code></pre></div><hr>
-<h3 id="-说明">🔍 说明</h3>
-<ol>
-<li>
-<p><strong>PHP 版本要求</strong>：</p>
-<ul>
-<li>使用了 <code>match</code> 表达式（PHP 8.0+），如果你使用的是 PHP 7.x，可以用 <code>switch</code> 替代。</li>
-<li>使用了 <code>: string</code> 返回类型声明（PHP 7.0+）。</li>
-</ul>
-</li>
-<li>
-<p><strong>兼容 PHP 7 的 <code>statusText</code> 实现（可选）</strong>：
-如果你需要兼容 PHP 7，可以将 <code>statusText</code> 改为：</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln"> 1</span><span class="cl"> <span class="k">public</span> <span class="k">static</span> <span class="k">function</span> <span class="nf">statusText</span><span class="p">(</span><span class="nv">$code</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln"> 2</span><span class="cl"> <span class="p">{</span>
-</span></span><span class="line"><span class="ln"> 3</span><span class="cl">     <span class="k">switch</span> <span class="p">(</span><span class="nv">$code</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="ln"> 4</span><span class="cl">         <span class="k">case</span> <span class="nx">self</span><span class="o">::</span><span class="na">StatusContinue</span><span class="o">:</span> <span class="k">return</span> <span class="s1">&#39;Continue&#39;</span><span class="p">;</span>
-</span></span><span class="line"><span class="ln"> 5</span><span class="cl">         <span class="k">case</span> <span class="nx">self</span><span class="o">::</span><span class="na">StatusSwitchingProtocols</span><span class="o">:</span> <span class="k">return</span> <span class="s1">&#39;Switching Protocols&#39;</span><span class="p">;</span>
-</span></span><span class="line"><span class="ln"> 6</span><span class="cl">         <span class="c1">// ... 其他 case
-</span></span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="c1"></span>         <span class="k">case</span> <span class="nx">self</span><span class="o">::</span><span class="na">StatusNetworkAuthenticationRequired</span><span class="o">:</span> <span class="k">return</span> <span class="s1">&#39;Network Authentication Required&#39;</span><span class="p">;</span>
-</span></span><span class="line"><span class="ln"> 8</span><span class="cl">         <span class="k">default</span><span class="o">:</span> <span class="k">return</span> <span class="s1">&#39;&#39;</span><span class="p">;</span>
-</span></span><span class="line"><span class="ln"> 9</span><span class="cl">     <span class="p">}</span>
-</span></span><span class="line"><span class="ln">10</span><span class="cl"> <span class="p">}</span>
-</span></span></code></pre></div></li>
-<li>
-<p><strong>命名风格</strong>：</p>
-<ul>
-<li>使用了 <code>PascalCase</code> 常量名，与 Go 保持一致。</li>
-<li>类名 <code>HttpStatus</code> 是标准做法。</li>
-</ul>
-</li>
-</ol>
+<h2 id="-php-71">🔹 PHP 7.1</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="c1">// 1. 可为空类型
+</span></span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="c1"></span><span class="k">function</span> <span class="nf">say</span><span class="p">(</span><span class="o">?</span><span class="nx">string</span> <span class="nv">$name</span><span class="p">)</span><span class="o">:</span> <span class="nx">void</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl">    <span class="k">echo</span> <span class="nv">$name</span> <span class="o">??</span> <span class="s1">&#39;Anonymous&#39;</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="nx">say</span><span class="p">(</span><span class="k">null</span><span class="p">);</span> <span class="c1">// Anonymous
+</span></span></span><span class="line"><span class="ln"> 6</span><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="c1">// 2. void 返回类型
+</span></span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="c1"></span><span class="k">function</span> <span class="nf">dump</span><span class="p">(</span><span class="nx">mixed</span> <span class="nv">$x</span><span class="p">)</span><span class="o">:</span> <span class="nx">void</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">    <span class="nx">var_dump</span><span class="p">(</span><span class="nv">$x</span><span class="p">);</span>
+</span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="ln">11</span><span class="cl">
+</span></span><span class="line"><span class="ln">12</span><span class="cl"><span class="c1">// 3. 类常量可见性
+</span></span></span><span class="line"><span class="ln">13</span><span class="cl"><span class="c1"></span><span class="k">class</span> <span class="nc">Config</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">14</span><span class="cl">    <span class="k">private</span> <span class="k">const</span> <span class="no">SECRET</span> <span class="o">=</span> <span class="s1">&#39;xxx&#39;</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln">15</span><span class="cl">    <span class="k">public</span> <span class="k">const</span> <span class="no">PUBLIC_KEY</span> <span class="o">=</span> <span class="s1">&#39;pub&#39;</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln">16</span><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="ln">17</span><span class="cl">
+</span></span><span class="line"><span class="ln">18</span><span class="cl"><span class="c1">// 4. 多异常捕获
+</span></span></span><span class="line"><span class="ln">19</span><span class="cl"><span class="c1"></span><span class="k">try</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">20</span><span class="cl">    <span class="k">throw</span> <span class="k">new</span> <span class="nx">InvalidArgumentException</span><span class="p">(</span><span class="s2">&#34;Bad input&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="ln">21</span><span class="cl"><span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">InvalidArgumentException</span> <span class="o">|</span> <span class="nx">OutOfRangeException</span> <span class="nv">$e</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">22</span><span class="cl">    <span class="k">echo</span> <span class="s2">&#34;Caught: &#34;</span> <span class="o">.</span> <span class="nv">$e</span><span class="o">-&gt;</span><span class="na">getMessage</span><span class="p">();</span>
+</span></span><span class="line"><span class="ln">23</span><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="ln">24</span><span class="cl">
+</span></span><span class="line"><span class="ln">25</span><span class="cl"><span class="c1">// 5. 对称数组解构
+</span></span></span><span class="line"><span class="ln">26</span><span class="cl"><span class="c1"></span><span class="p">[</span><span class="nv">$a</span><span class="p">,</span> <span class="nv">$b</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">];</span>
+</span></span><span class="line"><span class="ln">27</span><span class="cl"><span class="p">[</span><span class="s1">&#39;name&#39;</span> <span class="o">=&gt;</span> <span class="nv">$n</span><span class="p">,</span> <span class="s1">&#39;age&#39;</span> <span class="o">=&gt;</span> <span class="nv">$a</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;name&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Bob&#39;</span><span class="p">,</span> <span class="s1">&#39;age&#39;</span> <span class="o">=&gt;</span> <span class="mi">30</span><span class="p">];</span>
+</span></span><span class="line"><span class="ln">28</span><span class="cl">
+</span></span><span class="line"><span class="ln">29</span><span class="cl"><span class="c1">// 6. 负字符串偏移
+</span></span></span><span class="line"><span class="ln">30</span><span class="cl"><span class="c1"></span><span class="k">echo</span> <span class="s2">&#34;hello&#34;</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">];</span> <span class="c1">// &#39;o&#39;
+</span></span></span><span class="line"><span class="ln">31</span><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="ln">32</span><span class="cl"><span class="c1">// 7. iterable 伪类型
+</span></span></span><span class="line"><span class="ln">33</span><span class="cl"><span class="c1"></span><span class="k">function</span> <span class="nf">process</span><span class="p">(</span><span class="nx">iterable</span> <span class="nv">$items</span><span class="p">)</span><span class="o">:</span> <span class="nx">void</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">34</span><span class="cl">    <span class="k">foreach</span> <span class="p">(</span><span class="nv">$items</span> <span class="k">as</span> <span class="nv">$item</span><span class="p">)</span> <span class="p">{}</span>
+</span></span><span class="line"><span class="ln">35</span><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="ln">36</span><span class="cl"><span class="nx">process</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]);</span>
+</span></span><span class="line"><span class="ln">37</span><span class="cl"><span class="nx">process</span><span class="p">(</span><span class="k">new</span> <span class="nx">ArrayIterator</span><span class="p">([</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">]));</span>
+</span></span><span class="line"><span class="ln">38</span><span class="cl">
+</span></span><span class="line"><span class="ln">39</span><span class="cl"><span class="c1">// 8. 弃用 create_function()
+</span></span></span><span class="line"><span class="ln">40</span><span class="cl"><span class="c1">// $f = create_function(&#39;$a,$b&#39;, &#39;return $a+$b;&#39;); // ❌ Deprecated in 7.2, removed in 7.2+
+</span></span></span><span class="line"><span class="ln">41</span><span class="cl"><span class="c1"></span><span class="nv">$f</span> <span class="o">=</span> <span class="nx">fn</span><span class="p">(</span><span class="nv">$a</span><span class="p">,</span> <span class="nv">$b</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nv">$a</span> <span class="o">+</span> <span class="nv">$b</span><span class="p">;</span> <span class="c1">// ✅
+</span></span></span></code></pre></div><hr>
+<h2 id="-php-72">🔹 PHP 7.2</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="c1">// 1. object 类型提示
+</span></span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="c1"></span><span class="k">function</span> <span class="nf">cloneIt</span><span class="p">(</span><span class="nx">object</span> <span class="nv">$obj</span><span class="p">)</span><span class="o">:</span> <span class="nx">object</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl">    <span class="k">return</span> <span class="k">clone</span> <span class="nv">$obj</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl"><span class="c1">// 2. is_countable()
+</span></span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="c1"></span><span class="nv">$data</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">];</span>
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="k">if</span> <span class="p">(</span><span class="nx">is_countable</span><span class="p">(</span><span class="nv">$data</span><span class="p">))</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">    <span class="k">echo</span> <span class="nx">count</span><span class="p">(</span><span class="nv">$data</span><span class="p">);</span> <span class="c1">// 3
+</span></span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span><span class="line"><span class="ln">11</span><span class="cl">
+</span></span><span class="line"><span class="ln">12</span><span class="cl"><span class="c1">// 3. 内置 Sodium（现代加密）
+</span></span></span><span class="line"><span class="ln">13</span><span class="cl"><span class="c1"></span><span class="nv">$key</span> <span class="o">=</span> <span class="nx">random_bytes</span><span class="p">(</span><span class="nx">SODIUM_CRYPTO_SECRETBOX_KEYBYTES</span><span class="p">);</span>
+</span></span><span class="line"><span class="ln">14</span><span class="cl"><span class="nv">$nonce</span> <span class="o">=</span> <span class="nx">random_bytes</span><span class="p">(</span><span class="nx">SODIUM_CRYPTO_SECRETBOX_NONCEBYTES</span><span class="p">);</span>
+</span></span><span class="line"><span class="ln">15</span><span class="cl"><span class="nv">$ciphertext</span> <span class="o">=</span> <span class="nx">sodium_crypto_secretbox</span><span class="p">(</span><span class="s1">&#39;secret&#39;</span><span class="p">,</span> <span class="nv">$nonce</span><span class="p">,</span> <span class="nv">$key</span><span class="p">);</span>
+</span></span><span class="line"><span class="ln">16</span><span class="cl">
+</span></span><span class="line"><span class="ln">17</span><span class="cl"><span class="c1">// 4. stream_isatty()
+</span></span></span><span class="line"><span class="ln">18</span><span class="cl"><span class="c1"></span><span class="k">if</span> <span class="p">(</span><span class="nx">stream_isatty</span><span class="p">(</span><span class="nx">STDOUT</span><span class="p">))</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">19</span><span class="cl">    <span class="k">echo</span> <span class="s2">&#34;Running in terminal</span><span class="se">\n</span><span class="s2">&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln">20</span><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="ln">21</span><span class="cl">
+</span></span><span class="line"><span class="ln">22</span><span class="cl"><span class="c1">// 5. spl_object_id()（比 hash 更快）
+</span></span></span><span class="line"><span class="ln">23</span><span class="cl"><span class="c1"></span><span class="nv">$obj</span> <span class="o">=</span> <span class="k">new</span> <span class="k">stdClass</span><span class="p">();</span>
+</span></span><span class="line"><span class="ln">24</span><span class="cl"><span class="nv">$id</span> <span class="o">=</span> <span class="nx">spl_object_id</span><span class="p">(</span><span class="nv">$obj</span><span class="p">);</span> <span class="c1">// int
+</span></span></span><span class="line"><span class="ln">25</span><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="ln">26</span><span class="cl"><span class="c1">// 6. unserialize 默认禁用对象反序列化
+</span></span></span><span class="line"><span class="ln">27</span><span class="cl"><span class="c1"></span><span class="nv">$data</span> <span class="o">=</span> <span class="nx">serialize</span><span class="p">(</span><span class="k">new</span> <span class="k">stdClass</span><span class="p">());</span>
+</span></span><span class="line"><span class="ln">28</span><span class="cl"><span class="c1">// unserialize($data); // ❌ Notice: unserialize(): Class __PHP_Incomplete_Class not allowed
+</span></span></span><span class="line"><span class="ln">29</span><span class="cl"><span class="c1"></span><span class="nv">$obj</span> <span class="o">=</span> <span class="nx">unserialize</span><span class="p">(</span><span class="nv">$data</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;allowed_classes&#39;</span> <span class="o">=&gt;</span> <span class="p">[</span><span class="s1">&#39;stdClass&#39;</span><span class="p">]]);</span> <span class="c1">// ✅
+</span></span></span><span class="line"><span class="ln">30</span><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="ln">31</span><span class="cl"><span class="c1">// 7. 移除 __autoload()
+</span></span></span><span class="line"><span class="ln">32</span><span class="cl"><span class="c1">// function __autoload($class) {} // ❌ Fatal error
+</span></span></span><span class="line"><span class="ln">33</span><span class="cl"><span class="c1"></span><span class="nx">spl_autoload_register</span><span class="p">(</span><span class="k">function</span><span class="p">(</span><span class="nv">$class</span><span class="p">)</span> <span class="p">{</span> <span class="cm">/* ... */</span> <span class="p">});</span> <span class="c1">// ✅
+</span></span></span></code></pre></div><hr>
+<h2 id="-php-73">🔹 PHP 7.3</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="c1">// 1. 灵活 Heredoc
+</span></span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="c1"></span><span class="nv">$html</span> <span class="o">=</span> <span class="s">&lt;&lt;&lt;</span><span class="dl">HTML</span><span class="s">
+</span></span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="s">    &lt;div&gt;
+</span></span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="s">        Hello World
+</span></span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="s">    &lt;/div&gt;
+</span></span></span><span class="line"><span class="ln"> 6</span><span class="cl"><span class="s">    </span><span class="dl">HTML</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="c1">// 2. JSON 异常
+</span></span></span><span class="line"><span class="ln"> 9</span><span class="cl"><span class="c1"></span><span class="k">try</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">10</span><span class="cl">    <span class="nx">json_decode</span><span class="p">(</span><span class="s1">&#39;{invalid json}&#39;</span><span class="p">,</span> <span class="nx">flags</span><span class="o">:</span> <span class="nx">JSON_THROW_ON_ERROR</span><span class="p">);</span>
+</span></span><span class="line"><span class="ln">11</span><span class="cl"><span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">JsonException</span> <span class="nv">$e</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">12</span><span class="cl">    <span class="k">echo</span> <span class="s2">&#34;JSON Error: &#34;</span> <span class="o">.</span> <span class="nv">$e</span><span class="o">-&gt;</span><span class="na">getMessage</span><span class="p">();</span>
+</span></span><span class="line"><span class="ln">13</span><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="ln">14</span><span class="cl">
+</span></span><span class="line"><span class="ln">15</span><span class="cl"><span class="c1">// 3. 新字符串函数
+</span></span></span><span class="line"><span class="ln">16</span><span class="cl"><span class="c1"></span><span class="nx">var_dump</span><span class="p">(</span><span class="nx">str_contains</span><span class="p">(</span><span class="s1">&#39;hello world&#39;</span><span class="p">,</span> <span class="s1">&#39;world&#39;</span><span class="p">));</span>      <span class="c1">// true
+</span></span></span><span class="line"><span class="ln">17</span><span class="cl"><span class="c1"></span><span class="nx">var_dump</span><span class="p">(</span><span class="nx">str_starts_with</span><span class="p">(</span><span class="s1">&#39;https://&#39;</span><span class="p">,</span> <span class="s1">&#39;http&#39;</span><span class="p">));</span>       <span class="c1">// true
+</span></span></span><span class="line"><span class="ln">18</span><span class="cl"><span class="c1"></span><span class="nx">var_dump</span><span class="p">(</span><span class="nx">str_ends_with</span><span class="p">(</span><span class="s1">&#39;file.txt&#39;</span><span class="p">,</span> <span class="s1">&#39;.txt&#39;</span><span class="p">));</span>         <span class="c1">// true
+</span></span></span><span class="line"><span class="ln">19</span><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="ln">20</span><span class="cl"><span class="c1">// 4. 函数调用末尾逗号
+</span></span></span><span class="line"><span class="ln">21</span><span class="cl"><span class="c1"></span><span class="nv">$values</span> <span class="o">=</span> <span class="nx">array_merge</span><span class="p">(</span>
+</span></span><span class="line"><span class="ln">22</span><span class="cl">    <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span>
+</span></span><span class="line"><span class="ln">23</span><span class="cl">    <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">],</span>   <span class="c1">// 允许逗号
+</span></span></span><span class="line"><span class="ln">24</span><span class="cl"><span class="c1"></span><span class="p">);</span>
+</span></span><span class="line"><span class="ln">25</span><span class="cl">
+</span></span><span class="line"><span class="ln">26</span><span class="cl"><span class="c1">// 5. array_key_first / array_key_last
+</span></span></span><span class="line"><span class="ln">27</span><span class="cl"><span class="c1"></span><span class="nv">$arr</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;a&#39;</span> <span class="o">=&gt;</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span> <span class="o">=&gt;</span> <span class="mi">2</span><span class="p">];</span>
+</span></span><span class="line"><span class="ln">28</span><span class="cl"><span class="k">echo</span> <span class="nx">array_key_first</span><span class="p">(</span><span class="nv">$arr</span><span class="p">);</span> <span class="c1">// a
+</span></span></span><span class="line"><span class="ln">29</span><span class="cl"><span class="c1"></span><span class="k">echo</span> <span class="nx">array_key_last</span><span class="p">(</span><span class="nv">$arr</span><span class="p">);</span>  <span class="c1">// b
+</span></span></span><span class="line"><span class="ln">30</span><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="ln">31</span><span class="cl"><span class="c1">// 6. hrtime() 高精度时间
+</span></span></span><span class="line"><span class="ln">32</span><span class="cl"><span class="c1"></span><span class="nv">$start</span> <span class="o">=</span> <span class="nx">hrtime</span><span class="p">(</span><span class="k">true</span><span class="p">);</span>
+</span></span><span class="line"><span class="ln">33</span><span class="cl"><span class="nx">usleep</span><span class="p">(</span><span class="mi">1000</span><span class="p">);</span>
+</span></span><span class="line"><span class="ln">34</span><span class="cl"><span class="nv">$end</span> <span class="o">=</span> <span class="nx">hrtime</span><span class="p">(</span><span class="k">true</span><span class="p">);</span>
+</span></span><span class="line"><span class="ln">35</span><span class="cl"><span class="k">echo</span> <span class="s2">&#34;Elapsed: &#34;</span> <span class="o">.</span> <span class="p">(</span><span class="nv">$end</span> <span class="o">-</span> <span class="nv">$start</span><span class="p">)</span> <span class="o">/</span> <span class="mf">1e6</span> <span class="o">.</span> <span class="s2">&#34; μs</span><span class="se">\n</span><span class="s2">&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln">36</span><span class="cl">
+</span></span><span class="line"><span class="ln">37</span><span class="cl"><span class="c1">// 7. 弃用花括号访问
+</span></span></span><span class="line"><span class="ln">38</span><span class="cl"><span class="c1">// echo $str{0}; // ❌ Deprecated
+</span></span></span><span class="line"><span class="ln">39</span><span class="cl"><span class="c1"></span><span class="k">echo</span> <span class="nv">$str</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span> <span class="c1">// ✅
+</span></span></span></code></pre></div><hr>
+<h2 id="-php-74">🔹 PHP 7.4</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="c1">// 1. 属性类型声明
+</span></span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="c1"></span><span class="k">class</span> <span class="nc">User</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl">    <span class="k">public</span> <span class="nx">int</span> <span class="nv">$id</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl">    <span class="k">public</span> <span class="o">?</span><span class="nx">string</span> <span class="nv">$name</span> <span class="o">=</span> <span class="k">null</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl"><span class="nv">$user</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">User</span><span class="p">();</span>
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="nv">$user</span><span class="o">-&gt;</span><span class="na">id</span> <span class="o">=</span> <span class="mi">100</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl"><span class="c1">// 2. 箭头函数
+</span></span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="c1"></span><span class="nv">$factor</span> <span class="o">=</span> <span class="mi">10</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln">11</span><span class="cl"><span class="nv">$nums</span> <span class="o">=</span> <span class="nx">array_map</span><span class="p">(</span><span class="nx">fn</span><span class="p">(</span><span class="nv">$n</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nv">$n</span> <span class="o">*</span> <span class="nv">$factor</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]);</span> <span class="c1">// [10,20,30]
+</span></span></span><span class="line"><span class="ln">12</span><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="ln">13</span><span class="cl"><span class="c1">// 3. 空合并赋值
+</span></span></span><span class="line"><span class="ln">14</span><span class="cl"><span class="c1"></span><span class="nv">$config</span> <span class="o">=</span> <span class="p">[];</span>
+</span></span><span class="line"><span class="ln">15</span><span class="cl"><span class="nv">$config</span><span class="p">[</span><span class="s1">&#39;debug&#39;</span><span class="p">]</span> <span class="o">??=</span> <span class="k">true</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln">16</span><span class="cl">
+</span></span><span class="line"><span class="ln">17</span><span class="cl"><span class="c1">// 4. 协变返回 &amp; 逆变参数
+</span></span></span><span class="line"><span class="ln">18</span><span class="cl"><span class="c1"></span><span class="k">interface</span> <span class="nx">Factory</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">19</span><span class="cl">    <span class="k">function</span> <span class="nf">make</span><span class="p">()</span><span class="o">:</span> <span class="nx">object</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln">20</span><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="ln">21</span><span class="cl"><span class="k">class</span> <span class="nc">UserFactory</span> <span class="k">implements</span> <span class="nx">Factory</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">22</span><span class="cl">    <span class="k">function</span> <span class="nf">make</span><span class="p">()</span><span class="o">:</span> <span class="nx">User</span> <span class="p">{</span> <span class="k">return</span> <span class="k">new</span> <span class="nx">User</span><span class="p">();</span> <span class="p">}</span> <span class="c1">// 返回更具体类型 ✅
+</span></span></span><span class="line"><span class="ln">23</span><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span><span class="line"><span class="ln">24</span><span class="cl">
+</span></span><span class="line"><span class="ln">25</span><span class="cl"><span class="c1">// 5. FFI（需启用 ext-ffi）
+</span></span></span><span class="line"><span class="ln">26</span><span class="cl"><span class="c1"></span><span class="cm">/*
+</span></span></span><span class="line"><span class="ln">27</span><span class="cl"><span class="cm">$libc = FFI::cdef(&#34;int printf(const char *fmt, ...);&#34;, &#34;libc.so.6&#34;);
+</span></span></span><span class="line"><span class="ln">28</span><span class="cl"><span class="cm">$libc-&gt;printf(&#34;Hello from C!\n&#34;);
+</span></span></span><span class="line"><span class="ln">29</span><span class="cl"><span class="cm">*/</span>
+</span></span><span class="line"><span class="ln">30</span><span class="cl">
+</span></span><span class="line"><span class="ln">31</span><span class="cl"><span class="c1">// 6. 弃用花括号访问（彻底移除）
+</span></span></span><span class="line"><span class="ln">32</span><span class="cl"><span class="c1">// echo $arr{0}; // ❌ Fatal error in 7.4+
+</span></span></span></code></pre></div><blockquote>
+<p>⚠️ 注意：构造器属性提升是 <strong>PHP 8.0</strong> 特性，7.4 不支持。</p>
+</blockquote>
 <hr>
-<h3 id="-总结">✅ 总结</h3>
-<p>这个 PHP 类完整实现了 Go 代码中的所有 HTTP 状态码常量和 <code>StatusText</code> 功能，结构清晰、易于维护，可直接用于项目中作为工具类使用。</p>
+<h2 id="-php-80">🔹 PHP 8.0</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="c1">// 1. 联合类型
+</span></span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="c1"></span><span class="k">function</span> <span class="nf">getId</span><span class="p">(</span><span class="nx">int</span><span class="o">|</span><span class="nx">string</span> <span class="nv">$id</span><span class="p">)</span><span class="o">:</span> <span class="nx">void</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl">    <span class="k">echo</span> <span class="nv">$id</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="nx">getId</span><span class="p">(</span><span class="mi">100</span><span class="p">);</span>
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl"><span class="nx">getId</span><span class="p">(</span><span class="s2">&#34;abc&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="c1">// 2. 命名参数
+</span></span></span><span class="line"><span class="ln"> 9</span><span class="cl"><span class="c1"></span><span class="nx">htmlspecialchars</span><span class="p">(</span><span class="s2">&#34;&lt;script&gt;&#34;</span><span class="p">,</span> <span class="nx">double_encode</span><span class="o">:</span> <span class="k">false</span><span class="p">);</span>
+</span></span><span class="line"><span class="ln">10</span><span class="cl">
+</span></span><span class="line"><span class="ln">11</span><span class="cl"><span class="c1">// 3. 属性（原生注解）
+</span></span></span><span class="line"><span class="ln">12</span><span class="cl"><span class="c1">#[Attribute]
+</span></span></span><span class="line"><span class="ln">13</span><span class="cl"><span class="c1"></span><span class="k">class</span> <span class="nc">Route</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">14</span><span class="cl">    <span class="k">public</span> <span class="k">function</span> <span class="fm">__construct</span><span class="p">(</span><span class="k">public</span> <span class="nx">string</span> <span class="nv">$path</span><span class="p">)</span> <span class="p">{}</span>
+</span></span><span class="line"><span class="ln">15</span><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="ln">16</span><span class="cl"><span class="c1">#[Route(&#34;/api/users&#34;)]
+</span></span></span><span class="line"><span class="ln">17</span><span class="cl"><span class="c1"></span><span class="k">class</span> <span class="nc">UserController</span> <span class="p">{}</span>
+</span></span><span class="line"><span class="ln">18</span><span class="cl">
+</span></span><span class="line"><span class="ln">19</span><span class="cl"><span class="c1">// 4. 构造器属性提升
+</span></span></span><span class="line"><span class="ln">20</span><span class="cl"><span class="c1"></span><span class="k">class</span> <span class="nc">Point</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">21</span><span class="cl">    <span class="k">public</span> <span class="k">function</span> <span class="fm">__construct</span><span class="p">(</span>
+</span></span><span class="line"><span class="ln">22</span><span class="cl">        <span class="k">public</span> <span class="nx">float</span> <span class="nv">$x</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">23</span><span class="cl">        <span class="k">public</span> <span class="nx">float</span> <span class="nv">$y</span>
+</span></span><span class="line"><span class="ln">24</span><span class="cl">    <span class="p">)</span> <span class="p">{}</span>
+</span></span><span class="line"><span class="ln">25</span><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="ln">26</span><span class="cl"><span class="nv">$p</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Point</span><span class="p">(</span><span class="mf">1.5</span><span class="p">,</span> <span class="mf">2.5</span><span class="p">);</span>
+</span></span><span class="line"><span class="ln">27</span><span class="cl"><span class="k">echo</span> <span class="nv">$p</span><span class="o">-&gt;</span><span class="na">x</span><span class="p">;</span> <span class="c1">// 1.5
+</span></span></span><span class="line"><span class="ln">28</span><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="ln">29</span><span class="cl"><span class="c1">// 5. match 表达式
+</span></span></span><span class="line"><span class="ln">30</span><span class="cl"><span class="c1"></span><span class="nv">$status</span> <span class="o">=</span> <span class="nx">match</span><span class="p">(</span><span class="mi">404</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">31</span><span class="cl">    <span class="mi">200</span><span class="p">,</span> <span class="mi">201</span> <span class="o">=&gt;</span> <span class="s1">&#39;ok&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">32</span><span class="cl">    <span class="mi">404</span> <span class="o">=&gt;</span> <span class="s1">&#39;not found&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">33</span><span class="cl">    <span class="k">default</span> <span class="o">=&gt;</span> <span class="s1">&#39;unknown&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">34</span><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="ln">35</span><span class="cl">
+</span></span><span class="line"><span class="ln">36</span><span class="cl"><span class="c1">// 6. Nullsafe 运算符
+</span></span></span><span class="line"><span class="ln">37</span><span class="cl"><span class="c1"></span><span class="nv">$user</span> <span class="o">=</span> <span class="nx">getUser</span><span class="p">();</span> <span class="c1">// 可能为 null
+</span></span></span><span class="line"><span class="ln">38</span><span class="cl"><span class="c1"></span><span class="k">echo</span> <span class="nv">$user</span><span class="o">?-&gt;</span><span class="na">profile</span><span class="o">?-&gt;</span><span class="na">avatar</span><span class="p">;</span> <span class="c1">// 若中间为 null，返回 null
+</span></span></span><span class="line"><span class="ln">39</span><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="ln">40</span><span class="cl"><span class="c1">// 7. WeakMap
+</span></span></span><span class="line"><span class="ln">41</span><span class="cl"><span class="c1"></span><span class="nv">$map</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">WeakMap</span><span class="p">();</span>
+</span></span><span class="line"><span class="ln">42</span><span class="cl"><span class="nv">$obj</span> <span class="o">=</span> <span class="k">new</span> <span class="k">stdClass</span><span class="p">();</span>
+</span></span><span class="line"><span class="ln">43</span><span class="cl"><span class="nv">$map</span><span class="p">[</span><span class="nv">$obj</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;data&#39;</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln">44</span><span class="cl"><span class="nx">unset</span><span class="p">(</span><span class="nv">$obj</span><span class="p">);</span> <span class="c1">// 自动从 map 中移除
+</span></span></span><span class="line"><span class="ln">45</span><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="ln">46</span><span class="cl"><span class="c1">// 8. throw 表达式
+</span></span></span><span class="line"><span class="ln">47</span><span class="cl"><span class="c1"></span><span class="nv">$fn</span> <span class="o">=</span> <span class="nx">fn</span><span class="p">(</span><span class="nv">$val</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nv">$val</span> <span class="o">?:</span> <span class="k">throw</span> <span class="k">new</span> <span class="nx">InvalidArgumentException</span><span class="p">(</span><span class="s1">&#39;Empty&#39;</span><span class="p">);</span>
+</span></span><span class="line"><span class="ln">48</span><span class="cl">
+</span></span><span class="line"><span class="ln">49</span><span class="cl"><span class="c1">// 9. 错误处理统一
+</span></span></span><span class="line"><span class="ln">50</span><span class="cl"><span class="c1">// strlen([]); // TypeError（不再是 warning）
+</span></span></span><span class="line"><span class="ln">51</span><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="ln">52</span><span class="cl"><span class="c1">// 10. get_debug_type()
+</span></span></span><span class="line"><span class="ln">53</span><span class="cl"><span class="c1"></span><span class="k">echo</span> <span class="nx">get_debug_type</span><span class="p">(</span><span class="k">new</span> <span class="nx">DateTime</span><span class="p">());</span> <span class="c1">// &#34;DateTime&#34;
+</span></span></span><span class="line"><span class="ln">54</span><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="ln">55</span><span class="cl"><span class="c1">// 11. fdiv()
+</span></span></span><span class="line"><span class="ln">56</span><span class="cl"><span class="c1"></span><span class="nv">$result</span> <span class="o">=</span> <span class="nx">fdiv</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span> <span class="c1">// INF，无 warning
+</span></span></span></code></pre></div><hr>
+<h2 id="-php-81">🔹 PHP 8.1</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="c1">// 1. 枚举
+</span></span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="c1"></span><span class="nx">enum</span> <span class="nx">Status</span><span class="o">:</span> <span class="nx">string</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl">    <span class="k">case</span> <span class="nx">Draft</span> <span class="o">=</span> <span class="s1">&#39;draft&#39;</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl">    <span class="k">case</span> <span class="nx">Published</span> <span class="o">=</span> <span class="s1">&#39;published&#39;</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl"><span class="k">echo</span> <span class="nx">Status</span><span class="o">::</span><span class="na">Draft</span><span class="o">-&gt;</span><span class="na">value</span><span class="p">;</span> <span class="c1">// &#39;draft&#39;
+</span></span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="c1">// 2. 只读属性
+</span></span></span><span class="line"><span class="ln"> 9</span><span class="cl"><span class="c1"></span><span class="k">class</span> <span class="nc">User</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">10</span><span class="cl">    <span class="k">public</span> <span class="nx">readonly</span> <span class="nx">string</span> <span class="nv">$name</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln">11</span><span class="cl">    <span class="k">public</span> <span class="k">function</span> <span class="fm">__construct</span><span class="p">(</span><span class="nx">string</span> <span class="nv">$name</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">12</span><span class="cl">        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">name</span> <span class="o">=</span> <span class="nv">$name</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln">13</span><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="ln">14</span><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="ln">15</span><span class="cl"><span class="nv">$user</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">User</span><span class="p">(</span><span class="s2">&#34;Alice&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="ln">16</span><span class="cl"><span class="c1">// $user-&gt;name = &#34;Bob&#34;; // Error!
+</span></span></span><span class="line"><span class="ln">17</span><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="ln">18</span><span class="cl"><span class="c1">// 3. Fibers（纤程）
+</span></span></span><span class="line"><span class="ln">19</span><span class="cl"><span class="c1"></span><span class="nv">$fiber</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Fiber</span><span class="p">(</span><span class="k">function</span> <span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">20</span><span class="cl">    <span class="k">echo</span> <span class="s2">&#34;Start</span><span class="se">\n</span><span class="s2">&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln">21</span><span class="cl">    <span class="nv">$value</span> <span class="o">=</span> <span class="nx">Fiber</span><span class="o">::</span><span class="na">suspend</span><span class="p">(</span><span class="s1">&#39;from fiber&#39;</span><span class="p">);</span>
+</span></span><span class="line"><span class="ln">22</span><span class="cl">    <span class="k">echo</span> <span class="s2">&#34;Resume with: </span><span class="si">$value\n</span><span class="s2">&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln">23</span><span class="cl"><span class="p">});</span>
+</span></span><span class="line"><span class="ln">24</span><span class="cl"><span class="k">echo</span> <span class="nv">$fiber</span><span class="o">-&gt;</span><span class="na">start</span><span class="p">();</span> <span class="c1">// 输出 Start，返回 &#39;from fiber&#39;
+</span></span></span><span class="line"><span class="ln">25</span><span class="cl"><span class="c1"></span><span class="nv">$fiber</span><span class="o">-&gt;</span><span class="na">resume</span><span class="p">(</span><span class="s1">&#39;back&#39;</span><span class="p">);</span> <span class="c1">// 输出 Resume with: back
+</span></span></span><span class="line"><span class="ln">26</span><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="ln">27</span><span class="cl"><span class="c1">// 4. never 返回类型
+</span></span></span><span class="line"><span class="ln">28</span><span class="cl"><span class="c1"></span><span class="k">function</span> <span class="nf">redirect</span><span class="p">(</span><span class="nx">string</span> <span class="nv">$url</span><span class="p">)</span><span class="o">:</span> <span class="nx">never</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">29</span><span class="cl">    <span class="nx">header</span><span class="p">(</span><span class="s2">&#34;Location: </span><span class="si">$url</span><span class="s2">&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="ln">30</span><span class="cl">    <span class="k">exit</span><span class="p">();</span>
+</span></span><span class="line"><span class="ln">31</span><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="ln">32</span><span class="cl">
+</span></span><span class="line"><span class="ln">33</span><span class="cl"><span class="c1">// 5. 数组解包支持字符串键
+</span></span></span><span class="line"><span class="ln">34</span><span class="cl"><span class="c1"></span><span class="nv">$extra</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;role&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;admin&#39;</span><span class="p">];</span>
+</span></span><span class="line"><span class="ln">35</span><span class="cl"><span class="nv">$user</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;name&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Alice&#39;</span><span class="p">,</span> <span class="o">...</span><span class="nv">$extra</span><span class="p">];</span> <span class="c1">// [&#39;name&#39;=&gt;&#39;Alice&#39;,&#39;role&#39;=&gt;&#39;admin&#39;]
+</span></span></span><span class="line"><span class="ln">36</span><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="ln">37</span><span class="cl"><span class="c1">// 6. 动态属性默认禁止
+</span></span></span><span class="line"><span class="ln">38</span><span class="cl"><span class="c1"></span><span class="k">class</span> <span class="nc">User</span> <span class="p">{}</span>
+</span></span><span class="line"><span class="ln">39</span><span class="cl"><span class="c1">// (new User())-&gt;age = 30; // Error in 8.2+, Warning in 8.1
+</span></span></span><span class="line"><span class="ln">40</span><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="ln">41</span><span class="cl"><span class="c1">#[AllowDynamicProperties]
+</span></span></span><span class="line"><span class="ln">42</span><span class="cl"><span class="c1"></span><span class="k">class</span> <span class="nc">Flexible</span> <span class="p">{}</span>
+</span></span><span class="line"><span class="ln">43</span><span class="cl"><span class="p">(</span><span class="k">new</span> <span class="nx">Flexible</span><span class="p">())</span><span class="o">-&gt;</span><span class="na">anything</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="c1">// OK
+</span></span></span><span class="line"><span class="ln">44</span><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="ln">45</span><span class="cl"><span class="c1">// 7. array_is_list()
+</span></span></span><span class="line"><span class="ln">46</span><span class="cl"><span class="c1"></span><span class="nx">var_dump</span><span class="p">(</span><span class="nx">array_is_list</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]));</span>        <span class="c1">// true
+</span></span></span><span class="line"><span class="ln">47</span><span class="cl"><span class="c1"></span><span class="nx">var_dump</span><span class="p">(</span><span class="nx">array_is_list</span><span class="p">([</span><span class="s1">&#39;a&#39;</span> <span class="o">=&gt;</span> <span class="mi">1</span><span class="p">]));</span>       <span class="c1">// false
+</span></span></span></code></pre></div><hr>
+<h2 id="-php-82">🔹 PHP 8.2</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="c1">// 1. 只读类（所有属性自动 readonly）
+</span></span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="c1"></span><span class="nx">readonly</span> <span class="k">class</span> <span class="nc">Point</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl">    <span class="k">public</span> <span class="k">function</span> <span class="fm">__construct</span><span class="p">(</span>
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl">        <span class="k">public</span> <span class="nx">float</span> <span class="nv">$x</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl">        <span class="k">public</span> <span class="nx">float</span> <span class="nv">$y</span>
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">    <span class="p">)</span> <span class="p">{}</span>
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="c1">// $p = new Point(1, 2); $p-&gt;x = 3; // Error!
+</span></span></span><span class="line"><span class="ln"> 9</span><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="c1">// 2. DNF Types（交集+联合）
+</span></span></span><span class="line"><span class="ln">11</span><span class="cl"><span class="c1"></span><span class="k">function</span> <span class="nf">save</span><span class="p">((</span><span class="nx">LoggerInterface</span><span class="o">&amp;</span><span class="nx">Serializable</span><span class="p">)</span><span class="o">|</span><span class="k">null</span> <span class="nv">$logger</span><span class="p">)</span><span class="o">:</span> <span class="nx">void</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">12</span><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="nv">$logger</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">13</span><span class="cl">        <span class="nv">$logger</span><span class="o">-&gt;</span><span class="na">log</span><span class="p">(</span><span class="s2">&#34;Saving&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="ln">14</span><span class="cl">        <span class="nx">serialize</span><span class="p">(</span><span class="nv">$logger</span><span class="p">);</span>
+</span></span><span class="line"><span class="ln">15</span><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="ln">16</span><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="ln">17</span><span class="cl">
+</span></span><span class="line"><span class="ln">18</span><span class="cl"><span class="c1">// 3. 字面量类型
+</span></span></span><span class="line"><span class="ln">19</span><span class="cl"><span class="c1"></span><span class="k">function</span> <span class="nf">alwaysTrue</span><span class="p">()</span><span class="o">:</span> <span class="k">true</span> <span class="p">{</span> <span class="k">return</span> <span class="k">true</span><span class="p">;</span> <span class="p">}</span>
+</span></span><span class="line"><span class="ln">20</span><span class="cl"><span class="k">function</span> <span class="nf">alwaysNull</span><span class="p">()</span><span class="o">:</span> <span class="k">null</span> <span class="p">{</span> <span class="k">return</span> <span class="k">null</span><span class="p">;</span> <span class="p">}</span>
+</span></span><span class="line"><span class="ln">21</span><span class="cl">
+</span></span><span class="line"><span class="ln">22</span><span class="cl"><span class="c1">// 4. 敏感参数隐藏
+</span></span></span><span class="line"><span class="ln">23</span><span class="cl"><span class="c1"></span><span class="k">function</span> <span class="nf">login</span><span class="p">(</span>
+</span></span><span class="line"><span class="ln">24</span><span class="cl">    <span class="nx">string</span> <span class="nv">$username</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">25</span><span class="cl">    <span class="c1">#[\SensitiveParameter] string $password
+</span></span></span><span class="line"><span class="ln">26</span><span class="cl"><span class="c1"></span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">27</span><span class="cl">    <span class="c1">// 若抛异常，堆栈中 password 显示为 [redacted]
+</span></span></span><span class="line"><span class="ln">28</span><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span><span class="line"><span class="ln">29</span><span class="cl">
+</span></span><span class="line"><span class="ln">30</span><span class="cl"><span class="c1">// 5. Trait 常量
+</span></span></span><span class="line"><span class="ln">31</span><span class="cl"><span class="c1"></span><span class="k">trait</span> <span class="nx">Loggable</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">32</span><span class="cl">    <span class="k">public</span> <span class="k">const</span> <span class="no">LEVEL</span> <span class="o">=</span> <span class="s1">&#39;info&#39;</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln">33</span><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="ln">34</span><span class="cl"><span class="k">class</span> <span class="nc">Service</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">35</span><span class="cl">    <span class="k">use</span> <span class="nx">Loggable</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln">36</span><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="ln">37</span><span class="cl"><span class="k">echo</span> <span class="nx">Service</span><span class="o">::</span><span class="na">LEVEL</span><span class="p">;</span> <span class="c1">// &#39;info&#39;
+</span></span></span><span class="line"><span class="ln">38</span><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="ln">39</span><span class="cl"><span class="c1">// 6. 弃用 ${var} 插值
+</span></span></span><span class="line"><span class="ln">40</span><span class="cl"><span class="c1">// echo &#34;Hello ${name}&#34;; // ❌ Deprecated
+</span></span></span><span class="line"><span class="ln">41</span><span class="cl"><span class="c1"></span><span class="k">echo</span> <span class="s2">&#34;Hello </span><span class="si">{</span><span class="nv">$name</span><span class="si">}</span><span class="s2">&#34;</span><span class="p">;</span> <span class="c1">// ✅
+</span></span></span></code></pre></div><hr>
+<h2 id="-php-83">🔹 PHP 8.3</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="c1">// 1. 类常量类型声明
+</span></span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="c1"></span><span class="k">class</span> <span class="nc">Config</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl">    <span class="k">public</span> <span class="k">const</span> <span class="no">int</span> <span class="nx">MAX_SIZE</span> <span class="o">=</span> <span class="mi">100</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl">    <span class="k">public</span> <span class="k">const</span> <span class="no">string</span> <span class="nx">API_URL</span> <span class="o">=</span> <span class="s1">&#39;https://api.example.com&#39;</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="c1">// 2. json_validate()
+</span></span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="c1"></span><span class="nv">$input</span> <span class="o">=</span> <span class="s1">&#39;{&#34;valid&#34;: true}&#39;</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl"><span class="k">if</span> <span class="p">(</span><span class="nx">json_validate</span><span class="p">(</span><span class="nv">$input</span><span class="p">))</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">10</span><span class="cl">    <span class="nv">$data</span> <span class="o">=</span> <span class="nx">json_decode</span><span class="p">(</span><span class="nv">$input</span><span class="p">);</span>
+</span></span><span class="line"><span class="ln">11</span><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="ln">12</span><span class="cl">
+</span></span><span class="line"><span class="ln">13</span><span class="cl"><span class="c1">// 3. Trait 方法别名支持访问修饰符
+</span></span></span><span class="line"><span class="ln">14</span><span class="cl"><span class="c1"></span><span class="k">trait</span> <span class="nx">SayHello</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">15</span><span class="cl">    <span class="k">public</span> <span class="k">function</span> <span class="nf">hello</span><span class="p">()</span> <span class="p">{</span> <span class="k">echo</span> <span class="s2">&#34;Hello&#34;</span><span class="p">;</span> <span class="p">}</span>
+</span></span><span class="line"><span class="ln">16</span><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="ln">17</span><span class="cl"><span class="k">class</span> <span class="nc">Greeting</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">18</span><span class="cl">    <span class="k">use</span> <span class="nx">SayHello</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">19</span><span class="cl">        <span class="nx">SayHello</span><span class="o">::</span><span class="na">hello</span> <span class="k">as</span> <span class="k">private</span> <span class="nx">_hello</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln">20</span><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="ln">21</span><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="ln">22</span><span class="cl">
+</span></span><span class="line"><span class="ln">23</span><span class="cl"><span class="c1">// 4. mb_str_pad()
+</span></span></span><span class="line"><span class="ln">24</span><span class="cl"><span class="c1"></span><span class="k">echo</span> <span class="nx">mb_str_pad</span><span class="p">(</span><span class="s2">&#34;café&#34;</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="s2">&#34;•&#34;</span><span class="p">,</span> <span class="nx">STR_PAD_RIGHT</span><span class="p">,</span> <span class="s2">&#34;UTF-8&#34;</span><span class="p">);</span> <span class="c1">// café••••
+</span></span></span><span class="line"><span class="ln">25</span><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="ln">26</span><span class="cl"><span class="c1">// 5. DatePeriod 支持 ISO 8601
+</span></span></span><span class="line"><span class="ln">27</span><span class="cl"><span class="c1"></span><span class="nv">$period</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">DatePeriod</span><span class="p">(</span><span class="s1">&#39;R2/2023-01-01T00:00:00Z/P1D&#39;</span><span class="p">);</span>
+</span></span><span class="line"><span class="ln">28</span><span class="cl"><span class="k">foreach</span> <span class="p">(</span><span class="nv">$period</span> <span class="k">as</span> <span class="nv">$date</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">29</span><span class="cl">    <span class="k">echo</span> <span class="nv">$date</span><span class="o">-&gt;</span><span class="na">format</span><span class="p">(</span><span class="s1">&#39;Y-m-d&#39;</span><span class="p">)</span> <span class="o">.</span> <span class="s2">&#34;</span><span class="se">\n</span><span class="s2">&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln">30</span><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><hr>
+<h2 id="-php-84">🔹 PHP 8.4</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="c1">// 1. 交集类型（Intersection Types）
+</span></span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="c1"></span><span class="k">interface</span> <span class="nx">Logger</span> <span class="p">{</span> <span class="k">public</span> <span class="k">function</span> <span class="nf">log</span><span class="p">(</span><span class="nx">string</span> <span class="nv">$msg</span><span class="p">);</span> <span class="p">}</span>
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="k">interface</span> <span class="nx">Serializer</span> <span class="p">{</span> <span class="k">public</span> <span class="k">function</span> <span class="nf">serialize</span><span class="p">();</span> <span class="p">}</span>
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="k">function</span> <span class="nf">process</span><span class="p">(</span><span class="nx">Logger</span><span class="o">&amp;</span><span class="nx">Serializer</span> <span class="nv">$obj</span><span class="p">)</span><span class="o">:</span> <span class="nx">void</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">    <span class="nv">$obj</span><span class="o">-&gt;</span><span class="na">log</span><span class="p">(</span><span class="s2">&#34;Processing&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl">    <span class="k">echo</span> <span class="nv">$obj</span><span class="o">-&gt;</span><span class="na">serialize</span><span class="p">();</span>
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">
+</span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="c1">// 2. 标准化 #[Deprecated]
+</span></span></span><span class="line"><span class="ln">11</span><span class="cl"><span class="c1">#[Deprecated(reason: &#34;Use newMethod() instead&#34;, since: &#34;8.4&#34;)]
+</span></span></span><span class="line"><span class="ln">12</span><span class="cl"><span class="c1"></span><span class="k">function</span> <span class="nf">oldMethod</span><span class="p">()</span> <span class="p">{}</span>
+</span></span><span class="line"><span class="ln">13</span><span class="cl">
+</span></span><span class="line"><span class="ln">14</span><span class="cl"><span class="c1">// 3. JIT 默认启用（无需代码，配置层面）
+</span></span></span><span class="line"><span class="ln">15</span><span class="cl"><span class="c1">// php.ini: opcache.jit=on
+</span></span></span><span class="line"><span class="ln">16</span><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="ln">17</span><span class="cl"><span class="c1">// 4. new static() 在常量表达式中使用
+</span></span></span><span class="line"><span class="ln">18</span><span class="cl"><span class="c1"></span><span class="k">class</span> <span class="nc">Factory</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">19</span><span class="cl">    <span class="k">public</span> <span class="k">const</span> <span class="no">INSTANCE</span> <span class="o">=</span> <span class="k">new</span> <span class="k">static</span><span class="p">();</span>
+</span></span><span class="line"><span class="ln">20</span><span class="cl">    <span class="k">public</span> <span class="k">function</span> <span class="fm">__construct</span><span class="p">()</span> <span class="p">{}</span>
+</span></span><span class="line"><span class="ln">21</span><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="ln">22</span><span class="cl">
+</span></span><span class="line"><span class="ln">23</span><span class="cl"><span class="c1">// 5. array_is_list()（正式稳定）
+</span></span></span><span class="line"><span class="ln">24</span><span class="cl"><span class="c1"></span><span class="nx">var_dump</span><span class="p">(</span><span class="nx">array_is_list</span><span class="p">([</span><span class="mi">0</span> <span class="o">=&gt;</span> <span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="mi">1</span> <span class="o">=&gt;</span> <span class="s1">&#39;b&#39;</span><span class="p">]));</span> <span class="c1">// true
+</span></span></span><span class="line"><span class="ln">25</span><span class="cl"><span class="c1"></span><span class="nx">var_dump</span><span class="p">(</span><span class="nx">array_is_list</span><span class="p">([</span><span class="mi">1</span> <span class="o">=&gt;</span> <span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="mi">0</span> <span class="o">=&gt;</span> <span class="s1">&#39;b&#39;</span><span class="p">]));</span> <span class="c1">// false
+</span></span></span><span class="line"><span class="ln">26</span><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="ln">27</span><span class="cl"><span class="c1">// 6. memory_reset_peak_usage()
+</span></span></span><span class="line"><span class="ln">28</span><span class="cl"><span class="c1"></span><span class="nx">memory_get_peak_usage</span><span class="p">();</span> <span class="c1">// 获取峰值
+</span></span></span><span class="line"><span class="ln">29</span><span class="cl"><span class="c1"></span><span class="nx">memory_reset_peak_usage</span><span class="p">();</span> <span class="c1">// 重置计数器
+</span></span></span></code></pre></div><hr>
+<h2 id="-使用建议">✅ 使用建议</h2>
+<ul>
+<li>将每个代码块单独保存为 <code>.php</code> 文件，在对应 PHP 版本环境中运行。</li>
+<li>使用 <code>php -v</code> 确认版本。</li>
+<li>对于高版本特性（如 8.4），可在 <a href="https://hub.docker.com/_/php">Docker</a> 中拉取 <code>php:8.4-cli</code> 测试。</li>
+</ul>
+<hr>
+<p>这份清单已覆盖 <strong>PHP 7.0 至 8.4 所有官方记录的关键语言特性、标准库变更、弃用与移除项</strong>，共 <strong>超过 100 项</strong>，每项均有<strong>独立代码示例</strong>，适合系统复习、面试准备或升级迁移参考。</p>
+<hr>
+<hr>
+<hr>
 
     </div><div class="post_comments">
   
@@ -457,6 +684,9 @@
         <a href="https://jianlin-li.github.io/post/go_review/" class="nav-link" title="Go语言的知识点--GOPATH和Go Modules">Go语言的知识点--GOPATH和Go Modules</a>
       </li>
       <li>
+        <a href="https://jianlin-li.github.io/post/php_review_2/" class="nav-link" title="PHP语言的知识点-2">PHP语言的知识点-2</a>
+      </li>
+      <li>
         <a href="https://jianlin-li.github.io/post/php_review_1/" class="nav-link" title="PHP语言的知识点-1">PHP语言的知识点-1</a>
       </li>
       <li>
@@ -468,12 +698,12 @@
       <li>
         <a href="https://jianlin-li.github.io/post/local_enviroment_info/" class="nav-link" title="本地环境相关配置信息">本地环境相关配置信息</a>
       </li>
-      <li>
-        <a href="https://jianlin-li.github.io/post/course/" class="nav-link" title="Hugo的有关简易教程">Hugo的有关简易教程</a>
-      </li>
     </ul>
     <h2 class="mt-4">最新文章</h2>
     <ul class="flex-column">
+      <li>
+        <a href="https://jianlin-li.github.io/post/course/" class="nav-link" title="Hugo的有关简易教程">Hugo的有关简易教程</a>
+      </li>
     </ul>
     <div>
       <h2 class="mt-4 taxonomy" id="categories-section">分类</h2>
@@ -483,6 +713,11 @@
           <span class="button_tally">3</span>
         </a>
         
+        <a href='https://jianlin-li.github.io/categories/php%E8%AF%AD%E8%A8%80/' class="post_tag button button_translucent" title="php语言">
+          PHP语言
+          <span class="button_tally">2</span>
+        </a>
+        
         <a href='https://jianlin-li.github.io/categories/%E6%9C%AC%E5%9C%B0%E7%8E%AF%E5%A2%83/' class="post_tag button button_translucent" title="本地环境">
           本地环境
           <span class="button_tally">2</span>
@@ -490,11 +725,6 @@
         
         <a href='https://jianlin-li.github.io/categories/hugo/' class="post_tag button button_translucent" title="hugo">
           HUGO
-          <span class="button_tally">1</span>
-        </a>
-        
-        <a href='https://jianlin-li.github.io/categories/php%E8%AF%AD%E8%A8%80/' class="post_tag button button_translucent" title="php语言">
-          PHP语言
           <span class="button_tally">1</span>
         </a>
         
@@ -517,6 +747,11 @@
         <a href='https://jianlin-li.github.io/tags/go/' class="post_tag button button_translucent" title="go">
           GO
           <span class="button_tally">3</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/tags/php/' class="post_tag button button_translucent" title="php">
+          PHP
+          <span class="button_tally">2</span>
         </a>
         
         <a href='https://jianlin-li.github.io/tags/emoji/' class="post_tag button button_translucent" title="emoji">
@@ -551,11 +786,6 @@
         
         <a href='https://jianlin-li.github.io/tags/openstreetmap/' class="post_tag button button_translucent" title="openstreetmap">
           OPENSTREETMAP
-          <span class="button_tally">1</span>
-        </a>
-        
-        <a href='https://jianlin-li.github.io/tags/php/' class="post_tag button button_translucent" title="php">
-          PHP
           <span class="button_tally">1</span>
         </a>
         
@@ -602,7 +832,7 @@
             </a>
             
             
-            <a href='https://jianlin-li.github.io/tags/php/' class=" post_tag button button_translucent" data-position=1 title="php">PHP<span class="button_tally">1</span>
+            <a href='https://jianlin-li.github.io/tags/php/' class=" post_tag button button_translucent" data-position=2 title="php">PHP<span class="button_tally">2</span>
             </a>
             
             
