@@ -168,7 +168,7 @@
     <span class="post_date">
       2025-06-10	  
     </span>
-    <span class="post_time"> · 1 分钟阅读</span><span>&nbsp;· <a href='https://jianlin-li.github.io/tags/rabbitmq/' title="RabbitMQ" class="post_tag button button_translucent">RabbitMQ
+    <span class="post_time"> · 2 分钟阅读</span><span>&nbsp;· <a href='https://jianlin-li.github.io/tags/rabbitmq/' title="RabbitMQ" class="post_tag button button_translucent">RabbitMQ
         </a>
     </span>
     <span class="page_only">&nbsp;·
@@ -207,6 +207,85 @@
   </div>
 
     <div class="post_body"><h1 id="rabbitmq-消息中间件详解">RabbitMQ 消息中间件详解</h1>
+<p><figure>
+  <picture>
+
+    
+      
+        
+        
+        
+        
+        
+        
+    <img
+      loading="lazy"
+      decoding="async"
+      alt="RabbitMQ的基本结构"
+      
+        class="image_figure image_internal image_unprocessed"
+        src="https://jianlin-li.github.io/images/rabbitmq_1.png"
+      
+      
+    />
+
+    </picture>
+</figure>
+</p>
+<blockquote>
+<p>组件介绍</p>
+</blockquote>
+<ol>
+<li>Broker:它提供一种传输服务,它的角色就是维护一条从生产者到消费者的路线，保证数据能按照指定的方式进行传输,</li>
+<li>Exchange：消息交换机,它指定消息按什么规则,路由到哪个队列。</li>
+<li>Queue:消息的载体,每个消息都会被投到一个或多个队列。</li>
+<li>Binding:绑定，它的作用就是把exchange和queue按照路由规则绑定起来.</li>
+<li>Routing Key:路由关键字,exchange根据这个关键字进行消息投递。</li>
+<li>vhost:虚拟主机,一个broker里可以有多个vhost，用作不同用户的权限分离。</li>
+<li>Producer:消息生产者,就是投递消息的程序.</li>
+<li>Consumer:消息消费者,就是接受消息的程序.</li>
+<li>Channel:消息通道,在客户端的每个连接里,可建立多个channel.</li>
+</ol>
+<p><figure>
+  <picture>
+
+    
+      
+        
+        
+        
+        
+        
+        
+    <img
+      loading="lazy"
+      decoding="async"
+      alt="RabbitMQ的消息发布和接收流程"
+      
+        class="image_figure image_internal image_unprocessed"
+        src="https://jianlin-li.github.io/images/rabbitmq_2.png"
+      
+      
+    />
+
+    </picture>
+</figure>
+
+<strong>一. 如何发送消息</strong></p>
+<ol>
+<li>生产者和Broker建立TCP连接</li>
+<li>生产者和Broker建立通道</li>
+<li>生产者通过通道消息发送给Broker，由Exchange将消息进行转发</li>
+<li>Exchange将消息转发到止跌那个的Queue（队列）</li>
+</ol>
+<p><strong>二.如何接收消息</strong></p>
+<ol>
+<li>消费者和Broker建立TCP连接</li>
+<li>消费者和Broker建立通道</li>
+<li>消费者监听制定的Queue（队列）</li>
+<li>当有消息到达Queue时Broker默认将消息推送给消费者</li>
+<li>消费者接受到消息</li>
+</ol>
 <h2 id="消息中间件的作用">消息中间件的作用</h2>
 <ul>
 <li><strong>削峰</strong>：缓冲瞬时高峰流量，避免系统被冲垮</li>
@@ -225,7 +304,90 @@
 </ul>
 <h3 id="交换器类型">交换器类型</h3>
 <ul>
-<li><code>fanout</code>、<code>topic</code>、<code>direct</code>、<code>header</code>、<code>system</code>、自定义</li>
+<li><code>direct</code>
+<figure>
+  <picture>
+
+    
+      
+        
+        
+        
+        
+        
+        
+    <img
+      loading="lazy"
+      decoding="async"
+      alt="Direct 模式"
+      
+        class="image_figure image_internal image_unprocessed"
+        src="https://jianlin-li.github.io/images/rabbitmq_direct.png"
+      
+      
+    />
+
+    </picture>
+</figure>
+
+是最简单的模式.即创建消息队列的时候,指定一个路由键（RoutingKey）.当发送者发送消息的时候,指定对应的Key.当Key和消息队列的RoutingKey一致的时候,消息将会被发送到该消息队列中.</li>
+<li><code>topic</code>
+<figure>
+  <picture>
+
+    
+      
+        
+        
+        
+        
+        
+        
+    <img
+      loading="lazy"
+      decoding="async"
+      alt="Topic 主题模式"
+      
+        class="image_figure image_internal image_unprocessed"
+        src="https://jianlin-li.github.io/images/rabbitmq_topic.png"
+      
+      
+    />
+
+    </picture>
+</figure>
+
+topic转发信息主要是依据通配符,队列和交换机的绑定主要是依据一种模式(通配符+字符串),而当发送消息的时候,只有指定的Key和该模式相匹配的时候,消息才会被发送到该消息队列中.通配符：* 表示一个词，# 表示零个或多个词</li>
+<li><code>fanout</code>
+<figure>
+  <picture>
+
+    
+      
+        
+        
+        
+        
+        
+        
+    <img
+      loading="lazy"
+      decoding="async"
+      alt="Fanout模式"
+      
+        class="image_figure image_internal image_unprocessed"
+        src="https://jianlin-li.github.io/images/rabbitmq_fanout.png"
+      
+      
+    />
+
+    </picture>
+</figure>
+
+fanout是路由广播的形式,将会把消息发给绑定它的全部队列,即便设置了key,也会被忽略.因此我们发送到交换机的消息会使得绑定到该交换机的每一个Queue接收到消息,这个时候就算指定了路由键（routingKey）,或者规则(即上文中convertAndSend方法的参数2),也会被忽略!</li>
+<li><code>header</code></li>
+<li><code>system</code></li>
+<li><code>自定义</code></li>
 </ul>
 <h3 id="交换器属性">交换器属性</h3>
 <ul>

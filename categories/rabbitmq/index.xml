@@ -18,6 +18,85 @@
         
           
             &lt;h1 id=&#34;rabbitmq-消息中间件详解&#34;&gt;RabbitMQ 消息中间件详解&lt;/h1&gt;
+&lt;p&gt;&lt;figure&gt;
+  &lt;picture&gt;
+
+    
+      
+        
+        
+        
+        
+        
+        
+    &lt;img
+      loading=&#34;lazy&#34;
+      decoding=&#34;async&#34;
+      alt=&#34;RabbitMQ的基本结构&#34;
+      
+        class=&#34;image_figure image_internal image_unprocessed&#34;
+        src=&#34;https://jianlin-li.github.io/images/rabbitmq_1.png&#34;
+      
+      
+    /&gt;
+
+    &lt;/picture&gt;
+&lt;/figure&gt;
+&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;组件介绍&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;ol&gt;
+&lt;li&gt;Broker:它提供一种传输服务,它的角色就是维护一条从生产者到消费者的路线，保证数据能按照指定的方式进行传输,&lt;/li&gt;
+&lt;li&gt;Exchange：消息交换机,它指定消息按什么规则,路由到哪个队列。&lt;/li&gt;
+&lt;li&gt;Queue:消息的载体,每个消息都会被投到一个或多个队列。&lt;/li&gt;
+&lt;li&gt;Binding:绑定，它的作用就是把exchange和queue按照路由规则绑定起来.&lt;/li&gt;
+&lt;li&gt;Routing Key:路由关键字,exchange根据这个关键字进行消息投递。&lt;/li&gt;
+&lt;li&gt;vhost:虚拟主机,一个broker里可以有多个vhost，用作不同用户的权限分离。&lt;/li&gt;
+&lt;li&gt;Producer:消息生产者,就是投递消息的程序.&lt;/li&gt;
+&lt;li&gt;Consumer:消息消费者,就是接受消息的程序.&lt;/li&gt;
+&lt;li&gt;Channel:消息通道,在客户端的每个连接里,可建立多个channel.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;figure&gt;
+  &lt;picture&gt;
+
+    
+      
+        
+        
+        
+        
+        
+        
+    &lt;img
+      loading=&#34;lazy&#34;
+      decoding=&#34;async&#34;
+      alt=&#34;RabbitMQ的消息发布和接收流程&#34;
+      
+        class=&#34;image_figure image_internal image_unprocessed&#34;
+        src=&#34;https://jianlin-li.github.io/images/rabbitmq_2.png&#34;
+      
+      
+    /&gt;
+
+    &lt;/picture&gt;
+&lt;/figure&gt;
+
+&lt;strong&gt;一. 如何发送消息&lt;/strong&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;生产者和Broker建立TCP连接&lt;/li&gt;
+&lt;li&gt;生产者和Broker建立通道&lt;/li&gt;
+&lt;li&gt;生产者通过通道消息发送给Broker，由Exchange将消息进行转发&lt;/li&gt;
+&lt;li&gt;Exchange将消息转发到止跌那个的Queue（队列）&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;strong&gt;二.如何接收消息&lt;/strong&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;消费者和Broker建立TCP连接&lt;/li&gt;
+&lt;li&gt;消费者和Broker建立通道&lt;/li&gt;
+&lt;li&gt;消费者监听制定的Queue（队列）&lt;/li&gt;
+&lt;li&gt;当有消息到达Queue时Broker默认将消息推送给消费者&lt;/li&gt;
+&lt;li&gt;消费者接受到消息&lt;/li&gt;
+&lt;/ol&gt;
 &lt;h2 id=&#34;消息中间件的作用&#34;&gt;消息中间件的作用&lt;/h2&gt;
 &lt;ul&gt;
 &lt;li&gt;&lt;strong&gt;削峰&lt;/strong&gt;：缓冲瞬时高峰流量，避免系统被冲垮&lt;/li&gt;
@@ -36,7 +115,90 @@
 &lt;/ul&gt;
 &lt;h3 id=&#34;交换器类型&#34;&gt;交换器类型&lt;/h3&gt;
 &lt;ul&gt;
-&lt;li&gt;&lt;code&gt;fanout&lt;/code&gt;、&lt;code&gt;topic&lt;/code&gt;、&lt;code&gt;direct&lt;/code&gt;、&lt;code&gt;header&lt;/code&gt;、&lt;code&gt;system&lt;/code&gt;、自定义&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;direct&lt;/code&gt;
+&lt;figure&gt;
+  &lt;picture&gt;
+
+    
+      
+        
+        
+        
+        
+        
+        
+    &lt;img
+      loading=&#34;lazy&#34;
+      decoding=&#34;async&#34;
+      alt=&#34;Direct 模式&#34;
+      
+        class=&#34;image_figure image_internal image_unprocessed&#34;
+        src=&#34;https://jianlin-li.github.io/images/rabbitmq_direct.png&#34;
+      
+      
+    /&gt;
+
+    &lt;/picture&gt;
+&lt;/figure&gt;
+
+是最简单的模式.即创建消息队列的时候,指定一个路由键（RoutingKey）.当发送者发送消息的时候,指定对应的Key.当Key和消息队列的RoutingKey一致的时候,消息将会被发送到该消息队列中.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;topic&lt;/code&gt;
+&lt;figure&gt;
+  &lt;picture&gt;
+
+    
+      
+        
+        
+        
+        
+        
+        
+    &lt;img
+      loading=&#34;lazy&#34;
+      decoding=&#34;async&#34;
+      alt=&#34;Topic 主题模式&#34;
+      
+        class=&#34;image_figure image_internal image_unprocessed&#34;
+        src=&#34;https://jianlin-li.github.io/images/rabbitmq_topic.png&#34;
+      
+      
+    /&gt;
+
+    &lt;/picture&gt;
+&lt;/figure&gt;
+
+topic转发信息主要是依据通配符,队列和交换机的绑定主要是依据一种模式(通配符+字符串),而当发送消息的时候,只有指定的Key和该模式相匹配的时候,消息才会被发送到该消息队列中.通配符：* 表示一个词，# 表示零个或多个词&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;fanout&lt;/code&gt;
+&lt;figure&gt;
+  &lt;picture&gt;
+
+    
+      
+        
+        
+        
+        
+        
+        
+    &lt;img
+      loading=&#34;lazy&#34;
+      decoding=&#34;async&#34;
+      alt=&#34;Fanout模式&#34;
+      
+        class=&#34;image_figure image_internal image_unprocessed&#34;
+        src=&#34;https://jianlin-li.github.io/images/rabbitmq_fanout.png&#34;
+      
+      
+    /&gt;
+
+    &lt;/picture&gt;
+&lt;/figure&gt;
+
+fanout是路由广播的形式,将会把消息发给绑定它的全部队列,即便设置了key,也会被忽略.因此我们发送到交换机的消息会使得绑定到该交换机的每一个Queue接收到消息,这个时候就算指定了路由键（routingKey）,或者规则(即上文中convertAndSend方法的参数2),也会被忽略!&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;header&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;system&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;自定义&lt;/code&gt;&lt;/li&gt;
 &lt;/ul&gt;
 &lt;h3 id=&#34;交换器属性&#34;&gt;交换器属性&lt;/h3&gt;
 &lt;ul&gt;
@@ -56,48 +218,6 @@
 &lt;/ul&gt;
 &lt;h2 id=&#34;声明机制&#34;&gt;声明机制&lt;/h2&gt;
 &lt;p&gt;生产者和消费者都可以声明交换器或队列：&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;如果声明的参数完全匹配现存的交换器或者队列，RabbitMQ 直接返回成功&lt;/li&gt;
-&lt;li&gt;如果参数不匹配，则抛出异常&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h2 id=&#34;消费者端确认机制&#34;&gt;消费者端确认机制&lt;/h2&gt;
-&lt;h3 id=&#34;ack-确认&#34;&gt;ACK 确认&lt;/h3&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;strong&gt;自动确认&lt;/strong&gt;：队列自动删除已发送的消息，如果是自动确认机制，那么队列会自动的把发送出去的消息从队列中删除(其实是先打上标签，之后再删除)&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;显式确认&lt;/strong&gt;：等待消费者显式确认后才删除消息，如果是等待消费者显示的确认机制，那么队列会等待消费者显示的确认收到了消息之后，再把消息从内存或者硬盘中删除&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h3 id=&#34;拒绝消息&#34;&gt;拒绝消息&lt;/h3&gt;
-&lt;ul&gt;
-&lt;li&gt;
-&lt;p&gt;&lt;strong&gt;reject&lt;/strong&gt;：消费者明确拒绝消息(如果消费者明确拒绝当前收到的消息，那么队列会根据消费者是否设置了requeue参数，如果该参数是true那么该消息会被重新加入到队列中等待下一次的投递；如果该参数设置为false那么队列将直接移除该消息)&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;code&gt;requeue=true&lt;/code&gt;：消息重新加入队列等待下次投递&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;requeue=false&lt;/code&gt;：队列直接移除消息&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h2 id=&#34;消息路由控制&#34;&gt;消息路由控制&lt;/h2&gt;
-&lt;h3 id=&#34;mandatory-参数强调的是没有路由到任何队列的情况下当mandatory参数设为true时交换器无法根据自身的类型和路由键找到一个符合条件的队列那么rabbitmq会调用basicreturn命令将消息返回给生产者当mandatory参数设置为false时出现上述情形则消息直接被丢弃&#34;&gt;mandatory 参数(强调的是没有路由到任何队列的情况下，当mandatory参数设为true时，交换器无法根据自身的类型和路由键找到一个符合条件的队列，那么RabbitMQ会调用Basic.Return命令将消息返回给生产者。当mandatory参数设置为false时，出现上述情形，则消息直接被丢弃)&lt;/h3&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;code&gt;true&lt;/code&gt;：当无法路由到任何队列时，通过 &lt;code&gt;Basic.Return&lt;/code&gt; 将消息返回给生产者&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;false&lt;/code&gt;：无法路由时直接丢弃消息&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h3 id=&#34;immediate-参数rabbitmq-30-已移除&#34;&gt;immediate 参数（RabbitMQ 3.0+ 已移除）&lt;/h3&gt;
-&lt;ul&gt;
-&lt;li&gt;原功能：强调的是路由到队列后 队列上没有消费者的情况下，当immediate参数设为true时，如果交换器在将消息路由到队列时发现队列上并不存在任何消费者，那么这条消息将不会存入队列中。当与路由键匹配的所有队列都没有消费者时,该消息会通过 Basic.Return 返回至生产者。&lt;/li&gt;
-&lt;/ul&gt;
-&lt;blockquote&gt;
-&lt;p&gt;[!NOTE]&lt;/p&gt;
-&lt;p&gt;概括来说,mandatory参数告诉服务器至少将该消息路由到一个队列中,否则将消息返回给生产者。immediate参数告诉服务器如果该消息关联的队列上有消费者，则立刻投递。如果所有匹配的队列上都没有消费者，则直接将消息返还给生产者不用将消息存入队列而等待消费者了。RabbitMQ3.0版本开始去掉了对immediate参数的支持，immediate参数影响竞相队列的性能&lt;/p&gt;
-&lt;/blockquote&gt;
-&lt;h2 id=&#34;消息的过期时间设置&#34;&gt;消息的过期时间设置&lt;/h2&gt;
-&lt;h3 id=&#34;消息过期时间&#34;&gt;消息过期时间&lt;/h3&gt;
-&lt;ol&gt;
-&lt;li&gt;&lt;strong&gt;队列级别&lt;/strong&gt;：设置 &lt;code&gt;x-message-ttl&lt;/code&gt; 属性，统一所有消息的过期时间(方法是设置队列的x-message-ttl属性，所有入队列的消息的过期时间都是一样的)&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;消息级别&lt;/strong&gt;：在发布消息时设置 &lt;code&gt;expiration&lt;/code&gt; 属性，支持个性化过期时间(方法是为每个消息都设置过期时间，在生产者发布消息的时候设置属性expiration属性，每个消息都可以设置不同的过期时间)&lt;/li&gt;
-&lt;/ol&gt;
-&lt;h3 id=&#34;队列过期时间&#34;&gt;队列过期时间&lt;/h3&gt;
-&lt;p&gt;&lt;strong&gt;设置队列的x-expires属性可以控制队列被自动删除前处于未使用状态的时间。未使用的意思是队列上没有任何的消费者，队列也没有被重新声明，并且在过期时间段内也未调用过Basic.Get命令。&lt;/strong&gt;&lt;/p&gt;
           
           
         
