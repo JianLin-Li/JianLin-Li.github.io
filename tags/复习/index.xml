@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>复习 on 浩瀚天空</title>
+    <link>https://jianlin-li.github.io/tags/%E5%A4%8D%E4%B9%A0/</link>
+    <description>Recent content in 复习 on 浩瀚天空</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <copyright>Copyright © 1989–2025, 李建林 </copyright>
+    <lastBuildDate>Thu, 01 May 2025 12:50:05 +0800</lastBuildDate><atom:link href="https://jianlin-li.github.io/tags/%E5%A4%8D%E4%B9%A0/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>阅读过的书籍与看过的视频</title>
+      <link>https://jianlin-li.github.io/post/book_review/</link>
+      <pubDate>Thu, 01 May 2025 12:50:05 +0800</pubDate>
+      
+      <guid>https://jianlin-li.github.io/post/book_review/</guid>
+      <description>
+        
+          
+            &lt;h1 id=&#34;学习资源清单&#34;&gt;学习资源清单&lt;/h1&gt;
+&lt;h2 id=&#34;linux-运维&#34;&gt;Linux 运维&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;《跟老男孩学Linux运维：Shell编程实战》&lt;/li&gt;
+&lt;li&gt;《跟老男孩学Linux运维 Web集群实战》&lt;/li&gt;
+&lt;li&gt;《鸟哥的Linux私房菜-基础学习篇(第四版)》&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;web-服务器与中间件&#34;&gt;Web 服务器与中间件&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;《Nginx高性能Web服务器详解》&lt;/li&gt;
+&lt;li&gt;《RabbitMQ实战指南》&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;数据库&#34;&gt;数据库&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;《mysql是怎样运行的》&lt;/li&gt;
+&lt;li&gt;《我们都是小青蛙MySQL系列文章》&lt;/li&gt;
+&lt;li&gt;《Elasticsearch》&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;缓存技术&#34;&gt;缓存技术&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;《从零开始学Redis (高洪涛，刘河飞 编著)》&lt;/li&gt;
+&lt;li&gt;《Redis开发与运维》(付磊)&lt;/li&gt;
+&lt;li&gt;《Redis入门指南》(JB51.NET)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;编程语言&#34;&gt;编程语言&lt;/h2&gt;
+&lt;h3 id=&#34;php&#34;&gt;PHP&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;《跟兄弟连学PHP》&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;go&#34;&gt;Go&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;《深入浅出Go语言核心编程 (张朝明) 》&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://www.topgoer.cn/docs/golang&#34;&gt;《Go语言中文文档》&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;《GO语言编程从入门到实践_黄永样》&lt;/li&gt;
+&lt;li&gt;《Go语言从入门到进阶实战（视频教学版）》_徐波&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;脚本语言&#34;&gt;脚本语言&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;Lua 视频&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;版本控制&#34;&gt;版本控制&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;《Pro Git》v2.1.55&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;容器化与云原生&#34;&gt;容器化与云原生&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;《kubernetes权威指南第5版》&lt;/li&gt;
+&lt;li&gt;Docker 视频 (bilibili)&lt;/li&gt;
+&lt;li&gt;etcd 视频 (bilibili)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;视频教程-b站&#34;&gt;视频教程 (B站)&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;Docker 视频&lt;/li&gt;
+&lt;li&gt;Go语言韩茹视频&lt;/li&gt;
+&lt;li&gt;etcd 视频&lt;/li&gt;
+&lt;li&gt;Lua 视频&lt;/li&gt;
+&lt;/ul&gt;
+          
+          
+        
+      </description>
+    </item>
+    
+  </channel>
+</rss>
