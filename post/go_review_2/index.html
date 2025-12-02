@@ -168,7 +168,7 @@
     <span class="post_date">
       2025-08-24	  
     </span>
-    <span class="post_time"> · 16 分钟阅读</span><span>&nbsp;· <a href='https://jianlin-li.github.io/tags/go/' title="Go" class="post_tag button button_translucent">Go
+    <span class="post_time"> · 18 分钟阅读</span><span>&nbsp;· <a href='https://jianlin-li.github.io/tags/go/' title="Go" class="post_tag button button_translucent">Go
         </a>
     </span>
     <span class="page_only">&nbsp;·
@@ -1931,6 +1931,212 @@
 <blockquote>
 <p>💡 <strong>一句话记住</strong>：<br>
 <strong><code>go mod init</code> → 写代码 → <code>go run</code> / <code>go build</code> → 自动管理依赖</strong></p>
+</blockquote>
+<hr>
+<hr>
+<hr>
+<hr>
+<h1 id="在-go-语言中没有直接连接-mysql-的标准库但-go-提供了强大的数据库抽象接口-属于标准库它定义了一套通用的-api-用于操作关系型数据库如-mysqlpostgresqlsqlite-等">在 Go 语言中，<strong>没有直接连接 MySQL 的标准库</strong>，但 Go 提供了强大的<strong>数据库抽象接口 <code>database/sql</code></strong>（属于标准库），它定义了一套通用的 API 用于操作关系型数据库（如 MySQL、PostgreSQL、SQLite 等）。</h1>
+<p>要连接 <strong>MySQL</strong>，你需要：</p>
+<ol>
+<li>使用标准库 <code>database/sql</code> 编写代码；</li>
+<li><strong>搭配一个 MySQL 驱动（Driver）</strong> —— 这是一个第三方包，实现了 <code>database/sql/driver</code> 接口。</li>
+</ol>
+<hr>
+<h2 id="-正确姿势databasesql--mysql-driver">✅ 正确姿势：<code>database/sql</code> + MySQL Driver</h2>
+<h3 id="1-标准库">1. <strong>标准库 <code>database/sql</code></strong></h3>
+<ul>
+<li>提供统一接口：<code>sql.Open</code>, <code>db.Query</code>, <code>db.Exec</code>, <code>db.Prepare</code> 等。</li>
+<li>不包含具体数据库驱动，需配合驱动使用。</li>
+<li>支持连接池、预编译语句、事务等。</li>
+</ul>
+<h3 id="2-推荐的-mysql-驱动">2. <strong>推荐的 MySQL 驱动：<code>go-sql-driver/mysql</code></strong></h3>
+<ul>
+<li>GitHub: <a href="https://github.com/go-sql-driver/mysql">https://github.com/go-sql-driver/mysql</a></li>
+<li>最流行、维护活跃、功能完整、纯 Go 实现（无 C 依赖）。</li>
+<li>符合 <code>database/sql/driver</code> 接口规范。</li>
+</ul>
+<blockquote>
+<p>📌 <strong>这是 Go 社区事实上的标准 MySQL 驱动</strong>。</p>
+</blockquote>
+<hr>
+<h2 id="-使用示例">🛠️ 使用示例</h2>
+<h3 id="第一步安装驱动">第一步：安装驱动</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">go get -u github.com/go-sql-driver/mysql
+</span></span></code></pre></div><blockquote>
+<p>⚠️ 注意：你<strong>不需要在代码中显式 import 驱动包</strong>来调用它的函数，但必须通过 <code>_</code> 空导入（blank import）注册驱动：</p>
+</blockquote>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="ln">1</span><span class="cl"><span class="kn">import</span><span class="w"> </span><span class="p">(</span><span class="w">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="w">    </span><span class="s">&#34;database/sql&#34;</span><span class="w">
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="w">    </span><span class="nx">_</span><span class="w"> </span><span class="s">&#34;github.com/go-sql-driver/mysql&#34;</span><span class="w"> </span><span class="c1">// 注册 mysql 驱动</span><span class="w">
+</span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="w"></span><span class="p">)</span><span class="w">
+</span></span></span></code></pre></div><h3 id="第二步连接并操作数据库">第二步：连接并操作数据库</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="kn">package</span><span class="w"> </span><span class="nx">main</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="w"></span><span class="kn">import</span><span class="w"> </span><span class="p">(</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="w">    </span><span class="s">&#34;database/sql&#34;</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="w">    </span><span class="s">&#34;fmt&#34;</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 6</span><span class="cl"><span class="w">    </span><span class="s">&#34;log&#34;</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="w">    </span><span class="nx">_</span><span class="w"> </span><span class="s">&#34;github.com/go-sql-driver/mysql&#34;</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 9</span><span class="cl"><span class="w"></span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="ln">11</span><span class="cl"><span class="w"></span><span class="kd">func</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="ln">12</span><span class="cl"><span class="w">    </span><span class="c1">// DSN (Data Source Name) 格式：</span><span class="w">
+</span></span></span><span class="line"><span class="ln">13</span><span class="cl"><span class="w">    </span><span class="c1">// username:password@tcp(host:port)/dbname?param=value</span><span class="w">
+</span></span></span><span class="line"><span class="ln">14</span><span class="cl"><span class="w">    </span><span class="nx">dsn</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="s">&#34;user:password@tcp(127.0.0.1:3306)/testdb?charset=utf8mb4&amp;parseTime=True&amp;loc=Local&#34;</span><span class="w">
+</span></span></span><span class="line"><span class="ln">15</span><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="ln">16</span><span class="cl"><span class="w">    </span><span class="nx">db</span><span class="p">,</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">sql</span><span class="p">.</span><span class="nf">Open</span><span class="p">(</span><span class="s">&#34;mysql&#34;</span><span class="p">,</span><span class="w"> </span><span class="nx">dsn</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="ln">17</span><span class="cl"><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">nil</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="ln">18</span><span class="cl"><span class="w">        </span><span class="nx">log</span><span class="p">.</span><span class="nf">Fatal</span><span class="p">(</span><span class="nx">err</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="ln">19</span><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="ln">20</span><span class="cl"><span class="w">    </span><span class="k">defer</span><span class="w"> </span><span class="nx">db</span><span class="p">.</span><span class="nf">Close</span><span class="p">()</span><span class="w">
+</span></span></span><span class="line"><span class="ln">21</span><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="ln">22</span><span class="cl"><span class="w">    </span><span class="c1">// 测试连接</span><span class="w">
+</span></span></span><span class="line"><span class="ln">23</span><span class="cl"><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">db</span><span class="p">.</span><span class="nf">Ping</span><span class="p">();</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">nil</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="ln">24</span><span class="cl"><span class="w">        </span><span class="nx">log</span><span class="p">.</span><span class="nf">Fatal</span><span class="p">(</span><span class="s">&#34;Failed to connect to database:&#34;</span><span class="p">,</span><span class="w"> </span><span class="nx">err</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="ln">25</span><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="ln">26</span><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="ln">27</span><span class="cl"><span class="w">    </span><span class="c1">// 查询数据</span><span class="w">
+</span></span></span><span class="line"><span class="ln">28</span><span class="cl"><span class="w">    </span><span class="kd">var</span><span class="w"> </span><span class="nx">name</span><span class="w"> </span><span class="kt">string</span><span class="w">
+</span></span></span><span class="line"><span class="ln">29</span><span class="cl"><span class="w">    </span><span class="nx">err</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nx">db</span><span class="p">.</span><span class="nf">QueryRow</span><span class="p">(</span><span class="s">&#34;SELECT name FROM users WHERE id = ?&#34;</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">).</span><span class="nf">Scan</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">name</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="ln">30</span><span class="cl"><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">nil</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="ln">31</span><span class="cl"><span class="w">        </span><span class="nx">log</span><span class="p">.</span><span class="nf">Fatal</span><span class="p">(</span><span class="nx">err</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="ln">32</span><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="ln">33</span><span class="cl"><span class="w">    </span><span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;User name:&#34;</span><span class="p">,</span><span class="w"> </span><span class="nx">name</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="ln">34</span><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="ln">35</span><span class="cl"><span class="w">    </span><span class="c1">// 插入数据</span><span class="w">
+</span></span></span><span class="line"><span class="ln">36</span><span class="cl"><span class="w">    </span><span class="nx">result</span><span class="p">,</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">db</span><span class="p">.</span><span class="nf">Exec</span><span class="p">(</span><span class="s">&#34;INSERT INTO users (name, email) VALUES (?, ?)&#34;</span><span class="p">,</span><span class="w"> </span><span class="s">&#34;Alice&#34;</span><span class="p">,</span><span class="w"> </span><span class="s">&#34;alice@example.com&#34;</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="ln">37</span><span class="cl"><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">nil</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="ln">38</span><span class="cl"><span class="w">        </span><span class="nx">log</span><span class="p">.</span><span class="nf">Fatal</span><span class="p">(</span><span class="nx">err</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="ln">39</span><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="ln">40</span><span class="cl"><span class="w">    </span><span class="nx">lastID</span><span class="p">,</span><span class="w"> </span><span class="nx">_</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">result</span><span class="p">.</span><span class="nf">LastInsertId</span><span class="p">()</span><span class="w">
+</span></span></span><span class="line"><span class="ln">41</span><span class="cl"><span class="w">    </span><span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;Inserted ID:&#34;</span><span class="p">,</span><span class="w"> </span><span class="nx">lastID</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="ln">42</span><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></div><hr>
+<h2 id="-dsn连接字符串常用参数">🔐 DSN（连接字符串）常用参数</h2>
+<table>
+  <thead>
+      <tr>
+          <th>参数</th>
+          <th>说明</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>charset=utf8mb4</code></td>
+          <td>支持 emoji 和完整 Unicode</td>
+      </tr>
+      <tr>
+          <td><code>parseTime=true</code></td>
+          <td>自动将 <code>DATETIME</code>/<code>TIMESTAMP</code> 转为 <code>time.Time</code></td>
+      </tr>
+      <tr>
+          <td><code>loc=Local</code></td>
+          <td>使用本地时区解析时间</td>
+      </tr>
+      <tr>
+          <td><code>timeout=5s</code></td>
+          <td>连接超时</td>
+      </tr>
+      <tr>
+          <td><code>readTimeout=10s</code></td>
+          <td>读取超时</td>
+      </tr>
+      <tr>
+          <td><code>writeTimeout=10s</code></td>
+          <td>写入超时</td>
+      </tr>
+      <tr>
+          <td><code>maxAllowedPacket=0</code></td>
+          <td>允许的最大包大小</td>
+      </tr>
+  </tbody>
+</table>
+<p>完整文档：https://github.com/go-sql-driver/mysql#dsn-data-source-name</p>
+<hr>
+<h2 id="-其他可选-mysql-驱动不推荐新手">🧩 其他可选 MySQL 驱动（不推荐新手）</h2>
+<table>
+  <thead>
+      <tr>
+          <th>驱动</th>
+          <th>说明</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>github.com/GoogleCloudPlatform/cloudsql-proxy/proxy/dialers/mysql</code></td>
+          <td>专用于 Google Cloud SQL</td>
+      </tr>
+      <tr>
+          <td><code>github.com/sijms/go-ora/v2</code></td>
+          <td>主要用于 Oracle，也支持 MySQL（非主流）</td>
+      </tr>
+  </tbody>
+</table>
+<blockquote>
+<p>✅ <strong>绝大多数项目应使用 <code>go-sql-driver/mysql</code></strong>。</p>
+</blockquote>
+<hr>
+<h2 id="-高级建议搭配-orm-或查询构建器可选">🧰 高级建议：搭配 ORM 或查询构建器（可选）</h2>
+<p>虽然 <code>database/sql</code> 足够强大，但对复杂项目可考虑：</p>
+<h3 id="1-gorm全功能-orm">1. <strong>GORM</strong>（全功能 ORM）</h3>
+<ul>
+<li>GitHub: <a href="https://github.com/go-gorm/gorm">https://github.com/go-gorm/gorm</a></li>
+<li>支持关联、钩子、迁移、软删除等。</li>
+<li>底层仍使用 <code>go-sql-driver/mysql</code>。</li>
+</ul>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="ln">1</span><span class="cl"><span class="kn">import</span><span class="w"> </span><span class="s">&#34;gorm.io/driver/mysql&#34;</span><span class="w">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="w"></span><span class="kn">import</span><span class="w"> </span><span class="s">&#34;gorm.io/gorm&#34;</span><span class="w">
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="w"></span><span class="nx">dsn</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="s">&#34;user:pass@tcp(127.0.0.1:3306)/dbname?charset=utf8mb4&amp;parseTime=True&amp;loc=Local&#34;</span><span class="w">
+</span></span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="w"></span><span class="nx">db</span><span class="p">,</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">gorm</span><span class="p">.</span><span class="nf">Open</span><span class="p">(</span><span class="nx">mysql</span><span class="p">.</span><span class="nf">Open</span><span class="p">(</span><span class="nx">dsn</span><span class="p">),</span><span class="w"> </span><span class="o">&amp;</span><span class="nx">gorm</span><span class="p">.</span><span class="nx">Config</span><span class="p">{})</span><span class="w">
+</span></span></span></code></pre></div><h3 id="2-sqlboiler--ent--squirrel">2. <strong>SQLBoiler</strong> / <strong>Ent</strong> / <strong>Squirrel</strong></h3>
+<ul>
+<li>更轻量或类型安全的方案。</li>
+</ul>
+<blockquote>
+<p>💡 <strong>建议</strong>：</p>
+<ul>
+<li>小型项目 → 直接用 <code>database/sql</code> + <code>go-sql-driver/mysql</code></li>
+<li>中大型项目 → 考虑 GORM 或 Ent</li>
+</ul>
+</blockquote>
+<hr>
+<h2 id="-总结-3">✅ 总结</h2>
+<table>
+  <thead>
+      <tr>
+          <th>问题</th>
+          <th>答案</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Go 有 MySQL 标准库吗？</td>
+          <td>❌ 没有，但有标准数据库接口 <code>database/sql</code></td>
+      </tr>
+      <tr>
+          <td>如何连接 MySQL？</td>
+          <td>✅ <code>database/sql</code> + 第三方驱动 <code>go-sql-driver/mysql</code></td>
+      </tr>
+      <tr>
+          <td>需要 import 驱动吗？</td>
+          <td>✅ 用 <code>_ &quot;github.com/go-sql-driver/mysql&quot;</code> 空导入注册</td>
+      </tr>
+      <tr>
+          <td>是否支持连接池？</td>
+          <td>✅ <code>database/sql</code> 内置连接池，无需额外配置</td>
+      </tr>
+      <tr>
+          <td>推荐 ORM 吗？</td>
+          <td>可选，GORM 是最流行的</td>
+      </tr>
+  </tbody>
+</table>
+<blockquote>
+<p>📌 <strong>最佳实践</strong>：<br>
+<strong>永远使用参数化查询（<code>?</code> 占位符）防止 SQL 注入！</strong></p>
 </blockquote>
 <hr>
 <hr>
