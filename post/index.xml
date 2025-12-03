@@ -7,7 +7,51 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
     <copyright>Copyright © 1989–2025, 李建林 </copyright>
-    <lastBuildDate>Sun, 24 Aug 2025 11:36:29 +0800</lastBuildDate><atom:link href="https://jianlin-li.github.io/post/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Tue, 02 Dec 2025 11:36:29 +0800</lastBuildDate><atom:link href="https://jianlin-li.github.io/post/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Go语言的知识点-3</title>
+      <link>https://jianlin-li.github.io/post/go_review_3/</link>
+      <pubDate>Tue, 02 Dec 2025 11:36:29 +0800</pubDate>
+      
+      <guid>https://jianlin-li.github.io/post/go_review_3/</guid>
+      <description>
+        
+          
+            &lt;h1 id=&#34;在-go-语言中没有直接连接-mysql-的标准库但-go-提供了强大的数据库抽象接口-属于标准库它定义了一套通用的-api-用于操作关系型数据库如-mysqlpostgresqlsqlite-等&#34;&gt;在 Go 语言中，&lt;strong&gt;没有直接连接 MySQL 的标准库&lt;/strong&gt;，但 Go 提供了强大的&lt;strong&gt;数据库抽象接口 &lt;code&gt;database/sql&lt;/code&gt;&lt;/strong&gt;（属于标准库），它定义了一套通用的 API 用于操作关系型数据库（如 MySQL、PostgreSQL、SQLite 等）。&lt;/h1&gt;
+&lt;p&gt;要连接 &lt;strong&gt;MySQL&lt;/strong&gt;，你需要：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;使用标准库 &lt;code&gt;database/sql&lt;/code&gt; 编写代码；&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;搭配一个 MySQL 驱动（Driver）&lt;/strong&gt; —— 这是一个第三方包，实现了 &lt;code&gt;database/sql/driver&lt;/code&gt; 接口。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;hr&gt;
+&lt;h2 id=&#34;-正确姿势databasesql--mysql-driver&#34;&gt;✅ 正确姿势：&lt;code&gt;database/sql&lt;/code&gt; + MySQL Driver&lt;/h2&gt;
+&lt;h3 id=&#34;1-标准库&#34;&gt;1. &lt;strong&gt;标准库 &lt;code&gt;database/sql&lt;/code&gt;&lt;/strong&gt;&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;提供统一接口：&lt;code&gt;sql.Open&lt;/code&gt;, &lt;code&gt;db.Query&lt;/code&gt;, &lt;code&gt;db.Exec&lt;/code&gt;, &lt;code&gt;db.Prepare&lt;/code&gt; 等。&lt;/li&gt;
+&lt;li&gt;不包含具体数据库驱动，需配合驱动使用。&lt;/li&gt;
+&lt;li&gt;支持连接池、预编译语句、事务等。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;2-推荐的-mysql-驱动&#34;&gt;2. &lt;strong&gt;推荐的 MySQL 驱动：&lt;code&gt;go-sql-driver/mysql&lt;/code&gt;&lt;/strong&gt;&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;GitHub: &lt;a href=&#34;https://github.com/go-sql-driver/mysql&#34;&gt;https://github.com/go-sql-driver/mysql&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;最流行、维护活跃、功能完整、纯 Go 实现（无 C 依赖）。&lt;/li&gt;
+&lt;li&gt;符合 &lt;code&gt;database/sql/driver&lt;/code&gt; 接口规范。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;blockquote&gt;
+&lt;p&gt;📌 &lt;strong&gt;这是 Go 社区事实上的标准 MySQL 驱动&lt;/strong&gt;。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;hr&gt;
+&lt;h2 id=&#34;-使用示例&#34;&gt;🛠️ 使用示例&lt;/h2&gt;
+&lt;h3 id=&#34;第一步安装驱动&#34;&gt;第一步：安装驱动&lt;/h3&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;go get -u github.com/go-sql-driver/mysql
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;blockquote&gt;
+&lt;p&gt;⚠️ 注意：你&lt;strong&gt;不需要在代码中显式 import 驱动包&lt;/strong&gt;来调用它的函数，但必须通过 &lt;code&gt;_&lt;/code&gt; 空导入（blank import）注册驱动：&lt;/p&gt;
+          
+          
+        
+      </description>
+    </item>
+    
     <item>
       <title>Go语言的知识点-2</title>
       <link>https://jianlin-li.github.io/post/go_review_2/</link>
