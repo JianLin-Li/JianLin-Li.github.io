@@ -168,7 +168,7 @@
     <span class="post_date">
       2025-08-24	  
     </span>
-    <span class="post_time"> · 16 分钟阅读</span><span>&nbsp;· <a href='https://jianlin-li.github.io/tags/go/' title="Go" class="post_tag button button_translucent">Go
+    <span class="post_time"> · 18 分钟阅读</span><span>&nbsp;· <a href='https://jianlin-li.github.io/tags/go/' title="Go" class="post_tag button button_translucent">Go
         </a>
     </span>
     <span class="page_only">&nbsp;·
@@ -1671,6 +1671,146 @@
 <strong>“With great power comes great responsibility.”</strong><br>
 —— 反射是“最后的手段”，不是“首选工具”。</p>
 </blockquote>
+<hr>
+<hr>
+<hr>
+<hr>
+<h1 id="go-语言从-118-版本发布于-2022-年-3-月开始正式支持泛型generics泛型是一种编写代码的方式允许函数或类型在不指定具体类型的情况下操作数据从而提高代码的复用性和类型安全性">Go 语言从 <strong>1.18 版本</strong>（发布于 2022 年 3 月）开始正式支持<strong>泛型（Generics）</strong>。泛型是一种编写代码的方式，允许函数或类型在不指定具体类型的情况下操作数据，从而提高代码的复用性和类型安全性。</h1>
+<hr>
+<h2 id="一为什么需要泛型">一、为什么需要泛型？</h2>
+<p>在 Go 泛型之前，如果要写一个适用于多种类型的函数（比如 <code>Min</code> 函数），通常有以下几种方式：</p>
+<ul>
+<li>为每种类型写一个函数（重复代码）</li>
+<li>使用 <code>interface{}</code> + 类型断言（牺牲类型安全和性能）</li>
+<li>使用代码生成工具（如 <code>go generate</code>）</li>
+</ul>
+<p>泛型提供了一种<strong>类型安全且无需重复代码</strong>的方式来解决这类问题。</p>
+<hr>
+<h2 id="二基本语法">二、基本语法</h2>
+<h3 id="1-泛型函数">1. 泛型函数</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="ln">1</span><span class="cl"><span class="kd">func</span><span class="w"> </span><span class="nx">Print</span><span class="p">[</span><span class="nx">T</span><span class="w"> </span><span class="kt">any</span><span class="p">](</span><span class="nx">s</span><span class="w"> </span><span class="nx">T</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="w">    </span><span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="nx">s</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></div><ul>
+<li><code>[T any]</code> 是<strong>类型参数列表</strong>，其中 <code>T</code> 是类型参数名，<code>any</code> 是类型约束（表示任意类型）。</li>
+<li>调用时可以显式指定类型：<code>Print[int](42)</code>，也可以让编译器推导：<code>Print(42)</code></li>
+</ul>
+<h3 id="2-带约束的泛型">2. 带约束的泛型</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="ln">1</span><span class="cl"><span class="kd">func</span><span class="w"> </span><span class="nx">Add</span><span class="p">[</span><span class="nx">T</span><span class="w"> </span><span class="p">~</span><span class="kt">int</span><span class="w"> </span><span class="p">|</span><span class="w"> </span><span class="p">~</span><span class="kt">float64</span><span class="p">](</span><span class="nx">a</span><span class="p">,</span><span class="w"> </span><span class="nx">b</span><span class="w"> </span><span class="nx">T</span><span class="p">)</span><span class="w"> </span><span class="nx">T</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="nx">a</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nx">b</span><span class="w">
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></div><ul>
+<li><code>~int</code> 表示底层类型是 <code>int</code> 的所有类型（包括自定义类型如 <code>type MyInt int</code>）</li>
+<li><code>|</code> 表示“或”关系，即只允许 <code>int</code> 或 <code>float64</code> 及其底层类型</li>
+</ul>
+<blockquote>
+<p>注意：Go 1.18 引入了**类型约束（Type Constraints）**的概念，常用约束可定义在接口中。</p>
+</blockquote>
+<h3 id="3-使用内置约束">3. 使用内置约束</h3>
+<p>Go 在 <code>golang.org/x/exp/constraints</code>（实验包）或自己定义常用约束：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="kd">type</span><span class="w"> </span><span class="nx">Number</span><span class="w"> </span><span class="kd">interface</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="w">    </span><span class="p">~</span><span class="kt">int</span><span class="w"> </span><span class="p">|</span><span class="w"> </span><span class="p">~</span><span class="kt">int8</span><span class="w"> </span><span class="p">|</span><span class="w"> </span><span class="p">~</span><span class="kt">int16</span><span class="w"> </span><span class="p">|</span><span class="w"> </span><span class="p">~</span><span class="kt">int32</span><span class="w"> </span><span class="p">|</span><span class="w"> </span><span class="p">~</span><span class="kt">int64</span><span class="w"> </span><span class="p">|</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="w">    </span><span class="p">~</span><span class="kt">uint</span><span class="w"> </span><span class="p">|</span><span class="w"> </span><span class="p">~</span><span class="kt">uint8</span><span class="w"> </span><span class="p">|</span><span class="w"> </span><span class="p">~</span><span class="kt">uint16</span><span class="w"> </span><span class="p">|</span><span class="w"> </span><span class="p">~</span><span class="kt">uint32</span><span class="w"> </span><span class="p">|</span><span class="w"> </span><span class="p">~</span><span class="kt">uint64</span><span class="w"> </span><span class="p">|</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="w">    </span><span class="p">~</span><span class="kt">float32</span><span class="w"> </span><span class="p">|</span><span class="w"> </span><span class="p">~</span><span class="kt">float64</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 6</span><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="w"></span><span class="kd">func</span><span class="w"> </span><span class="nx">Sum</span><span class="p">[</span><span class="nx">T</span><span class="w"> </span><span class="nx">Number</span><span class="p">](</span><span class="nx">nums</span><span class="w"> </span><span class="p">[]</span><span class="nx">T</span><span class="p">)</span><span class="w"> </span><span class="nx">T</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="w">    </span><span class="kd">var</span><span class="w"> </span><span class="nx">total</span><span class="w"> </span><span class="nx">T</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 9</span><span class="cl"><span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="nx">_</span><span class="p">,</span><span class="w"> </span><span class="nx">n</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="k">range</span><span class="w"> </span><span class="nx">nums</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="w">        </span><span class="nx">total</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="nx">n</span><span class="w">
+</span></span></span><span class="line"><span class="ln">11</span><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="ln">12</span><span class="cl"><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="nx">total</span><span class="w">
+</span></span></span><span class="line"><span class="ln">13</span><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></div><blockquote>
+<p>从 Go 1.21 开始，官方在 <code>cmp</code> 和 <code>slices</code> 等标准库中使用了泛型，但 <code>constraints</code> 包尚未进入标准库（截至 Go 1.23）。</p>
+</blockquote>
+<hr>
+<h2 id="三泛型结构体">三、泛型结构体</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="kd">type</span><span class="w"> </span><span class="nx">Stack</span><span class="p">[</span><span class="nx">T</span><span class="w"> </span><span class="kt">any</span><span class="p">]</span><span class="w"> </span><span class="kd">struct</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="w">    </span><span class="nx">items</span><span class="w"> </span><span class="p">[]</span><span class="nx">T</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="w"></span><span class="kd">func</span><span class="w"> </span><span class="p">(</span><span class="nx">s</span><span class="w"> </span><span class="o">*</span><span class="nx">Stack</span><span class="p">[</span><span class="nx">T</span><span class="p">])</span><span class="w"> </span><span class="nf">Push</span><span class="p">(</span><span class="nx">item</span><span class="w"> </span><span class="nx">T</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 6</span><span class="cl"><span class="w">    </span><span class="nx">s</span><span class="p">.</span><span class="nx">items</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nb">append</span><span class="p">(</span><span class="nx">s</span><span class="p">.</span><span class="nx">items</span><span class="p">,</span><span class="w"> </span><span class="nx">item</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="ln"> 9</span><span class="cl"><span class="w"></span><span class="kd">func</span><span class="w"> </span><span class="p">(</span><span class="nx">s</span><span class="w"> </span><span class="o">*</span><span class="nx">Stack</span><span class="p">[</span><span class="nx">T</span><span class="p">])</span><span class="w"> </span><span class="nf">Pop</span><span class="p">()</span><span class="w"> </span><span class="p">(</span><span class="nx">T</span><span class="p">,</span><span class="w"> </span><span class="kt">bool</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="nb">len</span><span class="p">(</span><span class="nx">s</span><span class="p">.</span><span class="nx">items</span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="ln">11</span><span class="cl"><span class="w">        </span><span class="kd">var</span><span class="w"> </span><span class="nx">zero</span><span class="w"> </span><span class="nx">T</span><span class="w">
+</span></span></span><span class="line"><span class="ln">12</span><span class="cl"><span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="nx">zero</span><span class="p">,</span><span class="w"> </span><span class="kc">false</span><span class="w">
+</span></span></span><span class="line"><span class="ln">13</span><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="ln">14</span><span class="cl"><span class="w">    </span><span class="nx">item</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">s</span><span class="p">.</span><span class="nx">items</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="nx">s</span><span class="p">.</span><span class="nx">items</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="w">
+</span></span></span><span class="line"><span class="ln">15</span><span class="cl"><span class="w">    </span><span class="nx">s</span><span class="p">.</span><span class="nx">items</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nx">s</span><span class="p">.</span><span class="nx">items</span><span class="p">[:</span><span class="nb">len</span><span class="p">(</span><span class="nx">s</span><span class="p">.</span><span class="nx">items</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="w">
+</span></span></span><span class="line"><span class="ln">16</span><span class="cl"><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="nx">item</span><span class="p">,</span><span class="w"> </span><span class="kc">true</span><span class="w">
+</span></span></span><span class="line"><span class="ln">17</span><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></div><p>使用：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="ln">1</span><span class="cl"><span class="nx">s</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="o">&amp;</span><span class="nx">Stack</span><span class="p">[</span><span class="kt">string</span><span class="p">]{}</span><span class="w">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="w"></span><span class="nx">s</span><span class="p">.</span><span class="nf">Push</span><span class="p">(</span><span class="s">&#34;hello&#34;</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="w"></span><span class="nx">val</span><span class="p">,</span><span class="w"> </span><span class="nx">ok</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">s</span><span class="p">.</span><span class="nf">Pop</span><span class="p">()</span><span class="w">
+</span></span></span></code></pre></div><hr>
+<h2 id="四类型约束详解">四、类型约束详解</h2>
+<h3 id="1-any-等价于-interface">1. <code>any</code> 等价于 <code>interface{}</code></h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="ln">1</span><span class="cl"><span class="kd">func</span><span class="w"> </span><span class="nx">F</span><span class="p">[</span><span class="nx">T</span><span class="w"> </span><span class="kt">any</span><span class="p">](</span><span class="nx">t</span><span class="w"> </span><span class="nx">T</span><span class="p">)</span><span class="w"> </span><span class="c1">// 可接受任何类型</span><span class="w">
+</span></span></span></code></pre></div><h3 id="2-自定义约束接口">2. 自定义约束接口</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="ln">1</span><span class="cl"><span class="kd">type</span><span class="w"> </span><span class="nx">Stringer</span><span class="w"> </span><span class="kd">interface</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="w">    </span><span class="nf">String</span><span class="p">()</span><span class="w"> </span><span class="kt">string</span><span class="w">
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="w"></span><span class="kd">func</span><span class="w"> </span><span class="nx">PrintString</span><span class="p">[</span><span class="nx">T</span><span class="w"> </span><span class="nx">Stringer</span><span class="p">](</span><span class="nx">v</span><span class="w"> </span><span class="nx">T</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="ln">6</span><span class="cl"><span class="w">    </span><span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="nx">v</span><span class="p">.</span><span class="nf">String</span><span class="p">())</span><span class="w">
+</span></span></span><span class="line"><span class="ln">7</span><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></div><p>只有实现了 <code>String()</code> 方法的类型才能作为 <code>T</code> 传入。</p>
+<h3 id="3-操作符约束如支持-">3. 操作符约束（如支持 <code>&lt;</code>）</h3>
+<p>Go 不允许直接对泛型参数使用 <code>&lt;</code>，除非约束中明确说明该类型支持比较：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="ln">1</span><span class="cl"><span class="kd">func</span><span class="w"> </span><span class="nx">Min</span><span class="p">[</span><span class="nx">T</span><span class="w"> </span><span class="nx">constraints</span><span class="p">.</span><span class="nx">Ordered</span><span class="p">](</span><span class="nx">a</span><span class="p">,</span><span class="w"> </span><span class="nx">b</span><span class="w"> </span><span class="nx">T</span><span class="p">)</span><span class="w"> </span><span class="nx">T</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="nx">a</span><span class="w"> </span><span class="p">&lt;</span><span class="w"> </span><span class="nx">b</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="nx">a</span><span class="w">
+</span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="nx">b</span><span class="w">
+</span></span></span><span class="line"><span class="ln">6</span><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></div><p><code>constraints.Ordered</code> 是一个包含所有可比较顺序类型的约束（整数、浮点数、字符串等）。</p>
+<blockquote>
+<p>注：<code>constraints</code> 包目前位于 <code>golang.org/x/exp/constraints</code>，但社区广泛使用，未来可能进入标准库。</p>
+</blockquote>
+<hr>
+<h2 id="五注意事项">五、注意事项</h2>
+<ol>
+<li>
+<p><strong>不能对泛型类型使用 <code>==</code> 或 <code>!=</code></strong>，除非约束为可比较类型（如 <code>comparable</code>）：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="ln">1</span><span class="cl"><span class="kd">func</span><span class="w"> </span><span class="nx">Equal</span><span class="p">[</span><span class="nx">T</span><span class="w"> </span><span class="nx">comparable</span><span class="p">](</span><span class="nx">a</span><span class="p">,</span><span class="w"> </span><span class="nx">b</span><span class="w"> </span><span class="nx">T</span><span class="p">)</span><span class="w"> </span><span class="kt">bool</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="nx">a</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="nx">b</span><span class="w">
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></div></li>
+<li>
+<p><strong>泛型不能用于方法接收者以外的顶层函数以外的场景</strong>（如不能有泛型的全局变量）。</p>
+</li>
+<li>
+<p><strong>性能</strong>：泛型在编译时会进行<strong>单态化（monomorphization）</strong>，即为每个具体类型生成一份代码，因此运行时无额外开销。</p>
+</li>
+</ol>
+<hr>
+<h2 id="六实战示例通用-map-函数">六、实战示例：通用 Map 函数</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="kd">func</span><span class="w"> </span><span class="nx">Map</span><span class="p">[</span><span class="nx">T</span><span class="w"> </span><span class="kt">any</span><span class="p">,</span><span class="w"> </span><span class="nx">R</span><span class="w"> </span><span class="kt">any</span><span class="p">](</span><span class="nx">slice</span><span class="w"> </span><span class="p">[]</span><span class="nx">T</span><span class="p">,</span><span class="w"> </span><span class="nx">fn</span><span class="w"> </span><span class="kd">func</span><span class="p">(</span><span class="nx">T</span><span class="p">)</span><span class="w"> </span><span class="nx">R</span><span class="p">)</span><span class="w"> </span><span class="p">[]</span><span class="nx">R</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="w">    </span><span class="nx">result</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nb">make</span><span class="p">([]</span><span class="nx">R</span><span class="p">,</span><span class="w"> </span><span class="nb">len</span><span class="p">(</span><span class="nx">slice</span><span class="p">))</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="nx">i</span><span class="p">,</span><span class="w"> </span><span class="nx">v</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="k">range</span><span class="w"> </span><span class="nx">slice</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="w">        </span><span class="nx">result</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nf">fn</span><span class="p">(</span><span class="nx">v</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 6</span><span class="cl"><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="nx">result</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="ln"> 9</span><span class="cl"><span class="w"></span><span class="c1">// 使用</span><span class="w">
+</span></span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="w"></span><span class="nx">nums</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="p">[]</span><span class="kt">int</span><span class="p">{</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="ln">11</span><span class="cl"><span class="w"></span><span class="nx">strs</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nf">Map</span><span class="p">(</span><span class="nx">nums</span><span class="p">,</span><span class="w"> </span><span class="kd">func</span><span class="p">(</span><span class="nx">n</span><span class="w"> </span><span class="kt">int</span><span class="p">)</span><span class="w"> </span><span class="kt">string</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="ln">12</span><span class="cl"><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="nx">strconv</span><span class="p">.</span><span class="nf">Itoa</span><span class="p">(</span><span class="nx">n</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="ln">13</span><span class="cl"><span class="w"></span><span class="p">})</span><span class="w">
+</span></span></span><span class="line"><span class="ln">14</span><span class="cl"><span class="w"></span><span class="c1">// strs == []string{&#34;1&#34;, &#34;2&#34;, &#34;3&#34;}</span><span class="w">
+</span></span></span></code></pre></div><hr>
+<h2 id="七参考资料">七、参考资料</h2>
+<ul>
+<li>官方泛型提案：<a href="https://go.googlesource.com/proposal/&#43;/refs/heads/master/design/43651-type-parameters.md">Type Parameters Proposal</a></li>
+<li>Go 泛型 Playground：https://go.dev/play/</li>
+<li>Go 1.18 Release Notes：https://go.dev/doc/go1.18</li>
+</ul>
 <hr>
 <hr>
 <hr>
