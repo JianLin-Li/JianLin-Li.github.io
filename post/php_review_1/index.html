@@ -212,27 +212,27 @@
 <hr>
 <h2 id="-php-70">🔹 PHP 7.0</h2>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="c1">// 1. 标量类型声明（需 strict_types）
-</span></span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="c1"></span><span class="k">declare</span><span class="p">(</span><span class="nx">strict_types</span><span class="o">=</span><span class="mi">1</span><span class="p">);</span>
+</span></span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="k">declare</span><span class="p">(</span><span class="nx">strict_types</span><span class="o">=</span><span class="mi">1</span><span class="p">);</span>
 </span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="k">function</span> <span class="nf">add</span><span class="p">(</span><span class="nx">int</span> <span class="nv">$a</span><span class="p">,</span> <span class="nx">int</span> <span class="nv">$b</span><span class="p">)</span><span class="o">:</span> <span class="nx">int</span> <span class="p">{</span>
 </span></span><span class="line"><span class="ln"> 4</span><span class="cl">    <span class="k">return</span> <span class="nv">$a</span> <span class="o">+</span> <span class="nv">$b</span><span class="p">;</span>
 </span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="p">}</span>
 </span></span><span class="line"><span class="ln"> 6</span><span class="cl"><span class="k">echo</span> <span class="nx">add</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">);</span> <span class="c1">// 5
-</span></span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="c1"></span>
+</span></span></span><span class="line"><span class="ln"> 7</span><span class="cl">
 </span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="c1">// 2. 返回类型声明
-</span></span></span><span class="line"><span class="ln"> 9</span><span class="cl"><span class="c1"></span><span class="k">function</span> <span class="nf">getName</span><span class="p">()</span><span class="o">:</span> <span class="nx">string</span> <span class="p">{</span>
+</span></span></span><span class="line"><span class="ln"> 9</span><span class="cl"><span class="k">function</span> <span class="nf">getName</span><span class="p">()</span><span class="o">:</span> <span class="nx">string</span> <span class="p">{</span>
 </span></span><span class="line"><span class="ln">10</span><span class="cl">    <span class="k">return</span> <span class="s2">&#34;Alice&#34;</span><span class="p">;</span>
 </span></span><span class="line"><span class="ln">11</span><span class="cl"><span class="p">}</span>
 </span></span><span class="line"><span class="ln">12</span><span class="cl">
 </span></span><span class="line"><span class="ln">13</span><span class="cl"><span class="c1">// 3. Null 合并运算符
-</span></span></span><span class="line"><span class="ln">14</span><span class="cl"><span class="c1"></span><span class="nv">$username</span> <span class="o">=</span> <span class="nv">$_GET</span><span class="p">[</span><span class="s1">&#39;user&#39;</span><span class="p">]</span> <span class="o">??</span> <span class="s1">&#39;guest&#39;</span><span class="p">;</span>
+</span></span></span><span class="line"><span class="ln">14</span><span class="cl"><span class="nv">$username</span> <span class="o">=</span> <span class="nv">$_GET</span><span class="p">[</span><span class="s1">&#39;user&#39;</span><span class="p">]</span> <span class="o">??</span> <span class="s1">&#39;guest&#39;</span><span class="p">;</span>
 </span></span><span class="line"><span class="ln">15</span><span class="cl">
 </span></span><span class="line"><span class="ln">16</span><span class="cl"><span class="c1">// 4. 太空船运算符
-</span></span></span><span class="line"><span class="ln">17</span><span class="cl"><span class="c1"></span><span class="k">echo</span> <span class="mi">1</span> <span class="o">&lt;=&gt;</span> <span class="mi">2</span><span class="p">;</span> <span class="c1">// -1
-</span></span></span><span class="line"><span class="ln">18</span><span class="cl"><span class="c1"></span><span class="k">echo</span> <span class="mi">2</span> <span class="o">&lt;=&gt;</span> <span class="mi">2</span><span class="p">;</span> <span class="c1">// 0
-</span></span></span><span class="line"><span class="ln">19</span><span class="cl"><span class="c1"></span><span class="k">echo</span> <span class="mi">3</span> <span class="o">&lt;=&gt;</span> <span class="mi">2</span><span class="p">;</span> <span class="c1">// 1
-</span></span></span><span class="line"><span class="ln">20</span><span class="cl"><span class="c1"></span>
+</span></span></span><span class="line"><span class="ln">17</span><span class="cl"><span class="k">echo</span> <span class="mi">1</span> <span class="o">&lt;=&gt;</span> <span class="mi">2</span><span class="p">;</span> <span class="c1">// -1
+</span></span></span><span class="line"><span class="ln">18</span><span class="cl"><span class="k">echo</span> <span class="mi">2</span> <span class="o">&lt;=&gt;</span> <span class="mi">2</span><span class="p">;</span> <span class="c1">// 0
+</span></span></span><span class="line"><span class="ln">19</span><span class="cl"><span class="k">echo</span> <span class="mi">3</span> <span class="o">&lt;=&gt;</span> <span class="mi">2</span><span class="p">;</span> <span class="c1">// 1
+</span></span></span><span class="line"><span class="ln">20</span><span class="cl">
 </span></span><span class="line"><span class="ln">21</span><span class="cl"><span class="c1">// 5. 匿名类
-</span></span></span><span class="line"><span class="ln">22</span><span class="cl"><span class="c1"></span><span class="nv">$logger</span> <span class="o">=</span> <span class="k">new</span> <span class="k">class</span> <span class="err">{</span>
+</span></span></span><span class="line"><span class="ln">22</span><span class="cl"><span class="nv">$logger</span> <span class="o">=</span> <span class="k">new</span> <span class="k">class</span> <span class="err">{</span>
 </span></span><span class="line"><span class="ln">23</span><span class="cl">    <span class="k">public</span> <span class="k">function</span> <span class="nf">log</span><span class="p">(</span><span class="nx">string</span> <span class="nv">$msg</span><span class="p">)</span> <span class="p">{</span>
 </span></span><span class="line"><span class="ln">24</span><span class="cl">        <span class="k">echo</span> <span class="s2">&#34;[LOG] </span><span class="si">$msg\n</span><span class="s2">&#34;</span><span class="p">;</span>
 </span></span><span class="line"><span class="ln">25</span><span class="cl">    <span class="p">}</span>
@@ -240,53 +240,53 @@
 </span></span><span class="line"><span class="ln">27</span><span class="cl"><span class="nv">$logger</span><span class="o">-&gt;</span><span class="na">log</span><span class="p">(</span><span class="s2">&#34;Hello&#34;</span><span class="p">);</span>
 </span></span><span class="line"><span class="ln">28</span><span class="cl">
 </span></span><span class="line"><span class="ln">29</span><span class="cl"><span class="c1">// 6. Group use
-</span></span></span><span class="line"><span class="ln">30</span><span class="cl"><span class="c1"></span><span class="k">use</span> <span class="nx">Some\Namespace\</span><span class="p">{</span><span class="nx">ClassA</span><span class="p">,</span> <span class="nx">ClassB</span> <span class="k">as</span> <span class="nx">B</span><span class="p">};</span>
+</span></span></span><span class="line"><span class="ln">30</span><span class="cl"><span class="k">use</span> <span class="nx">Some\Namespace\</span><span class="p">{</span><span class="nx">ClassA</span><span class="p">,</span> <span class="nx">ClassB</span> <span class="k">as</span> <span class="nx">B</span><span class="p">};</span>
 </span></span><span class="line"><span class="ln">31</span><span class="cl">
 </span></span><span class="line"><span class="ln">32</span><span class="cl"><span class="c1">// 7. 移除 mysql_*（以下代码在 PHP 7+ 报错）
 </span></span></span><span class="line"><span class="ln">33</span><span class="cl"><span class="c1">// $conn = mysql_connect(); // ❌ Fatal error
-</span></span></span><span class="line"><span class="ln">34</span><span class="cl"><span class="c1"></span>
+</span></span></span><span class="line"><span class="ln">34</span><span class="cl">
 </span></span><span class="line"><span class="ln">35</span><span class="cl"><span class="c1">// 8. 安全随机数
-</span></span></span><span class="line"><span class="ln">36</span><span class="cl"><span class="c1"></span><span class="nv">$bytes</span> <span class="o">=</span> <span class="nx">random_bytes</span><span class="p">(</span><span class="mi">16</span><span class="p">);</span>
+</span></span></span><span class="line"><span class="ln">36</span><span class="cl"><span class="nv">$bytes</span> <span class="o">=</span> <span class="nx">random_bytes</span><span class="p">(</span><span class="mi">16</span><span class="p">);</span>
 </span></span><span class="line"><span class="ln">37</span><span class="cl"><span class="nv">$int</span> <span class="o">=</span> <span class="nx">random_int</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">100</span><span class="p">);</span>
 </span></span><span class="line"><span class="ln">38</span><span class="cl">
 </span></span><span class="line"><span class="ln">39</span><span class="cl"><span class="c1">// 9. Closure::call()
-</span></span></span><span class="line"><span class="ln">40</span><span class="cl"><span class="c1"></span><span class="nv">$obj</span> <span class="o">=</span> <span class="p">(</span><span class="nx">object</span><span class="p">)[</span><span class="s1">&#39;x&#39;</span> <span class="o">=&gt;</span> <span class="mi">42</span><span class="p">];</span>
+</span></span></span><span class="line"><span class="ln">40</span><span class="cl"><span class="nv">$obj</span> <span class="o">=</span> <span class="p">(</span><span class="nx">object</span><span class="p">)[</span><span class="s1">&#39;x&#39;</span> <span class="o">=&gt;</span> <span class="mi">42</span><span class="p">];</span>
 </span></span><span class="line"><span class="ln">41</span><span class="cl"><span class="p">(</span><span class="k">function</span><span class="p">()</span> <span class="p">{</span> <span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">x</span><span class="p">;</span> <span class="p">})</span><span class="o">-&gt;</span><span class="na">call</span><span class="p">(</span><span class="nv">$obj</span><span class="p">);</span> <span class="c1">// 42
 </span></span></span></code></pre></div><hr>
 <h2 id="-php-71">🔹 PHP 7.1</h2>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="c1">// 1. 可为空类型
-</span></span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="c1"></span><span class="k">function</span> <span class="nf">say</span><span class="p">(</span><span class="o">?</span><span class="nx">string</span> <span class="nv">$name</span><span class="p">)</span><span class="o">:</span> <span class="nx">void</span> <span class="p">{</span>
+</span></span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="k">function</span> <span class="nf">say</span><span class="p">(</span><span class="o">?</span><span class="nx">string</span> <span class="nv">$name</span><span class="p">)</span><span class="o">:</span> <span class="nx">void</span> <span class="p">{</span>
 </span></span><span class="line"><span class="ln"> 3</span><span class="cl">    <span class="k">echo</span> <span class="nv">$name</span> <span class="o">??</span> <span class="s1">&#39;Anonymous&#39;</span><span class="p">;</span>
 </span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="p">}</span>
 </span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="nx">say</span><span class="p">(</span><span class="k">null</span><span class="p">);</span> <span class="c1">// Anonymous
-</span></span></span><span class="line"><span class="ln"> 6</span><span class="cl"><span class="c1"></span>
+</span></span></span><span class="line"><span class="ln"> 6</span><span class="cl">
 </span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="c1">// 2. void 返回类型
-</span></span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="c1"></span><span class="k">function</span> <span class="nf">dump</span><span class="p">(</span><span class="nx">mixed</span> <span class="nv">$x</span><span class="p">)</span><span class="o">:</span> <span class="nx">void</span> <span class="p">{</span>
+</span></span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="k">function</span> <span class="nf">dump</span><span class="p">(</span><span class="nx">mixed</span> <span class="nv">$x</span><span class="p">)</span><span class="o">:</span> <span class="nx">void</span> <span class="p">{</span>
 </span></span><span class="line"><span class="ln"> 9</span><span class="cl">    <span class="nx">var_dump</span><span class="p">(</span><span class="nv">$x</span><span class="p">);</span>
 </span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="p">}</span>
 </span></span><span class="line"><span class="ln">11</span><span class="cl">
 </span></span><span class="line"><span class="ln">12</span><span class="cl"><span class="c1">// 3. 类常量可见性
-</span></span></span><span class="line"><span class="ln">13</span><span class="cl"><span class="c1"></span><span class="k">class</span> <span class="nc">Config</span> <span class="p">{</span>
+</span></span></span><span class="line"><span class="ln">13</span><span class="cl"><span class="k">class</span> <span class="nc">Config</span> <span class="p">{</span>
 </span></span><span class="line"><span class="ln">14</span><span class="cl">    <span class="k">private</span> <span class="k">const</span> <span class="no">SECRET</span> <span class="o">=</span> <span class="s1">&#39;xxx&#39;</span><span class="p">;</span>
 </span></span><span class="line"><span class="ln">15</span><span class="cl">    <span class="k">public</span> <span class="k">const</span> <span class="no">PUBLIC_KEY</span> <span class="o">=</span> <span class="s1">&#39;pub&#39;</span><span class="p">;</span>
 </span></span><span class="line"><span class="ln">16</span><span class="cl"><span class="p">}</span>
 </span></span><span class="line"><span class="ln">17</span><span class="cl">
 </span></span><span class="line"><span class="ln">18</span><span class="cl"><span class="c1">// 4. 多异常捕获
-</span></span></span><span class="line"><span class="ln">19</span><span class="cl"><span class="c1"></span><span class="k">try</span> <span class="p">{</span>
+</span></span></span><span class="line"><span class="ln">19</span><span class="cl"><span class="k">try</span> <span class="p">{</span>
 </span></span><span class="line"><span class="ln">20</span><span class="cl">    <span class="k">throw</span> <span class="k">new</span> <span class="nx">InvalidArgumentException</span><span class="p">(</span><span class="s2">&#34;Bad input&#34;</span><span class="p">);</span>
 </span></span><span class="line"><span class="ln">21</span><span class="cl"><span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">InvalidArgumentException</span> <span class="o">|</span> <span class="nx">OutOfRangeException</span> <span class="nv">$e</span><span class="p">)</span> <span class="p">{</span>
 </span></span><span class="line"><span class="ln">22</span><span class="cl">    <span class="k">echo</span> <span class="s2">&#34;Caught: &#34;</span> <span class="o">.</span> <span class="nv">$e</span><span class="o">-&gt;</span><span class="na">getMessage</span><span class="p">();</span>
 </span></span><span class="line"><span class="ln">23</span><span class="cl"><span class="p">}</span>
 </span></span><span class="line"><span class="ln">24</span><span class="cl">
 </span></span><span class="line"><span class="ln">25</span><span class="cl"><span class="c1">// 5. 对称数组解构
-</span></span></span><span class="line"><span class="ln">26</span><span class="cl"><span class="c1"></span><span class="p">[</span><span class="nv">$a</span><span class="p">,</span> <span class="nv">$b</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">];</span>
+</span></span></span><span class="line"><span class="ln">26</span><span class="cl"><span class="p">[</span><span class="nv">$a</span><span class="p">,</span> <span class="nv">$b</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">];</span>
 </span></span><span class="line"><span class="ln">27</span><span class="cl"><span class="p">[</span><span class="s1">&#39;name&#39;</span> <span class="o">=&gt;</span> <span class="nv">$n</span><span class="p">,</span> <span class="s1">&#39;age&#39;</span> <span class="o">=&gt;</span> <span class="nv">$a</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;name&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Bob&#39;</span><span class="p">,</span> <span class="s1">&#39;age&#39;</span> <span class="o">=&gt;</span> <span class="mi">30</span><span class="p">];</span>
 </span></span><span class="line"><span class="ln">28</span><span class="cl">
 </span></span><span class="line"><span class="ln">29</span><span class="cl"><span class="c1">// 6. 负字符串偏移
-</span></span></span><span class="line"><span class="ln">30</span><span class="cl"><span class="c1"></span><span class="k">echo</span> <span class="s2">&#34;hello&#34;</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">];</span> <span class="c1">// &#39;o&#39;
-</span></span></span><span class="line"><span class="ln">31</span><span class="cl"><span class="c1"></span>
+</span></span></span><span class="line"><span class="ln">30</span><span class="cl"><span class="k">echo</span> <span class="s2">&#34;hello&#34;</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">];</span> <span class="c1">// &#39;o&#39;
+</span></span></span><span class="line"><span class="ln">31</span><span class="cl">
 </span></span><span class="line"><span class="ln">32</span><span class="cl"><span class="c1">// 7. iterable 伪类型
-</span></span></span><span class="line"><span class="ln">33</span><span class="cl"><span class="c1"></span><span class="k">function</span> <span class="nf">process</span><span class="p">(</span><span class="nx">iterable</span> <span class="nv">$items</span><span class="p">)</span><span class="o">:</span> <span class="nx">void</span> <span class="p">{</span>
+</span></span></span><span class="line"><span class="ln">33</span><span class="cl"><span class="k">function</span> <span class="nf">process</span><span class="p">(</span><span class="nx">iterable</span> <span class="nv">$items</span><span class="p">)</span><span class="o">:</span> <span class="nx">void</span> <span class="p">{</span>
 </span></span><span class="line"><span class="ln">34</span><span class="cl">    <span class="k">foreach</span> <span class="p">(</span><span class="nv">$items</span> <span class="k">as</span> <span class="nv">$item</span><span class="p">)</span> <span class="p">{}</span>
 </span></span><span class="line"><span class="ln">35</span><span class="cl"><span class="p">}</span>
 </span></span><span class="line"><span class="ln">36</span><span class="cl"><span class="nx">process</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]);</span>
@@ -294,87 +294,87 @@
 </span></span><span class="line"><span class="ln">38</span><span class="cl">
 </span></span><span class="line"><span class="ln">39</span><span class="cl"><span class="c1">// 8. 弃用 create_function()
 </span></span></span><span class="line"><span class="ln">40</span><span class="cl"><span class="c1">// $f = create_function(&#39;$a,$b&#39;, &#39;return $a+$b;&#39;); // ❌ Deprecated in 7.2, removed in 7.2+
-</span></span></span><span class="line"><span class="ln">41</span><span class="cl"><span class="c1"></span><span class="nv">$f</span> <span class="o">=</span> <span class="nx">fn</span><span class="p">(</span><span class="nv">$a</span><span class="p">,</span> <span class="nv">$b</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nv">$a</span> <span class="o">+</span> <span class="nv">$b</span><span class="p">;</span> <span class="c1">// ✅
+</span></span></span><span class="line"><span class="ln">41</span><span class="cl"><span class="nv">$f</span> <span class="o">=</span> <span class="nx">fn</span><span class="p">(</span><span class="nv">$a</span><span class="p">,</span> <span class="nv">$b</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nv">$a</span> <span class="o">+</span> <span class="nv">$b</span><span class="p">;</span> <span class="c1">// ✅
 </span></span></span></code></pre></div><hr>
 <h2 id="-php-72">🔹 PHP 7.2</h2>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="c1">// 1. object 类型提示
-</span></span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="c1"></span><span class="k">function</span> <span class="nf">cloneIt</span><span class="p">(</span><span class="nx">object</span> <span class="nv">$obj</span><span class="p">)</span><span class="o">:</span> <span class="nx">object</span> <span class="p">{</span>
+</span></span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="k">function</span> <span class="nf">cloneIt</span><span class="p">(</span><span class="nx">object</span> <span class="nv">$obj</span><span class="p">)</span><span class="o">:</span> <span class="nx">object</span> <span class="p">{</span>
 </span></span><span class="line"><span class="ln"> 3</span><span class="cl">    <span class="k">return</span> <span class="k">clone</span> <span class="nv">$obj</span><span class="p">;</span>
 </span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="p">}</span>
 </span></span><span class="line"><span class="ln"> 5</span><span class="cl">
 </span></span><span class="line"><span class="ln"> 6</span><span class="cl"><span class="c1">// 2. is_countable()
-</span></span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="c1"></span><span class="nv">$data</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">];</span>
+</span></span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="nv">$data</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">];</span>
 </span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="k">if</span> <span class="p">(</span><span class="nx">is_countable</span><span class="p">(</span><span class="nv">$data</span><span class="p">))</span> <span class="p">{</span>
 </span></span><span class="line"><span class="ln"> 9</span><span class="cl">    <span class="k">echo</span> <span class="nx">count</span><span class="p">(</span><span class="nv">$data</span><span class="p">);</span> <span class="c1">// 3
-</span></span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="p">}</span>
 </span></span><span class="line"><span class="ln">11</span><span class="cl">
 </span></span><span class="line"><span class="ln">12</span><span class="cl"><span class="c1">// 3. 内置 Sodium（现代加密）
-</span></span></span><span class="line"><span class="ln">13</span><span class="cl"><span class="c1"></span><span class="nv">$key</span> <span class="o">=</span> <span class="nx">random_bytes</span><span class="p">(</span><span class="nx">SODIUM_CRYPTO_SECRETBOX_KEYBYTES</span><span class="p">);</span>
+</span></span></span><span class="line"><span class="ln">13</span><span class="cl"><span class="nv">$key</span> <span class="o">=</span> <span class="nx">random_bytes</span><span class="p">(</span><span class="nx">SODIUM_CRYPTO_SECRETBOX_KEYBYTES</span><span class="p">);</span>
 </span></span><span class="line"><span class="ln">14</span><span class="cl"><span class="nv">$nonce</span> <span class="o">=</span> <span class="nx">random_bytes</span><span class="p">(</span><span class="nx">SODIUM_CRYPTO_SECRETBOX_NONCEBYTES</span><span class="p">);</span>
 </span></span><span class="line"><span class="ln">15</span><span class="cl"><span class="nv">$ciphertext</span> <span class="o">=</span> <span class="nx">sodium_crypto_secretbox</span><span class="p">(</span><span class="s1">&#39;secret&#39;</span><span class="p">,</span> <span class="nv">$nonce</span><span class="p">,</span> <span class="nv">$key</span><span class="p">);</span>
 </span></span><span class="line"><span class="ln">16</span><span class="cl">
 </span></span><span class="line"><span class="ln">17</span><span class="cl"><span class="c1">// 4. stream_isatty()
-</span></span></span><span class="line"><span class="ln">18</span><span class="cl"><span class="c1"></span><span class="k">if</span> <span class="p">(</span><span class="nx">stream_isatty</span><span class="p">(</span><span class="nx">STDOUT</span><span class="p">))</span> <span class="p">{</span>
+</span></span></span><span class="line"><span class="ln">18</span><span class="cl"><span class="k">if</span> <span class="p">(</span><span class="nx">stream_isatty</span><span class="p">(</span><span class="nx">STDOUT</span><span class="p">))</span> <span class="p">{</span>
 </span></span><span class="line"><span class="ln">19</span><span class="cl">    <span class="k">echo</span> <span class="s2">&#34;Running in terminal</span><span class="se">\n</span><span class="s2">&#34;</span><span class="p">;</span>
 </span></span><span class="line"><span class="ln">20</span><span class="cl"><span class="p">}</span>
 </span></span><span class="line"><span class="ln">21</span><span class="cl">
 </span></span><span class="line"><span class="ln">22</span><span class="cl"><span class="c1">// 5. spl_object_id()（比 hash 更快）
-</span></span></span><span class="line"><span class="ln">23</span><span class="cl"><span class="c1"></span><span class="nv">$obj</span> <span class="o">=</span> <span class="k">new</span> <span class="k">stdClass</span><span class="p">();</span>
+</span></span></span><span class="line"><span class="ln">23</span><span class="cl"><span class="nv">$obj</span> <span class="o">=</span> <span class="k">new</span> <span class="k">stdClass</span><span class="p">();</span>
 </span></span><span class="line"><span class="ln">24</span><span class="cl"><span class="nv">$id</span> <span class="o">=</span> <span class="nx">spl_object_id</span><span class="p">(</span><span class="nv">$obj</span><span class="p">);</span> <span class="c1">// int
-</span></span></span><span class="line"><span class="ln">25</span><span class="cl"><span class="c1"></span>
+</span></span></span><span class="line"><span class="ln">25</span><span class="cl">
 </span></span><span class="line"><span class="ln">26</span><span class="cl"><span class="c1">// 6. unserialize 默认禁用对象反序列化
-</span></span></span><span class="line"><span class="ln">27</span><span class="cl"><span class="c1"></span><span class="nv">$data</span> <span class="o">=</span> <span class="nx">serialize</span><span class="p">(</span><span class="k">new</span> <span class="k">stdClass</span><span class="p">());</span>
+</span></span></span><span class="line"><span class="ln">27</span><span class="cl"><span class="nv">$data</span> <span class="o">=</span> <span class="nx">serialize</span><span class="p">(</span><span class="k">new</span> <span class="k">stdClass</span><span class="p">());</span>
 </span></span><span class="line"><span class="ln">28</span><span class="cl"><span class="c1">// unserialize($data); // ❌ Notice: unserialize(): Class __PHP_Incomplete_Class not allowed
-</span></span></span><span class="line"><span class="ln">29</span><span class="cl"><span class="c1"></span><span class="nv">$obj</span> <span class="o">=</span> <span class="nx">unserialize</span><span class="p">(</span><span class="nv">$data</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;allowed_classes&#39;</span> <span class="o">=&gt;</span> <span class="p">[</span><span class="s1">&#39;stdClass&#39;</span><span class="p">]]);</span> <span class="c1">// ✅
-</span></span></span><span class="line"><span class="ln">30</span><span class="cl"><span class="c1"></span>
+</span></span></span><span class="line"><span class="ln">29</span><span class="cl"><span class="nv">$obj</span> <span class="o">=</span> <span class="nx">unserialize</span><span class="p">(</span><span class="nv">$data</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;allowed_classes&#39;</span> <span class="o">=&gt;</span> <span class="p">[</span><span class="s1">&#39;stdClass&#39;</span><span class="p">]]);</span> <span class="c1">// ✅
+</span></span></span><span class="line"><span class="ln">30</span><span class="cl">
 </span></span><span class="line"><span class="ln">31</span><span class="cl"><span class="c1">// 7. 移除 __autoload()
 </span></span></span><span class="line"><span class="ln">32</span><span class="cl"><span class="c1">// function __autoload($class) {} // ❌ Fatal error
-</span></span></span><span class="line"><span class="ln">33</span><span class="cl"><span class="c1"></span><span class="nx">spl_autoload_register</span><span class="p">(</span><span class="k">function</span><span class="p">(</span><span class="nv">$class</span><span class="p">)</span> <span class="p">{</span> <span class="cm">/* ... */</span> <span class="p">});</span> <span class="c1">// ✅
+</span></span></span><span class="line"><span class="ln">33</span><span class="cl"><span class="nx">spl_autoload_register</span><span class="p">(</span><span class="k">function</span><span class="p">(</span><span class="nv">$class</span><span class="p">)</span> <span class="p">{</span> <span class="cm">/* ... */</span> <span class="p">});</span> <span class="c1">// ✅
 </span></span></span></code></pre></div><hr>
 <h2 id="-php-73">🔹 PHP 7.3</h2>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="c1">// 1. 灵活 Heredoc
-</span></span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="c1"></span><span class="nv">$html</span> <span class="o">=</span> <span class="s">&lt;&lt;&lt;</span><span class="dl">HTML</span><span class="s">
+</span></span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="nv">$html</span> <span class="o">=</span> <span class="s">&lt;&lt;&lt;</span><span class="dl">HTML</span><span class="s">
 </span></span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="s">    &lt;div&gt;
 </span></span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="s">        Hello World
 </span></span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="s">    &lt;/div&gt;
 </span></span></span><span class="line"><span class="ln"> 6</span><span class="cl"><span class="s">    </span><span class="dl">HTML</span><span class="p">;</span>
 </span></span><span class="line"><span class="ln"> 7</span><span class="cl">
 </span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="c1">// 2. JSON 异常
-</span></span></span><span class="line"><span class="ln"> 9</span><span class="cl"><span class="c1"></span><span class="k">try</span> <span class="p">{</span>
+</span></span></span><span class="line"><span class="ln"> 9</span><span class="cl"><span class="k">try</span> <span class="p">{</span>
 </span></span><span class="line"><span class="ln">10</span><span class="cl">    <span class="nx">json_decode</span><span class="p">(</span><span class="s1">&#39;{invalid json}&#39;</span><span class="p">,</span> <span class="nx">flags</span><span class="o">:</span> <span class="nx">JSON_THROW_ON_ERROR</span><span class="p">);</span>
 </span></span><span class="line"><span class="ln">11</span><span class="cl"><span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">JsonException</span> <span class="nv">$e</span><span class="p">)</span> <span class="p">{</span>
 </span></span><span class="line"><span class="ln">12</span><span class="cl">    <span class="k">echo</span> <span class="s2">&#34;JSON Error: &#34;</span> <span class="o">.</span> <span class="nv">$e</span><span class="o">-&gt;</span><span class="na">getMessage</span><span class="p">();</span>
 </span></span><span class="line"><span class="ln">13</span><span class="cl"><span class="p">}</span>
 </span></span><span class="line"><span class="ln">14</span><span class="cl">
 </span></span><span class="line"><span class="ln">15</span><span class="cl"><span class="c1">// 3. 新字符串函数
-</span></span></span><span class="line"><span class="ln">16</span><span class="cl"><span class="c1"></span><span class="nx">var_dump</span><span class="p">(</span><span class="nx">str_contains</span><span class="p">(</span><span class="s1">&#39;hello world&#39;</span><span class="p">,</span> <span class="s1">&#39;world&#39;</span><span class="p">));</span>      <span class="c1">// true
-</span></span></span><span class="line"><span class="ln">17</span><span class="cl"><span class="c1"></span><span class="nx">var_dump</span><span class="p">(</span><span class="nx">str_starts_with</span><span class="p">(</span><span class="s1">&#39;https://&#39;</span><span class="p">,</span> <span class="s1">&#39;http&#39;</span><span class="p">));</span>       <span class="c1">// true
-</span></span></span><span class="line"><span class="ln">18</span><span class="cl"><span class="c1"></span><span class="nx">var_dump</span><span class="p">(</span><span class="nx">str_ends_with</span><span class="p">(</span><span class="s1">&#39;file.txt&#39;</span><span class="p">,</span> <span class="s1">&#39;.txt&#39;</span><span class="p">));</span>         <span class="c1">// true
-</span></span></span><span class="line"><span class="ln">19</span><span class="cl"><span class="c1"></span>
+</span></span></span><span class="line"><span class="ln">16</span><span class="cl"><span class="nx">var_dump</span><span class="p">(</span><span class="nx">str_contains</span><span class="p">(</span><span class="s1">&#39;hello world&#39;</span><span class="p">,</span> <span class="s1">&#39;world&#39;</span><span class="p">));</span>      <span class="c1">// true
+</span></span></span><span class="line"><span class="ln">17</span><span class="cl"><span class="nx">var_dump</span><span class="p">(</span><span class="nx">str_starts_with</span><span class="p">(</span><span class="s1">&#39;https://&#39;</span><span class="p">,</span> <span class="s1">&#39;http&#39;</span><span class="p">));</span>       <span class="c1">// true
+</span></span></span><span class="line"><span class="ln">18</span><span class="cl"><span class="nx">var_dump</span><span class="p">(</span><span class="nx">str_ends_with</span><span class="p">(</span><span class="s1">&#39;file.txt&#39;</span><span class="p">,</span> <span class="s1">&#39;.txt&#39;</span><span class="p">));</span>         <span class="c1">// true
+</span></span></span><span class="line"><span class="ln">19</span><span class="cl">
 </span></span><span class="line"><span class="ln">20</span><span class="cl"><span class="c1">// 4. 函数调用末尾逗号
-</span></span></span><span class="line"><span class="ln">21</span><span class="cl"><span class="c1"></span><span class="nv">$values</span> <span class="o">=</span> <span class="nx">array_merge</span><span class="p">(</span>
+</span></span></span><span class="line"><span class="ln">21</span><span class="cl"><span class="nv">$values</span> <span class="o">=</span> <span class="nx">array_merge</span><span class="p">(</span>
 </span></span><span class="line"><span class="ln">22</span><span class="cl">    <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span>
 </span></span><span class="line"><span class="ln">23</span><span class="cl">    <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">],</span>   <span class="c1">// 允许逗号
-</span></span></span><span class="line"><span class="ln">24</span><span class="cl"><span class="c1"></span><span class="p">);</span>
+</span></span></span><span class="line"><span class="ln">24</span><span class="cl"><span class="p">);</span>
 </span></span><span class="line"><span class="ln">25</span><span class="cl">
 </span></span><span class="line"><span class="ln">26</span><span class="cl"><span class="c1">// 5. array_key_first / array_key_last
-</span></span></span><span class="line"><span class="ln">27</span><span class="cl"><span class="c1"></span><span class="nv">$arr</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;a&#39;</span> <span class="o">=&gt;</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span> <span class="o">=&gt;</span> <span class="mi">2</span><span class="p">];</span>
+</span></span></span><span class="line"><span class="ln">27</span><span class="cl"><span class="nv">$arr</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;a&#39;</span> <span class="o">=&gt;</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span> <span class="o">=&gt;</span> <span class="mi">2</span><span class="p">];</span>
 </span></span><span class="line"><span class="ln">28</span><span class="cl"><span class="k">echo</span> <span class="nx">array_key_first</span><span class="p">(</span><span class="nv">$arr</span><span class="p">);</span> <span class="c1">// a
-</span></span></span><span class="line"><span class="ln">29</span><span class="cl"><span class="c1"></span><span class="k">echo</span> <span class="nx">array_key_last</span><span class="p">(</span><span class="nv">$arr</span><span class="p">);</span>  <span class="c1">// b
-</span></span></span><span class="line"><span class="ln">30</span><span class="cl"><span class="c1"></span>
+</span></span></span><span class="line"><span class="ln">29</span><span class="cl"><span class="k">echo</span> <span class="nx">array_key_last</span><span class="p">(</span><span class="nv">$arr</span><span class="p">);</span>  <span class="c1">// b
+</span></span></span><span class="line"><span class="ln">30</span><span class="cl">
 </span></span><span class="line"><span class="ln">31</span><span class="cl"><span class="c1">// 6. hrtime() 高精度时间
-</span></span></span><span class="line"><span class="ln">32</span><span class="cl"><span class="c1"></span><span class="nv">$start</span> <span class="o">=</span> <span class="nx">hrtime</span><span class="p">(</span><span class="k">true</span><span class="p">);</span>
+</span></span></span><span class="line"><span class="ln">32</span><span class="cl"><span class="nv">$start</span> <span class="o">=</span> <span class="nx">hrtime</span><span class="p">(</span><span class="k">true</span><span class="p">);</span>
 </span></span><span class="line"><span class="ln">33</span><span class="cl"><span class="nx">usleep</span><span class="p">(</span><span class="mi">1000</span><span class="p">);</span>
 </span></span><span class="line"><span class="ln">34</span><span class="cl"><span class="nv">$end</span> <span class="o">=</span> <span class="nx">hrtime</span><span class="p">(</span><span class="k">true</span><span class="p">);</span>
 </span></span><span class="line"><span class="ln">35</span><span class="cl"><span class="k">echo</span> <span class="s2">&#34;Elapsed: &#34;</span> <span class="o">.</span> <span class="p">(</span><span class="nv">$end</span> <span class="o">-</span> <span class="nv">$start</span><span class="p">)</span> <span class="o">/</span> <span class="mf">1e6</span> <span class="o">.</span> <span class="s2">&#34; μs</span><span class="se">\n</span><span class="s2">&#34;</span><span class="p">;</span>
 </span></span><span class="line"><span class="ln">36</span><span class="cl">
 </span></span><span class="line"><span class="ln">37</span><span class="cl"><span class="c1">// 7. 弃用花括号访问
 </span></span></span><span class="line"><span class="ln">38</span><span class="cl"><span class="c1">// echo $str{0}; // ❌ Deprecated
-</span></span></span><span class="line"><span class="ln">39</span><span class="cl"><span class="c1"></span><span class="k">echo</span> <span class="nv">$str</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span> <span class="c1">// ✅
+</span></span></span><span class="line"><span class="ln">39</span><span class="cl"><span class="k">echo</span> <span class="nv">$str</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span> <span class="c1">// ✅
 </span></span></span></code></pre></div><hr>
 <h2 id="-php-74">🔹 PHP 7.4</h2>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="c1">// 1. 属性类型声明
-</span></span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="c1"></span><span class="k">class</span> <span class="nc">User</span> <span class="p">{</span>
+</span></span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="k">class</span> <span class="nc">User</span> <span class="p">{</span>
 </span></span><span class="line"><span class="ln"> 3</span><span class="cl">    <span class="k">public</span> <span class="nx">int</span> <span class="nv">$id</span><span class="p">;</span>
 </span></span><span class="line"><span class="ln"> 4</span><span class="cl">    <span class="k">public</span> <span class="o">?</span><span class="nx">string</span> <span class="nv">$name</span> <span class="o">=</span> <span class="k">null</span><span class="p">;</span>
 </span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="p">}</span>
@@ -382,23 +382,23 @@
 </span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="nv">$user</span><span class="o">-&gt;</span><span class="na">id</span> <span class="o">=</span> <span class="mi">100</span><span class="p">;</span>
 </span></span><span class="line"><span class="ln"> 8</span><span class="cl">
 </span></span><span class="line"><span class="ln"> 9</span><span class="cl"><span class="c1">// 2. 箭头函数
-</span></span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="c1"></span><span class="nv">$factor</span> <span class="o">=</span> <span class="mi">10</span><span class="p">;</span>
+</span></span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="nv">$factor</span> <span class="o">=</span> <span class="mi">10</span><span class="p">;</span>
 </span></span><span class="line"><span class="ln">11</span><span class="cl"><span class="nv">$nums</span> <span class="o">=</span> <span class="nx">array_map</span><span class="p">(</span><span class="nx">fn</span><span class="p">(</span><span class="nv">$n</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nv">$n</span> <span class="o">*</span> <span class="nv">$factor</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]);</span> <span class="c1">// [10,20,30]
-</span></span></span><span class="line"><span class="ln">12</span><span class="cl"><span class="c1"></span>
+</span></span></span><span class="line"><span class="ln">12</span><span class="cl">
 </span></span><span class="line"><span class="ln">13</span><span class="cl"><span class="c1">// 3. 空合并赋值
-</span></span></span><span class="line"><span class="ln">14</span><span class="cl"><span class="c1"></span><span class="nv">$config</span> <span class="o">=</span> <span class="p">[];</span>
+</span></span></span><span class="line"><span class="ln">14</span><span class="cl"><span class="nv">$config</span> <span class="o">=</span> <span class="p">[];</span>
 </span></span><span class="line"><span class="ln">15</span><span class="cl"><span class="nv">$config</span><span class="p">[</span><span class="s1">&#39;debug&#39;</span><span class="p">]</span> <span class="o">??=</span> <span class="k">true</span><span class="p">;</span>
 </span></span><span class="line"><span class="ln">16</span><span class="cl">
 </span></span><span class="line"><span class="ln">17</span><span class="cl"><span class="c1">// 4. 协变返回 &amp; 逆变参数
-</span></span></span><span class="line"><span class="ln">18</span><span class="cl"><span class="c1"></span><span class="k">interface</span> <span class="nx">Factory</span> <span class="p">{</span>
+</span></span></span><span class="line"><span class="ln">18</span><span class="cl"><span class="k">interface</span> <span class="nx">Factory</span> <span class="p">{</span>
 </span></span><span class="line"><span class="ln">19</span><span class="cl">    <span class="k">function</span> <span class="nf">make</span><span class="p">()</span><span class="o">:</span> <span class="nx">object</span><span class="p">;</span>
 </span></span><span class="line"><span class="ln">20</span><span class="cl"><span class="p">}</span>
 </span></span><span class="line"><span class="ln">21</span><span class="cl"><span class="k">class</span> <span class="nc">UserFactory</span> <span class="k">implements</span> <span class="nx">Factory</span> <span class="p">{</span>
 </span></span><span class="line"><span class="ln">22</span><span class="cl">    <span class="k">function</span> <span class="nf">make</span><span class="p">()</span><span class="o">:</span> <span class="nx">User</span> <span class="p">{</span> <span class="k">return</span> <span class="k">new</span> <span class="nx">User</span><span class="p">();</span> <span class="p">}</span> <span class="c1">// 返回更具体类型 ✅
-</span></span></span><span class="line"><span class="ln">23</span><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span></span><span class="line"><span class="ln">23</span><span class="cl"><span class="p">}</span>
 </span></span><span class="line"><span class="ln">24</span><span class="cl">
 </span></span><span class="line"><span class="ln">25</span><span class="cl"><span class="c1">// 5. FFI（需启用 ext-ffi）
-</span></span></span><span class="line"><span class="ln">26</span><span class="cl"><span class="c1"></span><span class="cm">/*
+</span></span></span><span class="line"><span class="ln">26</span><span class="cl"><span class="cm">/*
 </span></span></span><span class="line"><span class="ln">27</span><span class="cl"><span class="cm">$libc = FFI::cdef(&#34;int printf(const char *fmt, ...);&#34;, &#34;libc.so.6&#34;);
 </span></span></span><span class="line"><span class="ln">28</span><span class="cl"><span class="cm">$libc-&gt;printf(&#34;Hello from C!\n&#34;);
 </span></span></span><span class="line"><span class="ln">29</span><span class="cl"><span class="cm">*/</span>
@@ -411,25 +411,25 @@
 <hr>
 <h2 id="-php-80">🔹 PHP 8.0</h2>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="c1">// 1. 联合类型
-</span></span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="c1"></span><span class="k">function</span> <span class="nf">getId</span><span class="p">(</span><span class="nx">int</span><span class="o">|</span><span class="nx">string</span> <span class="nv">$id</span><span class="p">)</span><span class="o">:</span> <span class="nx">void</span> <span class="p">{</span>
+</span></span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="k">function</span> <span class="nf">getId</span><span class="p">(</span><span class="nx">int</span><span class="o">|</span><span class="nx">string</span> <span class="nv">$id</span><span class="p">)</span><span class="o">:</span> <span class="nx">void</span> <span class="p">{</span>
 </span></span><span class="line"><span class="ln"> 3</span><span class="cl">    <span class="k">echo</span> <span class="nv">$id</span><span class="p">;</span>
 </span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="p">}</span>
 </span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="nx">getId</span><span class="p">(</span><span class="mi">100</span><span class="p">);</span>
 </span></span><span class="line"><span class="ln"> 6</span><span class="cl"><span class="nx">getId</span><span class="p">(</span><span class="s2">&#34;abc&#34;</span><span class="p">);</span>
 </span></span><span class="line"><span class="ln"> 7</span><span class="cl">
 </span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="c1">// 2. 命名参数
-</span></span></span><span class="line"><span class="ln"> 9</span><span class="cl"><span class="c1"></span><span class="nx">htmlspecialchars</span><span class="p">(</span><span class="s2">&#34;&lt;script&gt;&#34;</span><span class="p">,</span> <span class="nx">double_encode</span><span class="o">:</span> <span class="k">false</span><span class="p">);</span>
+</span></span></span><span class="line"><span class="ln"> 9</span><span class="cl"><span class="nx">htmlspecialchars</span><span class="p">(</span><span class="s2">&#34;&lt;script&gt;&#34;</span><span class="p">,</span> <span class="nx">double_encode</span><span class="o">:</span> <span class="k">false</span><span class="p">);</span>
 </span></span><span class="line"><span class="ln">10</span><span class="cl">
 </span></span><span class="line"><span class="ln">11</span><span class="cl"><span class="c1">// 3. 属性（原生注解）
 </span></span></span><span class="line"><span class="ln">12</span><span class="cl"><span class="c1">#[Attribute]
-</span></span></span><span class="line"><span class="ln">13</span><span class="cl"><span class="c1"></span><span class="k">class</span> <span class="nc">Route</span> <span class="p">{</span>
+</span></span></span><span class="line"><span class="ln">13</span><span class="cl"><span class="k">class</span> <span class="nc">Route</span> <span class="p">{</span>
 </span></span><span class="line"><span class="ln">14</span><span class="cl">    <span class="k">public</span> <span class="k">function</span> <span class="fm">__construct</span><span class="p">(</span><span class="k">public</span> <span class="nx">string</span> <span class="nv">$path</span><span class="p">)</span> <span class="p">{}</span>
 </span></span><span class="line"><span class="ln">15</span><span class="cl"><span class="p">}</span>
 </span></span><span class="line"><span class="ln">16</span><span class="cl"><span class="c1">#[Route(&#34;/api/users&#34;)]
-</span></span></span><span class="line"><span class="ln">17</span><span class="cl"><span class="c1"></span><span class="k">class</span> <span class="nc">UserController</span> <span class="p">{}</span>
+</span></span></span><span class="line"><span class="ln">17</span><span class="cl"><span class="k">class</span> <span class="nc">UserController</span> <span class="p">{}</span>
 </span></span><span class="line"><span class="ln">18</span><span class="cl">
 </span></span><span class="line"><span class="ln">19</span><span class="cl"><span class="c1">// 4. 构造器属性提升
-</span></span></span><span class="line"><span class="ln">20</span><span class="cl"><span class="c1"></span><span class="k">class</span> <span class="nc">Point</span> <span class="p">{</span>
+</span></span></span><span class="line"><span class="ln">20</span><span class="cl"><span class="k">class</span> <span class="nc">Point</span> <span class="p">{</span>
 </span></span><span class="line"><span class="ln">21</span><span class="cl">    <span class="k">public</span> <span class="k">function</span> <span class="fm">__construct</span><span class="p">(</span>
 </span></span><span class="line"><span class="ln">22</span><span class="cl">        <span class="k">public</span> <span class="nx">float</span> <span class="nv">$x</span><span class="p">,</span>
 </span></span><span class="line"><span class="ln">23</span><span class="cl">        <span class="k">public</span> <span class="nx">float</span> <span class="nv">$y</span>
@@ -437,46 +437,46 @@
 </span></span><span class="line"><span class="ln">25</span><span class="cl"><span class="p">}</span>
 </span></span><span class="line"><span class="ln">26</span><span class="cl"><span class="nv">$p</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Point</span><span class="p">(</span><span class="mf">1.5</span><span class="p">,</span> <span class="mf">2.5</span><span class="p">);</span>
 </span></span><span class="line"><span class="ln">27</span><span class="cl"><span class="k">echo</span> <span class="nv">$p</span><span class="o">-&gt;</span><span class="na">x</span><span class="p">;</span> <span class="c1">// 1.5
-</span></span></span><span class="line"><span class="ln">28</span><span class="cl"><span class="c1"></span>
+</span></span></span><span class="line"><span class="ln">28</span><span class="cl">
 </span></span><span class="line"><span class="ln">29</span><span class="cl"><span class="c1">// 5. match 表达式
-</span></span></span><span class="line"><span class="ln">30</span><span class="cl"><span class="c1"></span><span class="nv">$status</span> <span class="o">=</span> <span class="nx">match</span><span class="p">(</span><span class="mi">404</span><span class="p">)</span> <span class="p">{</span>
+</span></span></span><span class="line"><span class="ln">30</span><span class="cl"><span class="nv">$status</span> <span class="o">=</span> <span class="nx">match</span><span class="p">(</span><span class="mi">404</span><span class="p">)</span> <span class="p">{</span>
 </span></span><span class="line"><span class="ln">31</span><span class="cl">    <span class="mi">200</span><span class="p">,</span> <span class="mi">201</span> <span class="o">=&gt;</span> <span class="s1">&#39;ok&#39;</span><span class="p">,</span>
 </span></span><span class="line"><span class="ln">32</span><span class="cl">    <span class="mi">404</span> <span class="o">=&gt;</span> <span class="s1">&#39;not found&#39;</span><span class="p">,</span>
 </span></span><span class="line"><span class="ln">33</span><span class="cl">    <span class="k">default</span> <span class="o">=&gt;</span> <span class="s1">&#39;unknown&#39;</span><span class="p">,</span>
 </span></span><span class="line"><span class="ln">34</span><span class="cl"><span class="p">};</span>
 </span></span><span class="line"><span class="ln">35</span><span class="cl">
 </span></span><span class="line"><span class="ln">36</span><span class="cl"><span class="c1">// 6. Nullsafe 运算符
-</span></span></span><span class="line"><span class="ln">37</span><span class="cl"><span class="c1"></span><span class="nv">$user</span> <span class="o">=</span> <span class="nx">getUser</span><span class="p">();</span> <span class="c1">// 可能为 null
-</span></span></span><span class="line"><span class="ln">38</span><span class="cl"><span class="c1"></span><span class="k">echo</span> <span class="nv">$user</span><span class="o">?-&gt;</span><span class="na">profile</span><span class="o">?-&gt;</span><span class="na">avatar</span><span class="p">;</span> <span class="c1">// 若中间为 null，返回 null
-</span></span></span><span class="line"><span class="ln">39</span><span class="cl"><span class="c1"></span>
+</span></span></span><span class="line"><span class="ln">37</span><span class="cl"><span class="nv">$user</span> <span class="o">=</span> <span class="nx">getUser</span><span class="p">();</span> <span class="c1">// 可能为 null
+</span></span></span><span class="line"><span class="ln">38</span><span class="cl"><span class="k">echo</span> <span class="nv">$user</span><span class="o">?-&gt;</span><span class="na">profile</span><span class="o">?-&gt;</span><span class="na">avatar</span><span class="p">;</span> <span class="c1">// 若中间为 null，返回 null
+</span></span></span><span class="line"><span class="ln">39</span><span class="cl">
 </span></span><span class="line"><span class="ln">40</span><span class="cl"><span class="c1">// 7. WeakMap
-</span></span></span><span class="line"><span class="ln">41</span><span class="cl"><span class="c1"></span><span class="nv">$map</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">WeakMap</span><span class="p">();</span>
+</span></span></span><span class="line"><span class="ln">41</span><span class="cl"><span class="nv">$map</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">WeakMap</span><span class="p">();</span>
 </span></span><span class="line"><span class="ln">42</span><span class="cl"><span class="nv">$obj</span> <span class="o">=</span> <span class="k">new</span> <span class="k">stdClass</span><span class="p">();</span>
 </span></span><span class="line"><span class="ln">43</span><span class="cl"><span class="nv">$map</span><span class="p">[</span><span class="nv">$obj</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;data&#39;</span><span class="p">;</span>
 </span></span><span class="line"><span class="ln">44</span><span class="cl"><span class="nx">unset</span><span class="p">(</span><span class="nv">$obj</span><span class="p">);</span> <span class="c1">// 自动从 map 中移除
-</span></span></span><span class="line"><span class="ln">45</span><span class="cl"><span class="c1"></span>
+</span></span></span><span class="line"><span class="ln">45</span><span class="cl">
 </span></span><span class="line"><span class="ln">46</span><span class="cl"><span class="c1">// 8. throw 表达式
-</span></span></span><span class="line"><span class="ln">47</span><span class="cl"><span class="c1"></span><span class="nv">$fn</span> <span class="o">=</span> <span class="nx">fn</span><span class="p">(</span><span class="nv">$val</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nv">$val</span> <span class="o">?:</span> <span class="k">throw</span> <span class="k">new</span> <span class="nx">InvalidArgumentException</span><span class="p">(</span><span class="s1">&#39;Empty&#39;</span><span class="p">);</span>
+</span></span></span><span class="line"><span class="ln">47</span><span class="cl"><span class="nv">$fn</span> <span class="o">=</span> <span class="nx">fn</span><span class="p">(</span><span class="nv">$val</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nv">$val</span> <span class="o">?:</span> <span class="k">throw</span> <span class="k">new</span> <span class="nx">InvalidArgumentException</span><span class="p">(</span><span class="s1">&#39;Empty&#39;</span><span class="p">);</span>
 </span></span><span class="line"><span class="ln">48</span><span class="cl">
 </span></span><span class="line"><span class="ln">49</span><span class="cl"><span class="c1">// 9. 错误处理统一
 </span></span></span><span class="line"><span class="ln">50</span><span class="cl"><span class="c1">// strlen([]); // TypeError（不再是 warning）
-</span></span></span><span class="line"><span class="ln">51</span><span class="cl"><span class="c1"></span>
+</span></span></span><span class="line"><span class="ln">51</span><span class="cl">
 </span></span><span class="line"><span class="ln">52</span><span class="cl"><span class="c1">// 10. get_debug_type()
-</span></span></span><span class="line"><span class="ln">53</span><span class="cl"><span class="c1"></span><span class="k">echo</span> <span class="nx">get_debug_type</span><span class="p">(</span><span class="k">new</span> <span class="nx">DateTime</span><span class="p">());</span> <span class="c1">// &#34;DateTime&#34;
-</span></span></span><span class="line"><span class="ln">54</span><span class="cl"><span class="c1"></span>
+</span></span></span><span class="line"><span class="ln">53</span><span class="cl"><span class="k">echo</span> <span class="nx">get_debug_type</span><span class="p">(</span><span class="k">new</span> <span class="nx">DateTime</span><span class="p">());</span> <span class="c1">// &#34;DateTime&#34;
+</span></span></span><span class="line"><span class="ln">54</span><span class="cl">
 </span></span><span class="line"><span class="ln">55</span><span class="cl"><span class="c1">// 11. fdiv()
-</span></span></span><span class="line"><span class="ln">56</span><span class="cl"><span class="c1"></span><span class="nv">$result</span> <span class="o">=</span> <span class="nx">fdiv</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span> <span class="c1">// INF，无 warning
+</span></span></span><span class="line"><span class="ln">56</span><span class="cl"><span class="nv">$result</span> <span class="o">=</span> <span class="nx">fdiv</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span> <span class="c1">// INF，无 warning
 </span></span></span></code></pre></div><hr>
 <h2 id="-php-81">🔹 PHP 8.1</h2>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="c1">// 1. 枚举
-</span></span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="c1"></span><span class="nx">enum</span> <span class="nx">Status</span><span class="o">:</span> <span class="nx">string</span> <span class="p">{</span>
+</span></span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="nx">enum</span> <span class="nx">Status</span><span class="o">:</span> <span class="nx">string</span> <span class="p">{</span>
 </span></span><span class="line"><span class="ln"> 3</span><span class="cl">    <span class="k">case</span> <span class="nx">Draft</span> <span class="o">=</span> <span class="s1">&#39;draft&#39;</span><span class="p">;</span>
 </span></span><span class="line"><span class="ln"> 4</span><span class="cl">    <span class="k">case</span> <span class="nx">Published</span> <span class="o">=</span> <span class="s1">&#39;published&#39;</span><span class="p">;</span>
 </span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="p">}</span>
 </span></span><span class="line"><span class="ln"> 6</span><span class="cl"><span class="k">echo</span> <span class="nx">Status</span><span class="o">::</span><span class="na">Draft</span><span class="o">-&gt;</span><span class="na">value</span><span class="p">;</span> <span class="c1">// &#39;draft&#39;
-</span></span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="c1"></span>
+</span></span></span><span class="line"><span class="ln"> 7</span><span class="cl">
 </span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="c1">// 2. 只读属性
-</span></span></span><span class="line"><span class="ln"> 9</span><span class="cl"><span class="c1"></span><span class="k">class</span> <span class="nc">User</span> <span class="p">{</span>
+</span></span></span><span class="line"><span class="ln"> 9</span><span class="cl"><span class="k">class</span> <span class="nc">User</span> <span class="p">{</span>
 </span></span><span class="line"><span class="ln">10</span><span class="cl">    <span class="k">public</span> <span class="nx">readonly</span> <span class="nx">string</span> <span class="nv">$name</span><span class="p">;</span>
 </span></span><span class="line"><span class="ln">11</span><span class="cl">    <span class="k">public</span> <span class="k">function</span> <span class="fm">__construct</span><span class="p">(</span><span class="nx">string</span> <span class="nv">$name</span><span class="p">)</span> <span class="p">{</span>
 </span></span><span class="line"><span class="ln">12</span><span class="cl">        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">name</span> <span class="o">=</span> <span class="nv">$name</span><span class="p">;</span>
@@ -484,50 +484,50 @@
 </span></span><span class="line"><span class="ln">14</span><span class="cl"><span class="p">}</span>
 </span></span><span class="line"><span class="ln">15</span><span class="cl"><span class="nv">$user</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">User</span><span class="p">(</span><span class="s2">&#34;Alice&#34;</span><span class="p">);</span>
 </span></span><span class="line"><span class="ln">16</span><span class="cl"><span class="c1">// $user-&gt;name = &#34;Bob&#34;; // Error!
-</span></span></span><span class="line"><span class="ln">17</span><span class="cl"><span class="c1"></span>
+</span></span></span><span class="line"><span class="ln">17</span><span class="cl">
 </span></span><span class="line"><span class="ln">18</span><span class="cl"><span class="c1">// 3. Fibers（纤程）
-</span></span></span><span class="line"><span class="ln">19</span><span class="cl"><span class="c1"></span><span class="nv">$fiber</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Fiber</span><span class="p">(</span><span class="k">function</span> <span class="p">()</span> <span class="p">{</span>
+</span></span></span><span class="line"><span class="ln">19</span><span class="cl"><span class="nv">$fiber</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Fiber</span><span class="p">(</span><span class="k">function</span> <span class="p">()</span> <span class="p">{</span>
 </span></span><span class="line"><span class="ln">20</span><span class="cl">    <span class="k">echo</span> <span class="s2">&#34;Start</span><span class="se">\n</span><span class="s2">&#34;</span><span class="p">;</span>
 </span></span><span class="line"><span class="ln">21</span><span class="cl">    <span class="nv">$value</span> <span class="o">=</span> <span class="nx">Fiber</span><span class="o">::</span><span class="na">suspend</span><span class="p">(</span><span class="s1">&#39;from fiber&#39;</span><span class="p">);</span>
 </span></span><span class="line"><span class="ln">22</span><span class="cl">    <span class="k">echo</span> <span class="s2">&#34;Resume with: </span><span class="si">$value\n</span><span class="s2">&#34;</span><span class="p">;</span>
 </span></span><span class="line"><span class="ln">23</span><span class="cl"><span class="p">});</span>
 </span></span><span class="line"><span class="ln">24</span><span class="cl"><span class="k">echo</span> <span class="nv">$fiber</span><span class="o">-&gt;</span><span class="na">start</span><span class="p">();</span> <span class="c1">// 输出 Start，返回 &#39;from fiber&#39;
-</span></span></span><span class="line"><span class="ln">25</span><span class="cl"><span class="c1"></span><span class="nv">$fiber</span><span class="o">-&gt;</span><span class="na">resume</span><span class="p">(</span><span class="s1">&#39;back&#39;</span><span class="p">);</span> <span class="c1">// 输出 Resume with: back
-</span></span></span><span class="line"><span class="ln">26</span><span class="cl"><span class="c1"></span>
+</span></span></span><span class="line"><span class="ln">25</span><span class="cl"><span class="nv">$fiber</span><span class="o">-&gt;</span><span class="na">resume</span><span class="p">(</span><span class="s1">&#39;back&#39;</span><span class="p">);</span> <span class="c1">// 输出 Resume with: back
+</span></span></span><span class="line"><span class="ln">26</span><span class="cl">
 </span></span><span class="line"><span class="ln">27</span><span class="cl"><span class="c1">// 4. never 返回类型
-</span></span></span><span class="line"><span class="ln">28</span><span class="cl"><span class="c1"></span><span class="k">function</span> <span class="nf">redirect</span><span class="p">(</span><span class="nx">string</span> <span class="nv">$url</span><span class="p">)</span><span class="o">:</span> <span class="nx">never</span> <span class="p">{</span>
+</span></span></span><span class="line"><span class="ln">28</span><span class="cl"><span class="k">function</span> <span class="nf">redirect</span><span class="p">(</span><span class="nx">string</span> <span class="nv">$url</span><span class="p">)</span><span class="o">:</span> <span class="nx">never</span> <span class="p">{</span>
 </span></span><span class="line"><span class="ln">29</span><span class="cl">    <span class="nx">header</span><span class="p">(</span><span class="s2">&#34;Location: </span><span class="si">$url</span><span class="s2">&#34;</span><span class="p">);</span>
 </span></span><span class="line"><span class="ln">30</span><span class="cl">    <span class="k">exit</span><span class="p">();</span>
 </span></span><span class="line"><span class="ln">31</span><span class="cl"><span class="p">}</span>
 </span></span><span class="line"><span class="ln">32</span><span class="cl">
 </span></span><span class="line"><span class="ln">33</span><span class="cl"><span class="c1">// 5. 数组解包支持字符串键
-</span></span></span><span class="line"><span class="ln">34</span><span class="cl"><span class="c1"></span><span class="nv">$extra</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;role&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;admin&#39;</span><span class="p">];</span>
+</span></span></span><span class="line"><span class="ln">34</span><span class="cl"><span class="nv">$extra</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;role&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;admin&#39;</span><span class="p">];</span>
 </span></span><span class="line"><span class="ln">35</span><span class="cl"><span class="nv">$user</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;name&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Alice&#39;</span><span class="p">,</span> <span class="o">...</span><span class="nv">$extra</span><span class="p">];</span> <span class="c1">// [&#39;name&#39;=&gt;&#39;Alice&#39;,&#39;role&#39;=&gt;&#39;admin&#39;]
-</span></span></span><span class="line"><span class="ln">36</span><span class="cl"><span class="c1"></span>
+</span></span></span><span class="line"><span class="ln">36</span><span class="cl">
 </span></span><span class="line"><span class="ln">37</span><span class="cl"><span class="c1">// 6. 动态属性默认禁止
-</span></span></span><span class="line"><span class="ln">38</span><span class="cl"><span class="c1"></span><span class="k">class</span> <span class="nc">User</span> <span class="p">{}</span>
+</span></span></span><span class="line"><span class="ln">38</span><span class="cl"><span class="k">class</span> <span class="nc">User</span> <span class="p">{}</span>
 </span></span><span class="line"><span class="ln">39</span><span class="cl"><span class="c1">// (new User())-&gt;age = 30; // Error in 8.2+, Warning in 8.1
-</span></span></span><span class="line"><span class="ln">40</span><span class="cl"><span class="c1"></span>
+</span></span></span><span class="line"><span class="ln">40</span><span class="cl">
 </span></span><span class="line"><span class="ln">41</span><span class="cl"><span class="c1">#[AllowDynamicProperties]
-</span></span></span><span class="line"><span class="ln">42</span><span class="cl"><span class="c1"></span><span class="k">class</span> <span class="nc">Flexible</span> <span class="p">{}</span>
+</span></span></span><span class="line"><span class="ln">42</span><span class="cl"><span class="k">class</span> <span class="nc">Flexible</span> <span class="p">{}</span>
 </span></span><span class="line"><span class="ln">43</span><span class="cl"><span class="p">(</span><span class="k">new</span> <span class="nx">Flexible</span><span class="p">())</span><span class="o">-&gt;</span><span class="na">anything</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="c1">// OK
-</span></span></span><span class="line"><span class="ln">44</span><span class="cl"><span class="c1"></span>
+</span></span></span><span class="line"><span class="ln">44</span><span class="cl">
 </span></span><span class="line"><span class="ln">45</span><span class="cl"><span class="c1">// 7. array_is_list()
-</span></span></span><span class="line"><span class="ln">46</span><span class="cl"><span class="c1"></span><span class="nx">var_dump</span><span class="p">(</span><span class="nx">array_is_list</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]));</span>        <span class="c1">// true
-</span></span></span><span class="line"><span class="ln">47</span><span class="cl"><span class="c1"></span><span class="nx">var_dump</span><span class="p">(</span><span class="nx">array_is_list</span><span class="p">([</span><span class="s1">&#39;a&#39;</span> <span class="o">=&gt;</span> <span class="mi">1</span><span class="p">]));</span>       <span class="c1">// false
+</span></span></span><span class="line"><span class="ln">46</span><span class="cl"><span class="nx">var_dump</span><span class="p">(</span><span class="nx">array_is_list</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]));</span>        <span class="c1">// true
+</span></span></span><span class="line"><span class="ln">47</span><span class="cl"><span class="nx">var_dump</span><span class="p">(</span><span class="nx">array_is_list</span><span class="p">([</span><span class="s1">&#39;a&#39;</span> <span class="o">=&gt;</span> <span class="mi">1</span><span class="p">]));</span>       <span class="c1">// false
 </span></span></span></code></pre></div><hr>
 <h2 id="-php-82">🔹 PHP 8.2</h2>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="c1">// 1. 只读类（所有属性自动 readonly）
-</span></span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="c1"></span><span class="nx">readonly</span> <span class="k">class</span> <span class="nc">Point</span> <span class="p">{</span>
+</span></span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="nx">readonly</span> <span class="k">class</span> <span class="nc">Point</span> <span class="p">{</span>
 </span></span><span class="line"><span class="ln"> 3</span><span class="cl">    <span class="k">public</span> <span class="k">function</span> <span class="fm">__construct</span><span class="p">(</span>
 </span></span><span class="line"><span class="ln"> 4</span><span class="cl">        <span class="k">public</span> <span class="nx">float</span> <span class="nv">$x</span><span class="p">,</span>
 </span></span><span class="line"><span class="ln"> 5</span><span class="cl">        <span class="k">public</span> <span class="nx">float</span> <span class="nv">$y</span>
 </span></span><span class="line"><span class="ln"> 6</span><span class="cl">    <span class="p">)</span> <span class="p">{}</span>
 </span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="p">}</span>
 </span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="c1">// $p = new Point(1, 2); $p-&gt;x = 3; // Error!
-</span></span></span><span class="line"><span class="ln"> 9</span><span class="cl"><span class="c1"></span>
+</span></span></span><span class="line"><span class="ln"> 9</span><span class="cl">
 </span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="c1">// 2. DNF Types（交集+联合）
-</span></span></span><span class="line"><span class="ln">11</span><span class="cl"><span class="c1"></span><span class="k">function</span> <span class="nf">save</span><span class="p">((</span><span class="nx">LoggerInterface</span><span class="o">&amp;</span><span class="nx">Serializable</span><span class="p">)</span><span class="o">|</span><span class="k">null</span> <span class="nv">$logger</span><span class="p">)</span><span class="o">:</span> <span class="nx">void</span> <span class="p">{</span>
+</span></span></span><span class="line"><span class="ln">11</span><span class="cl"><span class="k">function</span> <span class="nf">save</span><span class="p">((</span><span class="nx">LoggerInterface</span><span class="o">&amp;</span><span class="nx">Serializable</span><span class="p">)</span><span class="o">|</span><span class="k">null</span> <span class="nv">$logger</span><span class="p">)</span><span class="o">:</span> <span class="nx">void</span> <span class="p">{</span>
 </span></span><span class="line"><span class="ln">12</span><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="nv">$logger</span><span class="p">)</span> <span class="p">{</span>
 </span></span><span class="line"><span class="ln">13</span><span class="cl">        <span class="nv">$logger</span><span class="o">-&gt;</span><span class="na">log</span><span class="p">(</span><span class="s2">&#34;Saving&#34;</span><span class="p">);</span>
 </span></span><span class="line"><span class="ln">14</span><span class="cl">        <span class="nx">serialize</span><span class="p">(</span><span class="nv">$logger</span><span class="p">);</span>
@@ -535,45 +535,45 @@
 </span></span><span class="line"><span class="ln">16</span><span class="cl"><span class="p">}</span>
 </span></span><span class="line"><span class="ln">17</span><span class="cl">
 </span></span><span class="line"><span class="ln">18</span><span class="cl"><span class="c1">// 3. 字面量类型
-</span></span></span><span class="line"><span class="ln">19</span><span class="cl"><span class="c1"></span><span class="k">function</span> <span class="nf">alwaysTrue</span><span class="p">()</span><span class="o">:</span> <span class="k">true</span> <span class="p">{</span> <span class="k">return</span> <span class="k">true</span><span class="p">;</span> <span class="p">}</span>
+</span></span></span><span class="line"><span class="ln">19</span><span class="cl"><span class="k">function</span> <span class="nf">alwaysTrue</span><span class="p">()</span><span class="o">:</span> <span class="k">true</span> <span class="p">{</span> <span class="k">return</span> <span class="k">true</span><span class="p">;</span> <span class="p">}</span>
 </span></span><span class="line"><span class="ln">20</span><span class="cl"><span class="k">function</span> <span class="nf">alwaysNull</span><span class="p">()</span><span class="o">:</span> <span class="k">null</span> <span class="p">{</span> <span class="k">return</span> <span class="k">null</span><span class="p">;</span> <span class="p">}</span>
 </span></span><span class="line"><span class="ln">21</span><span class="cl">
 </span></span><span class="line"><span class="ln">22</span><span class="cl"><span class="c1">// 4. 敏感参数隐藏
-</span></span></span><span class="line"><span class="ln">23</span><span class="cl"><span class="c1"></span><span class="k">function</span> <span class="nf">login</span><span class="p">(</span>
+</span></span></span><span class="line"><span class="ln">23</span><span class="cl"><span class="k">function</span> <span class="nf">login</span><span class="p">(</span>
 </span></span><span class="line"><span class="ln">24</span><span class="cl">    <span class="nx">string</span> <span class="nv">$username</span><span class="p">,</span>
 </span></span><span class="line"><span class="ln">25</span><span class="cl">    <span class="c1">#[\SensitiveParameter] string $password
-</span></span></span><span class="line"><span class="ln">26</span><span class="cl"><span class="c1"></span><span class="p">)</span> <span class="p">{</span>
+</span></span></span><span class="line"><span class="ln">26</span><span class="cl"><span class="p">)</span> <span class="p">{</span>
 </span></span><span class="line"><span class="ln">27</span><span class="cl">    <span class="c1">// 若抛异常，堆栈中 password 显示为 [redacted]
-</span></span></span><span class="line"><span class="ln">28</span><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span></span><span class="line"><span class="ln">28</span><span class="cl"><span class="p">}</span>
 </span></span><span class="line"><span class="ln">29</span><span class="cl">
 </span></span><span class="line"><span class="ln">30</span><span class="cl"><span class="c1">// 5. Trait 常量
-</span></span></span><span class="line"><span class="ln">31</span><span class="cl"><span class="c1"></span><span class="k">trait</span> <span class="nx">Loggable</span> <span class="p">{</span>
+</span></span></span><span class="line"><span class="ln">31</span><span class="cl"><span class="k">trait</span> <span class="nx">Loggable</span> <span class="p">{</span>
 </span></span><span class="line"><span class="ln">32</span><span class="cl">    <span class="k">public</span> <span class="k">const</span> <span class="no">LEVEL</span> <span class="o">=</span> <span class="s1">&#39;info&#39;</span><span class="p">;</span>
 </span></span><span class="line"><span class="ln">33</span><span class="cl"><span class="p">}</span>
 </span></span><span class="line"><span class="ln">34</span><span class="cl"><span class="k">class</span> <span class="nc">Service</span> <span class="p">{</span>
 </span></span><span class="line"><span class="ln">35</span><span class="cl">    <span class="k">use</span> <span class="nx">Loggable</span><span class="p">;</span>
 </span></span><span class="line"><span class="ln">36</span><span class="cl"><span class="p">}</span>
 </span></span><span class="line"><span class="ln">37</span><span class="cl"><span class="k">echo</span> <span class="nx">Service</span><span class="o">::</span><span class="na">LEVEL</span><span class="p">;</span> <span class="c1">// &#39;info&#39;
-</span></span></span><span class="line"><span class="ln">38</span><span class="cl"><span class="c1"></span>
+</span></span></span><span class="line"><span class="ln">38</span><span class="cl">
 </span></span><span class="line"><span class="ln">39</span><span class="cl"><span class="c1">// 6. 弃用 ${var} 插值
 </span></span></span><span class="line"><span class="ln">40</span><span class="cl"><span class="c1">// echo &#34;Hello ${name}&#34;; // ❌ Deprecated
-</span></span></span><span class="line"><span class="ln">41</span><span class="cl"><span class="c1"></span><span class="k">echo</span> <span class="s2">&#34;Hello </span><span class="si">{</span><span class="nv">$name</span><span class="si">}</span><span class="s2">&#34;</span><span class="p">;</span> <span class="c1">// ✅
+</span></span></span><span class="line"><span class="ln">41</span><span class="cl"><span class="k">echo</span> <span class="s2">&#34;Hello </span><span class="si">{</span><span class="nv">$name</span><span class="si">}</span><span class="s2">&#34;</span><span class="p">;</span> <span class="c1">// ✅
 </span></span></span></code></pre></div><hr>
 <h2 id="-php-83">🔹 PHP 8.3</h2>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="c1">// 1. 类常量类型声明
-</span></span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="c1"></span><span class="k">class</span> <span class="nc">Config</span> <span class="p">{</span>
+</span></span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="k">class</span> <span class="nc">Config</span> <span class="p">{</span>
 </span></span><span class="line"><span class="ln"> 3</span><span class="cl">    <span class="k">public</span> <span class="k">const</span> <span class="no">int</span> <span class="nx">MAX_SIZE</span> <span class="o">=</span> <span class="mi">100</span><span class="p">;</span>
 </span></span><span class="line"><span class="ln"> 4</span><span class="cl">    <span class="k">public</span> <span class="k">const</span> <span class="no">string</span> <span class="nx">API_URL</span> <span class="o">=</span> <span class="s1">&#39;https://api.example.com&#39;</span><span class="p">;</span>
 </span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="p">}</span>
 </span></span><span class="line"><span class="ln"> 6</span><span class="cl">
 </span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="c1">// 2. json_validate()
-</span></span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="c1"></span><span class="nv">$input</span> <span class="o">=</span> <span class="s1">&#39;{&#34;valid&#34;: true}&#39;</span><span class="p">;</span>
+</span></span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="nv">$input</span> <span class="o">=</span> <span class="s1">&#39;{&#34;valid&#34;: true}&#39;</span><span class="p">;</span>
 </span></span><span class="line"><span class="ln"> 9</span><span class="cl"><span class="k">if</span> <span class="p">(</span><span class="nx">json_validate</span><span class="p">(</span><span class="nv">$input</span><span class="p">))</span> <span class="p">{</span>
 </span></span><span class="line"><span class="ln">10</span><span class="cl">    <span class="nv">$data</span> <span class="o">=</span> <span class="nx">json_decode</span><span class="p">(</span><span class="nv">$input</span><span class="p">);</span>
 </span></span><span class="line"><span class="ln">11</span><span class="cl"><span class="p">}</span>
 </span></span><span class="line"><span class="ln">12</span><span class="cl">
 </span></span><span class="line"><span class="ln">13</span><span class="cl"><span class="c1">// 3. Trait 方法别名支持访问修饰符
-</span></span></span><span class="line"><span class="ln">14</span><span class="cl"><span class="c1"></span><span class="k">trait</span> <span class="nx">SayHello</span> <span class="p">{</span>
+</span></span></span><span class="line"><span class="ln">14</span><span class="cl"><span class="k">trait</span> <span class="nx">SayHello</span> <span class="p">{</span>
 </span></span><span class="line"><span class="ln">15</span><span class="cl">    <span class="k">public</span> <span class="k">function</span> <span class="nf">hello</span><span class="p">()</span> <span class="p">{</span> <span class="k">echo</span> <span class="s2">&#34;Hello&#34;</span><span class="p">;</span> <span class="p">}</span>
 </span></span><span class="line"><span class="ln">16</span><span class="cl"><span class="p">}</span>
 </span></span><span class="line"><span class="ln">17</span><span class="cl"><span class="k">class</span> <span class="nc">Greeting</span> <span class="p">{</span>
@@ -583,17 +583,17 @@
 </span></span><span class="line"><span class="ln">21</span><span class="cl"><span class="p">}</span>
 </span></span><span class="line"><span class="ln">22</span><span class="cl">
 </span></span><span class="line"><span class="ln">23</span><span class="cl"><span class="c1">// 4. mb_str_pad()
-</span></span></span><span class="line"><span class="ln">24</span><span class="cl"><span class="c1"></span><span class="k">echo</span> <span class="nx">mb_str_pad</span><span class="p">(</span><span class="s2">&#34;café&#34;</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="s2">&#34;•&#34;</span><span class="p">,</span> <span class="nx">STR_PAD_RIGHT</span><span class="p">,</span> <span class="s2">&#34;UTF-8&#34;</span><span class="p">);</span> <span class="c1">// café••••
-</span></span></span><span class="line"><span class="ln">25</span><span class="cl"><span class="c1"></span>
+</span></span></span><span class="line"><span class="ln">24</span><span class="cl"><span class="k">echo</span> <span class="nx">mb_str_pad</span><span class="p">(</span><span class="s2">&#34;café&#34;</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="s2">&#34;•&#34;</span><span class="p">,</span> <span class="nx">STR_PAD_RIGHT</span><span class="p">,</span> <span class="s2">&#34;UTF-8&#34;</span><span class="p">);</span> <span class="c1">// café••••
+</span></span></span><span class="line"><span class="ln">25</span><span class="cl">
 </span></span><span class="line"><span class="ln">26</span><span class="cl"><span class="c1">// 5. DatePeriod 支持 ISO 8601
-</span></span></span><span class="line"><span class="ln">27</span><span class="cl"><span class="c1"></span><span class="nv">$period</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">DatePeriod</span><span class="p">(</span><span class="s1">&#39;R2/2023-01-01T00:00:00Z/P1D&#39;</span><span class="p">);</span>
+</span></span></span><span class="line"><span class="ln">27</span><span class="cl"><span class="nv">$period</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">DatePeriod</span><span class="p">(</span><span class="s1">&#39;R2/2023-01-01T00:00:00Z/P1D&#39;</span><span class="p">);</span>
 </span></span><span class="line"><span class="ln">28</span><span class="cl"><span class="k">foreach</span> <span class="p">(</span><span class="nv">$period</span> <span class="k">as</span> <span class="nv">$date</span><span class="p">)</span> <span class="p">{</span>
 </span></span><span class="line"><span class="ln">29</span><span class="cl">    <span class="k">echo</span> <span class="nv">$date</span><span class="o">-&gt;</span><span class="na">format</span><span class="p">(</span><span class="s1">&#39;Y-m-d&#39;</span><span class="p">)</span> <span class="o">.</span> <span class="s2">&#34;</span><span class="se">\n</span><span class="s2">&#34;</span><span class="p">;</span>
 </span></span><span class="line"><span class="ln">30</span><span class="cl"><span class="p">}</span>
 </span></span></code></pre></div><hr>
 <h2 id="-php-84">🔹 PHP 8.4</h2>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="c1">// 1. 交集类型（Intersection Types）
-</span></span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="c1"></span><span class="k">interface</span> <span class="nx">Logger</span> <span class="p">{</span> <span class="k">public</span> <span class="k">function</span> <span class="nf">log</span><span class="p">(</span><span class="nx">string</span> <span class="nv">$msg</span><span class="p">);</span> <span class="p">}</span>
+</span></span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="k">interface</span> <span class="nx">Logger</span> <span class="p">{</span> <span class="k">public</span> <span class="k">function</span> <span class="nf">log</span><span class="p">(</span><span class="nx">string</span> <span class="nv">$msg</span><span class="p">);</span> <span class="p">}</span>
 </span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="k">interface</span> <span class="nx">Serializer</span> <span class="p">{</span> <span class="k">public</span> <span class="k">function</span> <span class="nf">serialize</span><span class="p">();</span> <span class="p">}</span>
 </span></span><span class="line"><span class="ln"> 4</span><span class="cl">
 </span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="k">function</span> <span class="nf">process</span><span class="p">(</span><span class="nx">Logger</span><span class="o">&amp;</span><span class="nx">Serializer</span> <span class="nv">$obj</span><span class="p">)</span><span class="o">:</span> <span class="nx">void</span> <span class="p">{</span>
@@ -603,24 +603,24 @@
 </span></span><span class="line"><span class="ln"> 9</span><span class="cl">
 </span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="c1">// 2. 标准化 #[Deprecated]
 </span></span></span><span class="line"><span class="ln">11</span><span class="cl"><span class="c1">#[Deprecated(reason: &#34;Use newMethod() instead&#34;, since: &#34;8.4&#34;)]
-</span></span></span><span class="line"><span class="ln">12</span><span class="cl"><span class="c1"></span><span class="k">function</span> <span class="nf">oldMethod</span><span class="p">()</span> <span class="p">{}</span>
+</span></span></span><span class="line"><span class="ln">12</span><span class="cl"><span class="k">function</span> <span class="nf">oldMethod</span><span class="p">()</span> <span class="p">{}</span>
 </span></span><span class="line"><span class="ln">13</span><span class="cl">
 </span></span><span class="line"><span class="ln">14</span><span class="cl"><span class="c1">// 3. JIT 默认启用（无需代码，配置层面）
 </span></span></span><span class="line"><span class="ln">15</span><span class="cl"><span class="c1">// php.ini: opcache.jit=on
-</span></span></span><span class="line"><span class="ln">16</span><span class="cl"><span class="c1"></span>
+</span></span></span><span class="line"><span class="ln">16</span><span class="cl">
 </span></span><span class="line"><span class="ln">17</span><span class="cl"><span class="c1">// 4. new static() 在常量表达式中使用
-</span></span></span><span class="line"><span class="ln">18</span><span class="cl"><span class="c1"></span><span class="k">class</span> <span class="nc">Factory</span> <span class="p">{</span>
+</span></span></span><span class="line"><span class="ln">18</span><span class="cl"><span class="k">class</span> <span class="nc">Factory</span> <span class="p">{</span>
 </span></span><span class="line"><span class="ln">19</span><span class="cl">    <span class="k">public</span> <span class="k">const</span> <span class="no">INSTANCE</span> <span class="o">=</span> <span class="k">new</span> <span class="k">static</span><span class="p">();</span>
 </span></span><span class="line"><span class="ln">20</span><span class="cl">    <span class="k">public</span> <span class="k">function</span> <span class="fm">__construct</span><span class="p">()</span> <span class="p">{}</span>
 </span></span><span class="line"><span class="ln">21</span><span class="cl"><span class="p">}</span>
 </span></span><span class="line"><span class="ln">22</span><span class="cl">
 </span></span><span class="line"><span class="ln">23</span><span class="cl"><span class="c1">// 5. array_is_list()（正式稳定）
-</span></span></span><span class="line"><span class="ln">24</span><span class="cl"><span class="c1"></span><span class="nx">var_dump</span><span class="p">(</span><span class="nx">array_is_list</span><span class="p">([</span><span class="mi">0</span> <span class="o">=&gt;</span> <span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="mi">1</span> <span class="o">=&gt;</span> <span class="s1">&#39;b&#39;</span><span class="p">]));</span> <span class="c1">// true
-</span></span></span><span class="line"><span class="ln">25</span><span class="cl"><span class="c1"></span><span class="nx">var_dump</span><span class="p">(</span><span class="nx">array_is_list</span><span class="p">([</span><span class="mi">1</span> <span class="o">=&gt;</span> <span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="mi">0</span> <span class="o">=&gt;</span> <span class="s1">&#39;b&#39;</span><span class="p">]));</span> <span class="c1">// false
-</span></span></span><span class="line"><span class="ln">26</span><span class="cl"><span class="c1"></span>
+</span></span></span><span class="line"><span class="ln">24</span><span class="cl"><span class="nx">var_dump</span><span class="p">(</span><span class="nx">array_is_list</span><span class="p">([</span><span class="mi">0</span> <span class="o">=&gt;</span> <span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="mi">1</span> <span class="o">=&gt;</span> <span class="s1">&#39;b&#39;</span><span class="p">]));</span> <span class="c1">// true
+</span></span></span><span class="line"><span class="ln">25</span><span class="cl"><span class="nx">var_dump</span><span class="p">(</span><span class="nx">array_is_list</span><span class="p">([</span><span class="mi">1</span> <span class="o">=&gt;</span> <span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="mi">0</span> <span class="o">=&gt;</span> <span class="s1">&#39;b&#39;</span><span class="p">]));</span> <span class="c1">// false
+</span></span></span><span class="line"><span class="ln">26</span><span class="cl">
 </span></span><span class="line"><span class="ln">27</span><span class="cl"><span class="c1">// 6. memory_reset_peak_usage()
-</span></span></span><span class="line"><span class="ln">28</span><span class="cl"><span class="c1"></span><span class="nx">memory_get_peak_usage</span><span class="p">();</span> <span class="c1">// 获取峰值
-</span></span></span><span class="line"><span class="ln">29</span><span class="cl"><span class="c1"></span><span class="nx">memory_reset_peak_usage</span><span class="p">();</span> <span class="c1">// 重置计数器
+</span></span></span><span class="line"><span class="ln">28</span><span class="cl"><span class="nx">memory_get_peak_usage</span><span class="p">();</span> <span class="c1">// 获取峰值
+</span></span></span><span class="line"><span class="ln">29</span><span class="cl"><span class="nx">memory_reset_peak_usage</span><span class="p">();</span> <span class="c1">// 重置计数器
 </span></span></span></code></pre></div><hr>
 <h2 id="-使用建议">✅ 使用建议</h2>
 <ul>
@@ -693,14 +693,17 @@
         <a href="https://jianlin-li.github.io/post/rabbitmq_review/" class="nav-link" title="RabbitMQ消息中间件详解">RabbitMQ消息中间件详解</a>
       </li>
       <li>
-        <a href="https://jianlin-li.github.io/post/php_review_2/" class="nav-link" title="PHP语言的知识点-2">PHP语言的知识点-2</a>
+        <a href="https://jianlin-li.github.io/post/php_review_3/" class="nav-link" title="PHP语言的知识点-3">PHP语言的知识点-3</a>
       </li>
       <li>
-        <a href="https://jianlin-li.github.io/post/php_review_1/" class="nav-link" title="PHP语言的知识点-1">PHP语言的知识点-1</a>
+        <a href="https://jianlin-li.github.io/post/php_review_2/" class="nav-link" title="PHP语言的知识点-2">PHP语言的知识点-2</a>
       </li>
     </ul>
     <h2 class="mt-4">最新文章</h2>
     <ul class="flex-column">
+      <li>
+        <a href="https://jianlin-li.github.io/post/php_review_1/" class="nav-link" title="PHP语言的知识点-1">PHP语言的知识点-1</a>
+      </li>
       <li>
         <a href="https://jianlin-li.github.io/post/luoxi/" class="nav-link" title="华微世纪相关脚本解决方案">华微世纪相关脚本解决方案</a>
       </li>
@@ -727,7 +730,7 @@
         
         <a href='https://jianlin-li.github.io/categories/php%E8%AF%AD%E8%A8%80/' class="post_tag button button_translucent" title="php语言">
           PHP语言
-          <span class="button_tally">2</span>
+          <span class="button_tally">3</span>
         </a>
         
         <a href='https://jianlin-li.github.io/categories/%E6%9C%AC%E5%9C%B0%E7%8E%AF%E5%A2%83/' class="post_tag button button_translucent" title="本地环境">
@@ -783,7 +786,7 @@
         
         <a href='https://jianlin-li.github.io/tags/php/' class="post_tag button button_translucent" title="php">
           PHP
-          <span class="button_tally">2</span>
+          <span class="button_tally">3</span>
         </a>
         
         <a href='https://jianlin-li.github.io/tags/emoji/' class="post_tag button button_translucent" title="emoji">
@@ -864,7 +867,7 @@
             </a>
             
             
-            <a href='https://jianlin-li.github.io/tags/php/' class=" post_tag button button_translucent" data-position=2 title="php">PHP<span class="button_tally">2</span>
+            <a href='https://jianlin-li.github.io/tags/php/' class=" post_tag button button_translucent" data-position=3 title="php">PHP<span class="button_tally">3</span>
             </a>
             
             
@@ -1016,7 +1019,7 @@
 
 <script type="text/javascript" src="https://jianlin-li.github.io/zh-cn/js/bundle.e4e0e4fbe8acb50d7f973828f4138cdbea727800047fc93f9abbd6751e8f3422d6ef193f98da36fdb8488219c25692d73da89480f46abc8421a4ee3526dd6c23.js" integrity="sha512-5ODk&#43;&#43;istQ1/lzgo9BOM2&#43;pyeAAEf8k/mrvWdR6PNCLW7xk/mNo2/bhIghnCVpLXPaiUgPRqvIQhpO41Jt1sIw==" crossorigin="anonymous"></script>
 
-  <script src="https://jianlin-li.github.io/js/search.min.4c2b0421d128bbd7c43fc7d662fb5dfd8e439c60ee92c900a26d72d9c3271d2256f5bac9f6f919cddfd55101e9272898716cbb3381b4360bf43a66a5f7664f54.js"></script>
+  <script src="https://jianlin-li.github.io/js/search.min.8d141e1e7aa85984a5288b2172ad03540fc235f64379f8df11d062fd3deb9d49bbd9fb0f3df983e9663e322fa8e322a336d5350fbe833c77eb9ee7d907636cff.js"></script>
 
   </body>
 </html>

@@ -218,12 +218,12 @@
 <p>虽然 <code>validator</code> 主要用于结构体，但也可用于单个值：</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="kn">package</span><span class="w"> </span><span class="nx">main</span><span class="w">
 </span></span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="w">
-</span></span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="w"></span><span class="kn">import</span><span class="w"> </span><span class="p">(</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="kn">import</span><span class="w"> </span><span class="p">(</span><span class="w">
 </span></span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="w">    </span><span class="s">&#34;fmt&#34;</span><span class="w">
 </span></span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="w">    </span><span class="s">&#34;github.com/go-playground/validator/v10&#34;</span><span class="w">
-</span></span></span><span class="line"><span class="ln"> 6</span><span class="cl"><span class="w"></span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 6</span><span class="cl"><span class="p">)</span><span class="w">
 </span></span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="w">
-</span></span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="w"></span><span class="kd">func</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="kd">func</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
 </span></span></span><span class="line"><span class="ln"> 9</span><span class="cl"><span class="w">    </span><span class="nx">validate</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">validator</span><span class="p">.</span><span class="nf">New</span><span class="p">()</span><span class="w">
 </span></span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="w">
 </span></span></span><span class="line"><span class="ln">11</span><span class="cl"><span class="w">    </span><span class="kd">var</span><span class="w"> </span><span class="nx">email</span><span class="w"> </span><span class="kt">string</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s">&#34;invalid-email&#34;</span><span class="w">
@@ -231,7 +231,7 @@
 </span></span></span><span class="line"><span class="ln">13</span><span class="cl"><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">nil</span><span class="w"> </span><span class="p">{</span><span class="w">
 </span></span></span><span class="line"><span class="ln">14</span><span class="cl"><span class="w">        </span><span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;验证失败:&#34;</span><span class="p">,</span><span class="w"> </span><span class="nx">err</span><span class="p">)</span><span class="w">
 </span></span></span><span class="line"><span class="ln">15</span><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
-</span></span></span><span class="line"><span class="ln">16</span><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="ln">16</span><span class="cl"><span class="p">}</span><span class="w">
 </span></span></span></code></pre></div><blockquote>
 <p>✅ <code>Var(value interface{}, tag string)</code>：对单个变量应用验证标签。</p>
 </blockquote>
@@ -244,27 +244,27 @@
 </span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="w">    </span><span class="nx">Email</span><span class="w">    </span><span class="kt">string</span><span class="w"> </span><span class="s">`validate:&#34;required,email&#34;`</span><span class="w">
 </span></span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="w">    </span><span class="nx">Password</span><span class="w"> </span><span class="kt">string</span><span class="w"> </span><span class="s">`validate:&#34;required,min=8&#34;`</span><span class="w">
 </span></span></span><span class="line"><span class="ln">6</span><span class="cl"><span class="w">    </span><span class="nx">Website</span><span class="w">  </span><span class="kt">string</span><span class="w"> </span><span class="s">`validate:&#34;url,omitempty&#34;`</span><span class="w">
-</span></span></span><span class="line"><span class="ln">7</span><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="ln">7</span><span class="cl"><span class="p">}</span><span class="w">
 </span></span></span></code></pre></div><h3 id="验证代码">验证代码</h3>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="nx">user</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">User</span><span class="p">{</span><span class="w">
 </span></span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="w">    </span><span class="nx">Name</span><span class="p">:</span><span class="w">     </span><span class="s">&#34;Al&#34;</span><span class="p">,</span><span class="w">
 </span></span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="w">    </span><span class="nx">Age</span><span class="p">:</span><span class="w">      </span><span class="o">-</span><span class="mi">5</span><span class="p">,</span><span class="w">
 </span></span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="w">    </span><span class="nx">Email</span><span class="p">:</span><span class="w">    </span><span class="s">&#34;not-an-email&#34;</span><span class="p">,</span><span class="w">
 </span></span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="w">    </span><span class="nx">Password</span><span class="p">:</span><span class="w"> </span><span class="s">&#34;123&#34;</span><span class="p">,</span><span class="w">
-</span></span></span><span class="line"><span class="ln"> 6</span><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 6</span><span class="cl"><span class="p">}</span><span class="w">
 </span></span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="w">
-</span></span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="w"></span><span class="nx">validate</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">validator</span><span class="p">.</span><span class="nf">New</span><span class="p">()</span><span class="w">
-</span></span></span><span class="line"><span class="ln"> 9</span><span class="cl"><span class="w"></span><span class="nx">err</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">validate</span><span class="p">.</span><span class="nf">Struct</span><span class="p">(</span><span class="nx">user</span><span class="p">)</span><span class="w">
-</span></span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="w"></span><span class="k">if</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">nil</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="nx">validate</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">validator</span><span class="p">.</span><span class="nf">New</span><span class="p">()</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 9</span><span class="cl"><span class="nx">err</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">validate</span><span class="p">.</span><span class="nf">Struct</span><span class="p">(</span><span class="nx">user</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="k">if</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">nil</span><span class="w"> </span><span class="p">{</span><span class="w">
 </span></span></span><span class="line"><span class="ln">11</span><span class="cl"><span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="nx">_</span><span class="p">,</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="k">range</span><span class="w"> </span><span class="nx">err</span><span class="p">.(</span><span class="nx">validator</span><span class="p">.</span><span class="nx">ValidationErrors</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
 </span></span></span><span class="line"><span class="ln">12</span><span class="cl"><span class="w">        </span><span class="nx">fmt</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;字段 %s 验证失败: %s\n&#34;</span><span class="p">,</span><span class="w"> </span><span class="nx">err</span><span class="p">.</span><span class="nf">Field</span><span class="p">(),</span><span class="w"> </span><span class="nx">err</span><span class="p">.</span><span class="nf">Tag</span><span class="p">())</span><span class="w">
 </span></span></span><span class="line"><span class="ln">13</span><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
-</span></span></span><span class="line"><span class="ln">14</span><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="ln">14</span><span class="cl"><span class="p">}</span><span class="w">
 </span></span></span></code></pre></div><hr>
 <h2 id="-4-自定义错误消息">📝 4. 自定义错误消息</h2>
 <h3 id="方法一通过-validationerrors-获取结构化错误并翻译">方法一：通过 <code>ValidationErrors</code> 获取结构化错误并翻译</h3>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="c1">// 自定义错误信息映射</span><span class="w">
-</span></span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="w"></span><span class="kd">func</span><span class="w"> </span><span class="nf">translateError</span><span class="p">(</span><span class="nx">err</span><span class="w"> </span><span class="nx">validator</span><span class="p">.</span><span class="nx">FieldError</span><span class="p">)</span><span class="w"> </span><span class="kt">string</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="kd">func</span><span class="w"> </span><span class="nf">translateError</span><span class="p">(</span><span class="nx">err</span><span class="w"> </span><span class="nx">validator</span><span class="p">.</span><span class="nx">FieldError</span><span class="p">)</span><span class="w"> </span><span class="kt">string</span><span class="w"> </span><span class="p">{</span><span class="w">
 </span></span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="w">    </span><span class="k">switch</span><span class="w"> </span><span class="nx">err</span><span class="p">.</span><span class="nf">Tag</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
 </span></span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="w">    </span><span class="k">case</span><span class="w"> </span><span class="s">&#34;required&#34;</span><span class="p">:</span><span class="w">
 </span></span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="nx">fmt</span><span class="p">.</span><span class="nf">Sprintf</span><span class="p">(</span><span class="s">&#34;%s 是必填项&#34;</span><span class="p">,</span><span class="w"> </span><span class="nx">err</span><span class="p">.</span><span class="nf">Field</span><span class="p">())</span><span class="w">
@@ -277,23 +277,23 @@
 </span></span></span><span class="line"><span class="ln">12</span><span class="cl"><span class="w">    </span><span class="k">default</span><span class="p">:</span><span class="w">
 </span></span></span><span class="line"><span class="ln">13</span><span class="cl"><span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="nx">fmt</span><span class="p">.</span><span class="nf">Sprintf</span><span class="p">(</span><span class="s">&#34;%s 验证失败&#34;</span><span class="p">,</span><span class="w"> </span><span class="nx">err</span><span class="p">.</span><span class="nf">Field</span><span class="p">())</span><span class="w">
 </span></span></span><span class="line"><span class="ln">14</span><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
-</span></span></span><span class="line"><span class="ln">15</span><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="ln">15</span><span class="cl"><span class="p">}</span><span class="w">
 </span></span></span><span class="line"><span class="ln">16</span><span class="cl"><span class="w">
-</span></span></span><span class="line"><span class="ln">17</span><span class="cl"><span class="w"></span><span class="c1">// 使用</span><span class="w">
-</span></span></span><span class="line"><span class="ln">18</span><span class="cl"><span class="w"></span><span class="k">if</span><span class="w"> </span><span class="nx">errs</span><span class="p">,</span><span class="w"> </span><span class="nx">ok</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">err</span><span class="p">.(</span><span class="nx">validator</span><span class="p">.</span><span class="nx">ValidationErrors</span><span class="p">);</span><span class="w"> </span><span class="nx">ok</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="ln">17</span><span class="cl"><span class="c1">// 使用</span><span class="w">
+</span></span></span><span class="line"><span class="ln">18</span><span class="cl"><span class="k">if</span><span class="w"> </span><span class="nx">errs</span><span class="p">,</span><span class="w"> </span><span class="nx">ok</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">err</span><span class="p">.(</span><span class="nx">validator</span><span class="p">.</span><span class="nx">ValidationErrors</span><span class="p">);</span><span class="w"> </span><span class="nx">ok</span><span class="w"> </span><span class="p">{</span><span class="w">
 </span></span></span><span class="line"><span class="ln">19</span><span class="cl"><span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="nx">_</span><span class="p">,</span><span class="w"> </span><span class="nx">e</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="k">range</span><span class="w"> </span><span class="nx">errs</span><span class="w"> </span><span class="p">{</span><span class="w">
 </span></span></span><span class="line"><span class="ln">20</span><span class="cl"><span class="w">        </span><span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="nf">translateError</span><span class="p">(</span><span class="nx">e</span><span class="p">))</span><span class="w">
 </span></span></span><span class="line"><span class="ln">21</span><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
-</span></span></span><span class="line"><span class="ln">22</span><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="ln">22</span><span class="cl"><span class="p">}</span><span class="w">
 </span></span></span></code></pre></div><h3 id="方法二使用-utuniversal-translator--官方翻译器推荐">方法二：使用 <code>ut</code>（universal-translator） + 官方翻译器（推荐）</h3>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="kn">import</span><span class="w"> </span><span class="p">(</span><span class="w">
 </span></span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="w">    </span><span class="s">&#34;github.com/go-playground/validator/v10&#34;</span><span class="w">
 </span></span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="w">    </span><span class="s">&#34;github.com/go-playground/universal-translator&#34;</span><span class="w">
 </span></span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="w">    </span><span class="nx">en_translations</span><span class="w"> </span><span class="s">&#34;github.com/go-playground/validator/v10/translations/en&#34;</span><span class="w">
 </span></span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="w">    </span><span class="nx">zh_translations</span><span class="w"> </span><span class="s">&#34;github.com/go-playground/validator/v10/translations/zh&#34;</span><span class="w">
-</span></span></span><span class="line"><span class="ln"> 6</span><span class="cl"><span class="w"></span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 6</span><span class="cl"><span class="p">)</span><span class="w">
 </span></span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="w">
-</span></span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="w"></span><span class="kd">func</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="kd">func</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
 </span></span></span><span class="line"><span class="ln"> 9</span><span class="cl"><span class="w">    </span><span class="nx">validate</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">validator</span><span class="p">.</span><span class="nf">New</span><span class="p">()</span><span class="w">
 </span></span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="w">    </span><span class="nx">trans</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">ut</span><span class="p">.</span><span class="nf">New</span><span class="p">(</span><span class="nx">en</span><span class="p">.</span><span class="nf">New</span><span class="p">()).</span><span class="nf">GetFallback</span><span class="p">()</span><span class="w"> </span><span class="c1">// 或使用中文：zh.New()</span><span class="w">
 </span></span></span><span class="line"><span class="ln">11</span><span class="cl"><span class="w">    </span><span class="nx">_</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nx">en_translations</span><span class="p">.</span><span class="nf">RegisterDefaultTranslations</span><span class="p">(</span><span class="nx">validate</span><span class="p">,</span><span class="w"> </span><span class="nx">trans</span><span class="p">)</span><span class="w">
@@ -308,7 +308,7 @@
 </span></span></span><span class="line"><span class="ln">20</span><span class="cl"><span class="w">            </span><span class="p">}</span><span class="w">
 </span></span></span><span class="line"><span class="ln">21</span><span class="cl"><span class="w">        </span><span class="p">}</span><span class="w">
 </span></span></span><span class="line"><span class="ln">22</span><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
-</span></span></span><span class="line"><span class="ln">23</span><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="ln">23</span><span class="cl"><span class="p">}</span><span class="w">
 </span></span></span></code></pre></div><blockquote>
 <p>✅ 支持多语言（en, zh, fr, es 等），官方提供翻译包。</p>
 </blockquote>
@@ -494,7 +494,7 @@
 <h4 id="dive-示例"><code>dive</code> 示例：</h4>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="ln">1</span><span class="cl"><span class="kd">type</span><span class="w"> </span><span class="nx">Request</span><span class="w"> </span><span class="kd">struct</span><span class="w"> </span><span class="p">{</span><span class="w">
 </span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="w">    </span><span class="nx">Emails</span><span class="w"> </span><span class="p">[]</span><span class="kt">string</span><span class="w"> </span><span class="s">`validate:&#34;required,dive,email&#34;`</span><span class="w">
-</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="p">}</span><span class="w">
 </span></span></span></code></pre></div><blockquote>
 <p>表示 <code>Emails</code> 中每个元素都必须是有效邮箱。</p>
 </blockquote>
@@ -528,23 +528,23 @@
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="ln">1</span><span class="cl"><span class="kd">type</span><span class="w"> </span><span class="nx">Register</span><span class="w"> </span><span class="kd">struct</span><span class="w"> </span><span class="p">{</span><span class="w">
 </span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="w">    </span><span class="nx">Password</span><span class="w">        </span><span class="kt">string</span><span class="w"> </span><span class="s">`validate:&#34;required,min=8&#34;`</span><span class="w">
 </span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="w">    </span><span class="nx">ConfirmPassword</span><span class="w"> </span><span class="kt">string</span><span class="w"> </span><span class="s">`validate:&#34;required,eqfield=Password&#34;`</span><span class="w">
-</span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="p">}</span><span class="w">
 </span></span></span></code></pre></div><hr>
 <h2 id="-6-自定义验证函数">🛠️ 6. 自定义验证函数</h2>
 <h3 id="场景验证手机号中国">场景：验证手机号（中国）</h3>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="kn">import</span><span class="w"> </span><span class="p">(</span><span class="w">
 </span></span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="w">    </span><span class="s">&#34;regexp&#34;</span><span class="w">
 </span></span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="w">    </span><span class="s">&#34;github.com/go-playground/validator/v10&#34;</span><span class="w">
-</span></span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="w"></span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="p">)</span><span class="w">
 </span></span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="w">
-</span></span></span><span class="line"><span class="ln"> 6</span><span class="cl"><span class="w"></span><span class="kd">var</span><span class="w"> </span><span class="nx">phoneRegex</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nx">regexp</span><span class="p">.</span><span class="nf">MustCompile</span><span class="p">(</span><span class="s">`^1[3-9]\d{9}$`</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 6</span><span class="cl"><span class="kd">var</span><span class="w"> </span><span class="nx">phoneRegex</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nx">regexp</span><span class="p">.</span><span class="nf">MustCompile</span><span class="p">(</span><span class="s">`^1[3-9]\d{9}$`</span><span class="p">)</span><span class="w">
 </span></span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="w">
-</span></span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="w"></span><span class="kd">func</span><span class="w"> </span><span class="nf">validatePhone</span><span class="p">(</span><span class="nx">fl</span><span class="w"> </span><span class="nx">validator</span><span class="p">.</span><span class="nx">FieldLevel</span><span class="p">)</span><span class="w"> </span><span class="kt">bool</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="kd">func</span><span class="w"> </span><span class="nf">validatePhone</span><span class="p">(</span><span class="nx">fl</span><span class="w"> </span><span class="nx">validator</span><span class="p">.</span><span class="nx">FieldLevel</span><span class="p">)</span><span class="w"> </span><span class="kt">bool</span><span class="w"> </span><span class="p">{</span><span class="w">
 </span></span></span><span class="line"><span class="ln"> 9</span><span class="cl"><span class="w">    </span><span class="nx">value</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">fl</span><span class="p">.</span><span class="nf">Field</span><span class="p">().</span><span class="nf">String</span><span class="p">()</span><span class="w">
 </span></span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="nx">phoneRegex</span><span class="p">.</span><span class="nf">MatchString</span><span class="p">(</span><span class="nx">value</span><span class="p">)</span><span class="w">
-</span></span></span><span class="line"><span class="ln">11</span><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="ln">11</span><span class="cl"><span class="p">}</span><span class="w">
 </span></span></span><span class="line"><span class="ln">12</span><span class="cl"><span class="w">
-</span></span></span><span class="line"><span class="ln">13</span><span class="cl"><span class="w"></span><span class="kd">func</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="ln">13</span><span class="cl"><span class="kd">func</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
 </span></span></span><span class="line"><span class="ln">14</span><span class="cl"><span class="w">    </span><span class="nx">validate</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">validator</span><span class="p">.</span><span class="nf">New</span><span class="p">()</span><span class="w">
 </span></span></span><span class="line"><span class="ln">15</span><span class="cl"><span class="w">    </span><span class="nx">_</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nx">validate</span><span class="p">.</span><span class="nf">RegisterValidation</span><span class="p">(</span><span class="s">&#34;phone&#34;</span><span class="p">,</span><span class="w"> </span><span class="nx">validatePhone</span><span class="p">)</span><span class="w">
 </span></span></span><span class="line"><span class="ln">16</span><span class="cl"><span class="w">
@@ -554,7 +554,7 @@
 </span></span></span><span class="line"><span class="ln">20</span><span class="cl"><span class="w">
 </span></span></span><span class="line"><span class="ln">21</span><span class="cl"><span class="w">    </span><span class="nx">u</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">User</span><span class="p">{</span><span class="nx">Mobile</span><span class="p">:</span><span class="w"> </span><span class="s">&#34;13800138000&#34;</span><span class="p">}</span><span class="w">
 </span></span></span><span class="line"><span class="ln">22</span><span class="cl"><span class="w">    </span><span class="nx">err</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">validate</span><span class="p">.</span><span class="nf">Struct</span><span class="p">(</span><span class="nx">u</span><span class="p">)</span><span class="w"> </span><span class="c1">// 成功</span><span class="w">
-</span></span></span><span class="line"><span class="ln">23</span><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="ln">23</span><span class="cl"><span class="p">}</span><span class="w">
 </span></span></span></code></pre></div><blockquote>
 <p>✅ <code>RegisterValidation(tag string, fn func(fl FieldLevel) bool)</code></p>
 </blockquote>
@@ -562,20 +562,20 @@
 <h2 id="-7-自定义错误消息针对自定义验证">🌐 7. 自定义错误消息（针对自定义验证）</h2>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="ln">1</span><span class="cl"><span class="nx">_</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nx">validate</span><span class="p">.</span><span class="nf">RegisterTranslation</span><span class="p">(</span><span class="s">&#34;phone&#34;</span><span class="p">,</span><span class="w"> </span><span class="nx">trans</span><span class="p">,</span><span class="w"> </span><span class="kd">func</span><span class="p">(</span><span class="nx">ut</span><span class="w"> </span><span class="nx">ut</span><span class="p">.</span><span class="nx">Translator</span><span class="p">)</span><span class="w"> </span><span class="kt">error</span><span class="w"> </span><span class="p">{</span><span class="w">
 </span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="nx">ut</span><span class="p">.</span><span class="nf">Add</span><span class="p">(</span><span class="s">&#34;phone&#34;</span><span class="p">,</span><span class="w"> </span><span class="s">&#34;手机号格式不正确&#34;</span><span class="p">,</span><span class="w"> </span><span class="kc">true</span><span class="p">)</span><span class="w">
-</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="w"></span><span class="p">},</span><span class="w"> </span><span class="kd">func</span><span class="p">(</span><span class="nx">ut</span><span class="w"> </span><span class="nx">ut</span><span class="p">.</span><span class="nx">Translator</span><span class="p">,</span><span class="w"> </span><span class="nx">fe</span><span class="w"> </span><span class="nx">validator</span><span class="p">.</span><span class="nx">FieldError</span><span class="p">)</span><span class="w"> </span><span class="kt">string</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="p">},</span><span class="w"> </span><span class="kd">func</span><span class="p">(</span><span class="nx">ut</span><span class="w"> </span><span class="nx">ut</span><span class="p">.</span><span class="nx">Translator</span><span class="p">,</span><span class="w"> </span><span class="nx">fe</span><span class="w"> </span><span class="nx">validator</span><span class="p">.</span><span class="nx">FieldError</span><span class="p">)</span><span class="w"> </span><span class="kt">string</span><span class="w"> </span><span class="p">{</span><span class="w">
 </span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="w">    </span><span class="nx">t</span><span class="p">,</span><span class="w"> </span><span class="nx">_</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">ut</span><span class="p">.</span><span class="nf">T</span><span class="p">(</span><span class="s">&#34;phone&#34;</span><span class="p">,</span><span class="w"> </span><span class="nx">fe</span><span class="p">.</span><span class="nf">Field</span><span class="p">())</span><span class="w">
 </span></span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="nx">t</span><span class="w">
-</span></span></span><span class="line"><span class="ln">6</span><span class="cl"><span class="w"></span><span class="p">})</span><span class="w">
+</span></span></span><span class="line"><span class="ln">6</span><span class="cl"><span class="p">})</span><span class="w">
 </span></span></span></code></pre></div><p>然后调用 <code>err.Translate(trans)</code> 即可输出“手机号格式不正确”。</p>
 <hr>
 <h2 id="-8-高级配置">⚙️ 8. 高级配置</h2>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="ln">1</span><span class="cl"><span class="nx">validate</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">validator</span><span class="p">.</span><span class="nf">New</span><span class="p">()</span><span class="w">
 </span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="w">
-</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="w"></span><span class="c1">// 忽略 struct tag 中不存在的字段</span><span class="w">
-</span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="w"></span><span class="nx">validate</span><span class="p">.</span><span class="nf">SetTagName</span><span class="p">(</span><span class="s">&#34;valid&#34;</span><span class="p">)</span><span class="w"> </span><span class="c1">// 默认是 &#34;validate&#34;</span><span class="w">
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="c1">// 忽略 struct tag 中不存在的字段</span><span class="w">
+</span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="nx">validate</span><span class="p">.</span><span class="nf">SetTagName</span><span class="p">(</span><span class="s">&#34;valid&#34;</span><span class="p">)</span><span class="w"> </span><span class="c1">// 默认是 &#34;validate&#34;</span><span class="w">
 </span></span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="w">
-</span></span></span><span class="line"><span class="ln">6</span><span class="cl"><span class="w"></span><span class="c1">// 禁用某些内置验证（不推荐）</span><span class="w">
-</span></span></span><span class="line"><span class="ln">7</span><span class="cl"><span class="w"></span><span class="c1">// validate.DisableAnonymousStructValidation()</span><span class="w">
+</span></span></span><span class="line"><span class="ln">6</span><span class="cl"><span class="c1">// 禁用某些内置验证（不推荐）</span><span class="w">
+</span></span></span><span class="line"><span class="ln">7</span><span class="cl"><span class="c1">// validate.DisableAnonymousStructValidation()</span><span class="w">
 </span></span></span></code></pre></div><hr>
 <h2 id="-总结最佳实践">✅ 总结：最佳实践</h2>
 <table>
@@ -679,14 +679,17 @@
         <a href="https://jianlin-li.github.io/post/rabbitmq_review/" class="nav-link" title="RabbitMQ消息中间件详解">RabbitMQ消息中间件详解</a>
       </li>
       <li>
-        <a href="https://jianlin-li.github.io/post/php_review_2/" class="nav-link" title="PHP语言的知识点-2">PHP语言的知识点-2</a>
+        <a href="https://jianlin-li.github.io/post/php_review_3/" class="nav-link" title="PHP语言的知识点-3">PHP语言的知识点-3</a>
       </li>
       <li>
-        <a href="https://jianlin-li.github.io/post/php_review_1/" class="nav-link" title="PHP语言的知识点-1">PHP语言的知识点-1</a>
+        <a href="https://jianlin-li.github.io/post/php_review_2/" class="nav-link" title="PHP语言的知识点-2">PHP语言的知识点-2</a>
       </li>
     </ul>
     <h2 class="mt-4">最新文章</h2>
     <ul class="flex-column">
+      <li>
+        <a href="https://jianlin-li.github.io/post/php_review_1/" class="nav-link" title="PHP语言的知识点-1">PHP语言的知识点-1</a>
+      </li>
       <li>
         <a href="https://jianlin-li.github.io/post/luoxi/" class="nav-link" title="华微世纪相关脚本解决方案">华微世纪相关脚本解决方案</a>
       </li>
@@ -713,7 +716,7 @@
         
         <a href='https://jianlin-li.github.io/categories/php%E8%AF%AD%E8%A8%80/' class="post_tag button button_translucent" title="php语言">
           PHP语言
-          <span class="button_tally">2</span>
+          <span class="button_tally">3</span>
         </a>
         
         <a href='https://jianlin-li.github.io/categories/%E6%9C%AC%E5%9C%B0%E7%8E%AF%E5%A2%83/' class="post_tag button button_translucent" title="本地环境">
@@ -769,7 +772,7 @@
         
         <a href='https://jianlin-li.github.io/tags/php/' class="post_tag button button_translucent" title="php">
           PHP
-          <span class="button_tally">2</span>
+          <span class="button_tally">3</span>
         </a>
         
         <a href='https://jianlin-li.github.io/tags/emoji/' class="post_tag button button_translucent" title="emoji">
@@ -850,7 +853,7 @@
             </a>
             
             
-            <a href='https://jianlin-li.github.io/tags/php/' class=" post_tag button button_translucent" data-position=2 title="php">PHP<span class="button_tally">2</span>
+            <a href='https://jianlin-li.github.io/tags/php/' class=" post_tag button button_translucent" data-position=3 title="php">PHP<span class="button_tally">3</span>
             </a>
             
             
@@ -1002,7 +1005,7 @@
 
 <script type="text/javascript" src="https://jianlin-li.github.io/zh-cn/js/bundle.e4e0e4fbe8acb50d7f973828f4138cdbea727800047fc93f9abbd6751e8f3422d6ef193f98da36fdb8488219c25692d73da89480f46abc8421a4ee3526dd6c23.js" integrity="sha512-5ODk&#43;&#43;istQ1/lzgo9BOM2&#43;pyeAAEf8k/mrvWdR6PNCLW7xk/mNo2/bhIghnCVpLXPaiUgPRqvIQhpO41Jt1sIw==" crossorigin="anonymous"></script>
 
-  <script src="https://jianlin-li.github.io/js/search.min.4c2b0421d128bbd7c43fc7d662fb5dfd8e439c60ee92c900a26d72d9c3271d2256f5bac9f6f919cddfd55101e9272898716cbb3381b4360bf43a66a5f7664f54.js"></script>
+  <script src="https://jianlin-li.github.io/js/search.min.8d141e1e7aa85984a5288b2172ad03540fc235f64379f8df11d062fd3deb9d49bbd9fb0f3df983e9663e322fa8e322a336d5350fbe833c77eb9ee7d907636cff.js"></script>
 
   </body>
 </html>
