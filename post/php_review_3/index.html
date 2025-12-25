@@ -168,7 +168,7 @@
     <span class="post_date">
       2025-06-03	  
     </span>
-    <span class="post_time"> · 6 分钟阅读</span><span>&nbsp;· <a href='https://jianlin-li.github.io/tags/php/' title="PHP" class="post_tag button button_translucent">PHP
+    <span class="post_time"> · 8 分钟阅读</span><span>&nbsp;· <a href='https://jianlin-li.github.io/tags/php/' title="PHP" class="post_tag button button_translucent">PHP
         </a>
     </span>
     <span class="page_only">&nbsp;·
@@ -948,6 +948,194 @@
 <p>📌 <strong>最佳实践</strong>：新代码用 PSR-4，遗留代码用 classmap，两者共存无冲突。</p>
 </blockquote>
 <hr>
+<h1 id="在-php-中闭包closure-和-匿名函数anonymous-function-密切相关但有细微区别它们是现代-php-编程如回调高阶函数依赖注入等的重要工具">在 PHP 中，<strong>闭包（Closure）</strong> 和 <strong>匿名函数（Anonymous Function）</strong> 密切相关，但有细微区别。它们是现代 PHP 编程（如回调、高阶函数、依赖注入等）的重要工具。</h1>
+<hr>
+<h2 id="-一匿名函数-vs-闭包关系与区别">✅ 一、匿名函数 vs 闭包：关系与区别</h2>
+<h3 id="1-匿名函数anonymous-function">1. <strong>匿名函数（Anonymous Function）</strong></h3>
+<ul>
+<li>是<strong>没有名字的函数</strong>，通常赋值给变量或直接作为参数传递。</li>
+<li>使用 <code>function () { ... }</code> 语法定义。</li>
+</ul>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln">1</span><span class="cl"><span class="nv">$greet</span> <span class="o">=</span> <span class="k">function</span> <span class="p">(</span><span class="nv">$name</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl">    <span class="k">return</span> <span class="s2">&#34;Hello, </span><span class="si">$name</span><span class="s2">!&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="ln">4</span><span class="cl">
+</span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="k">echo</span> <span class="nv">$greet</span><span class="p">(</span><span class="s2">&#34;Alice&#34;</span><span class="p">);</span> <span class="c1">// Hello, Alice!
+</span></span></span></code></pre></div><blockquote>
+<p>✅ 所有匿名函数在 PHP 中都是 <strong><code>Closure</code> 类的实例</strong>。</p>
+</blockquote>
+<hr>
+<h3 id="2-闭包closure">2. <strong>闭包（Closure）</strong></h3>
+<ul>
+<li><strong>闭包 = 匿名函数 + 能捕获外部作用域变量的能力</strong></li>
+<li>在 PHP 中，<strong>只要匿名函数使用了 <code>use</code> 关键字引入外部变量，它就是一个“闭包”</strong>。</li>
+<li>即使没用 <code>use</code>，PHP 也把匿名函数当作 <code>Closure</code> 对象处理。</li>
+</ul>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln">1</span><span class="cl"><span class="nv">$message</span> <span class="o">=</span> <span class="s2">&#34;Hi&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl">
+</span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="c1">// 这是一个闭包（因为它通过 use 捕获了 $message）
+</span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="nv">$closure</span> <span class="o">=</span> <span class="k">function</span> <span class="p">(</span><span class="nv">$name</span><span class="p">)</span> <span class="k">use</span> <span class="p">(</span><span class="nv">$message</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">5</span><span class="cl">    <span class="k">return</span> <span class="s2">&#34;</span><span class="si">$message</span><span class="s2">, </span><span class="si">$name</span><span class="s2">!&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln">6</span><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="ln">7</span><span class="cl">
+</span></span><span class="line"><span class="ln">8</span><span class="cl"><span class="k">echo</span> <span class="nv">$closure</span><span class="p">(</span><span class="s2">&#34;Bob&#34;</span><span class="p">);</span> <span class="c1">// Hi, Bob!
+</span></span></span></code></pre></div><blockquote>
+<p>📌 <strong>简单说：在 PHP 中，“匿名函数”和“闭包”基本可以互换使用，但严格来说：</strong></p>
+<ul>
+<li>所有闭包都是匿名函数；</li>
+<li>不使用外部变量的匿名函数 technically 不是“闭包”（但在 PHP 中仍叫 Closure）。</li>
+</ul>
+</blockquote>
+<hr>
+<h2 id="-二use-关键字捕获外部变量">✅ 二、<code>use</code> 关键字：捕获外部变量</h2>
+<p><code>use</code> 允许匿名函数<strong>访问其定义作用域之外的变量</strong>。</p>
+<h3 id="基本语法-1">基本语法：</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln">1</span><span class="cl"><span class="k">function</span> <span class="p">()</span> <span class="k">use</span> <span class="p">(</span><span class="nv">$var1</span><span class="p">,</span> <span class="o">&amp;</span><span class="nv">$var2</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl">    <span class="c1">// ...
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><h3 id="1-默认是值传递拷贝">1. <strong>默认是值传递（拷贝）</strong></h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln">1</span><span class="cl"><span class="nv">$prefix</span> <span class="o">=</span> <span class="s2">&#34;Mr.&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl">
+</span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="nv">$greet</span> <span class="o">=</span> <span class="k">function</span> <span class="p">(</span><span class="nv">$name</span><span class="p">)</span> <span class="k">use</span> <span class="p">(</span><span class="nv">$prefix</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">4</span><span class="cl">    <span class="k">return</span> <span class="s2">&#34;</span><span class="si">$prefix</span><span class="s2"> </span><span class="si">$name</span><span class="s2">&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="ln">6</span><span class="cl">
+</span></span><span class="line"><span class="ln">7</span><span class="cl"><span class="nv">$prefix</span> <span class="o">=</span> <span class="s2">&#34;Ms.&#34;</span><span class="p">;</span> <span class="c1">// 修改外部变量
+</span></span></span><span class="line"><span class="ln">8</span><span class="cl"><span class="k">echo</span> <span class="nv">$greet</span><span class="p">(</span><span class="s2">&#34;Alice&#34;</span><span class="p">);</span> <span class="c1">// 输出: Mr. Alice （因为是拷贝）
+</span></span></span></code></pre></div><blockquote>
+<p>❗ <code>use ($x)</code> 是<strong>传值</strong>，函数内部的 <code>$x</code> 是外部变量的副本。</p>
+</blockquote>
+<hr>
+<h3 id="2-引用传递用">2. <strong>引用传递：用 <code>&amp;</code> 实现双向绑定</strong></h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln">1</span><span class="cl"><span class="nv">$count</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl">
+</span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="nv">$increment</span> <span class="o">=</span> <span class="k">function</span> <span class="p">()</span> <span class="k">use</span> <span class="p">(</span><span class="o">&amp;</span><span class="nv">$count</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">4</span><span class="cl">    <span class="nv">$count</span><span class="o">++</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="ln">6</span><span class="cl">
+</span></span><span class="line"><span class="ln">7</span><span class="cl"><span class="nv">$increment</span><span class="p">();</span>
+</span></span><span class="line"><span class="ln">8</span><span class="cl"><span class="k">echo</span> <span class="nv">$count</span><span class="p">;</span> <span class="c1">// 输出: 1
+</span></span></span></code></pre></div><blockquote>
+<p>✅ <code>use (&amp;$var)</code> 让闭包能<strong>修改外部变量</strong>。</p>
+</blockquote>
+<hr>
+<h3 id="3-可以同时传多个变量">3. <strong>可以同时传多个变量</strong></h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="nv">$name</span> <span class="o">=</span> <span class="s2">&#34;Alice&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="nv">$age</span> <span class="o">=</span> <span class="mi">30</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="nv">$show</span> <span class="o">=</span> <span class="k">function</span> <span class="p">()</span> <span class="k">use</span> <span class="p">(</span><span class="nv">$name</span><span class="p">,</span> <span class="o">&amp;</span><span class="nv">$age</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl">    <span class="nv">$age</span> <span class="o">+=</span> <span class="mi">1</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">    <span class="k">return</span> <span class="s2">&#34;</span><span class="si">$name</span><span class="s2"> is </span><span class="si">$age</span><span class="s2"> years old.&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl"><span class="k">echo</span> <span class="nv">$show</span><span class="p">();</span> <span class="c1">// Alice is 31 years old.
+</span></span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="k">echo</span> <span class="nv">$age</span><span class="p">;</span>    <span class="c1">// 31
+</span></span></span></code></pre></div><hr>
+<h2 id="-三闭包的类型closure-对象">✅ 三、闭包的类型：<code>Closure</code> 对象</h2>
+<p>PHP 中的匿名函数是一个 <strong><code>Closure</code> 类的实例</strong>，你可以：</p>
+<h3 id="1-检查类型">1. 检查类型</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln">1</span><span class="cl"><span class="nv">$fn</span> <span class="o">=</span> <span class="k">function</span> <span class="p">()</span> <span class="p">{};</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="nx">var_dump</span><span class="p">(</span><span class="nv">$fn</span> <span class="nx">instanceof</span> <span class="nx">Closure</span><span class="p">);</span> <span class="c1">// bool(true)
+</span></span></span></code></pre></div><h3 id="2-使用-closurebind-改变作用域高级用法">2. 使用 <code>Closure::bind()</code> 改变作用域（高级用法）</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="k">class</span> <span class="nc">MyClass</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl">    <span class="k">private</span> <span class="nv">$secret</span> <span class="o">=</span> <span class="s1">&#39;hidden&#39;</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="nv">$closure</span> <span class="o">=</span> <span class="k">function</span> <span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">    <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">secret</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl"><span class="nv">$obj</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">MyClass</span><span class="p">();</span>
+</span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="nv">$bound</span> <span class="o">=</span> <span class="nx">Closure</span><span class="o">::</span><span class="na">bind</span><span class="p">(</span><span class="nv">$closure</span><span class="p">,</span> <span class="nv">$obj</span><span class="p">,</span> <span class="nv">$obj</span><span class="p">);</span>
+</span></span><span class="line"><span class="ln">11</span><span class="cl"><span class="k">echo</span> <span class="nv">$bound</span><span class="p">();</span> <span class="c1">// 输出: hidden
+</span></span></span></code></pre></div><blockquote>
+<p>这在实现依赖注入、测试私有属性等场景有用。</p>
+</blockquote>
+<hr>
+<h2 id="-四常见使用场景">✅ 四、常见使用场景</h2>
+<table>
+  <thead>
+      <tr>
+          <th>场景</th>
+          <th>示例</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><strong>数组回调</strong></td>
+          <td><code>array_map(function ($n) { return $n * 2; }, $arr);</code></td>
+      </tr>
+      <tr>
+          <td><strong>事件处理</strong></td>
+          <td><code>$emitter-&gt;on('event', function ($data) use ($logger) { ... });</code></td>
+      </tr>
+      <tr>
+          <td><strong>延迟计算</strong></td>
+          <td>返回一个闭包供后续调用</td>
+      </tr>
+      <tr>
+          <td><strong>依赖注入容器</strong></td>
+          <td>用闭包定义服务创建逻辑</td>
+      </tr>
+  </tbody>
+</table>
+<hr>
+<h2 id="-五注意事项">⚠️ 五、注意事项</h2>
+<ol>
+<li>
+<p><strong><code>use</code> 只在定义时捕获变量值</strong><br>
+循环中创建闭包要特别小心：</p>
+<p>✅ 正确做法（PHP 7.0+）：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln">1</span><span class="cl"><span class="nv">$funcs</span> <span class="o">=</span> <span class="p">[];</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="k">for</span> <span class="p">(</span><span class="nv">$i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nv">$i</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">;</span> <span class="nv">$i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">3</span><span class="cl">    <span class="nv">$funcs</span><span class="p">[]</span> <span class="o">=</span> <span class="k">function</span> <span class="p">()</span> <span class="k">use</span> <span class="p">(</span><span class="nv">$i</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nv">$i</span><span class="p">;</span> <span class="p">};</span> <span class="c1">// 每次循环 $i 被拷贝
+</span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="c1">// 但如果在循环外修改 $i，不影响闭包内值（因为是拷贝）
+</span></span></span></code></pre></div></li>
+<li>
+<p><strong>避免内存泄漏</strong><br>
+闭包持有对象引用时，可能阻止垃圾回收（尤其在长生命周期应用中）。</p>
+</li>
+</ol>
+<hr>
+<h2 id="-总结-2">✅ 总结</h2>
+<table>
+  <thead>
+      <tr>
+          <th>概念</th>
+          <th>说明</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><strong>匿名函数</strong></td>
+          <td>没有名字的函数，<code>function() { }</code></td>
+      </tr>
+      <tr>
+          <td><strong>闭包</strong></td>
+          <td>能捕获外部变量的匿名函数（通过 <code>use</code>）</td>
+      </tr>
+      <tr>
+          <td><strong><code>use</code></strong></td>
+          <td>引入外部变量，默认<strong>传值</strong>，加 <code>&amp;</code> 可<strong>传引用</strong></td>
+      </tr>
+      <tr>
+          <td><strong>本质</strong></td>
+          <td>所有匿名函数都是 <code>Closure</code> 对象</td>
+      </tr>
+      <tr>
+          <td><strong>用途</strong></td>
+          <td>回调、作用域封装、延迟执行、依赖注入等</td>
+      </tr>
+  </tbody>
+</table>
+<blockquote>
+<p>💡 <strong>记住</strong>：</p>
+<ul>
+<li><code>use ($x)</code> → 拷贝一份 <code>$x</code></li>
+<li><code>use (&amp;$x)</code> → 和外部 <code>$x</code> 共享同一个值</li>
+</ul>
+</blockquote>
 
     </div><div class="post_comments">
   
