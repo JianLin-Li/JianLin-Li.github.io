@@ -168,7 +168,7 @@
     <span class="post_date">
       2025-06-03	  
     </span>
-    <span class="post_time"> · 11 分钟阅读</span><span>&nbsp;· <a href='https://jianlin-li.github.io/tags/php/' title="PHP" class="post_tag button button_translucent">PHP
+    <span class="post_time"> · 15 分钟阅读</span><span>&nbsp;· <a href='https://jianlin-li.github.io/tags/php/' title="PHP" class="post_tag button button_translucent">PHP
         </a>
     </span>
     <span class="page_only">&nbsp;·
@@ -1393,6 +1393,413 @@
 </ul>
 <blockquote>
 <p>💡 记住：<strong>“Favor composition over inheritance”</strong> —— Trait 是实现组合的一种优雅方式。</p>
+</blockquote>
+<h1 id="在-php-中错误error-和-异常exception-是两种不同的程序故障处理机制从-php-7-开始两者在底层被统一为-throwable-接口-的实现但它们的来源用途和处理方式仍有重要区别">在 PHP 中，<strong>错误（Error）</strong> 和 <strong>异常（Exception）</strong> 是两种不同的程序故障处理机制。从 <strong>PHP 7 开始</strong>，两者在底层被统一为 <strong>Throwable 接口</strong> 的实现，但它们的来源、用途和处理方式仍有重要区别。</h1>
+<p>下面将从概念、分类、处理机制、最佳实践等方面详细解析，并附带大量可运行示例。</p>
+<hr>
+<h2 id="-一核心概念error-vs-exception">🧩 一、核心概念：Error vs Exception</h2>
+<table>
+  <thead>
+      <tr>
+          <th>特性</th>
+          <th><strong>Error（错误）</strong></th>
+          <th><strong>Exception（异常）</strong></th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><strong>来源</strong></td>
+          <td>引擎内部（如语法错误、内存溢出）或用户触发（<code>trigger_error()</code>）</td>
+          <td>用户代码主动抛出（<code>throw new Exception()</code>）</td>
+      </tr>
+      <tr>
+          <td><strong>是否可恢复</strong></td>
+          <td>多数不可恢复（如 Fatal Error），但部分可捕获（PHP 7+）</td>
+          <td>设计上就是<strong>可恢复</strong>的流程控制</td>
+      </tr>
+      <tr>
+          <td><strong>继承关系</strong></td>
+          <td><code>Error</code> 类（PHP 7+）</td>
+          <td><code>Exception</code> 类</td>
+      </tr>
+      <tr>
+          <td><strong>共同祖先</strong></td>
+          <td>都实现 <code>Throwable</code> 接口（PHP 7+）</td>
+          <td></td>
+      </tr>
+  </tbody>
+</table>
+<blockquote>
+<p>✅ <strong>关键变化</strong>：</p>
+<ul>
+<li><strong>PHP 5</strong>：Error 是致命错误，无法用 <code>try/catch</code> 捕获。</li>
+<li><strong>PHP 7+</strong>：多数 Error 被转换为 <code>Error</code> 对象，<strong>可以被捕获</strong>！</li>
+</ul>
+</blockquote>
+<hr>
+<h2 id="-二throwable-接口php-7-统一顶层接口">🔁 二、Throwable 接口（PHP 7+ 统一顶层接口）</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln">1</span><span class="cl"><span class="k">interface</span> <span class="nx">Throwable</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl">    <span class="k">public</span> <span class="k">function</span> <span class="nf">getMessage</span><span class="p">()</span><span class="o">:</span> <span class="nx">string</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln">3</span><span class="cl">    <span class="k">public</span> <span class="k">function</span> <span class="nf">getCode</span><span class="p">()</span><span class="o">:</span> <span class="nx">int</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln">4</span><span class="cl">    <span class="k">public</span> <span class="k">function</span> <span class="nf">getFile</span><span class="p">()</span><span class="o">:</span> <span class="nx">string</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln">5</span><span class="cl">    <span class="k">public</span> <span class="k">function</span> <span class="nf">getLine</span><span class="p">()</span><span class="o">:</span> <span class="nx">int</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln">6</span><span class="cl">    <span class="k">public</span> <span class="k">function</span> <span class="nf">getTrace</span><span class="p">()</span><span class="o">:</span> <span class="k">array</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln">7</span><span class="cl">    <span class="k">public</span> <span class="k">function</span> <span class="nf">getPrevious</span><span class="p">()</span><span class="o">:</span> <span class="o">?</span><span class="nx">Throwable</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln">8</span><span class="cl">    <span class="k">public</span> <span class="k">function</span> <span class="fm">__toString</span><span class="p">()</span><span class="o">:</span> <span class="nx">string</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln">9</span><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>所有可抛出的对象必须实现 <code>Throwable</code>，包括：</p>
+<ul>
+<li><code>Exception</code>（及其子类）</li>
+<li><code>Error</code>（及其子类）</li>
+</ul>
+<hr>
+<h2 id="-三php-错误error详解">📚 三、PHP 错误（Error）详解</h2>
+<h3 id="1-error-的主要子类php-7">1. <strong>Error 的主要子类（PHP 7+）</strong></h3>
+<table>
+  <thead>
+      <tr>
+          <th>错误类型</th>
+          <th>触发场景</th>
+          <th>是否可捕获</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>ParseError</code></td>
+          <td>语法错误（如少分号）</td>
+          <td>❌（脚本未运行）</td>
+      </tr>
+      <tr>
+          <td><code>TypeError</code></td>
+          <td>类型声明不匹配</td>
+          <td>✅</td>
+      </tr>
+      <tr>
+          <td><code>ArgumentCountError</code></td>
+          <td>函数参数数量错误</td>
+          <td>✅</td>
+      </tr>
+      <tr>
+          <td><code>ArithmeticError</code></td>
+          <td>数学运算错误（如 <code>intdiv(1,0)</code>）</td>
+          <td>✅</td>
+      </tr>
+      <tr>
+          <td><code>DivisionByZeroError</code></td>
+          <td>除零错误（PHP 8+）</td>
+          <td>✅</td>
+      </tr>
+      <tr>
+          <td><code>CompileError</code></td>
+          <td>编译时错误（如无效 trait 使用）</td>
+          <td>❌</td>
+      </tr>
+      <tr>
+          <td><code>Fatal Error</code></td>
+          <td>如调用不存在的方法</td>
+          <td>✅（转为 <code>Error</code>）</td>
+      </tr>
+  </tbody>
+</table>
+<blockquote>
+<p>⚠️ 注意：<strong>ParseError 和 CompileError 发生在脚本执行前，无法用 try/catch 捕获</strong>。</p>
+</blockquote>
+<hr>
+<h3 id="2-error-示例">2. <strong>Error 示例</strong></h3>
+<h4 id="-可捕获的-errorphp-7">✅ 可捕获的 Error（PHP 7+）</h4>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="o">&lt;?</span><span class="nx">php</span>
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="k">try</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl">    <span class="c1">// TypeError: 期望 int，传了 string
+</span></span></span><span class="line"><span class="ln"> 4</span><span class="cl">    <span class="k">function</span> <span class="nf">add</span><span class="p">(</span><span class="nx">int</span> <span class="nv">$a</span><span class="p">,</span> <span class="nx">int</span> <span class="nv">$b</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nv">$a</span> <span class="o">+</span> <span class="nv">$b</span><span class="p">;</span> <span class="p">}</span>
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl">    <span class="nx">add</span><span class="p">(</span><span class="s2">&#34;hello&#34;</span><span class="p">,</span> <span class="mi">5</span><span class="p">);</span>
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl"><span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">TypeError</span> <span class="nv">$e</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl">    <span class="k">echo</span> <span class="s2">&#34;类型错误: &#34;</span> <span class="o">.</span> <span class="nv">$e</span><span class="o">-&gt;</span><span class="na">getMessage</span><span class="p">()</span> <span class="o">.</span> <span class="s2">&#34;</span><span class="se">\n</span><span class="s2">&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">
+</span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="k">try</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">11</span><span class="cl">    <span class="c1">// ArithmeticError: 除零
+</span></span></span><span class="line"><span class="ln">12</span><span class="cl">    <span class="nx">intdiv</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+</span></span><span class="line"><span class="ln">13</span><span class="cl"><span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">DivisionByZeroError</span> <span class="nv">$e</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">14</span><span class="cl">    <span class="k">echo</span> <span class="s2">&#34;除零错误: &#34;</span> <span class="o">.</span> <span class="nv">$e</span><span class="o">-&gt;</span><span class="na">getMessage</span><span class="p">()</span> <span class="o">.</span> <span class="s2">&#34;</span><span class="se">\n</span><span class="s2">&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln">15</span><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="ln">16</span><span class="cl">
+</span></span><span class="line"><span class="ln">17</span><span class="cl"><span class="k">try</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">18</span><span class="cl">    <span class="c1">// 调用不存在的方法 → Fatal Error 转为 Error
+</span></span></span><span class="line"><span class="ln">19</span><span class="cl">    <span class="nv">$obj</span> <span class="o">=</span> <span class="k">new</span> <span class="k">stdClass</span><span class="p">();</span>
+</span></span><span class="line"><span class="ln">20</span><span class="cl">    <span class="nv">$obj</span><span class="o">-&gt;</span><span class="na">nonExistentMethod</span><span class="p">();</span>
+</span></span><span class="line"><span class="ln">21</span><span class="cl"><span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">Error</span> <span class="nv">$e</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">22</span><span class="cl">    <span class="k">echo</span> <span class="s2">&#34;致命错误被捕获: &#34;</span> <span class="o">.</span> <span class="nv">$e</span><span class="o">-&gt;</span><span class="na">getMessage</span><span class="p">()</span> <span class="o">.</span> <span class="s2">&#34;</span><span class="se">\n</span><span class="s2">&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln">23</span><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><h4 id="-不可捕获的-parseerror">❌ 不可捕获的 ParseError</h4>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln">1</span><span class="cl"><span class="o">&lt;?</span><span class="nx">php</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="c1">// 这段代码有语法错误，根本不会进入运行时
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="k">echo</span> <span class="s2">&#34;Hello&#34;</span>
+</span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="c1">// 缺少分号 → ParseError，直接报错，无法 catch
+</span></span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="cp">?&gt;</span><span class="err">
+</span></span></span></code></pre></div><hr>
+<h2 id="-四php-异常exception详解">📚 四、PHP 异常（Exception）详解</h2>
+<h3 id="1-exception-的继承体系">1. <strong>Exception 的继承体系</strong></h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="ln"> 1</span><span class="cl">Throwable
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl">├── Exception
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl">│   ├── LogicException
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl">│   │   ├── BadFunctionCallException
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl">│   │   └── BadMethodCallException
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">│   │   └── InvalidArgumentException
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl">│   │   └── LengthException
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl">│   │   └── OutOfRangeException
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">│   └── RuntimeException
+</span></span><span class="line"><span class="ln">10</span><span class="cl">│       ├── OutOfBoundsException
+</span></span><span class="line"><span class="ln">11</span><span class="cl">│       ├── OverflowException
+</span></span><span class="line"><span class="ln">12</span><span class="cl">│       ├── RangeException
+</span></span><span class="line"><span class="ln">13</span><span class="cl">│       ├── UnderflowException
+</span></span><span class="line"><span class="ln">14</span><span class="cl">│       └── UnexpectedValueException
+</span></span><span class="line"><span class="ln">15</span><span class="cl">└── Error
+</span></span><span class="line"><span class="ln">16</span><span class="cl">    └── ...（见上文）
+</span></span></code></pre></div><blockquote>
+<p>💡 <strong>最佳实践</strong>：</p>
+<ul>
+<li>逻辑错误（如参数无效）→ 抛 <code>LogicException</code></li>
+<li>运行时错误（如文件不存在）→ 抛 <code>RuntimeException</code></li>
+</ul>
+</blockquote>
+<hr>
+<h3 id="2-自定义异常">2. <strong>自定义异常</strong></h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="k">class</span> <span class="nc">InvalidEmailException</span> <span class="k">extends</span> <span class="nx">InvalidArgumentException</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl">    <span class="k">public</span> <span class="k">function</span> <span class="fm">__construct</span><span class="p">(</span><span class="nv">$email</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl">        <span class="k">parent</span><span class="o">::</span><span class="na">__construct</span><span class="p">(</span><span class="s2">&#34;Invalid email: </span><span class="si">$email</span><span class="s2">&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="k">function</span> <span class="nf">validateEmail</span><span class="p">(</span><span class="nv">$email</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">filter_var</span><span class="p">(</span><span class="nv">$email</span><span class="p">,</span> <span class="nx">FILTER_VALIDATE_EMAIL</span><span class="p">))</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">        <span class="k">throw</span> <span class="k">new</span> <span class="nx">InvalidEmailException</span><span class="p">(</span><span class="nv">$email</span><span class="p">);</span>
+</span></span><span class="line"><span class="ln">10</span><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="ln">11</span><span class="cl">    <span class="k">return</span> <span class="k">true</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln">12</span><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="ln">13</span><span class="cl">
+</span></span><span class="line"><span class="ln">14</span><span class="cl"><span class="k">try</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">15</span><span class="cl">    <span class="nx">validateEmail</span><span class="p">(</span><span class="s2">&#34;not-an-email&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="ln">16</span><span class="cl"><span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">InvalidEmailException</span> <span class="nv">$e</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">17</span><span class="cl">    <span class="k">echo</span> <span class="s2">&#34;验证失败: &#34;</span> <span class="o">.</span> <span class="nv">$e</span><span class="o">-&gt;</span><span class="na">getMessage</span><span class="p">()</span> <span class="o">.</span> <span class="s2">&#34;</span><span class="se">\n</span><span class="s2">&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln">18</span><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><hr>
+<h2 id="-五错误与异常的处理机制">🛠 五、错误与异常的处理机制</h2>
+<h3 id="1-try--catch--finally">1. <strong>try / catch / finally</strong></h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="k">try</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl">    <span class="c1">// 可能抛出 Exception 或 Error 的代码
+</span></span></span><span class="line"><span class="ln"> 3</span><span class="cl">    <span class="nx">riskyOperation</span><span class="p">();</span>
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">InvalidArgumentException</span> <span class="nv">$e</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl">    <span class="c1">// 捕获特定异常
+</span></span></span><span class="line"><span class="ln"> 6</span><span class="cl">    <span class="nx">handleLogicError</span><span class="p">(</span><span class="nv">$e</span><span class="p">);</span>
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">RuntimeException</span> <span class="o">|</span> <span class="nx">Error</span> <span class="nv">$e</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl">    <span class="c1">// PHP 7.1+ 支持多类型 catch
+</span></span></span><span class="line"><span class="ln"> 9</span><span class="cl">    <span class="nx">handleRuntimeError</span><span class="p">(</span><span class="nv">$e</span><span class="p">);</span>
+</span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="p">}</span> <span class="k">finally</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">11</span><span class="cl">    <span class="c1">// 无论成功/失败都会执行（PHP 5.5+）
+</span></span></span><span class="line"><span class="ln">12</span><span class="cl">    <span class="nx">cleanup</span><span class="p">();</span>
+</span></span><span class="line"><span class="ln">13</span><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><blockquote>
+<p>✅ <strong>推荐</strong>：先捕获具体类型，再捕获通用类型（<code>Exception</code> / <code>Error</code>）。</p>
+</blockquote>
+<hr>
+<h3 id="2-全局异常处理器">2. <strong>全局异常处理器</strong></h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="c1">// 捕获未被捕获的 Exception
+</span></span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="nx">set_exception_handler</span><span class="p">(</span><span class="k">function</span> <span class="p">(</span><span class="nx">Throwable</span> <span class="nv">$e</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl">    <span class="nx">error_log</span><span class="p">(</span><span class="s2">&#34;Uncaught: &#34;</span> <span class="o">.</span> <span class="nv">$e</span><span class="o">-&gt;</span><span class="na">getMessage</span><span class="p">());</span>
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl">    <span class="k">echo</span> <span class="s2">&#34;系统错误，请稍后再试。&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="p">});</span>
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="c1">// 捕获未被捕获的 Error（PHP 7+）
+</span></span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="c1">// 实际上 set_exception_handler 也能捕获 Error！
+</span></span></span><span class="line"><span class="ln"> 9</span><span class="cl"><span class="c1">// 因为 Error 实现了 Throwable
+</span></span></span><span class="line"><span class="ln">10</span><span class="cl">
+</span></span><span class="line"><span class="ln">11</span><span class="cl"><span class="c1">// 触发未处理异常
+</span></span></span><span class="line"><span class="ln">12</span><span class="cl"><span class="k">throw</span> <span class="k">new</span> <span class="nx">Exception</span><span class="p">(</span><span class="s2">&#34;Oops!&#34;</span><span class="p">);</span>
+</span></span></code></pre></div><blockquote>
+<p>⚠️ 注意：<code>set_exception_handler</code> 在 PHP 7+ 可处理所有 <code>Throwable</code>。</p>
+</blockquote>
+<hr>
+<h3 id="3-传统错误e_">3. <strong>传统错误（E_ERROR, E_WARNING 等）的处理</strong></h3>
+<p>PHP 还有一套<strong>传统错误报告系统</strong>（基于 <code>error_reporting</code> 和 <code>trigger_error</code>），与异常系统并存。</p>
+<h4 id="启用传统错误转异常推荐">启用传统错误转异常（推荐！）</h4>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="c1">// 将 E_WARNING, E_NOTICE 等转换为 ErrorException
+</span></span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="nx">set_error_handler</span><span class="p">(</span><span class="k">function</span> <span class="p">(</span><span class="nv">$severity</span><span class="p">,</span> <span class="nv">$message</span><span class="p">,</span> <span class="nv">$file</span><span class="p">,</span> <span class="nv">$line</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="p">(</span><span class="nx">error_reporting</span><span class="p">()</span> <span class="o">&amp;</span> <span class="nv">$severity</span><span class="p">))</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl">        <span class="k">return</span> <span class="k">false</span><span class="p">;</span> <span class="c1">// 被 @ 抑制的错误
+</span></span></span><span class="line"><span class="ln"> 5</span><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">    <span class="k">throw</span> <span class="k">new</span> <span class="nx">ErrorException</span><span class="p">(</span><span class="nv">$message</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nv">$severity</span><span class="p">,</span> <span class="nv">$file</span><span class="p">,</span> <span class="nv">$line</span><span class="p">);</span>
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="p">});</span>
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl"><span class="c1">// 现在以下警告会变成异常！
+</span></span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="k">try</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">11</span><span class="cl">    <span class="k">echo</span> <span class="nv">$undefinedVariable</span><span class="p">;</span> <span class="c1">// 原本是 E_NOTICE
+</span></span></span><span class="line"><span class="ln">12</span><span class="cl"><span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">ErrorException</span> <span class="nv">$e</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">13</span><span class="cl">    <span class="k">echo</span> <span class="s2">&#34;捕获到传统错误: &#34;</span> <span class="o">.</span> <span class="nv">$e</span><span class="o">-&gt;</span><span class="na">getMessage</span><span class="p">();</span>
+</span></span><span class="line"><span class="ln">14</span><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><blockquote>
+<p>✅ <strong>强烈建议</strong>：在开发环境中启用此转换，使所有错误统一通过异常机制处理。</p>
+</blockquote>
+<hr>
+<h2 id="-六php-错误级别error-levels">📊 六、PHP 错误级别（Error Levels）</h2>
+<table>
+  <thead>
+      <tr>
+          <th>常量</th>
+          <th>说明</th>
+          <th>是否停止脚本</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>E_ERROR</code></td>
+          <td>致命运行时错误</td>
+          <td>✅</td>
+      </tr>
+      <tr>
+          <td><code>E_WARNING</code></td>
+          <td>运行时警告</td>
+          <td>❌</td>
+      </tr>
+      <tr>
+          <td><code>E_PARSE</code></td>
+          <td>编译时解析错误</td>
+          <td>✅（脚本不运行）</td>
+      </tr>
+      <tr>
+          <td><code>E_NOTICE</code></td>
+          <td>运行时通知（如未定义变量）</td>
+          <td>❌</td>
+      </tr>
+      <tr>
+          <td><code>E_STRICT</code></td>
+          <td>编码建议（PHP 8 已移除）</td>
+          <td>❌</td>
+      </tr>
+      <tr>
+          <td><code>E_DEPRECATED</code></td>
+          <td>已废弃功能警告</td>
+          <td>❌</td>
+      </tr>
+  </tbody>
+</table>
+<p>可通过 <code>error_reporting(E_ALL)</code> 控制显示哪些级别。</p>
+<hr>
+<h2 id="-七完整综合示例">🧪 七、完整综合示例</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="o">&lt;?</span><span class="nx">php</span>
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="c1">// 1. 将传统错误转为异常
+</span></span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="nx">set_error_handler</span><span class="p">(</span><span class="k">function</span> <span class="p">(</span><span class="nv">$severity</span><span class="p">,</span> <span class="nv">$msg</span><span class="p">,</span> <span class="nv">$file</span><span class="p">,</span> <span class="nv">$line</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl">    <span class="k">throw</span> <span class="k">new</span> <span class="nx">ErrorException</span><span class="p">(</span><span class="nv">$msg</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nv">$severity</span><span class="p">,</span> <span class="nv">$file</span><span class="p">,</span> <span class="nv">$line</span><span class="p">);</span>
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl"><span class="p">});</span>
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="c1">// 2. 全局未捕获处理器
+</span></span></span><span class="line"><span class="ln"> 9</span><span class="cl"><span class="nx">set_exception_handler</span><span class="p">(</span><span class="k">function</span> <span class="p">(</span><span class="nx">Throwable</span> <span class="nv">$e</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">10</span><span class="cl">    <span class="k">echo</span> <span class="s2">&#34;【全局捕获】&#34;</span> <span class="o">.</span> <span class="nx">get_class</span><span class="p">(</span><span class="nv">$e</span><span class="p">)</span> <span class="o">.</span> <span class="s2">&#34;: &#34;</span> <span class="o">.</span> <span class="nv">$e</span><span class="o">-&gt;</span><span class="na">getMessage</span><span class="p">()</span> <span class="o">.</span> <span class="s2">&#34;</span><span class="se">\n</span><span class="s2">&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln">11</span><span class="cl"><span class="p">});</span>
+</span></span><span class="line"><span class="ln">12</span><span class="cl">
+</span></span><span class="line"><span class="ln">13</span><span class="cl"><span class="c1">// 3. 测试各种情况
+</span></span></span><span class="line"><span class="ln">14</span><span class="cl"><span class="k">class</span> <span class="nc">Calculator</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">15</span><span class="cl">    <span class="k">public</span> <span class="k">function</span> <span class="nf">divide</span><span class="p">(</span><span class="nv">$a</span><span class="p">,</span> <span class="nv">$b</span><span class="p">)</span><span class="o">:</span> <span class="nx">float</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">16</span><span class="cl">        <span class="k">if</span> <span class="p">(</span><span class="nv">$b</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">17</span><span class="cl">            <span class="k">throw</span> <span class="k">new</span> <span class="nx">InvalidArgumentException</span><span class="p">(</span><span class="s2">&#34;Division by zero&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="ln">18</span><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="ln">19</span><span class="cl">        <span class="k">return</span> <span class="nv">$a</span> <span class="o">/</span> <span class="nv">$b</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln">20</span><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="ln">21</span><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="ln">22</span><span class="cl">
+</span></span><span class="line"><span class="ln">23</span><span class="cl"><span class="nv">$calc</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Calculator</span><span class="p">();</span>
+</span></span><span class="line"><span class="ln">24</span><span class="cl">
+</span></span><span class="line"><span class="ln">25</span><span class="cl"><span class="c1">// 测试 1: 自定义异常
+</span></span></span><span class="line"><span class="ln">26</span><span class="cl"><span class="k">try</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">27</span><span class="cl">    <span class="nv">$calc</span><span class="o">-&gt;</span><span class="na">divide</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+</span></span><span class="line"><span class="ln">28</span><span class="cl"><span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">InvalidArgumentException</span> <span class="nv">$e</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">29</span><span class="cl">    <span class="k">echo</span> <span class="s2">&#34;【捕获异常】&#34;</span> <span class="o">.</span> <span class="nv">$e</span><span class="o">-&gt;</span><span class="na">getMessage</span><span class="p">()</span> <span class="o">.</span> <span class="s2">&#34;</span><span class="se">\n</span><span class="s2">&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln">30</span><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="ln">31</span><span class="cl">
+</span></span><span class="line"><span class="ln">32</span><span class="cl"><span class="c1">// 测试 2: 类型错误（PHP 7+ Error）
+</span></span></span><span class="line"><span class="ln">33</span><span class="cl"><span class="k">try</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">34</span><span class="cl">    <span class="nx">strlen</span><span class="p">(</span><span class="k">null</span><span class="p">);</span> <span class="c1">// PHP 8.1+ 会触发 TypeError
+</span></span></span><span class="line"><span class="ln">35</span><span class="cl"><span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">TypeError</span> <span class="nv">$e</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">36</span><span class="cl">    <span class="k">echo</span> <span class="s2">&#34;【捕获类型错误】&#34;</span> <span class="o">.</span> <span class="nv">$e</span><span class="o">-&gt;</span><span class="na">getMessage</span><span class="p">()</span> <span class="o">.</span> <span class="s2">&#34;</span><span class="se">\n</span><span class="s2">&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln">37</span><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="ln">38</span><span class="cl">
+</span></span><span class="line"><span class="ln">39</span><span class="cl"><span class="c1">// 测试 3: 传统错误转异常
+</span></span></span><span class="line"><span class="ln">40</span><span class="cl"><span class="k">try</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">41</span><span class="cl">    <span class="k">echo</span> <span class="nv">$undefinedVar</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln">42</span><span class="cl"><span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">ErrorException</span> <span class="nv">$e</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">43</span><span class="cl">    <span class="k">echo</span> <span class="s2">&#34;【捕获传统错误】&#34;</span> <span class="o">.</span> <span class="nv">$e</span><span class="o">-&gt;</span><span class="na">getMessage</span><span class="p">()</span> <span class="o">.</span> <span class="s2">&#34;</span><span class="se">\n</span><span class="s2">&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln">44</span><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="ln">45</span><span class="cl">
+</span></span><span class="line"><span class="ln">46</span><span class="cl"><span class="c1">// 测试 4: 未捕获的 Error（会被全局处理器捕获）
+</span></span></span><span class="line"><span class="ln">47</span><span class="cl"><span class="k">new</span> <span class="nx">NonExistentClass</span><span class="p">();</span>
+</span></span></code></pre></div><p><strong>输出示例（PHP 8.1+）</strong>：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-gdscript3" data-lang="gdscript3"><span class="line"><span class="ln">1</span><span class="cl"><span class="err">【捕获异常】</span><span class="n">Division</span> <span class="n">by</span> <span class="n">zero</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="err">【捕获类型错误】</span><span class="n">strlen</span><span class="p">():</span> <span class="n">Argument</span> <span class="c1">#1 ($string) must be of type string, null given</span>
+</span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="err">【捕获传统错误】</span><span class="n">Undefined</span> <span class="n">variable</span> <span class="o">$</span><span class="n">undefinedVar</span>
+</span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="err">【全局捕获】</span><span class="n">Error</span><span class="p">:</span> <span class="n">Class</span> <span class="s2">&#34;NonExistentClass&#34;</span> <span class="ow">not</span> <span class="n">found</span>
+</span></span></code></pre></div><hr>
+<h2 id="-八最佳实践总结">✅ 八、最佳实践总结</h2>
+<table>
+  <thead>
+      <tr>
+          <th>场景</th>
+          <th>推荐做法</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><strong>新项目</strong></td>
+          <td>启用 <code>set_error_handler</code> 将传统错误转为异常</td>
+      </tr>
+      <tr>
+          <td><strong>异常类型</strong></td>
+          <td>使用标准异常子类（<code>InvalidArgumentException</code> 等）</td>
+      </tr>
+      <tr>
+          <td><strong>错误处理</strong></td>
+          <td>用 <code>try/catch</code> 捕获可恢复错误，全局处理器兜底</td>
+      </tr>
+      <tr>
+          <td><strong>日志记录</strong></td>
+          <td>在全局处理器中记录 <code>Throwable</code> 的完整信息（含 trace）</td>
+      </tr>
+      <tr>
+          <td><strong>生产环境</strong></td>
+          <td>不要暴露错误细节给用户，只记录日志</td>
+      </tr>
+      <tr>
+          <td><strong>避免</strong></td>
+          <td>不要混用 <code>die()</code>/<code>exit()</code> 和异常；不要忽略可恢复错误</td>
+      </tr>
+  </tbody>
+</table>
+<hr>
+<h2 id="-九常见误区">📌 九、常见误区</h2>
+<ol>
+<li>
+<p><strong>“Error 不能被捕获”</strong><br>
+→ <strong>PHP 7+ 大部分可以！</strong>（除了 ParseError）</p>
+</li>
+<li>
+<p><strong>“Exception 能捕获所有错误”</strong><br>
+→ 必须用 <code>catch (Throwable $e)</code> 才能同时捕获 <code>Exception</code> 和 <code>Error</code></p>
+</li>
+<li>
+<p><strong>“关闭 error_reporting 就安全了”</strong><br>
+→ 错误仍会发生，只是不显示。应正确处理而非隐藏。</p>
+</li>
+</ol>
+<hr>
+<h2 id="-总结-4">🔚 总结</h2>
+<ul>
+<li><strong>PHP 7+ 统一了错误和异常模型</strong>，都基于 <code>Throwable</code>。</li>
+<li><strong>Error</strong>：引擎级问题（多数可捕获）。</li>
+<li><strong>Exception</strong>：应用级问题（设计为可恢复）。</li>
+<li><strong>传统错误</strong>（E_WARNING 等）应通过 <code>set_error_handler</code> 转为异常。</li>
+<li><strong>始终使用 <code>try/catch</code> + 全局处理器</strong> 构建健壮应用。</li>
+</ul>
+<blockquote>
+<p>💡 记住：<strong>“Fail fast, handle gracefully.”</strong> —— 快速失败，优雅处理。</p>
 </blockquote>
 
     </div><div class="post_comments">
