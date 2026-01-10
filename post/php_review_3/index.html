@@ -168,7 +168,7 @@
     <span class="post_date">
       2025-06-03	  
     </span>
-    <span class="post_time"> · 15 分钟阅读</span><span>&nbsp;· <a href='https://jianlin-li.github.io/tags/php/' title="PHP" class="post_tag button button_translucent">PHP
+    <span class="post_time"> · 18 分钟阅读</span><span>&nbsp;· <a href='https://jianlin-li.github.io/tags/php/' title="PHP" class="post_tag button button_translucent">PHP
         </a>
     </span>
     <span class="page_only">&nbsp;·
@@ -1800,6 +1800,320 @@
 </ul>
 <blockquote>
 <p>💡 记住：<strong>“Fail fast, handle gracefully.”</strong> —— 快速失败，优雅处理。</p>
+</blockquote>
+<h1 id="从-php-5-开始系统梳理-mysqlnd-的演进关系并解释它们在不同-php-版本中的角色与协作机制">从 <strong>PHP 5 开始</strong>，系统梳理 <strong><code>mysqlnd</code>、<code>PDO</code>、MySQL 驱动</strong> 的演进关系，并解释它们在不同 PHP 版本中的角色与协作机制。</h1>
+<hr>
+<h2 id="-核心概念先澄清">🔑 核心概念先澄清</h2>
+<table>
+  <thead>
+      <tr>
+          <th>术语</th>
+          <th>全称 / 含义</th>
+          <th>作用</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><strong>PDO</strong></td>
+          <td>PHP Data Objects</td>
+          <td><strong>数据库抽象层</strong>（统一接口），本身不直接连数据库</td>
+      </tr>
+      <tr>
+          <td><strong>PDO Driver</strong></td>
+          <td>PDO 驱动（如 <code>pdo_mysql</code>）</td>
+          <td>实现 PDO 接口，对接具体数据库（如 MySQL）</td>
+      </tr>
+      <tr>
+          <td><strong>MySQL Client Library</strong></td>
+          <td>连接 MySQL 的底层 C 库</td>
+          <td>负责实际的网络通信、协议解析</td>
+      </tr>
+      <tr>
+          <td><strong>mysqlnd</strong></td>
+          <td>MySQL Native Driver</td>
+          <td><strong>PHP 官方用 C 写的 MySQL 客户端库</strong>（替代 libmysqlclient）</td>
+      </tr>
+  </tbody>
+</table>
+<blockquote>
+<p>✅ <strong>关键关系</strong>：<br>
+<strong>PDO（接口） → pdo_mysql（驱动） → mysqlnd 或 libmysqlclient（底层通信库）</strong></p>
+</blockquote>
+<hr>
+<h2 id="-一php-50--52只有-libmysqlclient">🧱 一、PHP 5.0 – 5.2：只有 <code>libmysqlclient</code></h2>
+<h3 id="架构">架构：</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="ln">1</span><span class="cl">Your Code
+</span></span><span class="line"><span class="ln">2</span><span class="cl">   ↓
+</span></span><span class="line"><span class="ln">3</span><span class="cl">PDO (or mysql/mysqli extension)
+</span></span><span class="line"><span class="ln">4</span><span class="cl">   ↓
+</span></span><span class="line"><span class="ln">5</span><span class="cl">libmysqlclient (由 Oracle/MySQL AB 提供的 C 库)
+</span></span><span class="line"><span class="ln">6</span><span class="cl">   ↓
+</span></span><span class="line"><span class="ln">7</span><span class="cl">MySQL Server
+</span></span></code></pre></div><h3 id="特点">特点：</h3>
+<ul>
+<li>所有 MySQL 扩展（<code>mysql_*</code>, <code>mysqli</code>, <code>pdo_mysql</code>）都依赖系统安装的 <strong><code>libmysqlclient.so</code></strong>。</li>
+<li>必须在编译 PHP 时链接该库（<code>--with-mysql=/path</code>）。</li>
+<li><strong>缺点</strong>：
+<ul>
+<li>依赖外部库，部署复杂；</li>
+<li>内存拷贝多（数据从 libmysqlclient → PHP 变量需转换）；</li>
+<li>不支持某些新特性（如压缩协议、性能统计）。</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="-二php-53mysqlnd-正式引入重大变革">🚀 二、PHP 5.3：<code>mysqlnd</code> 正式引入（重大变革）</h2>
+<blockquote>
+<p><strong>2008 年，PHP 5.3 发布，内置 <code>mysqlnd</code>（MySQL Native Driver）</strong></p>
+</blockquote>
+<h3 id="-mysqlnd-是什么">✅ <code>mysqlnd</code> 是什么？</h3>
+<ul>
+<li>由 <strong>PHP 团队用 C 重写的 MySQL 客户端库</strong>，<strong>完全集成在 PHP 源码中</strong>。</li>
+<li><strong>无需安装 <code>libmysqlclient</code></strong>，编译 PHP 时默认启用（除非显式禁用）。</li>
+<li>专为 PHP 优化，减少内存拷贝，提升性能。</li>
+</ul>
+<h3 id="新架构两种选择">新架构（两种选择）：</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="ln">1</span><span class="cl">Option A (旧)：
+</span></span><span class="line"><span class="ln">2</span><span class="cl">PDO → pdo_mysql → libmysqlclient
+</span></span><span class="line"><span class="ln">3</span><span class="cl">
+</span></span><span class="line"><span class="ln">4</span><span class="cl">Option B (新，默认)：
+</span></span><span class="line"><span class="ln">5</span><span class="cl">PDO → pdo_mysql → mysqlnd
+</span></span></code></pre></div><h3 id="如何查看当前使用哪个">如何查看当前使用哪个？</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="o">&lt;?</span><span class="nx">php</span>
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="c1">// 查看 mysqlnd 是否启用
+</span></span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="k">if</span> <span class="p">(</span><span class="nx">function_exists</span><span class="p">(</span><span class="s1">&#39;mysqli_get_client_info&#39;</span><span class="p">))</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl">    <span class="k">echo</span> <span class="nx">mysqli_get_client_info</span><span class="p">();</span> <span class="c1">// 若含 &#34;mysqlnd&#34; 则使用 native driver
+</span></span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="c1">// 或查看 phpinfo()
+</span></span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="nx">phpinfo</span><span class="p">();</span>
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl"><span class="c1">// 在 &#34;mysql&#34;, &#34;mysqli&#34;, &#34;pdo_mysql&#34; 区域会显示 &#34;Client API version&#34;
+</span></span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="c1">// 如果是 &#34;mysqlnd 5.x.x&#34;，说明用的是 mysqlnd
+</span></span></span><span class="line"><span class="ln">11</span><span class="cl"><span class="cp">?&gt;</span><span class="err">
+</span></span></span></code></pre></div><h3 id="-mysqlnd-的优势php-53">✅ <code>mysqlnd</code> 的优势（PHP 5.3+）：</h3>
+<table>
+  <thead>
+      <tr>
+          <th>功能</th>
+          <th>说明</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><strong>零拷贝结果集</strong></td>
+          <td>直接将 MySQL 结果转为 PHP zval，减少内存复制</td>
+      </tr>
+      <tr>
+          <td><strong>内置性能统计</strong></td>
+          <td><code>mysqli_get_cache_stats()</code>, <code>mysqli_get_connection_stats()</code></td>
+      </tr>
+      <tr>
+          <td><strong>支持插件架构</strong></td>
+          <td>可开发认证、负载均衡等插件</td>
+      </tr>
+      <tr>
+          <td><strong>更好的内存管理</strong></td>
+          <td>与 PHP 内存池集成</td>
+      </tr>
+      <tr>
+          <td><strong>支持新协议特性</strong></td>
+          <td>如压缩、SSL 等更易实现</td>
+      </tr>
+  </tbody>
+</table>
+<blockquote>
+<p>💡 <strong>从 PHP 5.4 起，官方强烈推荐使用 <code>mysqlnd</code></strong>。</p>
+</blockquote>
+<hr>
+<h2 id="-三php-55--70淘汰-mysql_-函数mysqlnd-成事实标准">🗑 三、PHP 5.5 – 7.0：淘汰 <code>mysql_*</code> 函数，<code>mysqlnd</code> 成事实标准</h2>
+<h3 id="重要变化">重要变化：</h3>
+<ul>
+<li><strong>PHP 5.5</strong>：标记 <code>mysql_*</code> 函数为 <strong>deprecated</strong>（已废弃）。</li>
+<li><strong>PHP 7.0</strong>：<strong>彻底移除 <code>mysql_*</code> 函数</strong>！
+<ul>
+<li>只剩 <code>mysqli</code> 和 <code>PDO</code> 两种官方 MySQL 扩展。</li>
+</ul>
+</li>
+<li><strong><code>mysqlnd</code> 成为默认且推荐的底层驱动</strong>。
+<ul>
+<li>大多数 Linux 发行版（如 Ubuntu、CentOS）的 PHP 包默认编译为使用 <code>mysqlnd</code>。</li>
+</ul>
+</li>
+</ul>
+<h3 id="此时典型栈">此时典型栈：</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="ln">1</span><span class="cl">Your Code (PDO or MySQLi)
+</span></span><span class="line"><span class="ln">2</span><span class="cl">   ↓
+</span></span><span class="line"><span class="ln">3</span><span class="cl">pdo_mysql 或 mysqli 扩展
+</span></span><span class="line"><span class="ln">4</span><span class="cl">   ↓
+</span></span><span class="line"><span class="ln">5</span><span class="cl">mysqlnd (内置，无需额外安装)
+</span></span><span class="line"><span class="ln">6</span><span class="cl">   ↓
+</span></span><span class="line"><span class="ln">7</span><span class="cl">MySQL Server
+</span></span></code></pre></div><blockquote>
+<p>✅ <strong>PDO 与 mysqlnd 的关系</strong>：<br>
+<code>pdo_mysql</code> 驱动可以编译为使用 <code>mysqlnd</code> 或 <code>libmysqlclient</code>，但 <strong>PHP 5.4+ 默认使用 <code>mysqlnd</code></strong>。</p>
+</blockquote>
+<hr>
+<h2 id="-四php-71--83mysqlnd-全面主导安全与性能增强">🔒 四、PHP 7.1 – 8.3：<code>mysqlnd</code> 全面主导，安全与性能增强</h2>
+<h3 id="关键演进">关键演进：</h3>
+<table>
+  <thead>
+      <tr>
+          <th>版本</th>
+          <th>改进</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><strong>PHP 7.1</strong></td>
+          <td><code>mysqlnd</code> 支持 <strong>SHA256 密码认证</strong>（MySQL 8.0 默认）</td>
+      </tr>
+      <tr>
+          <td><strong>PHP 7.4</strong></td>
+          <td>改进 SSL/TLS 支持，支持 <code>MYSQLI_CLIENT_SSL_DONT_VERIFY_SERVER_CERT</code></td>
+      </tr>
+      <tr>
+          <td><strong>PHP 8.0</strong></td>
+          <td>移除 <code>libmysqlclient</code> 编译选项（部分发行版仍保留，但官方倾向 mysqlnd）</td>
+      </tr>
+      <tr>
+          <td><strong>PHP 8.1+</strong></td>
+          <td><code>mysqlnd</code> 成为 <strong>唯一官方支持的 MySQL 客户端库</strong>（<code>libmysqlclient</code> 逐渐淘汰）</td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="验证-php-8x-是否使用-mysqlnd">验证 PHP 8.x 是否使用 mysqlnd：</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln">1</span><span class="cl"><span class="nx">var_dump</span><span class="p">(</span><span class="nx">PDO</span><span class="o">::</span><span class="na">getAvailableDrivers</span><span class="p">());</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="c1">// 输出应包含 &#34;mysql&#34;
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl">
+</span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="c1">// 查看 pdo_mysql 的底层驱动
+</span></span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="nv">$pdo</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">PDO</span><span class="p">(</span><span class="s1">&#39;mysql:host=127.0.0.1;dbname=test&#39;</span><span class="p">,</span> <span class="s1">&#39;user&#39;</span><span class="p">,</span> <span class="s1">&#39;pass&#39;</span><span class="p">);</span>
+</span></span><span class="line"><span class="ln">6</span><span class="cl"><span class="nv">$stmt</span> <span class="o">=</span> <span class="nv">$pdo</span><span class="o">-&gt;</span><span class="na">query</span><span class="p">(</span><span class="s2">&#34;SHOW VARIABLES LIKE &#39;version_compile_machine&#39;&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="ln">7</span><span class="cl"><span class="c1">// 如果返回空或报错，说明用的是 mysqlnd（因 libmysqlclient 才支持此查询）
+</span></span></span><span class="line"><span class="ln">8</span><span class="cl"><span class="c1">// 更可靠方式：phpinfo() 中看 &#34;Client API version&#34;
+</span></span></span></code></pre></div><blockquote>
+<p>⚠️ 注意：<strong><code>libmysqlclient</code> 在 PHP 8.1+ 中已基本被弃用</strong>，官方文档明确推荐 <code>mysqlnd</code>。</p>
+</blockquote>
+<hr>
+<h2 id="-五pdo--mysql-的完整调用链现代-php">🔄 五、PDO + MySQL 的完整调用链（现代 PHP）</h2>
+<p>以 <code>new PDO('mysql:...')</code> 为例：</p>
+<ol>
+<li><strong>PHP 用户代码</strong> 调用 <code>new PDO('mysql:host=...')</code></li>
+<li><strong>PDO 扩展</strong> 解析 DSN，发现是 <code>mysql</code> 驱动</li>
+<li><strong>加载 <code>pdo_mysql</code> 扩展</strong></li>
+<li><strong><code>pdo_mysql</code> 调用底层客户端库</strong>：
+<ul>
+<li>如果 PHP 编译时用了 <code>--with-mysql=mysqlnd</code> → 调用 <strong>mysqlnd</strong></li>
+<li>如果用了 <code>--with-mysql-libs=/usr</code> → 调用 <strong>libmysqlclient</strong>（已罕见）</li>
+</ul>
+</li>
+<li><strong>底层库建立 TCP 连接，执行 MySQL 协议通信</strong></li>
+<li><strong>结果返回给 <code>pdo_mysql</code> → PDO → 用户代码</strong></li>
+</ol>
+<hr>
+<h2 id="-六版本对比总结表">📊 六、版本对比总结表</h2>
+<table>
+  <thead>
+      <tr>
+          <th>PHP 版本</th>
+          <th>mysql_* 函数</th>
+          <th>默认 MySQL 客户端</th>
+          <th>PDO 驱动</th>
+          <th>备注</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><strong>5.0 – 5.2</strong></td>
+          <td>✅ 存在</td>
+          <td><code>libmysqlclient</code></td>
+          <td><code>pdo_mysql</code>（依赖 libmysql）</td>
+          <td>需手动安装 MySQL 客户端库</td>
+      </tr>
+      <tr>
+          <td><strong>5.3 – 5.4</strong></td>
+          <td>✅ 存在</td>
+          <td><strong><code>mysqlnd</code>（可选，默认）</strong></td>
+          <td><code>pdo_mysql</code>（可选 mysqlnd）</td>
+          <td><code>mysqlnd</code> 首次引入</td>
+      </tr>
+      <tr>
+          <td><strong>5.5 – 5.6</strong></td>
+          <td>⚠️ Deprecated</td>
+          <td><strong><code>mysqlnd</code>（推荐）</strong></td>
+          <td><code>pdo_mysql</code>（默认 mysqlnd）</td>
+          <td>开始淘汰旧函数</td>
+      </tr>
+      <tr>
+          <td><strong>7.0 – 7.4</strong></td>
+          <td>❌ 移除</td>
+          <td><strong><code>mysqlnd</code>（主流）</strong></td>
+          <td><code>pdo_mysql</code>（几乎都用 mysqlnd）</td>
+          <td>性能大幅提升</td>
+      </tr>
+      <tr>
+          <td><strong>8.0 – 8.3+</strong></td>
+          <td>❌ 不存在</td>
+          <td><strong><code>mysqlnd</code>（唯一官方支持）</strong></td>
+          <td><code>pdo_mysql</code>（绑定 mysqlnd）</td>
+          <td><code>libmysqlclient</code> 基本淘汰</td>
+      </tr>
+  </tbody>
+</table>
+<hr>
+<h2 id="-七最佳实践建议2025-年">✅ 七、最佳实践建议（2025 年）</h2>
+<ol>
+<li><strong>永远不要用 <code>mysql_*</code> 函数</strong>（已不存在于 PHP 7+）。</li>
+<li><strong>优先使用 <code>PDO</code> 或 <code>MySQLi</code></strong>：
+<ul>
+<li><code>PDO</code>：跨数据库兼容性好，支持预处理。</li>
+<li><code>MySQLi</code>：功能更丰富（如异步查询、存储过程）。</li>
+</ul>
+</li>
+<li><strong>确保使用 <code>mysqlnd</code></strong>：
+<ul>
+<li>检查 <code>phpinfo()</code> 中 MySQL 扩展的 &quot;Client API version&quot; 是否含 <code>mysqlnd</code>。</li>
+<li>在 Docker 或自编译 PHP 时，<strong>不要指定 <code>--with-mysql</code> 路径</strong>，让其自动用 mysqlnd。</li>
+</ul>
+</li>
+<li><strong>利用 <code>mysqlnd</code> 特性</strong>：
+<ul>
+<li>使用 <code>mysqli::get_connection_stats()</code> 监控连接性能；</li>
+<li>启用 <code>mysqlnd</code> 的内存缓存（需配置）。</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h2 id="-附如何确认你的-php-使用-mysqlnd">🔍 附：如何确认你的 PHP 使用 mysqlnd？</h2>
+<h3 id="方法-1phpinfo">方法 1：<code>phpinfo()</code></h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln">1</span><span class="cl"><span class="o">&lt;?</span><span class="nx">php</span> <span class="nx">phpinfo</span><span class="p">();</span> <span class="cp">?&gt;</span><span class="err">
+</span></span></span></code></pre></div><p>搜索：</p>
+<ul>
+<li><code>mysql</code> → 看 &quot;Client API version&quot;</li>
+<li><code>mysqli</code> → 同上</li>
+<li><code>pdo_mysql</code> → 同上<br>
+如果显示 <code>mysqlnd 8.1.10</code> 之类，就是 mysqlnd。</li>
+</ul>
+<h3 id="方法-2命令行">方法 2：命令行</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">php -r <span class="s2">&#34;phpinfo();&#34;</span> <span class="p">|</span> grep <span class="s2">&#34;Client API&#34;</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="c1"># 输出：Client API version =&gt; mysqlnd 8.1.10</span>
+</span></span></code></pre></div><h3 id="方法-3代码检测">方法 3：代码检测</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln">1</span><span class="cl"><span class="k">if</span> <span class="p">(</span><span class="nx">defined</span><span class="p">(</span><span class="s1">&#39;PDO::ATTR_DRIVER_NAME&#39;</span><span class="p">))</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl">    <span class="nv">$pdo</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">PDO</span><span class="p">(</span><span class="s1">&#39;mysql:host=127.0.0.1;dbname=mysql&#39;</span><span class="p">,</span> <span class="s1">&#39;root&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">);</span>
+</span></span><span class="line"><span class="ln">3</span><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="nv">$pdo</span><span class="o">-&gt;</span><span class="na">getAttribute</span><span class="p">(</span><span class="nx">PDO</span><span class="o">::</span><span class="na">ATTR_DRIVER_NAME</span><span class="p">)</span> <span class="o">===</span> <span class="s1">&#39;mysql&#39;</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">4</span><span class="cl">        <span class="k">echo</span> <span class="s2">&#34;PDO MySQL 驱动已加载</span><span class="se">\n</span><span class="s2">&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln">5</span><span class="cl">        <span class="c1">// 底层是否 mysqlnd 需看 phpinfo
+</span></span></span><span class="line"><span class="ln">6</span><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="ln">7</span><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><hr>
+<h2 id="-总结-5">📌 总结</h2>
+<ul>
+<li><strong><code>mysqlnd</code> 是 PHP 官方维护的 MySQL 客户端库</strong>，从 <strong>PHP 5.3 引入</strong>，<strong>PHP 7+ 成为默认和推荐</strong>，<strong>PHP 8+ 基本唯一选择</strong>。</li>
+<li><strong>PDO 是数据库抽象层</strong>，<code>pdo_mysql</code> 是其实现 MySQL 支持的驱动，<strong>它依赖底层客户端库（mysqlnd 或 libmysqlclient）</strong>。</li>
+<li><strong>现代 PHP 开发中，你只需关心 PDO 或 MySQLi，底层 mysqlnd 会自动工作</strong>，无需额外配置。</li>
+</ul>
+<blockquote>
+<p>💡 简单记忆：<br>
+<strong>“PDO 是方向盘，pdo_mysql 是传动轴，mysqlnd 是发动机。”</strong></p>
 </blockquote>
 
     </div><div class="post_comments">
