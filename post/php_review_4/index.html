@@ -168,7 +168,7 @@
     <span class="post_date">
       2025-06-04	  
     </span>
-    <span class="post_time"> · 2 分钟阅读</span><span>&nbsp;· <a href='https://jianlin-li.github.io/tags/php/' title="PHP" class="post_tag button button_translucent">PHP
+    <span class="post_time"> · 4 分钟阅读</span><span>&nbsp;· <a href='https://jianlin-li.github.io/tags/php/' title="PHP" class="post_tag button button_translucent">PHP
         </a>
     </span>
     <span class="page_only">&nbsp;·
@@ -490,6 +490,168 @@
   </tbody>
 </table>
 <p>合理配置 PHP-FPM 进程数，能显著提升系统稳定性与资源利用率。务必结合<strong>实际内存</strong>和<strong>业务负载</strong>进行调优。</p>
+<h1 id="下面是一个完整的配置过程用于在-php-fpm--nginx-环境中启用-pmstatus_path-状态页并通过-nginx-安全地暴露访问路径例如-fpm-status同时限制仅允许本地或特定-ip-访问">下面是一个<strong>完整的配置过程</strong>，用于在 <strong>PHP-FPM + Nginx</strong> 环境中启用 <code>pm.status_path</code> 状态页，并通过 Nginx 安全地暴露访问路径（例如 <code>/fpm-status</code>），同时限制仅允许本地或特定 IP 访问。</h1>
+<hr>
+<h2 id="-一前提条件">✅ 一、前提条件</h2>
+<ul>
+<li>已安装并运行 <strong>PHP-FPM</strong>（如 <code>php8.1-fpm</code>、<code>php8.2-fpm</code> 等）</li>
+<li>使用 <strong>Nginx</strong> 作为 Web 服务器</li>
+<li>配置文件路径示例（根据系统可能略有不同）：
+<ul>
+<li>PHP-FPM 池配置：<code>/etc/php/{version}/fpm/pool.d/www.conf</code></li>
+<li>Nginx 站点配置：<code>/etc/nginx/sites-available/default</code> 或自定义站点</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="-二步骤-1启用-php-fpm-状态页">✅ 二、步骤 1：启用 PHP-FPM 状态页</h2>
+<p>编辑你的 FPM 池配置文件（通常是 <code>www.conf</code>）：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">sudo nano /etc/php/8.2/fpm/pool.d/www.conf
+</span></span></code></pre></div><blockquote>
+<p>⚠️ 将 <code>8.2</code> 替换为你实际的 PHP 版本。</p>
+</blockquote>
+<p>找到以下行（通常被注释）并取消注释并修改：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ini" data-lang="ini"><span class="line"><span class="ln">1</span><span class="cl"><span class="c1">; 启用状态页路径</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="na">pm.status_path</span> <span class="o">=</span> <span class="s">/fpm-status</span>
+</span></span><span class="line"><span class="ln">3</span><span class="cl">
+</span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="c1">; （可选）启用 ping 路径，用于健康检查</span>
+</span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="na">ping.path</span> <span class="o">=</span> <span class="s">/fpm-ping</span>
+</span></span></code></pre></div><blockquote>
+<p>💡 路径名可以自定义，但建议不要使用常见路径（如 <code>/status</code>）以防被扫描。</p>
+</blockquote>
+<p>保存并退出。</p>
+<hr>
+<h2 id="-三步骤-2重载-php-fpm">✅ 三、步骤 2：重载 PHP-FPM</h2>
+<p>让配置生效（<strong>不要 restart</strong>，避免中断服务）：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">sudo systemctl reload php8.2-fpm
+</span></span></code></pre></div><blockquote>
+<p>如果你不确定服务名，可用 <code>systemctl list-units | grep fpm</code> 查看。</p>
+</blockquote>
+<hr>
+<h2 id="-四步骤-3配置-nginx-转发状态请求到-php-fpm">✅ 四、步骤 3：配置 Nginx 转发状态请求到 PHP-FPM</h2>
+<p>编辑你的 Nginx 站点配置文件，例如：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">sudo nano /etc/nginx/sites-available/default
+</span></span></code></pre></div><p>在 <code>server { ... }</code> 块中添加以下 location 块：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-nginx" data-lang="nginx"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="c1"># PHP-FPM 状态页（仅限本地访问）
+</span></span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="k">location</span> <span class="p">~</span> <span class="sr">^/(fpm-status|fpm-ping)$</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl">    <span class="kn">access_log</span> <span class="no">off</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl">    <span class="kn">allow</span> <span class="n">127.0.0.1</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl">    <span class="kn">allow</span> <span class="p">::</span><span class="mi">1</span><span class="p">;</span>               <span class="c1"># IPv6 localhost
+</span></span></span><span class="line"><span class="ln"> 6</span><span class="cl">    <span class="c1"># allow 192.168.1.0/24;  # 如需允许内网，取消注释并修改
+</span></span></span><span class="line"><span class="ln"> 7</span><span class="cl">    <span class="kn">deny</span> <span class="s">all</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">    <span class="kn">include</span> <span class="s">fastcgi_params</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln">10</span><span class="cl">    <span class="kn">fastcgi_param</span> <span class="s">SCRIPT_FILENAME</span> <span class="nv">$document_root$fastcgi_script_name</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln">11</span><span class="cl">    <span class="kn">fastcgi_pass</span> <span class="s">unix:/run/php/php8.2-fpm.sock</span><span class="p">;</span>  <span class="c1"># 根据你的 sock 路径调整
+</span></span></span><span class="line"><span class="ln">12</span><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><blockquote>
+<p>🔍 <strong>关键点说明</strong>：</p>
+<ul>
+<li><code>fastcgi_pass</code> 必须与 PHP-FPM 监听的 socket 或 TCP 地址一致。
+&gt;   - 查看 <code>www.conf</code> 中的 <code>listen = /run/php/php8.2-fpm.sock</code> 或 <code>127.0.0.1:9000</code></li>
+<li>默认只允许 <code>127.0.0.1</code>（本机）访问，防止信息泄露。</li>
+</ul>
+</blockquote>
+<hr>
+<h2 id="-五步骤-4测试配置--重载-nginx">✅ 五、步骤 4：测试配置 &amp; 重载 Nginx</h2>
+<ol>
+<li>
+<p><strong>检查 Nginx 配置语法</strong>：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">sudo nginx -t
+</span></span></code></pre></div><p>确保输出为 <code>syntax is ok</code> 和 <code>test is successful</code>。</p>
+</li>
+<li>
+<p><strong>重载 Nginx</strong>：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">sudo systemctl reload nginx
+</span></span></code></pre></div></li>
+</ol>
+<hr>
+<h2 id="-六步骤-5验证状态页是否生效">✅ 六、步骤 5：验证状态页是否生效</h2>
+<p>从服务器本机访问：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">curl http://127.0.0.1/fpm-status
+</span></span></code></pre></div><p>你应该看到类似输出：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="ln"> 1</span><span class="cl">pool:                 www
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl">process manager:      dynamic
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl">start time:           16/Jan/2026:14:20:00 +0800
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl">start since:          120
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl">accepted conn:        45
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">listen queue:         0
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl">max listen queue:     0
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl">listen queue len:     0
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">idle processes:       2
+</span></span><span class="line"><span class="ln">10</span><span class="cl">active processes:     1
+</span></span><span class="line"><span class="ln">11</span><span class="cl">total processes:      3
+</span></span><span class="line"><span class="ln">12</span><span class="cl">max active processes: 3
+</span></span><span class="line"><span class="ln">13</span><span class="cl">max children reached: 0
+</span></span><span class="line"><span class="ln">14</span><span class="cl">slow requests:        0
+</span></span></code></pre></div><p>也可以访问 <code>/fpm-ping</code>，应返回 <code>pong</code>。</p>
+<blockquote>
+<p>❌ 如果返回 403，说明 IP 被拒绝 —— 检查 <code>allow</code> 规则。<br>
+❌ 如果返回 404 或 502，检查 <code>fastcgi_pass</code> 是否匹配 PHP-FPM 的 <code>listen</code> 地址。</p>
+</blockquote>
+<hr>
+<h2 id="-七可选格式化输出json">✅ 七、（可选）格式化输出（JSON）</h2>
+<p>PHP-FPM 状态页支持 JSON 格式，便于监控脚本解析：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">curl http://127.0.0.1/fpm-status?json
+</span></span></code></pre></div><p>返回：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="ln">1</span><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl">  <span class="nt">&#34;pool&#34;</span><span class="p">:</span> <span class="s2">&#34;www&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">3</span><span class="cl">  <span class="nt">&#34;process manager&#34;</span><span class="p">:</span> <span class="s2">&#34;dynamic&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">4</span><span class="cl">  <span class="nt">&#34;start time&#34;</span><span class="p">:</span> <span class="mi">1771234800</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">5</span><span class="cl">  <span class="nt">&#34;start since&#34;</span><span class="p">:</span> <span class="mi">120</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">6</span><span class="cl">  <span class="nt">&#34;accepted conn&#34;</span><span class="p">:</span> <span class="mi">45</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">7</span><span class="cl">  <span class="err">...</span>
+</span></span><span class="line"><span class="ln">8</span><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>其他参数：</p>
+<ul>
+<li><code>?full</code>：显示每个子进程的详细信息</li>
+<li><code>?json&amp;full</code>：JSON + 详细信息</li>
+</ul>
+<hr>
+<h2 id="-八安全提醒">✅ 八、安全提醒</h2>
+<ul>
+<li><strong>切勿对公网开放</strong> <code>/fpm-status</code>！它会暴露进程数、内存、请求统计等敏感信息。</li>
+<li>如需远程监控，建议：
+<ul>
+<li>通过 SSH 隧道访问</li>
+<li>或配合 Prometheus + Exporter（如 <code>phpfpm_exporter</code>）</li>
+<li>或使用防火墙限制 IP</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="-总结-1">🎯 总结</h2>
+<table>
+  <thead>
+      <tr>
+          <th>步骤</th>
+          <th>操作</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>1</td>
+          <td>在 <code>www.conf</code> 中设置 <code>pm.status_path = /fpm-status</code></td>
+      </tr>
+      <tr>
+          <td>2</td>
+          <td>重载 PHP-FPM</td>
+      </tr>
+      <tr>
+          <td>3</td>
+          <td>在 Nginx 中添加 <code>location</code> 转发规则，限制 IP</td>
+      </tr>
+      <tr>
+          <td>4</td>
+          <td>重载 Nginx</td>
+      </tr>
+      <tr>
+          <td>5</td>
+          <td>用 <code>curl http://127.0.0.1/fpm-status</code> 验证</td>
+      </tr>
+  </tbody>
+</table>
+<p>完成以上步骤后，你就可以安全地监控 PHP-FPM 的运行状态了！</p>
 
     </div><div class="post_comments">
   
