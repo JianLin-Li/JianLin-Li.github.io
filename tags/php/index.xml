@@ -7,7 +7,73 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
     <copyright>Copyright © 1989–2025, 李建林 </copyright>
-    <lastBuildDate>Tue, 03 Jun 2025 15:04:49 +0800</lastBuildDate><atom:link href="https://jianlin-li.github.io/tags/php/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Wed, 04 Jun 2025 10:04:49 +0800</lastBuildDate><atom:link href="https://jianlin-li.github.io/tags/php/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>PHP语言的知识点-4</title>
+      <link>https://jianlin-li.github.io/post/php_review_4/</link>
+      <pubDate>Wed, 04 Jun 2025 10:04:49 +0800</pubDate>
+      
+      <guid>https://jianlin-li.github.io/post/php_review_4/</guid>
+      <description>
+        
+          
+            &lt;h1 id=&#34;在-php-中配置项ini-配置项具有不同的作用域ini-scope这决定了该配置项可以在哪些地方被修改php-定义了以下几种作用域常量定义在-phpini-的上下文中&#34;&gt;在 PHP 中，配置项（INI 配置项）具有不同的&lt;strong&gt;作用域（INI Scope）&lt;/strong&gt;，这决定了该配置项可以在哪些地方被修改。PHP 定义了以下几种作用域常量（定义在 &lt;code&gt;php.ini&lt;/code&gt; 的上下文中）：&lt;/h1&gt;
+&lt;hr&gt;
+&lt;h3 id=&#34;1-php_&#34;&gt;1. &lt;strong&gt;PHP_INI_USER&lt;/strong&gt;&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;含义&lt;/strong&gt;：可以在用户脚本中通过 &lt;code&gt;ini_set()&lt;/code&gt; 动态修改。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;可修改位置&lt;/strong&gt;：
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;.htaccess&lt;/code&gt;（Apache）&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;httpd.conf&lt;/code&gt; 中的 &lt;code&gt;&amp;lt;Directory&amp;gt;&lt;/code&gt;、&lt;code&gt;&amp;lt;Location&amp;gt;&lt;/code&gt; 等（如果允许）&lt;/li&gt;
+&lt;li&gt;PHP 脚本中使用 &lt;code&gt;ini_set()&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;示例配置项&lt;/strong&gt;：&lt;code&gt;display_errors&lt;/code&gt;、&lt;code&gt;error_reporting&lt;/code&gt;、&lt;code&gt;memory_limit&lt;/code&gt;（部分版本）&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;h3 id=&#34;2-php_&#34;&gt;2. &lt;strong&gt;PHP_INI_PERDIR&lt;/strong&gt;&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;含义&lt;/strong&gt;：可以在目录层级的配置文件中设置，但&lt;strong&gt;不能在运行时通过 &lt;code&gt;ini_set()&lt;/code&gt; 修改&lt;/strong&gt;。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;可修改位置&lt;/strong&gt;：
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;php.ini&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;.htaccess&lt;/code&gt;（Apache）&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;httpd.conf&lt;/code&gt; 中的 &lt;code&gt;&amp;lt;Directory&amp;gt;&lt;/code&gt;、&lt;code&gt;&amp;lt;VirtualHost&amp;gt;&lt;/code&gt; 等&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;不可在 PHP 脚本中用 &lt;code&gt;ini_set()&lt;/code&gt; 修改&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;示例配置项&lt;/strong&gt;：&lt;code&gt;upload_max_filesize&lt;/code&gt;、&lt;code&gt;post_max_size&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;h3 id=&#34;3-php_&#34;&gt;3. &lt;strong&gt;PHP_INI_SYSTEM&lt;/strong&gt;&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;含义&lt;/strong&gt;：只能在系统级配置文件中设置，对整个 PHP 环境生效。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;可修改位置&lt;/strong&gt;：
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;php.ini&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Web 服务器主配置（如 Apache 的 &lt;code&gt;httpd.conf&lt;/code&gt; 中的 &lt;code&gt;PHPIniDir&lt;/code&gt; 或 &lt;code&gt;php_admin_value&lt;/code&gt;）&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;不可在 &lt;code&gt;.htaccess&lt;/code&gt; 或 PHP 脚本中修改&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;示例配置项&lt;/strong&gt;：&lt;code&gt;extension_dir&lt;/code&gt;、&lt;code&gt;safe_mode&lt;/code&gt;（已废弃）、&lt;code&gt;enable_dl&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;h3 id=&#34;4-php_&#34;&gt;4. &lt;strong&gt;PHP_INI_ALL&lt;/strong&gt;&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;含义&lt;/strong&gt;：等价于 &lt;code&gt;PHP_INI_USER | PHP_INI_PERDIR | PHP_INI_SYSTEM&lt;/code&gt;，即&lt;strong&gt;所有地方都可以设置&lt;/strong&gt;。&lt;/li&gt;
+&lt;li&gt;实际上，这是某些配置项的“宽松”作用域。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;可在 PHP 脚本中用 &lt;code&gt;ini_set()&lt;/code&gt; 修改&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;示例配置项&lt;/strong&gt;：&lt;code&gt;date.timezone&lt;/code&gt;（在较新版本中）&lt;/li&gt;
+&lt;/ul&gt;
+&lt;blockquote&gt;
+&lt;p&gt;⚠️ 注意：不是所有文档都明确列出每个配置项的作用域，但可以通过 &lt;code&gt;phpinfo()&lt;/code&gt; 或 &lt;code&gt;ini_get_all()&lt;/code&gt; 查看。&lt;/p&gt;
+          
+          
+        
+      </description>
+    </item>
+    
     <item>
       <title>PHP语言的知识点-3</title>
       <link>https://jianlin-li.github.io/post/php_review_3/</link>
