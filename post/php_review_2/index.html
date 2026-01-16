@@ -168,7 +168,7 @@
     <span class="post_date">
       2025-06-02	  
     </span>
-    <span class="post_time"> · 7 分钟阅读</span><span>&nbsp;· <a href='https://jianlin-li.github.io/tags/php/' title="PHP" class="post_tag button button_translucent">PHP
+    <span class="post_time"> · 9 分钟阅读</span><span>&nbsp;· <a href='https://jianlin-li.github.io/tags/php/' title="PHP" class="post_tag button button_translucent">PHP
         </a>
     </span>
     <span class="page_only">&nbsp;·
@@ -731,6 +731,268 @@
 <li>✅ 不要相信 <code>filter_var</code> 能 100% 防攻击——它只是第一道防线。</li>
 </ul>
 <hr>
+<h1 id="在-php-中curl-本身不支持真正的多线程因为-php-是单线程语言但可以通过-curl_multi_从而模拟多线程效果大幅提升多个请求的执行效率从串行-on-降到接近-o1">在 PHP 中，<strong>CURL 本身不支持真正的多线程</strong>（因为 PHP 是单线程语言），但可以通过 <strong><code>curl_multi_*</code> 系列函数实现并发（异步）HTTP 请求</strong>，从而<strong>模拟“多线程”效果</strong>，大幅提升多个请求的执行效率（从串行 O(n) 降到接近 O(1)）。</h1>
+<hr>
+<h2 id="-一为什么需要-curl-并发">🔹 一、为什么需要 CURL 并发？</h2>
+<ul>
+<li><strong>串行请求</strong>：10 个请求 × 每个 1 秒 = <strong>10 秒</strong></li>
+<li><strong>并发请求</strong>：10 个请求同时发 → <strong>约 1 秒完成</strong></li>
+</ul>
+<blockquote>
+<p>✅ 适用于：批量 API 调用、爬虫、微服务聚合等场景。</p>
+</blockquote>
+<hr>
+<h2 id="-二核心函数curl_multi_">🔹 二、核心函数：<code>curl_multi_*</code></h2>
+<table>
+  <thead>
+      <tr>
+          <th>函数</th>
+          <th>作用</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>curl_multi_init()</code></td>
+          <td>初始化一个多 handle</td>
+      </tr>
+      <tr>
+          <td><code>curl_multi_add_handle()</code></td>
+          <td>添加一个 curl handle 到多 handle</td>
+      </tr>
+      <tr>
+          <td><code>curl_multi_exec()</code></td>
+          <td>执行所有请求（非阻塞）</td>
+      </tr>
+      <tr>
+          <td><code>curl_multi_select()</code></td>
+          <td>等待 I/O 活动（避免 CPU 空转）</td>
+      </tr>
+      <tr>
+          <td><code>curl_multi_getcontent()</code></td>
+          <td>获取某个请求的响应内容</td>
+      </tr>
+      <tr>
+          <td><code>curl_multi_remove_handle()</code></td>
+          <td>移除 handle</td>
+      </tr>
+      <tr>
+          <td><code>curl_multi_close()</code></td>
+          <td>关闭多 handle</td>
+      </tr>
+  </tbody>
+</table>
+<hr>
+<h2 id="-三完整示例并发请求多个-url">🔹 三、完整示例：并发请求多个 URL</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="o">&lt;?</span><span class="nx">php</span>
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="k">function</span> <span class="nf">curlMultiRequest</span><span class="p">(</span><span class="nv">$urls</span><span class="p">,</span> <span class="nv">$options</span> <span class="o">=</span> <span class="p">[])</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl">    <span class="c1">// 1. 初始化 multi handle
+</span></span></span><span class="line"><span class="ln"> 5</span><span class="cl">    <span class="nv">$mh</span> <span class="o">=</span> <span class="nx">curl_multi_init</span><span class="p">();</span>
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">    <span class="nv">$handles</span> <span class="o">=</span> <span class="p">[];</span>
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl">    <span class="nv">$results</span> <span class="o">=</span> <span class="p">[];</span>
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">    <span class="c1">// 2. 为每个 URL 创建 curl handle
+</span></span></span><span class="line"><span class="ln">10</span><span class="cl">    <span class="k">foreach</span> <span class="p">(</span><span class="nv">$urls</span> <span class="k">as</span> <span class="nv">$i</span> <span class="o">=&gt;</span> <span class="nv">$url</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">11</span><span class="cl">        <span class="nv">$ch</span> <span class="o">=</span> <span class="nx">curl_init</span><span class="p">();</span>
+</span></span><span class="line"><span class="ln">12</span><span class="cl">        <span class="nx">curl_setopt_array</span><span class="p">(</span><span class="nv">$ch</span><span class="p">,</span> <span class="p">[</span>
+</span></span><span class="line"><span class="ln">13</span><span class="cl">            <span class="nx">CURLOPT_URL</span>            <span class="o">=&gt;</span> <span class="nv">$url</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">14</span><span class="cl">            <span class="nx">CURLOPT_RETURNTRANSFER</span> <span class="o">=&gt;</span> <span class="k">true</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">15</span><span class="cl">            <span class="nx">CURLOPT_TIMEOUT</span>        <span class="o">=&gt;</span> <span class="mi">30</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">16</span><span class="cl">            <span class="nx">CURLOPT_FOLLOWLOCATION</span> <span class="o">=&gt;</span> <span class="k">true</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">17</span><span class="cl">            <span class="nx">CURLOPT_SSL_VERIFYPEER</span> <span class="o">=&gt;</span> <span class="k">false</span><span class="p">,</span> <span class="c1">// 生产环境建议开启
+</span></span></span><span class="line"><span class="ln">18</span><span class="cl">        <span class="p">]);</span>
+</span></span><span class="line"><span class="ln">19</span><span class="cl">        
+</span></span><span class="line"><span class="ln">20</span><span class="cl">        <span class="c1">// 应用自定义选项
+</span></span></span><span class="line"><span class="ln">21</span><span class="cl">        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="k">empty</span><span class="p">(</span><span class="nv">$options</span><span class="p">))</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">22</span><span class="cl">            <span class="nx">curl_setopt_array</span><span class="p">(</span><span class="nv">$ch</span><span class="p">,</span> <span class="nv">$options</span><span class="p">);</span>
+</span></span><span class="line"><span class="ln">23</span><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="ln">24</span><span class="cl">
+</span></span><span class="line"><span class="ln">25</span><span class="cl">        <span class="c1">// 添加到 multi handle
+</span></span></span><span class="line"><span class="ln">26</span><span class="cl">        <span class="nx">curl_multi_add_handle</span><span class="p">(</span><span class="nv">$mh</span><span class="p">,</span> <span class="nv">$ch</span><span class="p">);</span>
+</span></span><span class="line"><span class="ln">27</span><span class="cl">        <span class="nv">$handles</span><span class="p">[</span><span class="nv">$i</span><span class="p">]</span> <span class="o">=</span> <span class="nv">$ch</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln">28</span><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="ln">29</span><span class="cl">
+</span></span><span class="line"><span class="ln">30</span><span class="cl">    <span class="c1">// 3. 执行并发请求
+</span></span></span><span class="line"><span class="ln">31</span><span class="cl">    <span class="nv">$running</span> <span class="o">=</span> <span class="k">null</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln">32</span><span class="cl">    <span class="k">do</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">33</span><span class="cl">        <span class="nx">curl_multi_exec</span><span class="p">(</span><span class="nv">$mh</span><span class="p">,</span> <span class="nv">$running</span><span class="p">);</span>
+</span></span><span class="line"><span class="ln">34</span><span class="cl">        <span class="nx">curl_multi_select</span><span class="p">(</span><span class="nv">$mh</span><span class="p">);</span> <span class="c1">// 阻塞直到有活动（节省 CPU）
+</span></span></span><span class="line"><span class="ln">35</span><span class="cl">    <span class="p">}</span> <span class="k">while</span> <span class="p">(</span><span class="nv">$running</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">);</span>
+</span></span><span class="line"><span class="ln">36</span><span class="cl">
+</span></span><span class="line"><span class="ln">37</span><span class="cl">    <span class="c1">// 4. 收集结果
+</span></span></span><span class="line"><span class="ln">38</span><span class="cl">    <span class="k">foreach</span> <span class="p">(</span><span class="nv">$handles</span> <span class="k">as</span> <span class="nv">$i</span> <span class="o">=&gt;</span> <span class="nv">$ch</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">39</span><span class="cl">        <span class="nv">$content</span> <span class="o">=</span> <span class="nx">curl_multi_getcontent</span><span class="p">(</span><span class="nv">$ch</span><span class="p">);</span>
+</span></span><span class="line"><span class="ln">40</span><span class="cl">        <span class="nv">$errno</span>   <span class="o">=</span> <span class="nx">curl_errno</span><span class="p">(</span><span class="nv">$ch</span><span class="p">);</span>
+</span></span><span class="line"><span class="ln">41</span><span class="cl">        <span class="nv">$error</span>   <span class="o">=</span> <span class="nx">curl_error</span><span class="p">(</span><span class="nv">$ch</span><span class="p">);</span>
+</span></span><span class="line"><span class="ln">42</span><span class="cl">        <span class="nv">$httpCode</span> <span class="o">=</span> <span class="nx">curl_getinfo</span><span class="p">(</span><span class="nv">$ch</span><span class="p">,</span> <span class="nx">CURLINFO_HTTP_CODE</span><span class="p">);</span>
+</span></span><span class="line"><span class="ln">43</span><span class="cl">
+</span></span><span class="line"><span class="ln">44</span><span class="cl">        <span class="nv">$results</span><span class="p">[</span><span class="nv">$i</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+</span></span><span class="line"><span class="ln">45</span><span class="cl">            <span class="s1">&#39;url&#39;</span>       <span class="o">=&gt;</span> <span class="nv">$urls</span><span class="p">[</span><span class="nv">$i</span><span class="p">],</span>
+</span></span><span class="line"><span class="ln">46</span><span class="cl">            <span class="s1">&#39;content&#39;</span>   <span class="o">=&gt;</span> <span class="nv">$errno</span> <span class="o">?</span> <span class="k">null</span> <span class="o">:</span> <span class="nv">$content</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">47</span><span class="cl">            <span class="s1">&#39;http_code&#39;</span> <span class="o">=&gt;</span> <span class="nv">$httpCode</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">48</span><span class="cl">            <span class="s1">&#39;error&#39;</span>     <span class="o">=&gt;</span> <span class="nv">$errno</span> <span class="o">?</span> <span class="nv">$error</span> <span class="o">:</span> <span class="k">null</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">49</span><span class="cl">        <span class="p">];</span>
+</span></span><span class="line"><span class="ln">50</span><span class="cl">
+</span></span><span class="line"><span class="ln">51</span><span class="cl">        <span class="nx">curl_multi_remove_handle</span><span class="p">(</span><span class="nv">$mh</span><span class="p">,</span> <span class="nv">$ch</span><span class="p">);</span>
+</span></span><span class="line"><span class="ln">52</span><span class="cl">        <span class="nx">curl_close</span><span class="p">(</span><span class="nv">$ch</span><span class="p">);</span>
+</span></span><span class="line"><span class="ln">53</span><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="ln">54</span><span class="cl">
+</span></span><span class="line"><span class="ln">55</span><span class="cl">    <span class="nx">curl_multi_close</span><span class="p">(</span><span class="nv">$mh</span><span class="p">);</span>
+</span></span><span class="line"><span class="ln">56</span><span class="cl">    <span class="k">return</span> <span class="nv">$results</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln">57</span><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="ln">58</span><span class="cl">
+</span></span><span class="line"><span class="ln">59</span><span class="cl"><span class="c1">// 使用示例
+</span></span></span><span class="line"><span class="ln">60</span><span class="cl"><span class="nv">$urls</span> <span class="o">=</span> <span class="p">[</span>
+</span></span><span class="line"><span class="ln">61</span><span class="cl">    <span class="s1">&#39;https://httpbin.org/delay/1&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">62</span><span class="cl">    <span class="s1">&#39;https://httpbin.org/delay/2&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">63</span><span class="cl">    <span class="s1">&#39;https://httpbin.org/get&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">64</span><span class="cl"><span class="p">];</span>
+</span></span><span class="line"><span class="ln">65</span><span class="cl">
+</span></span><span class="line"><span class="ln">66</span><span class="cl"><span class="nv">$start</span> <span class="o">=</span> <span class="nx">microtime</span><span class="p">(</span><span class="k">true</span><span class="p">);</span>
+</span></span><span class="line"><span class="ln">67</span><span class="cl"><span class="nv">$results</span> <span class="o">=</span> <span class="nx">curlMultiRequest</span><span class="p">(</span><span class="nv">$urls</span><span class="p">);</span>
+</span></span><span class="line"><span class="ln">68</span><span class="cl"><span class="nv">$elapsed</span> <span class="o">=</span> <span class="nx">microtime</span><span class="p">(</span><span class="k">true</span><span class="p">)</span> <span class="o">-</span> <span class="nv">$start</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln">69</span><span class="cl">
+</span></span><span class="line"><span class="ln">70</span><span class="cl"><span class="k">echo</span> <span class="s2">&#34;共 &#34;</span> <span class="o">.</span> <span class="nx">count</span><span class="p">(</span><span class="nv">$urls</span><span class="p">)</span> <span class="o">.</span> <span class="s2">&#34; 个请求，并发耗时: &#34;</span> <span class="o">.</span> <span class="nx">round</span><span class="p">(</span><span class="nv">$elapsed</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="o">.</span> <span class="s2">&#34; 秒</span><span class="se">\n</span><span class="s2">&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln">71</span><span class="cl">
+</span></span><span class="line"><span class="ln">72</span><span class="cl"><span class="k">foreach</span> <span class="p">(</span><span class="nv">$results</span> <span class="k">as</span> <span class="nv">$r</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">73</span><span class="cl">    <span class="k">echo</span> <span class="s2">&#34;[</span><span class="si">{</span><span class="nv">$r</span><span class="p">[</span><span class="s1">&#39;http_code&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">] </span><span class="si">{</span><span class="nv">$r</span><span class="p">[</span><span class="s1">&#39;url&#39;</span><span class="p">]</span><span class="si">}</span><span class="se">\n</span><span class="s2">&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln">74</span><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="nv">$r</span><span class="p">[</span><span class="s1">&#39;error&#39;</span><span class="p">])</span> <span class="k">echo</span> <span class="s2">&#34;  ❌ Error: </span><span class="si">{</span><span class="nv">$r</span><span class="p">[</span><span class="s1">&#39;error&#39;</span><span class="p">]</span><span class="si">}</span><span class="se">\n</span><span class="s2">&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln">75</span><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><blockquote>
+<p>💡 输出示例：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="ln">1</span><span class="cl">共 3 个请求，并发耗时: 2.15 秒
+</span></span><span class="line"><span class="ln">2</span><span class="cl">[200] https://httpbin.org/delay/1
+</span></span><span class="line"><span class="ln">3</span><span class="cl">[200] https://httpbin.org/delay/2
+</span></span><span class="line"><span class="ln">4</span><span class="cl">[200] https://httpbin.org/get
+</span></span></code></pre></div></blockquote>
+<blockquote>
+<p>⚠️ 如果串行执行，至少需要 1+2+0.5 ≈ 3.5 秒。</p>
+</blockquote>
+<hr>
+<h2 id="-四高级技巧">🔹 四、高级技巧</h2>
+<h3 id="-1-限制并发数量防资源耗尽">✅ 1. <strong>限制并发数量（防资源耗尽）</strong></h3>
+<p>当 URL 数量很大（如 1000+），可分批处理：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="k">function</span> <span class="nf">curlMultiBatch</span><span class="p">(</span><span class="nv">$urls</span><span class="p">,</span> <span class="nv">$concurrency</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span> <span class="nv">$options</span> <span class="o">=</span> <span class="p">[])</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl">    <span class="nv">$results</span> <span class="o">=</span> <span class="p">[];</span>
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl">    <span class="nv">$total</span> <span class="o">=</span> <span class="nx">count</span><span class="p">(</span><span class="nv">$urls</span><span class="p">);</span>
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl">    
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl">    <span class="k">for</span> <span class="p">(</span><span class="nv">$i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nv">$i</span> <span class="o">&lt;</span> <span class="nv">$total</span><span class="p">;</span> <span class="nv">$i</span> <span class="o">+=</span> <span class="nv">$concurrency</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">        <span class="nv">$batch</span> <span class="o">=</span> <span class="nx">array_slice</span><span class="p">(</span><span class="nv">$urls</span><span class="p">,</span> <span class="nv">$i</span><span class="p">,</span> <span class="nv">$concurrency</span><span class="p">);</span>
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl">        <span class="nv">$batchResults</span> <span class="o">=</span> <span class="nx">curlMultiRequest</span><span class="p">(</span><span class="nv">$batch</span><span class="p">,</span> <span class="nv">$options</span><span class="p">);</span>
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl">        <span class="nv">$results</span> <span class="o">=</span> <span class="nx">array_merge</span><span class="p">(</span><span class="nv">$results</span><span class="p">,</span> <span class="nv">$batchResults</span><span class="p">);</span>
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="ln">10</span><span class="cl">    
+</span></span><span class="line"><span class="ln">11</span><span class="cl">    <span class="k">return</span> <span class="nv">$results</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln">12</span><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><h3 id="-2-设置超时和重试">✅ 2. <strong>设置超时和重试</strong></h3>
+<p>在 <code>$options</code> 中添加：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln">1</span><span class="cl"><span class="nv">$options</span> <span class="o">=</span> <span class="p">[</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl">    <span class="nx">CURLOPT_TIMEOUT</span>        <span class="o">=&gt;</span> <span class="mi">10</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">3</span><span class="cl">    <span class="nx">CURLOPT_CONNECTTIMEOUT</span> <span class="o">=&gt;</span> <span class="mi">5</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">4</span><span class="cl">    <span class="c1">// 可配合自定义重试逻辑
+</span></span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="p">];</span>
+</span></span></code></pre></div><h3 id="-3-获取详细信息headersredirect-等">✅ 3. <strong>获取详细信息（headers、redirect 等）</strong></h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln">1</span><span class="cl"><span class="nx">curl_setopt</span><span class="p">(</span><span class="nv">$ch</span><span class="p">,</span> <span class="nx">CURLOPT_HEADER</span><span class="p">,</span> <span class="k">true</span><span class="p">);</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="c1">// 或
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="nv">$info</span> <span class="o">=</span> <span class="nx">curl_getinfo</span><span class="p">(</span><span class="nv">$ch</span><span class="p">);</span>
+</span></span></code></pre></div><hr>
+<h2 id="-五替代方案现代推荐">🔹 五、替代方案（现代推荐）</h2>
+<h3 id="-方案-1使用-guzzle-http-client推荐">📌 方案 1：使用 <strong>Guzzle HTTP Client</strong>（推荐！）</h3>
+<p>Guzzle 内置并发支持，代码更简洁：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="k">use</span> <span class="nx">GuzzleHttp\Client</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="k">use</span> <span class="nx">GuzzleHttp\Promise</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="nv">$client</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Client</span><span class="p">();</span>
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="nv">$promises</span> <span class="o">=</span> <span class="p">[</span>
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">    <span class="s1">&#39;req1&#39;</span> <span class="o">=&gt;</span> <span class="nv">$client</span><span class="o">-&gt;</span><span class="na">getAsync</span><span class="p">(</span><span class="s1">&#39;https://httpbin.org/delay/1&#39;</span><span class="p">),</span>
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl">    <span class="s1">&#39;req2&#39;</span> <span class="o">=&gt;</span> <span class="nv">$client</span><span class="o">-&gt;</span><span class="na">getAsync</span><span class="p">(</span><span class="s1">&#39;https://httpbin.org/delay/2&#39;</span><span class="p">),</span>
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="p">];</span>
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">
+</span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="nv">$responses</span> <span class="o">=</span> <span class="nx">Promise\settle</span><span class="p">(</span><span class="nv">$promises</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">wait</span><span class="p">();</span>
+</span></span><span class="line"><span class="ln">11</span><span class="cl">
+</span></span><span class="line"><span class="ln">12</span><span class="cl"><span class="k">foreach</span> <span class="p">(</span><span class="nv">$responses</span> <span class="k">as</span> <span class="nv">$name</span> <span class="o">=&gt;</span> <span class="nv">$result</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">13</span><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="nv">$result</span><span class="p">[</span><span class="s1">&#39;state&#39;</span><span class="p">]</span> <span class="o">===</span> <span class="s1">&#39;fulfilled&#39;</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">14</span><span class="cl">        <span class="k">echo</span> <span class="nv">$result</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">]</span><span class="o">-&gt;</span><span class="na">getStatusCode</span><span class="p">()</span> <span class="o">.</span> <span class="s2">&#34;</span><span class="se">\n</span><span class="s2">&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln">15</span><span class="cl">    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">16</span><span class="cl">        <span class="k">echo</span> <span class="s2">&#34;Error: &#34;</span> <span class="o">.</span> <span class="nv">$result</span><span class="p">[</span><span class="s1">&#39;reason&#39;</span><span class="p">]</span> <span class="o">.</span> <span class="s2">&#34;</span><span class="se">\n</span><span class="s2">&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln">17</span><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="ln">18</span><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><blockquote>
+<p>✅ 优点：自动处理异常、中间件、PSR-7 标准、连接池等。</p>
+</blockquote>
+<h3 id="-方案-2swoole--amp--reactphp异步-php">📌 方案 2：Swoole / Amp / ReactPHP（异步 PHP）</h3>
+<ul>
+<li><strong>Swoole</strong>：提供真正的协程并发（需安装扩展）</li>
+<li>适合高并发长连接场景（如 WebSocket、微服务网关）</li>
+</ul>
+<hr>
+<h2 id="-六注意事项">🔹 六、注意事项</h2>
+<table>
+  <thead>
+      <tr>
+          <th>问题</th>
+          <th>建议</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><strong>DNS 解析阻塞</strong></td>
+          <td>使用 <code>CURLOPT_RESOLVE</code> 预解析 IP</td>
+      </tr>
+      <tr>
+          <td><strong>内存泄漏</strong></td>
+          <td>确保 <code>curl_close()</code> 和 <code>curl_multi_remove_handle()</code></td>
+      </tr>
+      <tr>
+          <td><strong>SSL 证书验证</strong></td>
+          <td>生产环境不要关闭 <code>CURLOPT_SSL_VERIFYPEER</code></td>
+      </tr>
+      <tr>
+          <td><strong>最大连接数</strong></td>
+          <td>系统限制（<code>ulimit -n</code>）和远程服务器限制</td>
+      </tr>
+      <tr>
+          <td><strong>错误处理</strong></td>
+          <td>检查 <code>curl_errno()</code> 和 <code>curl_error()</code></td>
+      </tr>
+  </tbody>
+</table>
+<hr>
+<h2 id="-总结-1">✅ 总结</h2>
+<table>
+  <thead>
+      <tr>
+          <th>方式</th>
+          <th>适用场景</th>
+          <th>推荐度</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>curl_multi_*</code></td>
+          <td>原生 PHP，无依赖，轻量级</td>
+          <td>⭐⭐⭐⭐</td>
+      </tr>
+      <tr>
+          <td><strong>Guzzle + Promise</strong></td>
+          <td>项目已用 Composer，需健壮性</td>
+          <td>⭐⭐⭐⭐⭐</td>
+      </tr>
+      <tr>
+          <td>Swoole 协程</td>
+          <td>高并发服务，可改架构</td>
+          <td>⭐⭐⭐⭐</td>
+      </tr>
+  </tbody>
+</table>
+<blockquote>
+<p>💡 <strong>最佳实践</strong>：</p>
+<ul>
+<li>小项目 → 用 <code>curl_multi_*</code></li>
+<li>中大型项目 → 用 <strong>Guzzle</strong></li>
+<li>高性能服务 → 考虑 <strong>Swoole</strong></li>
+</ul>
+</blockquote>
 
     </div><div class="post_comments">
   
