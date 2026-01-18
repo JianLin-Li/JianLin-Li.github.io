@@ -168,7 +168,7 @@
     <span class="post_date">
       2025-06-02	  
     </span>
-    <span class="post_time"> · 9 分钟阅读</span><span>&nbsp;· <a href='https://jianlin-li.github.io/tags/php/' title="PHP" class="post_tag button button_translucent">PHP
+    <span class="post_time"> · 12 分钟阅读</span><span>&nbsp;· <a href='https://jianlin-li.github.io/tags/php/' title="PHP" class="post_tag button button_translucent">PHP
         </a>
     </span>
     <span class="page_only">&nbsp;·
@@ -993,6 +993,204 @@
 <li>高性能服务 → 考虑 <strong>Swoole</strong></li>
 </ul>
 </blockquote>
+<h1 id="在-php-的-curl-请求中ssl-配置和-http-认证basicdigest-是两个常见且重要的安全设置下面分别详解如何正确配置并提供完整示例">在 PHP 的 cURL 请求中，<strong>SSL 配置</strong>和 <strong>HTTP 认证（Basic/Digest）</strong> 是两个常见且重要的安全设置。下面分别详解如何正确配置，并提供完整示例。</h1>
+<hr>
+<h2 id="-一curl-设置-sslhttps">🔐 一、cURL 设置 SSL（HTTPS）</h2>
+<p>当请求 <code>https://</code> 网站时，PHP cURL 默认会验证 SSL 证书。若配置不当，可能报错：</p>
+<blockquote>
+<p><code>cURL error: SSL certificate problem: unable to get local issuer certificate</code></p>
+</blockquote>
+<h3 id="-正确做法生产环境推荐">✅ 正确做法（生产环境推荐）</h3>
+<h4 id="方法-1使用系统-ca-证书包推荐">方法 1：使用系统 CA 证书包（推荐）</h4>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln">1</span><span class="cl"><span class="nv">$ch</span> <span class="o">=</span> <span class="nx">curl_init</span><span class="p">();</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="nx">curl_setopt_array</span><span class="p">(</span><span class="nv">$ch</span><span class="p">,</span> <span class="p">[</span>
+</span></span><span class="line"><span class="ln">3</span><span class="cl">    <span class="nx">CURLOPT_URL</span>            <span class="o">=&gt;</span> <span class="s1">&#39;https://example.com&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">4</span><span class="cl">    <span class="nx">CURLOPT_RETURNTRANSFER</span> <span class="o">=&gt;</span> <span class="k">true</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">5</span><span class="cl">    <span class="nx">CURLOPT_SSL_VERIFYPEER</span> <span class="o">=&gt;</span> <span class="k">true</span><span class="p">,</span>   <span class="c1">// 验证证书是否由可信 CA 签发
+</span></span></span><span class="line"><span class="ln">6</span><span class="cl">    <span class="nx">CURLOPT_SSL_VERIFYHOST</span> <span class="o">=&gt;</span> <span class="mi">2</span><span class="p">,</span>      <span class="c1">// 验证证书中的域名是否匹配
+</span></span></span><span class="line"><span class="ln">7</span><span class="cl">    <span class="nx">CURLOPT_CAINFO</span>         <span class="o">=&gt;</span> <span class="s1">&#39;/etc/ssl/certs/ca-certificates.crt&#39;</span><span class="p">,</span> <span class="c1">// Linux 常见路径
+</span></span></span><span class="line"><span class="ln">8</span><span class="cl">    <span class="c1">// Windows 可用: &#39;C:\php\extras\ssl\cacert.pem&#39;
+</span></span></span><span class="line"><span class="ln">9</span><span class="cl"><span class="p">]);</span>
+</span></span></code></pre></div><blockquote>
+<p>📌 <strong>CA 证书文件获取</strong>：</p>
+<ul>
+<li>从 <a href="https://curl.se/docs/caextract.html">curl.se/docs/caextract.html</a> 下载 <code>cacert.pem</code></li>
+<li>放到服务器（如 <code>/usr/local/etc/openssl/cert.pem</code> 或自定义路径）</li>
+<li>在 <code>php.ini</code> 中全局设置（可选）：
+&gt;   ```ini
+curl.cainfo = &quot;/path/to/cacert.pem&quot;
+openssl.cafile = &quot;/path/to/cacert.pem&quot;
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"></code></pre></div></li>
+</ul>
+</blockquote>
+<h4 id="方法-2禁用-ssl-验证仅限开发测试">方法 2：禁用 SSL 验证（仅限开发/测试！）</h4>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln">1</span><span class="cl"><span class="nx">curl_setopt_array</span><span class="p">(</span><span class="nv">$ch</span><span class="p">,</span> <span class="p">[</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl">    <span class="nx">CURLOPT_SSL_VERIFYPEER</span> <span class="o">=&gt;</span> <span class="k">false</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">3</span><span class="cl">    <span class="nx">CURLOPT_SSL_VERIFYHOST</span> <span class="o">=&gt;</span> <span class="k">false</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="p">]);</span>
+</span></span></code></pre></div><blockquote>
+<p>⚠️ <strong>绝对不要在生产环境使用！</strong> 会导致中间人攻击（MITM）风险。</p>
+</blockquote>
+<hr>
+<h2 id="-二curl-设置-http-认证">🔑 二、cURL 设置 HTTP 认证</h2>
+<p>HTTP 认证常见于 API、管理后台等需要用户名/密码的场景。</p>
+<h3 id="1-http-basic-auth">1. <strong>HTTP Basic Auth</strong></h3>
+<p>最简单，Base64 编码 <code>username:password</code> 放入 <code>Authorization</code> 头。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln">1</span><span class="cl"><span class="nv">$ch</span> <span class="o">=</span> <span class="nx">curl_init</span><span class="p">();</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="nx">curl_setopt_array</span><span class="p">(</span><span class="nv">$ch</span><span class="p">,</span> <span class="p">[</span>
+</span></span><span class="line"><span class="ln">3</span><span class="cl">    <span class="nx">CURLOPT_URL</span>            <span class="o">=&gt;</span> <span class="s1">&#39;https://api.example.com/data&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">4</span><span class="cl">    <span class="nx">CURLOPT_RETURNTRANSFER</span> <span class="o">=&gt;</span> <span class="k">true</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">5</span><span class="cl">    <span class="nx">CURLOPT_USERPWD</span>        <span class="o">=&gt;</span> <span class="s1">&#39;myuser:mypassword&#39;</span><span class="p">,</span> <span class="c1">// 格式: &#34;username:password&#34;
+</span></span></span><span class="line"><span class="ln">6</span><span class="cl">    <span class="nx">CURLOPT_HTTPAUTH</span>       <span class="o">=&gt;</span> <span class="nx">CURLAUTH_BASIC</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">7</span><span class="cl"><span class="p">]);</span>
+</span></span></code></pre></div><blockquote>
+<p>💡 等价于手动设置 Header：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln">1</span><span class="cl"><span class="nx">curl_setopt</span><span class="p">(</span><span class="nv">$ch</span><span class="p">,</span> <span class="nx">CURLOPT_HTTPHEADER</span><span class="p">,</span> <span class="p">[</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl">    <span class="s1">&#39;Authorization: Basic &#39;</span> <span class="o">.</span> <span class="nx">base64_encode</span><span class="p">(</span><span class="s1">&#39;myuser:mypassword&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="p">]);</span>
+</span></span></code></pre></div></blockquote>
+<h3 id="2-http-digest-auth">2. <strong>HTTP Digest Auth</strong></h3>
+<p>比 Basic 更安全（避免明文传输密码），服务器会挑战（challenge）客户端。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln">1</span><span class="cl"><span class="nx">curl_setopt_array</span><span class="p">(</span><span class="nv">$ch</span><span class="p">,</span> <span class="p">[</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl">    <span class="nx">CURLOPT_URL</span>            <span class="o">=&gt;</span> <span class="s1">&#39;https://secure.example.com/api&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">3</span><span class="cl">    <span class="nx">CURLOPT_RETURNTRANSFER</span> <span class="o">=&gt;</span> <span class="k">true</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">4</span><span class="cl">    <span class="nx">CURLOPT_USERPWD</span>        <span class="o">=&gt;</span> <span class="s1">&#39;alice:secret123&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">5</span><span class="cl">    <span class="nx">CURLOPT_HTTPAUTH</span>       <span class="o">=&gt;</span> <span class="nx">CURLAUTH_DIGEST</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">6</span><span class="cl"><span class="p">]);</span>
+</span></span></code></pre></div><blockquote>
+<p>✅ cURL 会自动处理 <code>WWW-Authenticate</code> 挑战流程。</p>
+</blockquote>
+<h3 id="3-支持多种认证方式自动协商">3. <strong>支持多种认证方式（自动协商）</strong></h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln">1</span><span class="cl"><span class="nx">curl_setopt</span><span class="p">(</span><span class="nv">$ch</span><span class="p">,</span> <span class="nx">CURLOPT_HTTPAUTH</span><span class="p">,</span> <span class="nx">CURLAUTH_BASIC</span> <span class="o">|</span> <span class="nx">CURLAUTH_DIGEST</span><span class="p">);</span>
+</span></span></code></pre></div><hr>
+<h2 id="-三完整示例带-ssl--basic-auth-的安全请求">🔧 三、完整示例：带 SSL + Basic Auth 的安全请求</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="o">&lt;?</span><span class="nx">php</span>
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="k">function</span> <span class="nf">secureCurlRequest</span><span class="p">(</span><span class="nv">$url</span><span class="p">,</span> <span class="nv">$username</span><span class="p">,</span> <span class="nv">$password</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl">    <span class="nv">$ch</span> <span class="o">=</span> <span class="nx">curl_init</span><span class="p">();</span>
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">    <span class="nx">curl_setopt_array</span><span class="p">(</span><span class="nv">$ch</span><span class="p">,</span> <span class="p">[</span>
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl">        <span class="c1">// 目标 URL
+</span></span></span><span class="line"><span class="ln"> 8</span><span class="cl">        <span class="nx">CURLOPT_URL</span>            <span class="o">=&gt;</span> <span class="nv">$url</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">        <span class="nx">CURLOPT_RETURNTRANSFER</span> <span class="o">=&gt;</span> <span class="k">true</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">10</span><span class="cl">        <span class="nx">CURLOPT_TIMEOUT</span>        <span class="o">=&gt;</span> <span class="mi">30</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">11</span><span class="cl">
+</span></span><span class="line"><span class="ln">12</span><span class="cl">        <span class="c1">// SSL 安全设置（生产环境）
+</span></span></span><span class="line"><span class="ln">13</span><span class="cl">        <span class="nx">CURLOPT_SSL_VERIFYPEER</span> <span class="o">=&gt;</span> <span class="k">true</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">14</span><span class="cl">        <span class="nx">CURLOPT_SSL_VERIFYHOST</span> <span class="o">=&gt;</span> <span class="mi">2</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">15</span><span class="cl">        <span class="nx">CURLOPT_CAINFO</span>         <span class="o">=&gt;</span> <span class="s1">&#39;/etc/ssl/certs/ca-certificates.crt&#39;</span><span class="p">,</span> <span class="c1">// 根据系统调整
+</span></span></span><span class="line"><span class="ln">16</span><span class="cl">
+</span></span><span class="line"><span class="ln">17</span><span class="cl">        <span class="c1">// HTTP Basic 认证
+</span></span></span><span class="line"><span class="ln">18</span><span class="cl">        <span class="nx">CURLOPT_USERPWD</span>        <span class="o">=&gt;</span> <span class="nv">$username</span> <span class="o">.</span> <span class="s1">&#39;:&#39;</span> <span class="o">.</span> <span class="nv">$password</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">19</span><span class="cl">        <span class="nx">CURLOPT_HTTPAUTH</span>       <span class="o">=&gt;</span> <span class="nx">CURLAUTH_BASIC</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">20</span><span class="cl">    <span class="p">]);</span>
+</span></span><span class="line"><span class="ln">21</span><span class="cl">
+</span></span><span class="line"><span class="ln">22</span><span class="cl">    <span class="nv">$response</span> <span class="o">=</span> <span class="nx">curl_exec</span><span class="p">(</span><span class="nv">$ch</span><span class="p">);</span>
+</span></span><span class="line"><span class="ln">23</span><span class="cl">    <span class="nv">$httpCode</span> <span class="o">=</span> <span class="nx">curl_getinfo</span><span class="p">(</span><span class="nv">$ch</span><span class="p">,</span> <span class="nx">CURLINFO_HTTP_CODE</span><span class="p">);</span>
+</span></span><span class="line"><span class="ln">24</span><span class="cl">    <span class="nv">$error</span>    <span class="o">=</span> <span class="nx">curl_error</span><span class="p">(</span><span class="nv">$ch</span><span class="p">);</span>
+</span></span><span class="line"><span class="ln">25</span><span class="cl">
+</span></span><span class="line"><span class="ln">26</span><span class="cl">    <span class="nx">curl_close</span><span class="p">(</span><span class="nv">$ch</span><span class="p">);</span>
+</span></span><span class="line"><span class="ln">27</span><span class="cl">
+</span></span><span class="line"><span class="ln">28</span><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="nv">$error</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">29</span><span class="cl">        <span class="k">throw</span> <span class="k">new</span> <span class="nx">Exception</span><span class="p">(</span><span class="s2">&#34;cURL Error: </span><span class="si">$error</span><span class="s2">&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="ln">30</span><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="ln">31</span><span class="cl">
+</span></span><span class="line"><span class="ln">32</span><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="nv">$httpCode</span> <span class="o">&gt;=</span> <span class="mi">400</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">33</span><span class="cl">        <span class="k">throw</span> <span class="k">new</span> <span class="nx">Exception</span><span class="p">(</span><span class="s2">&#34;HTTP Error: </span><span class="si">$httpCode</span><span class="s2">&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="ln">34</span><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="ln">35</span><span class="cl">
+</span></span><span class="line"><span class="ln">36</span><span class="cl">    <span class="k">return</span> <span class="nv">$response</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln">37</span><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="ln">38</span><span class="cl">
+</span></span><span class="line"><span class="ln">39</span><span class="cl"><span class="c1">// 使用
+</span></span></span><span class="line"><span class="ln">40</span><span class="cl"><span class="k">try</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">41</span><span class="cl">    <span class="nv">$data</span> <span class="o">=</span> <span class="nx">secureCurlRequest</span><span class="p">(</span>
+</span></span><span class="line"><span class="ln">42</span><span class="cl">        <span class="s1">&#39;https://api.myservice.com/v1/users&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">43</span><span class="cl">        <span class="s1">&#39;admin&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">44</span><span class="cl">        <span class="s1">&#39;s3cr3tP@ss&#39;</span>
+</span></span><span class="line"><span class="ln">45</span><span class="cl">    <span class="p">);</span>
+</span></span><span class="line"><span class="ln">46</span><span class="cl">    <span class="k">echo</span> <span class="nv">$data</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln">47</span><span class="cl"><span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">Exception</span> <span class="nv">$e</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">48</span><span class="cl">    <span class="k">echo</span> <span class="s2">&#34;请求失败: &#34;</span> <span class="o">.</span> <span class="nv">$e</span><span class="o">-&gt;</span><span class="na">getMessage</span><span class="p">();</span>
+</span></span><span class="line"><span class="ln">49</span><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><hr>
+<h2 id="-四其他相关选项">⚙️ 四、其他相关选项</h2>
+<table>
+  <thead>
+      <tr>
+          <th>选项</th>
+          <th>说明</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>CURLOPT_PROXY</code></td>
+          <td>设置代理（如 <code>127.0.0.1:8080</code>）</td>
+      </tr>
+      <tr>
+          <td><code>CURLOPT_PROXYUSERPWD</code></td>
+          <td>代理认证（格式 <code>&quot;user:pass&quot;</code>）</td>
+      </tr>
+      <tr>
+          <td><code>CURLOPT_HEADER</code></td>
+          <td>返回响应头（设为 <code>true</code>）</td>
+      </tr>
+      <tr>
+          <td><code>CURLOPT_NOBODY</code></td>
+          <td>只请求 HEAD（不返回 body）</td>
+      </tr>
+  </tbody>
+</table>
+<hr>
+<h2 id="-五调试技巧">🔍 五、调试技巧</h2>
+<h3 id="1-查看实际发送的请求头">1. 查看实际发送的请求头</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln">1</span><span class="cl"><span class="nx">curl_setopt</span><span class="p">(</span><span class="nv">$ch</span><span class="p">,</span> <span class="nx">CURLOPT_VERBOSE</span><span class="p">,</span> <span class="k">true</span><span class="p">);</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="nv">$verbose</span> <span class="o">=</span> <span class="nx">fopen</span><span class="p">(</span><span class="s1">&#39;php://temp&#39;</span><span class="p">,</span> <span class="s1">&#39;w+&#39;</span><span class="p">);</span>
+</span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="nx">curl_setopt</span><span class="p">(</span><span class="nv">$ch</span><span class="p">,</span> <span class="nx">CURLOPT_STDERR</span><span class="p">,</span> <span class="nv">$verbose</span><span class="p">);</span>
+</span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="c1">// 执行后读取 $verbose 内容
+</span></span></span></code></pre></div><h3 id="2-检查-ssl-握手">2. 检查 SSL 握手</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl"><span class="c1"># 命令行测试</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl">curl -v https://example.com
+</span></span></code></pre></div><h3 id="3-获取详细连接信息">3. 获取详细连接信息</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln">1</span><span class="cl"><span class="nv">$info</span> <span class="o">=</span> <span class="nx">curl_getinfo</span><span class="p">(</span><span class="nv">$ch</span><span class="p">);</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="nx">print_r</span><span class="p">(</span><span class="nv">$info</span><span class="p">);</span> <span class="c1">// 包含 ssl_verify_result、redirect_count 等
+</span></span></span></code></pre></div><hr>
+<h2 id="-最佳实践总结">✅ 最佳实践总结</h2>
+<table>
+  <thead>
+      <tr>
+          <th>场景</th>
+          <th>推荐配置</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><strong>生产环境 HTTPS</strong></td>
+          <td><code>SSL_VERIFYPEER=true</code> + 正确 <code>CAINFO</code></td>
+      </tr>
+      <tr>
+          <td><strong>内部测试环境</strong></td>
+          <td>可临时关闭验证，但需注释说明</td>
+      </tr>
+      <tr>
+          <td><strong>Basic Auth</strong></td>
+          <td>确保使用 HTTPS（否则密码明文传输！）</td>
+      </tr>
+      <tr>
+          <td><strong>敏感凭证</strong></td>
+          <td>不要硬编码，使用环境变量或密钥管理服务</td>
+      </tr>
+      <tr>
+          <td><strong>错误处理</strong></td>
+          <td>始终检查 <code>curl_error()</code> 和 HTTP 状态码</td>
+      </tr>
+  </tbody>
+</table>
+<blockquote>
+<p>🔒 <strong>安全黄金法则</strong>：<br>
+<strong>永远不要在 HTTP 上使用 Basic Auth！必须配合 HTTPS。</strong></p>
+</blockquote>
+<hr>
 
     </div><div class="post_comments">
   
