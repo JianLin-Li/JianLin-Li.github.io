@@ -168,7 +168,7 @@
     <span class="post_date">
       2025-06-02	  
     </span>
-    <span class="post_time"> · 12 分钟阅读</span><span>&nbsp;· <a href='https://jianlin-li.github.io/tags/php/' title="PHP" class="post_tag button button_translucent">PHP
+    <span class="post_time"> · 17 分钟阅读</span><span>&nbsp;· <a href='https://jianlin-li.github.io/tags/php/' title="PHP" class="post_tag button button_translucent">PHP
         </a>
     </span>
     <span class="page_only">&nbsp;·
@@ -1191,6 +1191,592 @@ openssl.cafile = &quot;/path/to/cacert.pem&quot;
 <strong>永远不要在 HTTP 上使用 Basic Auth！必须配合 HTTPS。</strong></p>
 </blockquote>
 <hr>
+<h1 id="自签名-ssl-证书完整指南含多域名与通配符支持">自签名 SSL 证书完整指南（含多域名与通配符支持）</h1>
+<p>创建自签名 SSL 证书（Self-Signed Certificate）是开发、测试或内部服务中常见的需求。虽然它<strong>不被浏览器或操作系统信任</strong>（会显示“不安全”警告），但在本地开发、内网服务、Docker 容器通信等场景非常实用。</p>
+<p>下面以 <strong>OpenSSL</strong>（几乎所有 Linux/macOS 系统自带，Windows 可通过 WSL、Git Bash 或安装 OpenSSL）为例，详细介绍创建过程。</p>
+<hr>
+<h2 id="-一基本概念">🔐 一、基本概念</h2>
+<ul>
+<li><strong>私钥（Private Key）</strong>：<code>server.key</code> —— 必须保密，用于解密和签名。</li>
+<li><strong>证书签名请求（CSR）</strong>：<code>server.csr</code> —— 可选，用于向 CA 申请证书（自签名时可跳过）。</li>
+<li><strong>自签名证书（Certificate）</strong>：<code>server.crt</code> —— 包含公钥和身份信息，由自己签发。</li>
+</ul>
+<blockquote>
+<p>✅ 自签名证书 = 私钥 + 自己给自己签名的公钥证书。</p>
+</blockquote>
+<hr>
+<h2 id="-二快速创建一步生成">🛠 二、快速创建（一步生成）</h2>
+<h3 id="命令推荐用于开发">命令（推荐用于开发）：</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">openssl req -x509 -nodes -days <span class="m">365</span> -newkey rsa:2048 <span class="se">\
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl">  -keyout server.key -out server.crt <span class="se">\
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl">  -subj <span class="s2">&#34;/C=CN/ST=Beijing/L=Beijing/O=MyOrg/CN=localhost&#34;</span>
+</span></span></code></pre></div><h3 id="参数说明">参数说明：</h3>
+<table>
+  <thead>
+      <tr>
+          <th>参数</th>
+          <th>作用</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>-x509</code></td>
+          <td>直接生成自签名证书（跳过 CSR）</td>
+      </tr>
+      <tr>
+          <td><code>-nodes</code></td>
+          <td><strong>不要加密私钥</strong>（否则每次用都要输密码）</td>
+      </tr>
+      <tr>
+          <td><code>-days 365</code></td>
+          <td>证书有效期 365 天</td>
+      </tr>
+      <tr>
+          <td><code>-newkey rsa:2048</code></td>
+          <td>生成 2048 位 RSA 私钥</td>
+      </tr>
+      <tr>
+          <td><code>-keyout server.key</code></td>
+          <td>输出私钥文件</td>
+      </tr>
+      <tr>
+          <td><code>-out server.crt</code></td>
+          <td>输出证书文件</td>
+      </tr>
+      <tr>
+          <td><code>-subj &quot;...&quot;</code></td>
+          <td>自动填写证书信息（避免交互式输入）</td>
+      </tr>
+  </tbody>
+</table>
+<blockquote>
+<p>💡 常见字段含义：</p>
+<ul>
+<li><code>C</code> = Country（国家，如 <code>CN</code>）</li>
+<li><code>ST</code> = State（省）</li>
+<li><code>L</code> = Locality（市）</li>
+<li><code>O</code> = Organization（组织）</li>
+<li><code>CN</code> = Common Name（<strong>必须匹配你访问的域名或 IP</strong>，如 <code>localhost</code>、<code>192.168.1.100</code>、<code>myapp.local</code>）</li>
+</ul>
+</blockquote>
+<hr>
+<h2 id="-三详细步骤含-csr更规范">🧪 三、详细步骤（含 CSR，更规范）</h2>
+<h3 id="步骤-1生成私钥">步骤 1：生成私钥</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">openssl genrsa -out server.key <span class="m">2048</span>
+</span></span></code></pre></div><h3 id="步骤-2生成-csr证书签名请求">步骤 2：生成 CSR（证书签名请求）</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">openssl req -new -key server.key -out server.csr <span class="se">\
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl">  -subj <span class="s2">&#34;/C=CN/ST=Beijing/L=Beijing/O=MyOrg/CN=localhost&#34;</span>
+</span></span></code></pre></div><h3 id="步骤-3用私钥自签名-csr生成证书">步骤 3：用私钥自签名 CSR，生成证书</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">openssl x509 -req -days <span class="m">365</span> -in server.csr -signkey server.key -out server.crt
+</span></span></code></pre></div><blockquote>
+<p>✅ 这种方式适合需要 CSR 的场景（如未来要替换为正式 CA 证书）。</p>
+</blockquote>
+<hr>
+<h2 id="-四支持多个域名--ipsan-扩展">🌐 四、支持多个域名 / IP（SAN 扩展）</h2>
+<p>现代浏览器要求证书包含 <strong>Subject Alternative Name (SAN)</strong>，否则即使 <code>CN=localhost</code> 也会报错。</p>
+<h3 id="方法使用配置文件">方法：使用配置文件</h3>
+<ol>
+<li>创建 <code>server.conf</code>：</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ini" data-lang="ini"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="k">[req]</span>
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="na">default_bits</span> <span class="o">=</span> <span class="s">2048</span>
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="na">prompt</span> <span class="o">=</span> <span class="s">no</span>
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="na">default_md</span> <span class="o">=</span> <span class="s">sha256</span>
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="na">distinguished_name</span> <span class="o">=</span> <span class="s">dn</span>
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl"><span class="na">req_extensions</span> <span class="o">=</span> <span class="s">v3_req</span>
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="k">[dn]</span>
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl"><span class="na">C</span> <span class="o">=</span> <span class="s">CN</span>
+</span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="na">ST</span> <span class="o">=</span> <span class="s">Beijing</span>
+</span></span><span class="line"><span class="ln">11</span><span class="cl"><span class="na">L</span> <span class="o">=</span> <span class="s">Beijing</span>
+</span></span><span class="line"><span class="ln">12</span><span class="cl"><span class="na">O</span> <span class="o">=</span> <span class="s">MyOrg</span>
+</span></span><span class="line"><span class="ln">13</span><span class="cl"><span class="na">CN</span> <span class="o">=</span> <span class="s">localhost</span>
+</span></span><span class="line"><span class="ln">14</span><span class="cl">
+</span></span><span class="line"><span class="ln">15</span><span class="cl"><span class="k">[v3_req]</span>
+</span></span><span class="line"><span class="ln">16</span><span class="cl"><span class="na">basicConstraints</span> <span class="o">=</span> <span class="s">CA:FALSE</span>
+</span></span><span class="line"><span class="ln">17</span><span class="cl"><span class="na">keyUsage</span> <span class="o">=</span> <span class="s">nonRepudiation, digitalSignature, keyEncipherment</span>
+</span></span><span class="line"><span class="ln">18</span><span class="cl"><span class="na">subjectAltName</span> <span class="o">=</span> <span class="s">@alt_names</span>
+</span></span><span class="line"><span class="ln">19</span><span class="cl">
+</span></span><span class="line"><span class="ln">20</span><span class="cl"><span class="k">[alt_names]</span>
+</span></span><span class="line"><span class="ln">21</span><span class="cl"><span class="na">DNS.1</span> <span class="o">=</span> <span class="s">localhost</span>
+</span></span><span class="line"><span class="ln">22</span><span class="cl"><span class="na">DNS.2</span> <span class="o">=</span> <span class="s">myapp.local</span>
+</span></span><span class="line"><span class="ln">23</span><span class="cl"><span class="na">IP.1</span> <span class="o">=</span> <span class="s">127.0.0.1</span>
+</span></span><span class="line"><span class="ln">24</span><span class="cl"><span class="na">IP.2</span> <span class="o">=</span> <span class="s">192.168.1.100</span>
+</span></span></code></pre></div><ol start="2">
+<li>生成证书：</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">openssl req -x509 -nodes -days <span class="m">365</span> -newkey rsa:2048 <span class="se">\
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl">  -keyout server.key -out server.crt <span class="se">\
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl">  -config server.conf -extensions v3_req
+</span></span></code></pre></div><blockquote>
+<p>✅ 这样生成的证书支持 <code>https://localhost</code>、<code>https://myapp.local</code>、<code>https://127.0.0.1</code> 等。</p>
+</blockquote>
+<hr>
+<h2 id="-五在-web-服务器中使用">🖥 五、在 Web 服务器中使用</h2>
+<h3 id="nginx-示例">Nginx 示例：</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-nginx" data-lang="nginx"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="k">server</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl">    <span class="kn">listen</span> <span class="mi">443</span> <span class="s">ssl</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl">    <span class="kn">server_name</span> <span class="s">localhost</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl">    <span class="kn">ssl_certificate</span> <span class="s">/path/to/server.crt</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">    <span class="kn">ssl_certificate_key</span> <span class="s">/path/to/server.key</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl">    <span class="kn">location</span> <span class="s">/</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">        <span class="kn">root</span> <span class="s">/var/www/html</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln">10</span><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="ln">11</span><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><h3 id="apache-示例">Apache 示例：</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-apache" data-lang="apache"><span class="line"><span class="ln">1</span><span class="cl"><span class="nt">&lt;VirtualHost</span> <span class="s">*:443</span><span class="nt">&gt;</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl">    <span class="nb">ServerName</span> localhost
+</span></span><span class="line"><span class="ln">3</span><span class="cl">    <span class="nb">DocumentRoot</span> <span class="sx">/var/www/html</span>
+</span></span><span class="line"><span class="ln">4</span><span class="cl">
+</span></span><span class="line"><span class="ln">5</span><span class="cl">    <span class="nb">SSLEngine</span> <span class="k">on</span>
+</span></span><span class="line"><span class="ln">6</span><span class="cl">    <span class="nb">SSLCertificateFile</span> <span class="s2">&#34;/path/to/server.crt&#34;</span>
+</span></span><span class="line"><span class="ln">7</span><span class="cl">    <span class="nb">SSLCertificateKeyFile</span> <span class="s2">&#34;/path/to/server.key&#34;</span>
+</span></span><span class="line"><span class="ln">8</span><span class="cl"><span class="nt">&lt;/VirtualHost&gt;</span>
+</span></span></code></pre></div><h3 id="php-内置服务器仅限-cli-测试">PHP 内置服务器（仅限 CLI 测试）：</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">php -S localhost:8443 -t public/ router.php
+</span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="c1"># ❌ 不支持 HTTPS！需用 Nginx/Apache 或 Caddy 代理</span>
+</span></span></code></pre></div><hr>
+<h2 id="-六让系统浏览器信任自签名证书可选">🔒 六、让系统/浏览器信任自签名证书（可选）</h2>
+<blockquote>
+<p>⚠️ 仅建议用于开发机或内网环境！</p>
+</blockquote>
+<h3 id="macos">macOS：</h3>
+<ol>
+<li>双击 <code>server.crt</code> → 添加到“系统”钥匙串</li>
+<li>在“钥匙串访问”中找到该证书 → 右键 → “显示简介” → 展开“信任” → 选择“始终信任”</li>
+</ol>
+<h3 id="windows">Windows：</h3>
+<ol>
+<li>双击 <code>.crt</code> 文件 → “安装证书” → 存入“受信任的根证书颁发机构”</li>
+</ol>
+<h3 id="linuxubuntudebian">Linux（Ubuntu/Debian）：</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">sudo cp server.crt /usr/local/share/ca-certificates/mycert.crt
+</span></span><span class="line"><span class="ln">2</span><span class="cl">sudo update-ca-certificates
+</span></span></code></pre></div><blockquote>
+<p>💡 浏览器可能仍需重启才能生效。</p>
+</blockquote>
+<hr>
+<h2 id="-七清理与验证">🧹 七、清理与验证</h2>
+<h3 id="查看证书内容">查看证书内容：</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">openssl x509 -in server.crt -text -noout
+</span></span></code></pre></div><h3 id="验证-https-服务">验证 HTTPS 服务：</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">curl -k https://localhost          <span class="c1"># -k 忽略证书错误</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl">curl --cacert server.crt https://localhost  <span class="c1"># 使用自定义 CA（如果信任）</span>
+</span></span></code></pre></div><h3 id="检查-san">检查 SAN：</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">openssl x509 -in server.crt -text <span class="p">|</span> grep -A1 <span class="s2">&#34;Subject Alternative Name&#34;</span>
+</span></span></code></pre></div><hr>
+<h2 id="-总结-2">✅ 总结</h2>
+<table>
+  <thead>
+      <tr>
+          <th>场景</th>
+          <th>推荐命令</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><strong>快速开发</strong></td>
+          <td>一步生成（带 <code>-subj</code>）</td>
+      </tr>
+      <tr>
+          <td><strong>多域名/IP</strong></td>
+          <td>使用 <code>server.conf</code> 配置 SAN</td>
+      </tr>
+      <tr>
+          <td><strong>生产环境</strong></td>
+          <td><strong>不要用自签名！</strong> 请用 Let's Encrypt（免费）或商业 CA</td>
+      </tr>
+  </tbody>
+</table>
+<blockquote>
+<p>🔑 <strong>关键提醒</strong>：</p>
+<ul>
+<li>自签名证书<strong>不能用于公网生产环境</strong>（用户会看到严重警告）</li>
+<li>开发时可用，但务必配合 <code>CN</code> 或 <code>SAN</code> 匹配访问地址</li>
+<li>私钥（<code>.key</code>）<strong>切勿泄露</strong>！</li>
+</ul>
+</blockquote>
+<hr>
+<h1 id="支持多个域名的自签名证书如-phpdemocom-和-phpmyselfcom">支持多个域名的自签名证书（如 <code>php.demo.com</code> 和 <code>php.myself.com</code>）</h1>
+<p>要让一个自签名 SSL 证书同时支持多个域名（如 <code>php.demo.com</code> 和 <code>php.myself.com</code>），<strong>必须使用 SAN（Subject Alternative Name，主题备用名称）扩展</strong>。现代浏览器和客户端（包括 curl、PHP stream、Node.js 等）都要求使用 SAN，仅靠 <code>Common Name (CN)</code> 已不再被信任。</p>
+<p>下面以你的两个域名为例：<strong><code>php.demo.com</code></strong> 和 <strong><code>php.myself.com</code></strong>，详细说明如何生成支持多域名的自签名证书。</p>
+<hr>
+<h2 id="-步骤-1创建-openssl-配置文件关键">✅ 步骤 1：创建 OpenSSL 配置文件（关键！）</h2>
+<p>创建一个配置文件，比如叫 <code>php-sites.conf</code>：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ini" data-lang="ini"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="k">[req]</span>
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="na">default_bits</span>       <span class="o">=</span> <span class="s">2048</span>
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="na">prompt</span>             <span class="o">=</span> <span class="s">no</span>
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="na">default_md</span>         <span class="o">=</span> <span class="s">sha256</span>
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="na">distinguished_name</span> <span class="o">=</span> <span class="s">dn</span>
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl"><span class="na">req_extensions</span>     <span class="o">=</span> <span class="s">v3_req</span>
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="k">[dn]</span>
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl"><span class="na">C</span>  <span class="o">=</span> <span class="s">CN</span>
+</span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="na">ST</span> <span class="o">=</span> <span class="s">Guangdong</span>
+</span></span><span class="line"><span class="ln">11</span><span class="cl"><span class="na">L</span>  <span class="o">=</span> <span class="s">Shenzhen</span>
+</span></span><span class="line"><span class="ln">12</span><span class="cl"><span class="na">O</span>  <span class="o">=</span> <span class="s">MyDevTeam</span>
+</span></span><span class="line"><span class="ln">13</span><span class="cl"><span class="na">CN</span> <span class="o">=</span> <span class="s">php.demo.com</span>
+</span></span><span class="line"><span class="ln">14</span><span class="cl">
+</span></span><span class="line"><span class="ln">15</span><span class="cl"><span class="k">[v3_req]</span>
+</span></span><span class="line"><span class="ln">16</span><span class="cl"><span class="na">basicConstraints</span>   <span class="o">=</span> <span class="s">CA:FALSE</span>
+</span></span><span class="line"><span class="ln">17</span><span class="cl"><span class="na">keyUsage</span>           <span class="o">=</span> <span class="s">nonRepudiation, digitalSignature, keyEncipherment</span>
+</span></span><span class="line"><span class="ln">18</span><span class="cl"><span class="na">subjectAltName</span>     <span class="o">=</span> <span class="s">@alt_names</span>
+</span></span><span class="line"><span class="ln">19</span><span class="cl">
+</span></span><span class="line"><span class="ln">20</span><span class="cl"><span class="k">[alt_names]</span>
+</span></span><span class="line"><span class="ln">21</span><span class="cl"><span class="na">DNS.1</span> <span class="o">=</span> <span class="s">php.demo.com</span>
+</span></span><span class="line"><span class="ln">22</span><span class="cl"><span class="na">DNS.2</span> <span class="o">=</span> <span class="s">php.myself.com</span>
+</span></span></code></pre></div><blockquote>
+<p>🔍 说明：</p>
+<ul>
+<li><code>[dn]</code> 中的 <code>CN</code>（Common Name）可以任选其一（或写一个通用名），<strong>但实际生效的是 <code>[alt_names]</code></strong></li>
+<li><code>DNS.1</code>, <code>DNS.2</code>... 列出所有你要支持的<strong>域名</strong></li>
+<li>如果还需要支持 IP 地址，可加 <code>IP.1 = 192.168.1.100</code>（但你这里不需要）</li>
+</ul>
+</blockquote>
+<hr>
+<h2 id="-步骤-2使用-openssl-生成证书">✅ 步骤 2：使用 OpenSSL 生成证书</h2>
+<p>在终端执行以下命令（确保 <code>php-sites.conf</code> 在当前目录）：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">openssl req -x509 -nodes -days <span class="m">365</span> <span class="se">\
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl">  -newkey rsa:2048 <span class="se">\
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl">  -keyout php-sites.key <span class="se">\
+</span></span></span><span class="line"><span class="ln">4</span><span class="cl">  -out php-sites.crt <span class="se">\
+</span></span></span><span class="line"><span class="ln">5</span><span class="cl">  -config php-sites.conf <span class="se">\
+</span></span></span><span class="line"><span class="ln">6</span><span class="cl">  -extensions v3_req
+</span></span></code></pre></div><h3 id="参数解释">参数解释：</h3>
+<table>
+  <thead>
+      <tr>
+          <th>参数</th>
+          <th>作用</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>-x509</code></td>
+          <td>直接生成自签名证书</td>
+      </tr>
+      <tr>
+          <td><code>-nodes</code></td>
+          <td>私钥不加密（避免每次启动服务输密码）</td>
+      </tr>
+      <tr>
+          <td><code>-days 365</code></td>
+          <td>有效期 1 年</td>
+      </tr>
+      <tr>
+          <td><code>-config php-sites.conf</code></td>
+          <td>使用自定义配置</td>
+      </tr>
+      <tr>
+          <td><code>-extensions v3_req</code></td>
+          <td>应用配置中的 <code>v3_req</code> 扩展（包含 SAN）</td>
+      </tr>
+  </tbody>
+</table>
+<p>执行后会生成两个文件：</p>
+<ul>
+<li><code>php-sites.key</code> → 私钥（保密！）</li>
+<li><code>php-sites.crt</code> → 自签名证书（可分发）</li>
+</ul>
+<hr>
+<h2 id="-步骤-3验证证书是否包含两个域名">✅ 步骤 3：验证证书是否包含两个域名</h2>
+<p>运行以下命令查看证书详情：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">openssl x509 -in php-sites.crt -text -noout
+</span></span></code></pre></div><p>在输出中找到 <strong><code>X509v3 Subject Alternative Name</code></strong> 部分，应看到：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="ln">1</span><span class="cl">X509v3 Subject Alternative Name:
+</span></span><span class="line"><span class="ln">2</span><span class="cl">    DNS:php.demo.com, DNS:php.myself.com
+</span></span></code></pre></div><p>✅ 如果看到这两个域名，说明配置成功！</p>
+<hr>
+<h2 id="-步骤-4在-web-服务器中使用以-nginx-为例">✅ 步骤 4：在 Web 服务器中使用（以 Nginx 为例）</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-nginx" data-lang="nginx"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="k">server</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl">    <span class="kn">listen</span> <span class="mi">443</span> <span class="s">ssl</span> <span class="s">http2</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl">    <span class="kn">server_name</span> <span class="s">php.demo.com</span> <span class="s">php.myself.com</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl">    <span class="kn">ssl_certificate</span>     <span class="s">/path/to/php-sites.crt</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">    <span class="kn">ssl_certificate_key</span> <span class="s">/path/to/php-sites.key</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl">    <span class="kn">root</span> <span class="s">/var/www/php-demo</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">    <span class="kn">index</span> <span class="s">index.php</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln">10</span><span class="cl">
+</span></span><span class="line"><span class="ln">11</span><span class="cl">    <span class="kn">location</span> <span class="p">~</span> <span class="sr">\.php$</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">12</span><span class="cl">        <span class="kn">fastcgi_pass</span> <span class="s">unix:/run/php/php8.2-fpm.sock</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln">13</span><span class="cl">        <span class="kn">include</span> <span class="s">fastcgi_params</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln">14</span><span class="cl">        <span class="kn">fastcgi_param</span> <span class="s">SCRIPT_FILENAME</span> <span class="nv">$document_root$fastcgi_script_name</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln">15</span><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="ln">16</span><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><blockquote>
+<p>💡 注意：</p>
+<ul>
+<li><code>server_name</code> 要包含两个域名</li>
+<li>证书和私钥路径要正确</li>
+</ul>
+</blockquote>
+<p>然后重载 Nginx：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">sudo nginx -t <span class="o">&amp;&amp;</span> sudo systemctl reload nginx
+</span></span></code></pre></div><hr>
+<h2 id="-步骤-5本地测试修改-hosts">✅ 步骤 5：本地测试（修改 hosts）</h2>
+<p>因为 <code>php.demo.com</code> 和 <code>php.myself.com</code> 不是公网域名，需在本机 <code>hosts</code> 文件中映射到服务器 IP（如 <code>127.0.0.1</code>）：</p>
+<h3 id="linuxmacos">Linux/macOS：</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">sudo nano /etc/hosts
+</span></span></code></pre></div><p>添加：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="ln">1</span><span class="cl">127.0.0.1 php.demo.com
+</span></span><span class="line"><span class="ln">2</span><span class="cl">127.0.0.1 php.myself.com
+</span></span></code></pre></div><h3 id="windows-1">Windows：</h3>
+<p>编辑 <code>C:\Windows\System32\drivers\etc\hosts</code>，加上同样两行。</p>
+<p>保存后，浏览器访问：</p>
+<ul>
+<li><a href="https://php.demo.com">https://php.demo.com</a></li>
+<li><a href="https://php.myself.com">https://php.myself.com</a></li>
+</ul>
+<blockquote>
+<p>⚠️ 第一次访问仍会提示“不安全”（因为是自签名），点击“高级” → “继续前往”即可。</p>
+<p>如果你希望<strong>彻底消除警告</strong>，可将 <code>php-sites.crt</code> 安装为受信任的根证书（见下文）。</p>
+</blockquote>
+<hr>
+<h2 id="-可选让系统信任该证书">🔒 （可选）让系统信任该证书</h2>
+<h3 id="macos-1">macOS：</h3>
+<ol>
+<li>双击 <code>php-sites.crt</code> → 添加到“系统”钥匙串</li>
+<li>打开“钥匙串访问” → 找到该证书 → 右键 → “显示简介”</li>
+<li>展开“信任” → 选择“始终信任”</li>
+</ol>
+<h3 id="windows-2">Windows：</h3>
+<ol>
+<li>双击 <code>.crt</code> 文件 → “安装证书”</li>
+<li>选择“本地计算机” → 存入“受信任的根证书颁发机构”</li>
+</ol>
+<h3 id="linuxdebianubuntu">Linux（Debian/Ubuntu）：</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">sudo cp php-sites.crt /usr/local/share/ca-certificates/php-sites.crt
+</span></span><span class="line"><span class="ln">2</span><span class="cl">sudo update-ca-certificates
+</span></span></code></pre></div><blockquote>
+<p>🔄 安装后重启浏览器，访问两个域名将不再有安全警告！</p>
+</blockquote>
+<hr>
+<h2 id="-常见错误排查">❌ 常见错误排查</h2>
+<table>
+  <thead>
+      <tr>
+          <th>问题</th>
+          <th>原因</th>
+          <th>解决</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>浏览器报 <code>ERR_CERT_COMMON_NAME_INVALID</code></td>
+          <td>证书没有 SAN 或 SAN 未包含该域名</td>
+          <td>检查 <code>openssl x509 -text</code> 输出</td>
+      </tr>
+      <tr>
+          <td>curl 报 <code>SSL: no alternative certificate subject name matches</code></td>
+          <td>同上</td>
+          <td>重新生成带正确 SAN 的证书</td>
+      </tr>
+      <tr>
+          <td>Nginx 启动失败</td>
+          <td>证书/私钥路径错误或权限不足</td>
+          <td>检查路径、<code>chmod 600 *.key</code></td>
+      </tr>
+  </tbody>
+</table>
+<hr>
+<h2 id="-总结-3">✅ 总结</h2>
+<p>要支持多个域名，<strong>核心就是配置 <code>subjectAltName</code></strong>：</p>
+<ol>
+<li>写一个 <code>.conf</code> 文件，列出所有 <code>DNS.x = your.domain</code></li>
+<li>用 <code>openssl req -x509 -config your.conf -extensions v3_req</code> 生成</li>
+<li>验证 SAN 是否生效</li>
+<li>配置 Web 服务器 + hosts 测试</li>
+</ol>
+<blockquote>
+<p>🎯 最终效果：<br>
+一个证书 → 同时安全地服务于 <code>https://php.demo.com</code> 和 <code>https://php.myself.com</code></p>
+</blockquote>
+<hr>
+<h1 id="生成支持通配符域名wildcard-domain的自签名证书">生成支持通配符域名（Wildcard Domain）的自签名证书</h1>
+<p>要生成支持<strong>通配符域名（Wildcard Domain）</strong> 的 SSL 证书（例如 <code>*.demo.com</code>），你仍然可以使用 <strong>OpenSSL 自签名证书</strong>，但需注意以下关键点：</p>
+<hr>
+<h2 id="-一通配符证书的规则">✅ 一、通配符证书的规则</h2>
+<ul>
+<li>通配符 <strong>只能匹配一级子域名</strong>：
+<ul>
+<li><code>*.demo.com</code> ✅ 匹配：<code>a.demo.com</code>、<code>api.demo.com</code>、<code>php.demo.com</code></li>
+<li><code>*.demo.com</code> ❌ <strong>不匹配</strong>：<code>demo.com</code>（主域名）、<code>a.b.demo.com</code>（二级子域）</li>
+</ul>
+</li>
+<li>通配符 <strong>必须出现在最左侧标签</strong>：<code>*</code> 只能代替一个完整的 DNS 标签（不能写成 <code>api.*.com</code>）</li>
+<li>在 SAN（Subject Alternative Name）中指定通配符才有效（仅 <code>CN=*.demo.com</code> 已被现代浏览器忽略）</li>
+</ul>
+<hr>
+<h2 id="-二生成支持通配符的自签名证书以-democom-为例">✅ 二、生成支持通配符的自签名证书（以 <code>*.demo.com</code> 为例）</h2>
+<h3 id="步骤-1创建-openssl-配置文件-wildcardconf">步骤 1：创建 OpenSSL 配置文件 <code>wildcard.conf</code></h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ini" data-lang="ini"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="k">[req]</span>
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="na">default_bits</span>       <span class="o">=</span> <span class="s">2048</span>
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="na">prompt</span>             <span class="o">=</span> <span class="s">no</span>
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="na">default_md</span>         <span class="o">=</span> <span class="s">sha256</span>
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="na">distinguished_name</span> <span class="o">=</span> <span class="s">dn</span>
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl"><span class="na">req_extensions</span>     <span class="o">=</span> <span class="s">v3_req</span>
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="k">[dn]</span>
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl"><span class="na">C</span>  <span class="o">=</span> <span class="s">CN</span>
+</span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="na">ST</span> <span class="o">=</span> <span class="s">Guangdong</span>
+</span></span><span class="line"><span class="ln">11</span><span class="cl"><span class="na">L</span>  <span class="o">=</span> <span class="s">Shenzhen</span>
+</span></span><span class="line"><span class="ln">12</span><span class="cl"><span class="na">O</span>  <span class="o">=</span> <span class="s">MyDevTeam</span>
+</span></span><span class="line"><span class="ln">13</span><span class="cl"><span class="na">CN</span> <span class="o">=</span> <span class="s">*.demo.com</span>
+</span></span><span class="line"><span class="ln">14</span><span class="cl">
+</span></span><span class="line"><span class="ln">15</span><span class="cl"><span class="k">[v3_req]</span>
+</span></span><span class="line"><span class="ln">16</span><span class="cl"><span class="na">basicConstraints</span>   <span class="o">=</span> <span class="s">CA:FALSE</span>
+</span></span><span class="line"><span class="ln">17</span><span class="cl"><span class="na">keyUsage</span>           <span class="o">=</span> <span class="s">nonRepudiation, digitalSignature, keyEncipherment</span>
+</span></span><span class="line"><span class="ln">18</span><span class="cl"><span class="na">subjectAltName</span>     <span class="o">=</span> <span class="s">@alt_names</span>
+</span></span><span class="line"><span class="ln">19</span><span class="cl">
+</span></span><span class="line"><span class="ln">20</span><span class="cl"><span class="k">[alt_names]</span>
+</span></span><span class="line"><span class="ln">21</span><span class="cl"><span class="na">DNS.1</span> <span class="o">=</span> <span class="s">*.demo.com</span>
+</span></span><span class="line"><span class="ln">22</span><span class="cl"><span class="na">DNS.2</span> <span class="o">=</span> <span class="s">demo.com          # 👈 如果你也想支持主域名，需显式添加！</span>
+</span></span></code></pre></div><blockquote>
+<p>🔍 说明：</p>
+<ul>
+<li><code>DNS.1 = *.demo.com</code> → 支持所有一级子域</li>
+<li><code>DNS.2 = demo.com</code> → <strong>单独添加主域名</strong>（通配符不包含它！）</li>
+<li>如果你还有其他固定子域（如 <code>admin.demo.com</code>），也可以加，但非必需</li>
+</ul>
+</blockquote>
+<hr>
+<h3 id="步骤-2生成证书和私钥">步骤 2：生成证书和私钥</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">openssl req -x509 -nodes -days <span class="m">365</span> <span class="se">\
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl">  -newkey rsa:2048 <span class="se">\
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl">  -keyout wildcard-demo.key <span class="se">\
+</span></span></span><span class="line"><span class="ln">4</span><span class="cl">  -out wildcard-demo.crt <span class="se">\
+</span></span></span><span class="line"><span class="ln">5</span><span class="cl">  -config wildcard.conf <span class="se">\
+</span></span></span><span class="line"><span class="ln">6</span><span class="cl">  -extensions v3_req
+</span></span></code></pre></div><p>执行后生成：</p>
+<ul>
+<li><code>wildcard-demo.key</code>：私钥</li>
+<li><code>wildcard-demo.crt</code>：自签名证书</li>
+</ul>
+<hr>
+<h3 id="步骤-3验证证书是否包含通配符-san">步骤 3：验证证书是否包含通配符 SAN</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">openssl x509 -in wildcard-demo.crt -text -noout <span class="p">|</span> grep -A1 <span class="s2">&#34;Subject Alternative Name&#34;</span>
+</span></span></code></pre></div><p>✅ 正确输出应为：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="ln">1</span><span class="cl">X509v3 Subject Alternative Name:
+</span></span><span class="line"><span class="ln">2</span><span class="cl">    DNS:*.demo.com, DNS:demo.com
+</span></span></code></pre></div><blockquote>
+<p>⚠️ 如果只看到 <code>CN = *.demo.com</code> 但没有 SAN，浏览器会拒绝！</p>
+</blockquote>
+<hr>
+<h2 id="-三在-web-服务器中使用nginx-示例">✅ 三、在 Web 服务器中使用（Nginx 示例）</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-nginx" data-lang="nginx"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="k">server</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl">    <span class="kn">listen</span> <span class="mi">443</span> <span class="s">ssl</span> <span class="s">http2</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl">    <span class="kn">server_name</span> <span class="p">~</span><span class="sr">^.*\.demo\.com$</span> <span class="s">demo.com</span><span class="p">;</span>  <span class="c1"># 匹配所有子域 + 主域
+</span></span></span><span class="line"><span class="ln"> 4</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl">    <span class="kn">ssl_certificate</span>     <span class="s">/path/to/wildcard-demo.crt</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">    <span class="kn">ssl_certificate_key</span> <span class="s">/path/to/wildcard-demo.key</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl">    <span class="kn">root</span> <span class="s">/var/www/demo</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">    <span class="kn">index</span> <span class="s">index.php</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln">10</span><span class="cl">
+</span></span><span class="line"><span class="ln">11</span><span class="cl">    <span class="kn">location</span> <span class="p">~</span> <span class="sr">\.php$</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">12</span><span class="cl">        <span class="kn">fastcgi_pass</span> <span class="s">unix:/run/php/php8.2-fpm.sock</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln">13</span><span class="cl">        <span class="kn">include</span> <span class="s">fastcgi_params</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln">14</span><span class="cl">        <span class="kn">fastcgi_param</span> <span class="s">SCRIPT_FILENAME</span> <span class="nv">$document_root$fastcgi_script_name</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln">15</span><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="ln">16</span><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><blockquote>
+<p>💡 <code>server_name</code> 使用正则 <code>~^.*\.demo\.com$</code> 或直接列出常用子域：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-nginx" data-lang="nginx"><span class="line"><span class="ln">1</span><span class="cl"><span class="k">server_name</span> <span class="s">demo.com</span> <span class="s">*.demo.com</span><span class="p">;</span>
+</span></span></code></pre></div><p>（Nginx 从 1.15.7+ 开始支持 <code>*.example.com</code> 语法）</p>
+</blockquote>
+<hr>
+<h2 id="-四本地测试修改-hosts">✅ 四、本地测试（修改 hosts）</h2>
+<p>因为通配符无法在 <code>hosts</code> 文件中直接模拟，你需要<strong>为每个测试子域单独添加记录</strong>：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl"><span class="c1"># /etc/hosts</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl">127.0.0.1 demo.com
+</span></span><span class="line"><span class="ln">3</span><span class="cl">127.0.0.1 php.demo.com
+</span></span><span class="line"><span class="ln">4</span><span class="cl">127.0.0.1 api.demo.com
+</span></span><span class="line"><span class="ln">5</span><span class="cl">127.0.0.1 test.demo.com
+</span></span></code></pre></div><p>然后访问：</p>
+<ul>
+<li><a href="https://php.demo.com">https://php.demo.com</a> ✅</li>
+<li><a href="https://api.demo.com">https://api.demo.com</a> ✅</li>
+<li><a href="https://demo.com">https://demo.com</a> ✅（因为我们显式添加了）</li>
+<li><a href="https://a.b.demo.com">https://a.b.demo.com</a> ❌（通配符不支持多级）</li>
+</ul>
+<hr>
+<h2 id="-五重要限制与注意事项">⚠️ 五、重要限制与注意事项</h2>
+<table>
+  <thead>
+      <tr>
+          <th>项目</th>
+          <th>说明</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><strong>不能用于公网生产环境</strong></td>
+          <td>自签名证书会被浏览器标记为不安全</td>
+      </tr>
+      <tr>
+          <td><strong>Let's Encrypt 支持免费通配符证书</strong></td>
+          <td>但需要 DNS API 验证（如 Cloudflare、阿里云）</td>
+      </tr>
+      <tr>
+          <td><strong>通配符不包含主域名</strong></td>
+          <td>必须在 SAN 中<strong>显式添加 <code>demo.com</code></strong></td>
+      </tr>
+      <tr>
+          <td><strong>不支持多级通配符</strong></td>
+          <td><code>*.*.demo.com</code> 无效</td>
+      </tr>
+      <tr>
+          <td><strong>私钥安全</strong></td>
+          <td>通配符私钥一旦泄露，所有子域都危险！</td>
+      </tr>
+  </tbody>
+</table>
+<hr>
+<h2 id="-六生产环境建议使用-lets-encrypt免费">🌐 六、生产环境建议：使用 Let's Encrypt（免费）</h2>
+<p>如果你有公网域名和 DNS 控制权，推荐用 <strong>Certbot + DNS 插件</strong>申请免费通配符证书：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl"><span class="c1"># 示例：使用 Cloudflare DNS</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl">sudo certbot certonly <span class="se">\
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl">  --dns-cloudflare <span class="se">\
+</span></span></span><span class="line"><span class="ln">4</span><span class="cl">  --dns-cloudflare-credentials ~/.secrets/cloudflare.ini <span class="se">\
+</span></span></span><span class="line"><span class="ln">5</span><span class="cl">  -d demo.com -d <span class="s1">&#39;*.demo.com&#39;</span>
+</span></span></code></pre></div><blockquote>
+<p>✅ 优点：被所有浏览器信任，自动续期。</p>
+</blockquote>
+<hr>
+<h2 id="-总结-4">✅ 总结</h2>
+<table>
+  <thead>
+      <tr>
+          <th>目标</th>
+          <th>操作</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>支持 <code>*.demo.com</code></td>
+          <td>在 SAN 中添加 <code>DNS.1 = *.demo.com</code></td>
+      </tr>
+      <tr>
+          <td>同时支持 <code>demo.com</code></td>
+          <td><strong>额外添加</strong> <code>DNS.2 = demo.com</code></td>
+      </tr>
+      <tr>
+          <td>本地开发测试</td>
+          <td>修改 <code>hosts</code> + 自签名证书 + 安装为受信任根证书</td>
+      </tr>
+      <tr>
+          <td>公网生产环境</td>
+          <td>使用 <strong>Let's Encrypt</strong> 申请免费通配符证书</td>
+      </tr>
+  </tbody>
+</table>
+<blockquote>
+<p>🔑 <strong>核心口诀</strong>：<br>
+<strong>“通配符只管一级子域，主域要单独加，SAN 是必须项！”</strong></p>
+</blockquote>
 
     </div><div class="post_comments">
   
