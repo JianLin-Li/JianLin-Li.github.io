@@ -2,12 +2,14 @@
 <!DOCTYPE html>
 <html
   lang="zh-cn"
-  data-figures=""
+  data-figures="true"
+  
+    class="page"
   
   
   >
   <head>
-<title>本地环境 | 浩瀚天空</title>
+<title>Docker的知识点-1 | 浩瀚天空</title>
 <meta charset="utf-8">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -17,25 +19,57 @@
 
 
 
+
 <meta property="og:locale" content="zh-cn" />
 
 <meta property="og:type" content="article">
-<meta name="description" content="" />
+<meta name="description" content="Article description." />
 <meta name="twitter:card" content="summary" />
 <meta name="twitter:creator" content="">
-<meta name="twitter:title" content="本地环境" />
+<meta name="twitter:title" content="Docker的知识点-1" />
 <meta name="twitter:image" content="https://jianlin-li.github.io/images/thumbnail.png"/>
-<meta property="og:url" content="https://jianlin-li.github.io/categories/%E6%9C%AC%E5%9C%B0%E7%8E%AF%E5%A2%83/" />
-<meta property="og:title" content="本地环境" />
-<meta property="og:description" content="" />
+<meta property="og:url" content="https://jianlin-li.github.io/post/docker_review_1/" />
+<meta property="og:title" content="Docker的知识点-1" />
+<meta property="og:description" content="Article description." />
 <meta property="og:image" content="https://jianlin-li.github.io/images/thumbnail.png" />
+  <meta name="keywords" content="Docker" />
+  <script type="application/ld+json">
+    {
+      "@context": "http://schema.org",
+      "@type": "BlogPosting",
+      "mainEntityOfPage":"https:\/\/jianlin-li.github.io\/post\/docker_review_1\/",
+      "name": "浩瀚天空",
+      "headline": "Docker的知识点-1",
+      "description": "Article description.",
+      "url": "https:\/\/jianlin-li.github.io\/post\/docker_review_1\/",
+      "datePublished": "2026-01-19T17:22:44+08:00",
+      "dateModified": "2026-01-19T17:22:44+08:00",
+      "keywords": ["Docker"],
+        "articleSection": ["Docker"],
+      "author": {
+        "@type": "Person",
+        "name": "map[name:李建林 photo:images\/fish-head.png]"
+      },
+      "image":{
+        "@type":"ImageObject",
+        "url": "https:\/\/jianlin-li.github.io\/images\/thumbnail.png"
+      },
+      "publisher": {
+        "@type": "Organization",
+        "logo": {
+          "@type":"ImageObject",
+          "url": "https:\/\/jianlin-li.github.io\/logos\/logo.png"
+        },
+        "name": "浩瀚天空"
+      }
+    }
+  </script>
 
 <link rel="apple-touch-icon" sizes="180x180" href="https://jianlin-li.github.io/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="https://jianlin-li.github.io/icons/favicon-32x32.png">
 <link rel="manifest" href="https://jianlin-li.github.io/icons/site.webmanifest">
 
-<link rel="canonical" href="https://jianlin-li.github.io/categories/%E6%9C%AC%E5%9C%B0%E7%8E%AF%E5%A2%83/">
-<link rel="alternate" type="application/rss+xml" href="https://jianlin-li.github.io/categories/%E6%9C%AC%E5%9C%B0%E7%8E%AF%E5%A2%83/index.xml" title="浩瀚天空" />
+<link rel="canonical" href="https://jianlin-li.github.io/post/docker_review_1/">
 
 
 
@@ -51,8 +85,8 @@
 
   </head>
   <body
-    data-code="7"
-    data-lines="true"
+    data-code="10"
+    data-lines="false"
     id="documentTop"
     data-lang="zh-cn"
   >
@@ -121,19 +155,10 @@
 </header>
 
     <main>
-
-
-
+  
 <div class="grid-inverse wrap content">
-  <div>
-    <ul class="posts" id="posts">
-        <li class="post_item">
-  <div class="excerpt">
-    <div class="excerpt_header">
-      <h3 class="post_link">
-        <a href="https://jianlin-li.github.io/post/local_hosts_bak/" title="本地hosts的开发环境备份">本地hosts的开发环境备份</a>
-      </h3>
-      
+  <article class="post_content">
+    <h1 class="post_title">Docker的知识点-1</h1>
   <div class="post_meta">
     <span><svg class="icon">
   <title>calendar</title>
@@ -141,22 +166,22 @@
 </svg>
 </span>
     <span class="post_date">
-      2025-01-31	  
+      2026-01-19	  
     </span>
-    <span class="post_time"> · 1 分钟阅读</span><span>&nbsp;· <a href='https://jianlin-li.github.io/tags/hosts/' title="hosts" class="post_tag button button_translucent">hosts
+    <span class="post_time"> · 3 分钟阅读</span><span>&nbsp;· <a href='https://jianlin-li.github.io/tags/docker/' title="Docker" class="post_tag button button_translucent">Docker
         </a>
     </span>
     <span class="page_only">&nbsp;·
   <div class="post_share">
     分享到:
-    <a href="https://twitter.com/intent/tweet?text=%e6%9c%ac%e5%9c%b0hosts%e7%9a%84%e5%bc%80%e5%8f%91%e7%8e%af%e5%a2%83%e5%a4%87%e4%bb%bd&url=https%3a%2f%2fjianlin-li.github.io%2fpost%2flocal_hosts_bak%2f&tw_p=tweetbutton" class="twitter" title="分享到 Twitter" target="_blank" rel="nofollow">
+    <a href="https://twitter.com/intent/tweet?text=Docker%e7%9a%84%e7%9f%a5%e8%af%86%e7%82%b9-1&url=https%3a%2f%2fjianlin-li.github.io%2fpost%2fdocker_review_1%2f&tw_p=tweetbutton" class="twitter" title="分享到 Twitter" target="_blank" rel="nofollow">
       <svg class="icon">
   <title>twitter</title>
   <use xlink:href="#twitter"></use>
 </svg>
 
     </a>
-    <a href="https://www.facebook.com/sharer.php?u=https%3a%2f%2fjianlin-li.github.io%2fpost%2flocal_hosts_bak%2f&t=%e6%9c%ac%e5%9c%b0hosts%e7%9a%84%e5%bc%80%e5%8f%91%e7%8e%af%e5%a2%83%e5%a4%87%e4%bb%bd" class="facebook" title="分享到 Facebook" target="_blank" rel="nofollow">
+    <a href="https://www.facebook.com/sharer.php?u=https%3a%2f%2fjianlin-li.github.io%2fpost%2fdocker_review_1%2f&t=Docker%e7%9a%84%e7%9f%a5%e8%af%86%e7%82%b9-1" class="facebook" title="分享到 Facebook" target="_blank" rel="nofollow">
       <svg class="icon">
   <title>facebook</title>
   <use xlink:href="#facebook"></use>
@@ -170,7 +195,7 @@
 </svg>
 
     </a>
-    <a href="https://jianlin-li.github.io/post/local_hosts_bak/" title="Copy Link" class="link link_yank">
+    <a href="https://jianlin-li.github.io/post/docker_review_1/" title="Copy Link" class="link link_yank">
       <svg class="icon">
   <title>copy</title>
   <use xlink:href="#copy"></use>
@@ -181,98 +206,555 @@
   </span>
   </div>
 
-    </div>
-      <div class="excerpt_footer">
-        <div class="pale">
-          
-            <p>提示 本地hosts的开发环境备份
-1#postman forbidden update 20.0.0.0 dl.pstmn.io 3 4#sublimetext 5127.0.0.1 <a href="https://www.sublimetext.com">www.sublimetext.com</a> 6127.0.0.1 license.sublimehq.com 7 8#github.com no proxy 9#20.205.243.166 github.com 10 11 12 13192.168.31.250 ljl-maci5 14192.168.31.150 ljl-maci9 15 16 17192.168.31.71 vm7-1 vm7-1.com vm7-1-phpmyadmin.com …</p>
-          
-          <br>
-          <a href="https://jianlin-li.github.io/post/local_hosts_bak/" title="阅读更多" class="excerpt_more button">阅读更多</a>
-        </div>
-      </div>
-    </div>
-  </li>
+    <div class="post_body"><h1 id="docker-架构示意图">Docker 架构示意图</h1>
+<p><figure>
+  <picture>
 
-        <li class="post_item">
-  <div class="excerpt">
-    <div class="excerpt_header">
-      <h3 class="post_link">
-        <a href="https://jianlin-li.github.io/post/local_enviroment_info/" title="本地环境相关配置信息">本地环境相关配置信息</a>
-      </h3>
+    
       
-  <div class="post_meta">
-    <span><svg class="icon">
-  <title>calendar</title>
-  <use xlink:href="#calendar"></use>
-</svg>
-</span>
-    <span class="post_date">
-      2025-01-30	  
-    </span>
-    <span class="post_time"> · 1 分钟阅读</span><span>&nbsp;· <a href='https://jianlin-li.github.io/tags/%E6%9C%AC%E5%9C%B0%E7%8E%AF%E5%A2%83/' title="本地环境" class="post_tag button button_translucent">本地环境
-        </a>
-    </span>
-    <span class="page_only">&nbsp;·
-  <div class="post_share">
-    分享到:
-    <a href="https://twitter.com/intent/tweet?text=%e6%9c%ac%e5%9c%b0%e7%8e%af%e5%a2%83%e7%9b%b8%e5%85%b3%e9%85%8d%e7%bd%ae%e4%bf%a1%e6%81%af&url=https%3a%2f%2fjianlin-li.github.io%2fpost%2flocal_enviroment_info%2f&tw_p=tweetbutton" class="twitter" title="分享到 Twitter" target="_blank" rel="nofollow">
-      <svg class="icon">
-  <title>twitter</title>
-  <use xlink:href="#twitter"></use>
-</svg>
+        
+        
+        
+        
+        
+        
+    <img
+      loading="lazy"
+      decoding="async"
+      alt="Docker 架构示意图"
+      
+        class="image_figure image_internal image_unprocessed"
+        src="https://jianlin-li.github.io/images/docker-architecture.webp"
+      
+      
+    />
 
-    </a>
-    <a href="https://www.facebook.com/sharer.php?u=https%3a%2f%2fjianlin-li.github.io%2fpost%2flocal_enviroment_info%2f&t=%e6%9c%ac%e5%9c%b0%e7%8e%af%e5%a2%83%e7%9b%b8%e5%85%b3%e9%85%8d%e7%bd%ae%e4%bf%a1%e6%81%af" class="facebook" title="分享到 Facebook" target="_blank" rel="nofollow">
-      <svg class="icon">
-  <title>facebook</title>
-  <use xlink:href="#facebook"></use>
-</svg>
+    </picture>
+</figure>
+</p>
+<hr>
+<h1 id="-docker-命令大全完整版">🐳 Docker 命令大全（完整版）</h1>
+<blockquote>
+<p>适用于 Docker CLI（20.x+ 版本），涵盖容器、镜像、网络、卷、Compose 等核心操作。<br>
+最后更新：2026年1月</p>
+</blockquote>
+<hr>
+<h2 id="目录">目录</h2>
+<ul>
+<li><a href="/post/docker_review_1/#%e4%b8%80%e5%ae%b9%e5%99%a8%e7%94%9f%e5%91%bd%e5%91%a8%e6%9c%9f%e7%ae%a1%e7%90%86">一、容器生命周期管理</a></li>
+<li><a href="/post/docker_review_1/#%e4%ba%8c%e5%ae%b9%e5%99%a8%e6%93%8d%e4%bd%9cinspect--logs--exec">二、容器操作（Inspect / Logs / Exec）</a></li>
+<li><a href="/post/docker_review_1/#%e4%b8%89%e5%ae%b9%e5%99%a8%e7%9a%84-rootfs-%e7%9b%b8%e5%85%b3%e5%91%bd%e4%bb%a4">三、容器的 RootFS 相关命令</a></li>
+<li><a href="/post/docker_review_1/#%e5%9b%9b%e6%9c%ac%e5%9c%b0%e9%95%9c%e5%83%8f%e7%ae%a1%e7%90%86">四、本地镜像管理</a></li>
+<li><a href="/post/docker_review_1/#%e4%ba%94%e9%95%9c%e5%83%8f%e4%bb%93%e5%ba%93registry%e6%93%8d%e4%bd%9c">五、镜像仓库（Registry）操作</a></li>
+<li><a href="/post/docker_review_1/#%e5%85%ad%e7%b3%bb%e7%bb%9f%e4%bf%a1%e6%81%af%e4%b8%8e%e7%89%88%e6%9c%ac">六、系统信息与版本</a></li>
+<li><a href="/post/docker_review_1/#%e4%b8%83%e7%bd%91%e7%bb%9c%e5%91%bd%e4%bb%a4network">七、网络命令（Network）</a></li>
+<li><a href="/post/docker_review_1/#%e5%85%ab%e5%8d%b7%e5%91%bd%e4%bb%a4volume">八、卷命令（Volume）</a></li>
+<li><a href="/post/docker_review_1/#%e4%b9%9ddocker-compose-%e5%91%bd%e4%bb%a4">九、Docker Compose 命令</a></li>
+<li><a href="/post/docker_review_1/#%e5%8d%81%e5%85%b6%e4%bb%96%e5%ae%9e%e7%94%a8%e5%91%bd%e4%bb%a4">十、其他实用命令</a></li>
+<li><a href="/post/docker_review_1/#%e9%99%84%e5%b8%b8%e7%94%a8%e9%80%89%e9%a1%b9%e9%80%9f%e6%9f%a5">附：常用选项速查</a></li>
+</ul>
+<hr>
+<h2 id="一容器生命周期管理">一、容器生命周期管理</h2>
+<table>
+  <thead>
+      <tr>
+          <th>命令</th>
+          <th>说明</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>docker create [OPTIONS] IMAGE [COMMAND] [ARG...]</code></td>
+          <td>创建容器但不启动</td>
+      </tr>
+      <tr>
+          <td><code>docker run [OPTIONS] IMAGE [COMMAND] [ARG...]</code></td>
+          <td>创建并启动容器</td>
+      </tr>
+      <tr>
+          <td><code>docker start [CONTAINER...]</code></td>
+          <td>启动已停止的容器</td>
+      </tr>
+      <tr>
+          <td><code>docker stop [CONTAINER...]</code></td>
+          <td>优雅停止运行中的容器（SIGTERM → SIGKILL）</td>
+      </tr>
+      <tr>
+          <td><code>docker restart [CONTAINER...]</code></td>
+          <td>重启容器</td>
+      </tr>
+      <tr>
+          <td><code>docker kill [CONTAINER...]</code></td>
+          <td>强制终止容器（默认 SIGKILL）</td>
+      </tr>
+      <tr>
+          <td><code>docker pause [CONTAINER...]</code></td>
+          <td>暂停容器内所有进程</td>
+      </tr>
+      <tr>
+          <td><code>docker unpause [CONTAINER...]</code></td>
+          <td>恢复暂停的容器</td>
+      </tr>
+      <tr>
+          <td><code>docker rm [CONTAINER...]</code></td>
+          <td>删除已停止的容器</td>
+      </tr>
+      <tr>
+          <td><code>docker container prune</code></td>
+          <td>删除所有已停止的容器</td>
+      </tr>
+  </tbody>
+</table>
+<blockquote>
+<p>💡 提示：<code>docker run --rm</code> 可在容器退出后自动删除。</p>
+</blockquote>
+<hr>
+<h2 id="二容器操作inspect--logs--exec">二、容器操作（Inspect / Logs / Exec）</h2>
+<table>
+  <thead>
+      <tr>
+          <th>命令</th>
+          <th>说明</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>docker ps [-a] [-q]</code></td>
+          <td>列出容器（<code>-a</code> 全部，<code>-q</code> 仅 ID）</td>
+      </tr>
+      <tr>
+          <td><code>docker inspect NAME|ID</code></td>
+          <td>查看容器/镜像/网络的详细 JSON 信息</td>
+      </tr>
+      <tr>
+          <td><code>docker logs [-f] [--tail N] CONTAINER</code></td>
+          <td>查看容器日志</td>
+      </tr>
+      <tr>
+          <td><code>docker exec [-it] CONTAINER COMMAND</code></td>
+          <td>在运行中容器内执行命令</td>
+      </tr>
+      <tr>
+          <td><code>docker top CONTAINER</code></td>
+          <td>显示容器内进程（类似 <code>ps</code>）</td>
+      </tr>
+      <tr>
+          <td><code>docker stats [CONTAINER...]</code></td>
+          <td>实时监控资源使用（CPU/内存/网络）</td>
+      </tr>
+      <tr>
+          <td><code>docker cp SRC_PATH CONTAINER:DEST_PATH</code></td>
+          <td>主机 ↔ 容器间复制文件</td>
+      </tr>
+      <tr>
+          <td><code>docker diff CONTAINER</code></td>
+          <td>显示容器文件系统变更（A=新增, D=删除, C=修改）</td>
+      </tr>
+      <tr>
+          <td><code>docker port CONTAINER [PRIVATE_PORT]</code></td>
+          <td>查看端口映射关系</td>
+      </tr>
+  </tbody>
+</table>
+<hr>
+<h2 id="三容器的-rootfs-相关命令">三、容器的 RootFS 相关命令</h2>
+<blockquote>
+<p>RootFS（根文件系统）由镜像层 + 容器可写层组成，通常通过以下命令间接操作：</p>
+</blockquote>
+<table>
+  <thead>
+      <tr>
+          <th>命令</th>
+          <th>说明</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>docker export CONTAINER</code></td>
+          <td>导出容器文件系统为 tar（不含元数据）</td>
+      </tr>
+      <tr>
+          <td><code>docker commit CONTAINER [REPO:TAG]</code></td>
+          <td>将容器快照保存为新镜像</td>
+      </tr>
+      <tr>
+          <td><code>docker save IMAGE &gt; image.tar</code></td>
+          <td>保存镜像（含所有层）到 tar 文件</td>
+      </tr>
+      <tr>
+          <td><code>docker load &lt; image.tar</code></td>
+          <td>从 tar 文件加载镜像</td>
+      </tr>
+      <tr>
+          <td><code>docker diff CONTAINER</code></td>
+          <td>对比容器与原始镜像的文件差异</td>
+      </tr>
+  </tbody>
+</table>
+<blockquote>
+<p>⚠️ 不建议直接修改容器内部文件，应通过 Dockerfile 或 Volume 管理数据。</p>
+</blockquote>
+<hr>
+<h2 id="四本地镜像管理">四、本地镜像管理</h2>
+<table>
+  <thead>
+      <tr>
+          <th>命令</th>
+          <th>说明</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>docker images [-a] [-q]</code></td>
+          <td>列出本地镜像</td>
+      </tr>
+      <tr>
+          <td><code>docker rmi IMAGE [IMAGE...]</code></td>
+          <td>删除镜像</td>
+      </tr>
+      <tr>
+          <td><code>docker build -t NAME:TAG .</code></td>
+          <td>从当前目录 Dockerfile 构建镜像</td>
+      </tr>
+      <tr>
+          <td><code>docker tag SOURCE_IMAGE TARGET_IMAGE</code></td>
+          <td>为镜像打新标签</td>
+      </tr>
+      <tr>
+          <td><code>docker history IMAGE</code></td>
+          <td>查看镜像构建历史层</td>
+      </tr>
+      <tr>
+          <td><code>docker image prune [-a]</code></td>
+          <td>清理未使用的镜像（<code>-a</code> 删除所有未被容器引用的镜像）</td>
+      </tr>
+      <tr>
+          <td><code>docker image ls</code></td>
+          <td>同 <code>docker images</code></td>
+      </tr>
+  </tbody>
+</table>
+<hr>
+<h2 id="五镜像仓库registry操作">五、镜像仓库（Registry）操作</h2>
+<table>
+  <thead>
+      <tr>
+          <th>命令</th>
+          <th>说明</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>docker login [REGISTRY]</code></td>
+          <td>登录镜像仓库（如 Docker Hub、私有 Registry）</td>
+      </tr>
+      <tr>
+          <td><code>docker logout [REGISTRY]</code></td>
+          <td>退出登录</td>
+      </tr>
+      <tr>
+          <td><code>docker pull IMAGE[:TAG]</code></td>
+          <td>从仓库拉取镜像</td>
+      </tr>
+      <tr>
+          <td><code>docker push IMAGE[:TAG]</code></td>
+          <td>推送本地镜像到仓库</td>
+      </tr>
+      <tr>
+          <td><code>docker search TERM</code></td>
+          <td>在 Docker Hub 搜索镜像（功能已弱化，建议网页搜索）</td>
+      </tr>
+  </tbody>
+</table>
+<blockquote>
+<p>示例：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">docker login registry.example.com
+</span></span><span class="line"><span class="ln">2</span><span class="cl">docker pull nginx:alpine
+</span></span><span class="line"><span class="ln">3</span><span class="cl">docker tag myapp:latest registry.example.com/myapp:v1
+</span></span><span class="line"><span class="ln">4</span><span class="cl">docker push registry.example.com/myapp:v1
+</span></span></code></pre></div></blockquote>
+<hr>
+<h2 id="六系统信息与版本">六、系统信息与版本</h2>
+<table>
+  <thead>
+      <tr>
+          <th>命令</th>
+          <th>说明</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>docker info</code></td>
+          <td>显示 Docker 系统信息（存储驱动、内核、容器数等）</td>
+      </tr>
+      <tr>
+          <td><code>docker version</code></td>
+          <td>显示客户端和服务器版本</td>
+      </tr>
+      <tr>
+          <td><code>docker system df</code></td>
+          <td>显示磁盘使用情况（镜像、容器、卷、构建缓存）</td>
+      </tr>
+      <tr>
+          <td><code>docker system prune [-a] [--volumes]</code></td>
+          <td>清理未使用资源（加 <code>--volumes</code> 可删卷）</td>
+      </tr>
+  </tbody>
+</table>
+<hr>
+<h2 id="七网络命令network">七、网络命令（Network）</h2>
+<table>
+  <thead>
+      <tr>
+          <th>命令</th>
+          <th>说明</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>docker network ls</code></td>
+          <td>列出所有网络</td>
+      </tr>
+      <tr>
+          <td><code>docker network create [--driver bridge] NAME</code></td>
+          <td>创建自定义网络</td>
+      </tr>
+      <tr>
+          <td><code>docker network inspect NETWORK</code></td>
+          <td>查看网络详情（含连接的容器）</td>
+      </tr>
+      <tr>
+          <td><code>docker network connect NETWORK CONTAINER</code></td>
+          <td>将容器加入网络</td>
+      </tr>
+      <tr>
+          <td><code>docker network disconnect NETWORK CONTAINER</code></td>
+          <td>将容器移出网络</td>
+      </tr>
+      <tr>
+          <td><code>docker network rm NETWORK</code></td>
+          <td>删除网络</td>
+      </tr>
+      <tr>
+          <td><code>docker network prune</code></td>
+          <td>删除未使用的网络</td>
+      </tr>
+  </tbody>
+</table>
+<blockquote>
+<p>默认网络类型：<code>bridge</code>（单机）、<code>host</code>、<code>none</code>；Swarm 模式支持 <code>overlay</code>。</p>
+</blockquote>
+<hr>
+<h2 id="八卷命令volume">八、卷命令（Volume）</h2>
+<table>
+  <thead>
+      <tr>
+          <th>命令</th>
+          <th>说明</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>docker volume create NAME</code></td>
+          <td>创建命名卷</td>
+      </tr>
+      <tr>
+          <td><code>docker volume ls</code></td>
+          <td>列出所有卷</td>
+      </tr>
+      <tr>
+          <td><code>docker volume inspect NAME</code></td>
+          <td>查看卷详细信息（如 Mountpoint）</td>
+      </tr>
+      <tr>
+          <td><code>docker volume rm NAME</code></td>
+          <td>删除卷</td>
+      </tr>
+      <tr>
+          <td><code>docker volume prune</code></td>
+          <td>删除未使用的卷</td>
+      </tr>
+      <tr>
+          <td><code>docker run -v /host:/container</code></td>
+          <td>绑定挂载（Bind Mount）</td>
+      </tr>
+      <tr>
+          <td><code>docker run -v vol_name:/container/path</code></td>
+          <td>使用命名卷</td>
+      </tr>
+  </tbody>
+</table>
+<blockquote>
+<p>✅ 推荐使用命名卷进行持久化存储。</p>
+</blockquote>
+<hr>
+<h2 id="九docker-compose-命令">九、Docker Compose 命令</h2>
+<blockquote>
+<p>使用内置插件 <code>docker compose</code>（推荐）或旧版 <code>docker-compose</code></p>
+</blockquote>
+<table>
+  <thead>
+      <tr>
+          <th>命令</th>
+          <th>说明</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>docker compose up [-d]</code></td>
+          <td>启动服务（<code>-d</code> 后台）</td>
+      </tr>
+      <tr>
+          <td><code>docker compose down [--volumes]</code></td>
+          <td>停止并移除服务（加 <code>--volumes</code> 删除卷）</td>
+      </tr>
+      <tr>
+          <td><code>docker compose ps</code></td>
+          <td>列出服务容器状态</td>
+      </tr>
+      <tr>
+          <td><code>docker compose logs [-f] [SERVICE]</code></td>
+          <td>查看服务日志</td>
+      </tr>
+      <tr>
+          <td><code>docker compose build [SERVICE]</code></td>
+          <td>构建服务镜像</td>
+      </tr>
+      <tr>
+          <td><code>docker compose config</code></td>
+          <td>验证并输出 compose 配置</td>
+      </tr>
+      <tr>
+          <td><code>docker compose restart [SERVICE]</code></td>
+          <td>重启服务</td>
+      </tr>
+      <tr>
+          <td><code>docker compose exec SERVICE CMD</code></td>
+          <td>在服务容器中执行命令</td>
+      </tr>
+      <tr>
+          <td><code>docker compose pull [SERVICE]</code></td>
+          <td>拉取服务所需镜像</td>
+      </tr>
+  </tbody>
+</table>
+<blockquote>
+<p>默认配置文件：<code>docker-compose.yml</code> 或 <code>compose.yaml</code></p>
+</blockquote>
+<hr>
+<h2 id="十其他实用命令">十、其他实用命令</h2>
+<table>
+  <thead>
+      <tr>
+          <th>命令</th>
+          <th>说明</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>docker builder prune</code></td>
+          <td>清理 BuildKit 构建缓存</td>
+      </tr>
+      <tr>
+          <td><code>docker events</code></td>
+          <td>实时监听 Docker 事件流</td>
+      </tr>
+      <tr>
+          <td><code>docker wait CONTAINER</code></td>
+          <td>阻塞等待容器退出，返回退出码</td>
+      </tr>
+      <tr>
+          <td><code>docker update --memory=512m CONTAINER</code></td>
+          <td>动态更新容器资源限制</td>
+      </tr>
+      <tr>
+          <td><code>docker rename OLD_NAME NEW_NAME</code></td>
+          <td>重命名容器</td>
+      </tr>
+  </tbody>
+</table>
+<hr>
+<h2 id="附常用选项速查">附：常用选项速查</h2>
+<table>
+  <thead>
+      <tr>
+          <th>选项</th>
+          <th>说明</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>-d</code></td>
+          <td>后台运行（detached mode）</td>
+      </tr>
+      <tr>
+          <td><code>-it</code></td>
+          <td>交互式终端（<code>-i</code> 保持 STDIN，<code>-t</code> 分配 TTY）</td>
+      </tr>
+      <tr>
+          <td><code>-p HOST:CONTAINER</code></td>
+          <td>端口映射（如 <code>-p 8080:80</code>）</td>
+      </tr>
+      <tr>
+          <td><code>-v /host:/container</code></td>
+          <td>绑定挂载主机目录</td>
+      </tr>
+      <tr>
+          <td><code>-v vol_name:/path</code></td>
+          <td>使用命名卷</td>
+      </tr>
+      <tr>
+          <td><code>--rm</code></td>
+          <td>容器退出后自动删除</td>
+      </tr>
+      <tr>
+          <td><code>--name NAME</code></td>
+          <td>指定容器名称</td>
+      </tr>
+      <tr>
+          <td><code>-e KEY=VALUE</code> 或 <code>--env</code></td>
+          <td>设置环境变量</td>
+      </tr>
+      <tr>
+          <td><code>--network NETWORK</code></td>
+          <td>指定网络</td>
+      </tr>
+      <tr>
+          <td><code>--memory=&quot;512m&quot;</code></td>
+          <td>限制内存</td>
+      </tr>
+      <tr>
+          <td><code>--cpus=1.5</code></td>
+          <td>限制 CPU 使用</td>
+      </tr>
+  </tbody>
+</table>
+<hr>
+<blockquote>
+<p>📌 <strong>提示</strong>：任何命令均可加 <code>--help</code> 查看详细用法，例如：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">docker run --help
+</span></span><span class="line"><span class="ln">2</span><span class="cl">docker compose up --help
+</span></span></code></pre></div></blockquote>
+<hr>
 
-    </a>
-    <a href="#linkedinshare" id = "linkedinshare" class="linkedin" title="分享到 LinkedIn" rel="nofollow">
-      <svg class="icon">
-  <title>linkedin</title>
-  <use xlink:href="#linkedin"></use>
-</svg>
+    </div><div class="post_comments">
+  
+  
+  
+  
+</div>
 
-    </a>
-    <a href="https://jianlin-li.github.io/post/local_enviroment_info/" title="Copy Link" class="link link_yank">
-      <svg class="icon">
-  <title>copy</title>
-  <use xlink:href="#copy"></use>
-</svg>
 
-    </a>
-  </div>
-  </span>
-  </div>
 
-    </div>
-      <div class="excerpt_footer">
-        <div class="pale">
-          
-            <p>本地环境相关配置信息 1local.rabbitmq.com 2　brew services restart rabbitmq 3　4 5local.gitlab.com 6　dockerdesktop 启动容器 7 8 9local.harbors.com 10　dockerdesktop 启动容器 11　12 13local.jenkins.com 14　brew services restart jenkins 15 16 17local.elasticsearch.com 18　4个node 19　ljl-maci9 master 先启动(LaunchControl 里面启动elasticsearch服务) 20　vm7-4 …</p>
-          
-          <br>
-          <a href="https://jianlin-li.github.io/post/local_enviroment_info/" title="阅读更多" class="excerpt_more button">阅读更多</a>
-        </div>
-      </div>
-    </div>
-  </li>
 
-      <li>
-      </li>
-    </ul>
-  </div>
+  </article>
 <aside class="sidebar">
   <section class="sidebar_inner">
     <br>
     
   
   <div class="search">
-    <input type="search" class="search_field form_field" placeholder='搜索内容...' id="find" autocomplete="off" data-scope='categories'>
+    <input type="search" class="search_field form_field" placeholder='搜索内容...' id="find" autocomplete="off" data-scope='post'>
     <label for="find" class="search_label"><svg class="icon">
   <title>search</title>
   <use xlink:href="#search"></use>
@@ -600,9 +1082,8 @@
   </section>
 </aside>
 
+  
 </div>
-
-
     </main><svg width="0" height="0" class="hidden">
   <symbol viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" id="facebook">
     <path d="M437 0H75C33.648 0 0 33.648 0 75v362c0 41.352 33.648 75 75 75h151V331h-60v-90h60v-61c0-49.629 40.371-90 90-90h91v90h-91v61h91l-15 90h-76v181h121c41.352 0 75-33.648 75-75V75c0-41.352-33.648-75-75-75zm0 0"></path>

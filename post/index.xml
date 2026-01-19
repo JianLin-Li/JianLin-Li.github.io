@@ -7,7 +7,123 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
     <copyright>Copyright © 1989–2025, 李建林 </copyright>
-    <lastBuildDate>Wed, 10 Dec 2025 10:36:29 +0800</lastBuildDate><atom:link href="https://jianlin-li.github.io/post/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Mon, 19 Jan 2026 17:22:44 +0800</lastBuildDate><atom:link href="https://jianlin-li.github.io/post/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Docker的知识点-1</title>
+      <link>https://jianlin-li.github.io/post/docker_review_1/</link>
+      <pubDate>Mon, 19 Jan 2026 17:22:44 +0800</pubDate>
+      
+      <guid>https://jianlin-li.github.io/post/docker_review_1/</guid>
+      <description>
+        
+          
+            &lt;h1 id=&#34;docker-架构示意图&#34;&gt;Docker 架构示意图&lt;/h1&gt;
+&lt;p&gt;&lt;figure&gt;
+  &lt;picture&gt;
+
+    
+      
+        
+        
+        
+        
+        
+        
+    &lt;img
+      loading=&#34;lazy&#34;
+      decoding=&#34;async&#34;
+      alt=&#34;Docker 架构示意图&#34;
+      
+        class=&#34;image_figure image_internal image_unprocessed&#34;
+        src=&#34;https://jianlin-li.github.io/images/docker-architecture.webp&#34;
+      
+      
+    /&gt;
+
+    &lt;/picture&gt;
+&lt;/figure&gt;
+&lt;/p&gt;
+&lt;hr&gt;
+&lt;h1 id=&#34;-docker-命令大全完整版&#34;&gt;🐳 Docker 命令大全（完整版）&lt;/h1&gt;
+&lt;blockquote&gt;
+&lt;p&gt;适用于 Docker CLI（20.x+ 版本），涵盖容器、镜像、网络、卷、Compose 等核心操作。&lt;br&gt;
+最后更新：2026年1月&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;hr&gt;
+&lt;h2 id=&#34;目录&#34;&gt;目录&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://jianlin-li.github.io/post/docker_review_1/#%e4%b8%80%e5%ae%b9%e5%99%a8%e7%94%9f%e5%91%bd%e5%91%a8%e6%9c%9f%e7%ae%a1%e7%90%86&#34;&gt;一、容器生命周期管理&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://jianlin-li.github.io/post/docker_review_1/#%e4%ba%8c%e5%ae%b9%e5%99%a8%e6%93%8d%e4%bd%9cinspect--logs--exec&#34;&gt;二、容器操作（Inspect / Logs / Exec）&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://jianlin-li.github.io/post/docker_review_1/#%e4%b8%89%e5%ae%b9%e5%99%a8%e7%9a%84-rootfs-%e7%9b%b8%e5%85%b3%e5%91%bd%e4%bb%a4&#34;&gt;三、容器的 RootFS 相关命令&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://jianlin-li.github.io/post/docker_review_1/#%e5%9b%9b%e6%9c%ac%e5%9c%b0%e9%95%9c%e5%83%8f%e7%ae%a1%e7%90%86&#34;&gt;四、本地镜像管理&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://jianlin-li.github.io/post/docker_review_1/#%e4%ba%94%e9%95%9c%e5%83%8f%e4%bb%93%e5%ba%93registry%e6%93%8d%e4%bd%9c&#34;&gt;五、镜像仓库（Registry）操作&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://jianlin-li.github.io/post/docker_review_1/#%e5%85%ad%e7%b3%bb%e7%bb%9f%e4%bf%a1%e6%81%af%e4%b8%8e%e7%89%88%e6%9c%ac&#34;&gt;六、系统信息与版本&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://jianlin-li.github.io/post/docker_review_1/#%e4%b8%83%e7%bd%91%e7%bb%9c%e5%91%bd%e4%bb%a4network&#34;&gt;七、网络命令（Network）&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://jianlin-li.github.io/post/docker_review_1/#%e5%85%ab%e5%8d%b7%e5%91%bd%e4%bb%a4volume&#34;&gt;八、卷命令（Volume）&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://jianlin-li.github.io/post/docker_review_1/#%e4%b9%9ddocker-compose-%e5%91%bd%e4%bb%a4&#34;&gt;九、Docker Compose 命令&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://jianlin-li.github.io/post/docker_review_1/#%e5%8d%81%e5%85%b6%e4%bb%96%e5%ae%9e%e7%94%a8%e5%91%bd%e4%bb%a4&#34;&gt;十、其他实用命令&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://jianlin-li.github.io/post/docker_review_1/#%e9%99%84%e5%b8%b8%e7%94%a8%e9%80%89%e9%a1%b9%e9%80%9f%e6%9f%a5&#34;&gt;附：常用选项速查&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;h2 id=&#34;一容器生命周期管理&#34;&gt;一、容器生命周期管理&lt;/h2&gt;
+&lt;table&gt;
+  &lt;thead&gt;
+      &lt;tr&gt;
+          &lt;th&gt;命令&lt;/th&gt;
+          &lt;th&gt;说明&lt;/th&gt;
+      &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+      &lt;tr&gt;
+          &lt;td&gt;&lt;code&gt;docker create [OPTIONS] IMAGE [COMMAND] [ARG...]&lt;/code&gt;&lt;/td&gt;
+          &lt;td&gt;创建容器但不启动&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;&lt;code&gt;docker run [OPTIONS] IMAGE [COMMAND] [ARG...]&lt;/code&gt;&lt;/td&gt;
+          &lt;td&gt;创建并启动容器&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;&lt;code&gt;docker start [CONTAINER...]&lt;/code&gt;&lt;/td&gt;
+          &lt;td&gt;启动已停止的容器&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;&lt;code&gt;docker stop [CONTAINER...]&lt;/code&gt;&lt;/td&gt;
+          &lt;td&gt;优雅停止运行中的容器（SIGTERM → SIGKILL）&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;&lt;code&gt;docker restart [CONTAINER...]&lt;/code&gt;&lt;/td&gt;
+          &lt;td&gt;重启容器&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;&lt;code&gt;docker kill [CONTAINER...]&lt;/code&gt;&lt;/td&gt;
+          &lt;td&gt;强制终止容器（默认 SIGKILL）&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;&lt;code&gt;docker pause [CONTAINER...]&lt;/code&gt;&lt;/td&gt;
+          &lt;td&gt;暂停容器内所有进程&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;&lt;code&gt;docker unpause [CONTAINER...]&lt;/code&gt;&lt;/td&gt;
+          &lt;td&gt;恢复暂停的容器&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;&lt;code&gt;docker rm [CONTAINER...]&lt;/code&gt;&lt;/td&gt;
+          &lt;td&gt;删除已停止的容器&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;&lt;code&gt;docker container prune&lt;/code&gt;&lt;/td&gt;
+          &lt;td&gt;删除所有已停止的容器&lt;/td&gt;
+      &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;blockquote&gt;
+&lt;p&gt;💡 提示：&lt;code&gt;docker run --rm&lt;/code&gt; 可在容器退出后自动删除。&lt;/p&gt;
+          
+          
+        
+      </description>
+    </item>
+    
     <item>
       <title>Go语言的知识点-4</title>
       <link>https://jianlin-li.github.io/post/go_review_4/</link>
