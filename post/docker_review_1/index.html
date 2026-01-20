@@ -168,7 +168,7 @@
     <span class="post_date">
       2026-01-19	  
     </span>
-    <span class="post_time"> · 3 分钟阅读</span><span>&nbsp;· <a href='https://jianlin-li.github.io/tags/docker/' title="Docker" class="post_tag button button_translucent">Docker
+    <span class="post_time"> · 10 分钟阅读</span><span>&nbsp;· <a href='https://jianlin-li.github.io/tags/docker/' title="Docker" class="post_tag button button_translucent">Docker
         </a>
     </span>
     <span class="page_only">&nbsp;·
@@ -735,6 +735,972 @@
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">docker run --help
 </span></span><span class="line"><span class="ln">2</span><span class="cl">docker compose up --help
 </span></span></code></pre></div></blockquote>
+<hr>
+<h1 id="dockerfile-所有指令详解全量按官方文档整理截至-docker-26x包含语法作用最佳实践和示例适用于构建高效安全可维护的镜像">Dockerfile 所有指令详解（全量）按官方文档整理（截至 Docker 26.x），包含语法、作用、最佳实践和示例。适用于构建高效、安全、可维护的镜像。</h1>
+<hr>
+<h2 id="目录-1">目录</h2>
+<ul>
+<li><a href="/post/docker_review_1/#1-from--%e5%9f%ba%e7%a1%80%e9%95%9c%e5%83%8f">1. <code>FROM</code> —— 基础镜像</a></li>
+<li><a href="/post/docker_review_1/#2-run--%e6%9e%84%e5%bb%ba%e6%97%b6%e6%89%a7%e8%a1%8c%e5%91%bd%e4%bb%a4">2. <code>RUN</code> —— 构建时执行命令</a></li>
+<li><a href="/post/docker_review_1/#3-cmd--%e5%ae%b9%e5%99%a8%e5%90%af%e5%8a%a8%e9%bb%98%e8%ae%a4%e5%91%bd%e4%bb%a4">3. <code>CMD</code> —— 容器启动默认命令</a></li>
+<li><a href="/post/docker_review_1/#4-entrypoint--%e5%ae%b9%e5%99%a8%e4%b8%bb%e5%85%a5%e5%8f%a3%e7%a8%8b%e5%ba%8f">4. <code>ENTRYPOINT</code> —— 容器主入口程序</a></li>
+<li><a href="/post/docker_review_1/#5-label--%e6%b7%bb%e5%8a%a0%e5%85%83%e6%95%b0%e6%8d%ae%e6%a0%87%e7%ad%be">5. <code>LABEL</code> —— 添加元数据标签</a></li>
+<li><a href="/post/docker_review_1/#6-expose--%e5%a3%b0%e6%98%8e%e7%9b%91%e5%90%ac%e7%ab%af%e5%8f%a3">6. <code>EXPOSE</code> —— 声明监听端口</a></li>
+<li><a href="/post/docker_review_1/#7-env--%e8%ae%be%e7%bd%ae%e7%8e%af%e5%a2%83%e5%8f%98%e9%87%8f">7. <code>ENV</code> —— 设置环境变量</a></li>
+<li><a href="/post/docker_review_1/#8-add--%e5%a4%8d%e5%88%b6%e6%96%87%e4%bb%b6%e7%9b%ae%e5%bd%95url-%e5%88%b0%e9%95%9c%e5%83%8f%e6%99%ba%e8%83%bd%e7%89%88">8. <code>ADD</code> —— 复制文件/目录/URL 到镜像（智能版）</a></li>
+<li><a href="/post/docker_review_1/#9-copy--%e5%a4%8d%e5%88%b6%e6%9c%ac%e5%9c%b0%e6%96%87%e4%bb%b6%e7%9b%ae%e5%bd%95%e5%88%b0%e9%95%9c%e5%83%8f%e6%8e%a8%e8%8d%90">9. <code>COPY</code> —— 复制本地文件/目录到镜像（推荐）</a></li>
+<li><a href="/post/docker_review_1/#10-volume--%e5%88%9b%e5%bb%ba%e6%8c%82%e8%bd%bd%e7%82%b9">10. <code>VOLUME</code> —— 创建挂载点</a></li>
+<li><a href="/post/docker_review_1/#11-user--%e6%8c%87%e5%ae%9a%e8%bf%90%e8%a1%8c%e7%94%a8%e6%88%b7">11. <code>USER</code> —— 指定运行用户</a></li>
+<li><a href="/post/docker_review_1/#12-workdir--%e8%ae%be%e7%bd%ae%e5%b7%a5%e4%bd%9c%e7%9b%ae%e5%bd%95">12. <code>WORKDIR</code> —— 设置工作目录</a></li>
+<li><a href="/post/docker_review_1/#13-arg--%e6%9e%84%e5%bb%ba%e5%8f%82%e6%95%b0%e9%9d%9e%e6%8c%81%e4%b9%85%e5%8c%96">13. <code>ARG</code> —— 构建参数（非持久化）</a></li>
+<li><a href="/post/docker_review_1/#14-onbuild--%e8%a7%a6%e5%8f%91%e5%99%a8%e5%ad%90%e9%95%9c%e5%83%8f%e6%9e%84%e5%bb%ba%e6%97%b6%e6%89%a7%e8%a1%8c">14. <code>ONBUILD</code> —— 触发器（子镜像构建时执行）</a></li>
+<li><a href="/post/docker_review_1/#15-stopsignal--%e8%ae%be%e7%bd%ae%e5%81%9c%e6%ad%a2%e4%bf%a1%e5%8f%b7">15. <code>STOPSIGNAL</code> —— 设置停止信号</a></li>
+<li><a href="/post/docker_review_1/#16-healthcheck--%e5%81%a5%e5%ba%b7%e6%a3%80%e6%9f%a5">16. <code>HEALTHCHECK</code> —— 健康检查</a></li>
+<li><a href="/post/docker_review_1/#17-shell--%e6%8c%87%e5%ae%9a-runcmdentrypoint-%e7%9a%84-shell">17. <code>SHELL</code> —— 指定 RUN/CMD/ENTRYPOINT 的 shell</a></li>
+<li><a href="/post/docker_review_1/#18-comment--%e6%b3%a8%e9%87%8a--%e9%9d%9e%e6%8c%87%e4%bb%a4%e4%bd%86%e5%b8%b8%e7%94%a8">18. <code>COMMENT</code>（# 注释）—— 非指令但常用</a></li>
+</ul>
+<hr>
+<h3 id="1-from--基础镜像">1. <code>FROM</code> —— 基础镜像</h3>
+<p><strong>作用</strong>：指定构建镜像的基础镜像（必须是第一条非注释指令）。</p>
+<p><strong>语法</strong>：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-dockerfile" data-lang="dockerfile"><span class="line"><span class="ln">1</span><span class="cl"><span class="k">FROM</span><span class="w"> </span><span class="s">&lt;image</span>&gt; <span class="o">[</span>AS &lt;name&gt;<span class="o">]</span>                <span class="c1"># 单阶段</span><span class="err">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="k">FROM</span><span class="w"> </span><span class="s">&lt;image&gt;[:&lt;tag</span>&gt;<span class="o">]</span> <span class="o">[</span>AS &lt;name&gt;<span class="o">]</span>        <span class="c1"># 指定 tag</span><span class="err">
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="k">FROM</span><span class="w"> </span><span class="s">&lt;image&gt;[@&lt;digest</span>&gt;<span class="o">]</span> <span class="o">[</span>AS &lt;name&gt;<span class="o">]</span>     <span class="c1"># 指定 digest（最安全）</span><span class="err">
+</span></span></span></code></pre></div><p><strong>说明</strong>：</p>
+<ul>
+<li>支持多阶段构建（<code>AS &lt;name&gt;</code>），用于减小最终镜像体积。</li>
+<li>若未指定 tag，默认为 <code>latest</code>（不推荐）。</li>
+</ul>
+<p><strong>示例</strong>：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-dockerfile" data-lang="dockerfile"><span class="line"><span class="ln">1</span><span class="cl"><span class="k">FROM</span><span class="w"> </span><span class="s">alpine:3.18</span><span class="err">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="k">FROM</span><span class="w"> </span><span class="s">node:18-alpine</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="s">builder</span><span class="err">
+</span></span></span></code></pre></div><hr>
+<h3 id="2-run--构建时执行命令">2. <code>RUN</code> —— 构建时执行命令</h3>
+<p><strong>作用</strong>：在镜像构建过程中执行命令（每条 <code>RUN</code> 生成一个新层）。</p>
+<p><strong>语法</strong>：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-dockerfile" data-lang="dockerfile"><span class="line"><span class="ln">1</span><span class="cl"><span class="c"># Shell 形式（不推荐）</span><span class="err">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="k">RUN</span> &lt;command&gt;<span class="err">
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="err">
+</span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="c"># Exec 形式（推荐）</span><span class="err">
+</span></span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="k">RUN</span> <span class="o">[</span><span class="s2">&#34;executable&#34;</span>, <span class="s2">&#34;param1&#34;</span>, <span class="s2">&#34;param2&#34;</span><span class="o">]</span><span class="err">
+</span></span></span></code></pre></div><p><strong>最佳实践</strong>：</p>
+<ul>
+<li>合并多个命令减少层数（用 <code>&amp;&amp;</code> 连接）。</li>
+<li>清理缓存（如 <code>apt-get clean</code>）。</li>
+</ul>
+<p><strong>示例</strong>：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-dockerfile" data-lang="dockerfile"><span class="line"><span class="ln">1</span><span class="cl"><span class="k">RUN</span> apt-get update <span class="o">&amp;&amp;</span> apt-get install -y curl <span class="o">&amp;&amp;</span> rm -rf /var/lib/apt/lists/*<span class="err">
+</span></span></span></code></pre></div><hr>
+<h3 id="3-cmd--容器启动默认命令">3. <code>CMD</code> —— 容器启动默认命令</h3>
+<p><strong>作用</strong>：提供容器启动时的<strong>默认参数</strong>（可被 <code>docker run</code> 覆盖）。</p>
+<p><strong>语法</strong>（三种形式，仅最后一行生效）：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-dockerfile" data-lang="dockerfile"><span class="line"><span class="ln">1</span><span class="cl"><span class="k">CMD</span> <span class="p">[</span><span class="s2">&#34;executable&#34;</span><span class="p">,</span><span class="s2">&#34;param1&#34;</span><span class="p">,</span><span class="s2">&#34;param2&#34;</span><span class="p">]</span>   <span class="c1"># exec 形式（推荐）</span><span class="err">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="k">CMD</span> <span class="p">[</span><span class="s2">&#34;param1&#34;</span><span class="p">,</span><span class="s2">&#34;param2&#34;</span><span class="p">]</span>                <span class="c1"># 作为 ENTRYPOINT 的默认参数</span><span class="err">
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="k">CMD</span> <span class="nb">command</span> param1 param2              <span class="c1"># shell 形式（不推荐）</span><span class="err">
+</span></span></span></code></pre></div><p><strong>注意</strong>：若与 <code>ENTRYPOINT</code> 共存，<code>CMD</code> 内容作为参数传入。</p>
+<hr>
+<h3 id="4-entrypoint--容器主入口程序">4. <code>ENTRYPOINT</code> —— 容器主入口程序</h3>
+<p><strong>作用</strong>：定义容器的<strong>主程序</strong>（不易被覆盖）。</p>
+<p><strong>语法</strong>：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-dockerfile" data-lang="dockerfile"><span class="line"><span class="ln">1</span><span class="cl"><span class="k">ENTRYPOINT</span> <span class="p">[</span><span class="s2">&#34;executable&#34;</span><span class="p">,</span> <span class="s2">&#34;param1&#34;</span><span class="p">,</span> <span class="s2">&#34;param2&#34;</span><span class="p">]</span>  <span class="c1"># exec 形式（推荐）</span><span class="err">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="k">ENTRYPOINT</span> <span class="nb">command</span> param1 param2               <span class="c1"># shell 形式（不推荐）</span><span class="err">
+</span></span></span></code></pre></div><p><strong>特点</strong>：</p>
+<ul>
+<li><code>docker run &lt;image&gt; arg1</code> → <code>arg1</code> 会追加到 <code>ENTRYPOINT</code> 后。</li>
+<li>可用 <code>--entrypoint</code> 强制覆盖。</li>
+</ul>
+<p><strong>最佳实践</strong>：固定应用入口，如 <code>[&quot;nginx&quot;, &quot;-g&quot;, &quot;daemon off;&quot;]</code>。</p>
+<hr>
+<h3 id="5-label--添加元数据标签">5. <code>LABEL</code> —— 添加元数据标签</h3>
+<p><strong>作用</strong>：为镜像添加键值对元数据（替代旧版 <code>MAINTAINER</code>）。</p>
+<p><strong>语法</strong>：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-dockerfile" data-lang="dockerfile"><span class="line"><span class="ln">1</span><span class="cl"><span class="k">LABEL</span> &lt;key&gt;<span class="o">=</span>&lt;value&gt; &lt;key2&gt;<span class="o">=</span>&lt;value2&gt; ...<span class="err">
+</span></span></span></code></pre></div><p><strong>示例</strong>：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-dockerfile" data-lang="dockerfile"><span class="line"><span class="ln">1</span><span class="cl"><span class="k">LABEL</span> <span class="nv">maintainer</span><span class="o">=</span><span class="s2">&#34;dev@example.com&#34;</span><span class="err">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="k">LABEL</span> <span class="nv">version</span><span class="o">=</span><span class="s2">&#34;1.0&#34;</span> <span class="nv">description</span><span class="o">=</span><span class="s2">&#34;My App&#34;</span><span class="err">
+</span></span></span></code></pre></div><p>查看标签：<code>docker inspect --format='{{json .Config.Labels}}' image</code></p>
+<hr>
+<h3 id="6-expose--声明监听端口">6. <code>EXPOSE</code> —— 声明监听端口</h3>
+<p><strong>作用</strong>：<strong>声明</strong>容器运行时监听的端口（<strong>不实际发布端口</strong>）。</p>
+<p><strong>语法</strong>：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-dockerfile" data-lang="dockerfile"><span class="line"><span class="ln">1</span><span class="cl"><span class="k">EXPOSE</span><span class="w"> </span><span class="s">&lt;port</span>&gt; <span class="o">[</span>&lt;port&gt;/&lt;protocol&gt;...<span class="o">]</span><span class="err">
+</span></span></span></code></pre></div><p><strong>说明</strong>：</p>
+<ul>
+<li>仅为文档用途，需配合 <code>docker run -p</code> 才能从主机访问。</li>
+<li>默认协议为 TCP，可指定 UDP：<code>EXPOSE 53/udp</code></li>
+</ul>
+<hr>
+<h3 id="7-env--设置环境变量">7. <code>ENV</code> —— 设置环境变量</h3>
+<p><strong>作用</strong>：设置环境变量（在构建和运行时都可用）。</p>
+<p><strong>语法</strong>：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-dockerfile" data-lang="dockerfile"><span class="line"><span class="ln">1</span><span class="cl"><span class="k">ENV</span> &lt;key&gt;<span class="o">=</span>&lt;value&gt; ...<span class="err">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="k">ENV</span> &lt;key&gt; &lt;value&gt;<span class="err">
+</span></span></span></code></pre></div><p><strong>示例</strong>：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-dockerfile" data-lang="dockerfile"><span class="line"><span class="ln">1</span><span class="cl"><span class="k">ENV</span> <span class="nv">NODE_ENV</span><span class="o">=</span>production
+</span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="k">ENV</span> <span class="nv">PATH</span><span class="o">=</span><span class="s2">&#34;/usr/local/bin:</span><span class="nv">$PATH</span><span class="s2">&#34;</span><span class="err">
+</span></span></span></code></pre></div><p><strong>注意</strong>：每个 <code>ENV</code> 会创建新层，建议合并设置。</p>
+<hr>
+<h3 id="8-add--复制文件目录url-到镜像智能版">8. <code>ADD</code> —— 复制文件/目录/URL 到镜像（智能版）</h3>
+<p><strong>作用</strong>：复制文件、目录或远程 URL 到镜像中（<strong>自动解压 tar</strong>）。</p>
+<p><strong>语法</strong>：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-dockerfile" data-lang="dockerfile"><span class="line"><span class="ln">1</span><span class="cl"><span class="k">ADD</span> <span class="o">[</span>--chown<span class="o">=</span>&lt;user&gt;:&lt;group&gt;<span class="o">]</span> &lt;src&gt; ... &lt;dest&gt;<span class="err">
+</span></span></span></code></pre></div><p><strong>特性</strong>：</p>
+<ul>
+<li>支持 URL 下载（不推荐，破坏可重现性）。</li>
+<li>自动解压本地 <code>.tar</code>, <code>.gz</code> 等（仅限本地路径）。</li>
+<li><strong>一般优先使用 <code>COPY</code></strong>，除非需要自动解压或 URL 功能。</li>
+</ul>
+<hr>
+<h3 id="9-copy--复制本地文件目录到镜像推荐">9. <code>COPY</code> —— 复制本地文件/目录到镜像（推荐）</h3>
+<p><strong>作用</strong>：将构建上下文中的文件/目录复制到镜像（<strong>不处理 URL，不解压</strong>）。</p>
+<p><strong>语法</strong>：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-dockerfile" data-lang="dockerfile"><span class="line"><span class="ln">1</span><span class="cl"><span class="k">COPY</span> <span class="o">[</span>--chown<span class="o">=</span>&lt;user&gt;:&lt;group&gt;<span class="o">]</span> &lt;src&gt; ... &lt;dest&gt;<span class="err">
+</span></span></span></code></pre></div><p><strong>最佳实践</strong>：</p>
+<ul>
+<li>优先使用 <code>COPY</code> 而非 <code>ADD</code>。</li>
+<li>使用 <code>.dockerignore</code> 排除无关文件。</li>
+</ul>
+<p><strong>示例</strong>：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-dockerfile" data-lang="dockerfile"><span class="line"><span class="ln">1</span><span class="cl"><span class="k">COPY</span> app.js /app/<span class="err">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="k">COPY</span> --chown<span class="o">=</span>node:node . /app<span class="err">
+</span></span></span></code></pre></div><hr>
+<h3 id="10-volume--创建挂载点">10. <code>VOLUME</code> —— 创建挂载点</h3>
+<p><strong>作用</strong>：创建一个挂载点，用于持久化数据或共享数据。</p>
+<p><strong>语法</strong>：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-dockerfile" data-lang="dockerfile"><span class="line"><span class="ln">1</span><span class="cl"><span class="k">VOLUME</span> <span class="p">[</span><span class="s2">&#34;/data&#34;</span><span class="p">]</span><span class="err">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="k">VOLUME</span><span class="w"> </span><span class="s">/var/log</span> /tmp<span class="err">
+</span></span></span></code></pre></div><p><strong>说明</strong>：</p>
+<ul>
+<li>容器启动时，若未挂载卷，Docker 会自动创建匿名卷。</li>
+<li><strong>不能挂载主机目录</strong>（需 <code>docker run -v /host:/container</code>）。</li>
+</ul>
+<hr>
+<h3 id="11-user--指定运行用户">11. <code>USER</code> —— 指定运行用户</h3>
+<p><strong>作用</strong>：设置后续 <code>RUN</code>、<code>CMD</code>、<code>ENTRYPOINT</code> 的运行用户。</p>
+<p><strong>语法</strong>：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-dockerfile" data-lang="dockerfile"><span class="line"><span class="ln">1</span><span class="cl"><span class="k">USER</span><span class="w"> </span><span class="s">&lt;user&gt;[:&lt;group</span>&gt;<span class="o">]</span><span class="err">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="k">USER</span><span class="w"> </span><span class="s">&lt;UID&gt;[:&lt;GID</span>&gt;<span class="o">]</span><span class="err">
+</span></span></span></code></pre></div><p><strong>安全建议</strong>：</p>
+<ul>
+<li>避免以 root 运行应用。</li>
+<li>示例：<code>USER 1000</code> 或 <code>USER node</code></li>
+</ul>
+<hr>
+<h3 id="12-workdir--设置工作目录">12. <code>WORKDIR</code> —— 设置工作目录</h3>
+<p><strong>作用</strong>：设置工作目录（后续 <code>RUN</code>、<code>CMD</code>、<code>COPY</code> 等的相对路径基准）。</p>
+<p><strong>语法</strong>：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-dockerfile" data-lang="dockerfile"><span class="line"><span class="ln">1</span><span class="cl"><span class="k">WORKDIR</span><span class="w"> </span><span class="s">/path/to/workdir</span><span class="err">
+</span></span></span></code></pre></div><p><strong>特点</strong>：</p>
+<ul>
+<li>若目录不存在会自动创建。</li>
+<li>可多次使用，路径可嵌套。</li>
+</ul>
+<p><strong>示例</strong>：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-dockerfile" data-lang="dockerfile"><span class="line"><span class="ln">1</span><span class="cl"><span class="k">WORKDIR</span><span class="w"> </span><span class="s">/app</span><span class="err">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="k">COPY</span> . .<span class="err">
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="k">RUN</span> npm install<span class="err">
+</span></span></span></code></pre></div><hr>
+<h3 id="13-arg--构建参数非持久化">13. <code>ARG</code> —— 构建参数（非持久化）</h3>
+<p><strong>作用</strong>：定义构建时变量（<strong>不会保留在最终镜像中</strong>）。</p>
+<p><strong>语法</strong>：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-dockerfile" data-lang="dockerfile"><span class="line"><span class="ln">1</span><span class="cl"><span class="k">ARG</span> &lt;name&gt;<span class="o">[=</span>&lt;default value&gt;<span class="o">]</span><span class="err">
+</span></span></span></code></pre></div><p><strong>使用</strong>：</p>
+<ul>
+<li>构建时通过 <code>--build-arg</code> 传值。</li>
+<li>常用于版本号、密钥（但密钥应使用 BuildKit secrets）。</li>
+</ul>
+<p><strong>示例</strong>：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-dockerfile" data-lang="dockerfile"><span class="line"><span class="ln">1</span><span class="cl"><span class="k">ARG</span> <span class="nv">VERSION</span><span class="o">=</span><span class="m">1</span>.0<span class="err">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="k">RUN</span> <span class="nb">echo</span> <span class="nv">$VERSION</span><span class="err">
+</span></span></span></code></pre></div><p>构建：<code>docker build --build-arg VERSION=2.0 .</code></p>
+<blockquote>
+<p>⚠️ <code>ARG</code> 和 <code>ENV</code> 区别：<code>ARG</code> 仅在构建时存在，<code>ENV</code> 在运行时也存在。</p>
+</blockquote>
+<hr>
+<h3 id="14-onbuild--触发器子镜像构建时执行">14. <code>ONBUILD</code> —— 触发器（子镜像构建时执行）</h3>
+<p><strong>作用</strong>：为当前镜像添加“触发器”，当它被用作<strong>父镜像</strong>时执行。</p>
+<p><strong>语法</strong>：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-dockerfile" data-lang="dockerfile"><span class="line"><span class="ln">1</span><span class="cl"><span class="k">ONBUILD</span> &lt;INSTRUCTION&gt;<span class="err">
+</span></span></span></code></pre></div><p><strong>示例</strong>：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-dockerfile" data-lang="dockerfile"><span class="line"><span class="ln">1</span><span class="cl"><span class="k">ONBUILD</span> <span class="k">COPY</span> . /app/src<span class="err">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="k">ONBUILD</span> <span class="k">RUN</span> npm install<span class="err">
+</span></span></span></code></pre></div><p><strong>应用场景</strong>：构建语言基础镜像（如 <code>node:slim-onbuild</code>），但已<strong>不推荐使用</strong>（多阶段构建更清晰）。</p>
+<hr>
+<h3 id="15-stopsignal--设置停止信号">15. <code>STOPSIGNAL</code> —— 设置停止信号</h3>
+<p><strong>作用</strong>：指定 <code>docker stop</code> 发送的系统信号（默认 <code>SIGTERM</code>）。</p>
+<p><strong>语法</strong>：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-dockerfile" data-lang="dockerfile"><span class="line"><span class="ln">1</span><span class="cl"><span class="k">STOPSIGNAL</span><span class="w"> </span><span class="s">signal</span><span class="err">
+</span></span></span></code></pre></div><p><strong>示例</strong>：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-dockerfile" data-lang="dockerfile"><span class="line"><span class="ln">1</span><span class="cl"><span class="k">STOPSIGNAL</span><span class="w"> </span><span class="s">SIGQUIT</span><span class="err">
+</span></span></span></code></pre></div><hr>
+<h3 id="16-healthcheck--健康检查">16. <code>HEALTHCHECK</code> —— 健康检查</h3>
+<p><strong>作用</strong>：定义容器健康状态检测命令。</p>
+<p><strong>语法</strong>：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-dockerfile" data-lang="dockerfile"><span class="line"><span class="ln">1</span><span class="cl"><span class="k">HEALTHCHECK</span> <span class="o">[</span>OPTIONS<span class="o">]</span> CMD command<span class="err">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="k">HEALTHCHECK</span> NONE   <span class="c1"># 禁用健康检查</span><span class="err">
+</span></span></span></code></pre></div><p><strong>选项</strong>：</p>
+<ul>
+<li><code>--interval=DURATION</code>（默认 30s）</li>
+<li><code>--timeout=DURATION</code>（默认 30s）</li>
+<li><code>--start-period=DURATION</code>（启动宽限期）</li>
+<li><code>--retries=N</code>（失败重试次数，默认 3）</li>
+</ul>
+<p><strong>示例</strong>：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-dockerfile" data-lang="dockerfile"><span class="line"><span class="ln">1</span><span class="cl"><span class="k">HEALTHCHECK</span> --interval<span class="o">=</span>30s --timeout<span class="o">=</span>3s <span class="se">\
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl">  <span class="k">CMD</span> curl -f http://localhost/ <span class="o">||</span> <span class="nb">exit</span> <span class="m">1</span><span class="err">
+</span></span></span></code></pre></div><p>查看状态：<code>docker inspect --format='{{.State.Health}}' container</code></p>
+<hr>
+<h3 id="17-shell--指定-runcmdentrypoint-的-shell">17. <code>SHELL</code> —— 指定 RUN/CMD/ENTRYPOINT 的 shell</h3>
+<p><strong>作用</strong>：覆盖默认 shell（Linux 默认 <code>/bin/sh -c</code>，Windows 默认 <code>cmd /S /C</code>）。</p>
+<p><strong>语法</strong>：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-dockerfile" data-lang="dockerfile"><span class="line"><span class="ln">1</span><span class="cl"><span class="k">SHELL</span> <span class="p">[</span><span class="s2">&#34;executable&#34;</span><span class="p">,</span> <span class="s2">&#34;parameters&#34;</span><span class="p">]</span><span class="err">
+</span></span></span></code></pre></div><p><strong>示例</strong>（使用 bash）：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-dockerfile" data-lang="dockerfile"><span class="line"><span class="ln">1</span><span class="cl"><span class="k">SHELL</span> <span class="p">[</span><span class="s2">&#34;/bin/bash&#34;</span><span class="p">,</span> <span class="s2">&#34;-c&#34;</span><span class="p">]</span><span class="err">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="k">RUN</span> <span class="nb">echo</span> <span class="nv">$HOME</span><span class="err">
+</span></span></span></code></pre></div><hr>
+<h3 id="18-comment-注释-非指令但常用">18. <code>COMMENT</code>（# 注释）—— 非指令但常用</h3>
+<p><strong>作用</strong>：添加注释（以 <code>#</code> 开头）。</p>
+<p><strong>注意</strong>：</p>
+<ul>
+<li><code># syntax = docker/dockerfile:1</code> 是特殊注释，用于启用 BuildKit 新语法。</li>
+</ul>
+<hr>
+<h2 id="-总结指令使用频率与建议">🔚 总结：指令使用频率与建议</h2>
+<table>
+  <thead>
+      <tr>
+          <th>指令</th>
+          <th>使用频率</th>
+          <th>建议</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>FROM</code>, <code>RUN</code>, <code>COPY</code>, <code>CMD</code>, <code>ENTRYPOINT</code></td>
+          <td>⭐⭐⭐⭐⭐</td>
+          <td>必须掌握</td>
+      </tr>
+      <tr>
+          <td><code>WORKDIR</code>, <code>ENV</code>, <code>EXPOSE</code>, <code>VOLUME</code></td>
+          <td>⭐⭐⭐⭐</td>
+          <td>推荐使用</td>
+      </tr>
+      <tr>
+          <td><code>ARG</code>, <code>LABEL</code>, <code>HEALTHCHECK</code></td>
+          <td>⭐⭐⭐</td>
+          <td>按需使用</td>
+      </tr>
+      <tr>
+          <td><code>ADD</code>, <code>ONBUILD</code></td>
+          <td>⭐</td>
+          <td>谨慎使用（<code>ADD</code> 仅在需自动解压时）</td>
+      </tr>
+      <tr>
+          <td><code>STOPSIGNAL</code>, <code>SHELL</code></td>
+          <td>⭐</td>
+          <td>特殊场景</td>
+      </tr>
+  </tbody>
+</table>
+<hr>
+<p>✅ <strong>最佳实践提醒</strong>：</p>
+<ul>
+<li>使用 <strong>多阶段构建</strong> 减小镜像体积。</li>
+<li>优先使用 <strong>exec 形式</strong>（<code>[&quot;cmd&quot;, &quot;arg&quot;]</code>）。</li>
+<li>避免在镜像中存储敏感信息（用 BuildKit secrets 或运行时挂载）。</li>
+<li>使用 <code>.dockerignore</code> 排除无关文件。</li>
+</ul>
+<hr>
+<h1 id="在-docker-中entrypoint-和-cmd-都用于指定容器启动时要运行的命令但它们的行为和用途有本质区别理解它们的差异对构建灵活可复用的镜像是非常关键的">在 Docker 中，<code>ENTRYPOINT</code> 和 <code>CMD</code> 都用于指定容器启动时要运行的命令，但它们的行为和用途有本质区别。理解它们的差异对构建灵活、可复用的镜像是非常关键的。</h1>
+<hr>
+<h2 id="-核心区别总结">🧩 核心区别总结</h2>
+<table>
+  <thead>
+      <tr>
+          <th>特性</th>
+          <th><code>ENTRYPOINT</code></th>
+          <th><code>CMD</code></th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><strong>目的</strong></td>
+          <td>定义容器的<strong>主程序/入口</strong>（不可轻易被覆盖）</td>
+          <td>提供<strong>默认参数</strong>给 <code>ENTRYPOINT</code>（可被覆盖）</td>
+      </tr>
+      <tr>
+          <td><strong>是否可被 <code>docker run</code> 覆盖</strong></td>
+          <td>❌ 默认不能（除非用 <code>--entrypoint</code> 强制覆盖）</td>
+          <td>✅ 可以，<code>docker run</code> 后的参数会<strong>完全替换</strong> <code>CMD</code></td>
+      </tr>
+      <tr>
+          <td><strong>两者共存时的行为</strong></td>
+          <td><code>CMD</code> 作为 <code>ENTRYPOINT</code> 的<strong>默认参数</strong></td>
+          <td>若无 <code>ENTRYPOINT</code>，<code>CMD</code> 就是完整命令</td>
+      </tr>
+      <tr>
+          <td><strong>推荐使用方式</strong></td>
+          <td>使用 <strong>exec 形式</strong>：<code>[&quot;executable&quot;, &quot;param1&quot;, &quot;param2&quot;]</code></td>
+          <td>同样推荐 exec 形式</td>
+      </tr>
+  </tbody>
+</table>
+<hr>
+<h2 id="-详细行为说明">🔍 详细行为说明</h2>
+<h3 id="情况-1只有-cmd">情况 1：只有 <code>CMD</code></h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-Dockerfile" data-lang="Dockerfile"><span class="line"><span class="ln">1</span><span class="cl"><span class="k">CMD</span> <span class="p">[</span><span class="s2">&#34;echo&#34;</span><span class="p">,</span> <span class="s2">&#34;Hello World&#34;</span><span class="p">]</span><span class="err">
+</span></span></span></code></pre></div><ul>
+<li>运行：<code>docker run myimage</code> → 输出 <code>Hello World</code></li>
+<li>覆盖：<code>docker run myimage date</code> → 执行 <code>date</code>，<strong>完全忽略 <code>CMD</code></strong></li>
+</ul>
+<blockquote>
+<p>✅ 适合提供一个<strong>可被用户替换的默认命令</strong></p>
+</blockquote>
+<hr>
+<h3 id="情况-2只有-entrypoint">情况 2：只有 <code>ENTRYPOINT</code></h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-Dockerfile" data-lang="Dockerfile"><span class="line"><span class="ln">1</span><span class="cl"><span class="k">ENTRYPOINT</span> <span class="p">[</span><span class="s2">&#34;echo&#34;</span><span class="p">,</span> <span class="s2">&#34;Hello&#34;</span><span class="p">]</span><span class="err">
+</span></span></span></code></pre></div><ul>
+<li>运行：<code>docker run myimage</code> → 输出 <code>Hello</code></li>
+<li>覆盖：<code>docker run myimage World</code> → 输出 <code>Hello World</code>（<code>World</code> 作为参数追加到 <code>ENTRYPOINT</code> 后）</li>
+<li>强制改入口：<code>docker run --entrypoint /bin/bash myimage</code> → 启动 bash，忽略原 <code>ENTRYPOINT</code></li>
+</ul>
+<blockquote>
+<p>✅ 适合将镜像当作<strong>可执行程序</strong>（如 <code>nginx</code>, <code>redis-server</code>）</p>
+</blockquote>
+<hr>
+<h3 id="情况-3entrypoint--cmd最常用组合">情况 3：<code>ENTRYPOINT</code> + <code>CMD</code>（最常用组合）</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-Dockerfile" data-lang="Dockerfile"><span class="line"><span class="ln">1</span><span class="cl"><span class="k">ENTRYPOINT</span> <span class="p">[</span><span class="s2">&#34;nginx&#34;</span><span class="p">,</span> <span class="s2">&#34;-g&#34;</span><span class="p">,</span> <span class="s2">&#34;daemon off;&#34;</span><span class="p">]</span><span class="err">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="k">CMD</span> <span class="p">[</span><span class="s2">&#34;-c&#34;</span><span class="p">,</span> <span class="s2">&#34;/etc/nginx/nginx.conf&#34;</span><span class="p">]</span><span class="err">
+</span></span></span></code></pre></div><ul>
+<li>
+<p>实际执行命令 = <code>ENTRYPOINT + CMD</code></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">nginx -g <span class="s2">&#34;daemon off;&#34;</span> -c /etc/nginx/nginx.conf
+</span></span></code></pre></div></li>
+<li>
+<p>用户运行时可<strong>只替换参数部分</strong>：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">docker run myimage -c /custom/nginx.conf
+</span></span></code></pre></div><p>→ 相当于：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">nginx -g <span class="s2">&#34;daemon off;&#34;</span> -c /custom/nginx.conf
+</span></span></code></pre></div><p>（<code>CMD</code> 被替换，<code>ENTRYPOINT</code> 保留）</p>
+</li>
+</ul>
+<blockquote>
+<p>✅ 这是<strong>最佳实践</strong>：</p>
+<ul>
+<li><code>ENTRYPOINT</code> 固定主程序</li>
+<li><code>CMD</code> 提供默认配置/参数，允许用户自定义</li>
+</ul>
+</blockquote>
+<hr>
+<h2 id="-注意事项">⚠️ 注意事项</h2>
+<h3 id="1-shell-形式-vs-exec-形式">1. Shell 形式 vs Exec 形式</h3>
+<ul>
+<li>
+<p><strong>Shell 形式</strong>（不推荐）：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-Dockerfile" data-lang="Dockerfile"><span class="line"><span class="ln">1</span><span class="cl"><span class="k">ENTRYPOINT</span> <span class="nb">echo</span> hello   <span class="c1"># 实际运行 /bin/sh -c &#39;echo hello&#39;</span><span class="err">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="k">CMD</span> <span class="nb">echo</span> world<span class="err">
+</span></span></span></code></pre></div><p>→ 会导致信号处理异常（如无法响应 <code>SIGTERM</code>），且 <code>CMD</code> 不会被传递给 <code>ENTRYPOINT</code></p>
+</li>
+<li>
+<p><strong>Exec 形式</strong>（强烈推荐）：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-Dockerfile" data-lang="Dockerfile"><span class="line"><span class="ln">1</span><span class="cl"><span class="k">ENTRYPOINT</span> <span class="p">[</span><span class="s2">&#34;echo&#34;</span><span class="p">,</span> <span class="s2">&#34;hello&#34;</span><span class="p">]</span><span class="err">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="k">CMD</span> <span class="p">[</span><span class="s2">&#34;world&#34;</span><span class="p">]</span><span class="err">
+</span></span></span></code></pre></div></li>
+</ul>
+<h3 id="2-多个-entrypoint-或-cmd">2. 多个 <code>ENTRYPOINT</code> 或 <code>CMD</code>？</h3>
+<ul>
+<li>Dockerfile 中<strong>最后一个生效</strong>，前面的会被覆盖。</li>
+<li>通常只写一个 <code>ENTRYPOINT</code> 和一个 <code>CMD</code>。</li>
+</ul>
+<h3 id="3-继承行为">3. 继承行为</h3>
+<ul>
+<li>子镜像可以覆盖父镜像的 <code>ENTRYPOINT</code> 或 <code>CMD</code>。</li>
+<li>如果子镜像只定义了 <code>CMD</code>，而父镜像有 <code>ENTRYPOINT</code>，则子镜像的 <code>CMD</code> 会作为新参数传给父镜像的 <code>ENTRYPOINT</code>。</li>
+</ul>
+<hr>
+<h2 id="-最佳实践建议">✅ 最佳实践建议</h2>
+<table>
+  <thead>
+      <tr>
+          <th>场景</th>
+          <th>推荐写法</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>镜像代表一个<strong>固定应用</strong>（如数据库、Web 服务器）</td>
+          <td><code>ENTRYPOINT [&quot;app&quot;]</code> + <code>CMD [&quot;--default-flag&quot;]</code></td>
+      </tr>
+      <tr>
+          <td>镜像用于<strong>通用工具</strong>（如 CLI 工具）</td>
+          <td>仅用 <code>CMD [&quot;tool&quot;]</code>，让用户自由替换命令</td>
+      </tr>
+      <tr>
+          <td>需要支持灵活传参</td>
+          <td><code>ENTRYPOINT</code> 固定主程序，<code>CMD</code> 提供默认参数</td>
+      </tr>
+  </tbody>
+</table>
+<hr>
+<h2 id="-示例对比">📌 示例对比</h2>
+<table>
+  <thead>
+      <tr>
+          <th>Dockerfile 内容</th>
+          <th><code>docker run image</code></th>
+          <th><code>docker run image arg1</code></th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>CMD [&quot;echo&quot;, &quot;hi&quot;]</code></td>
+          <td><code>hi</code></td>
+          <td>报错（<code>arg1</code> 被当作命令，找不到）</td>
+      </tr>
+      <tr>
+          <td><code>ENTRYPOINT [&quot;echo&quot;]</code></td>
+          <td>（空行）</td>
+          <td><code>arg1</code></td>
+      </tr>
+      <tr>
+          <td><code>ENTRYPOINT [&quot;echo&quot;]``CMD [&quot;hi&quot;]</code></td>
+          <td><code>hi</code></td>
+          <td><code>arg1</code></td>
+      </tr>
+  </tbody>
+</table>
+<hr>
+<p>✅ <strong>一句话记住</strong>：</p>
+<blockquote>
+<p><strong><code>ENTRYPOINT</code> 是“命令”，<code>CMD</code> 是“默认参数”。</strong><br>
+用户运行时输入的内容会<strong>替换 <code>CMD</code>，并作为参数追加到 <code>ENTRYPOINT</code> 后面</strong>。</p>
+</blockquote>
+<h1 id="以下是-docker-compose-配置文件基于-compose-specification-v3兼容-docker-compose-v2x-及最新版本内容结构清晰涵盖全面适用于开发测试与生产环境">以下是 <strong>Docker Compose 配置文件（<code>docker-compose.yml</code>）中所有可用指令的完整详解</strong>，基于 <strong>Compose Specification v3+（兼容 Docker Compose v2.x 及最新版本）</strong>，内容结构清晰、涵盖全面，适用于开发、测试与生产环境。</h1>
+<hr>
+<h1 id="-docker-compose-配置指令详解全量">📄 Docker Compose 配置指令详解（全量）</h1>
+<blockquote>
+<p>✅ 官方规范：<a href="https://docs.docker.com/compose/compose-file/">https://docs.docker.com/compose/compose-file/</a><br>
+✅ 适用格式：<code>compose.yaml</code> 或 <code>docker-compose.yml</code></p>
+</blockquote>
+<hr>
+<h2 id="目录-2">目录</h2>
+<ul>
+<li><a href="/post/docker_review_1/#%e9%a1%b6%e5%b1%82%e7%bb%93%e6%9e%84">顶层结构</a></li>
+<li><a href="/post/docker_review_1/#1-version%e5%b7%b2%e5%bc%83%e7%94%a8%e4%bd%86%e5%b8%b8%e8%a7%81">1. <code>version</code>（已弃用但常见）</a></li>
+<li><a href="/post/docker_review_1/#2-services%e6%a0%b8%e5%bf%83">2. <code>services</code>（核心）</a>
+<ul>
+<li><a href="/post/docker_review_1/#%e9%80%9a%e7%94%a8%e6%9c%8d%e5%8a%a1%e9%85%8d%e7%bd%ae">通用服务配置</a></li>
+<li><a href="/post/docker_review_1/#%e6%9e%84%e5%bb%ba%e7%9b%b8%e5%85%b3">构建相关</a></li>
+<li><a href="/post/docker_review_1/#%e8%bf%90%e8%a1%8c%e6%97%b6%e8%a1%8c%e4%b8%ba">运行时行为</a></li>
+<li><a href="/post/docker_review_1/#%e7%bd%91%e7%bb%9c%e4%b8%8e%e7%ab%af%e5%8f%a3">网络与端口</a></li>
+<li><a href="/post/docker_review_1/#%e5%ad%98%e5%82%a8%e5%8d%b7">存储卷</a></li>
+<li><a href="/post/docker_review_1/#%e4%be%9d%e8%b5%96%e4%b8%8e%e5%90%af%e5%8a%a8%e9%a1%ba%e5%ba%8f">依赖与启动顺序</a></li>
+<li><a href="/post/docker_review_1/#%e5%81%a5%e5%ba%b7%e6%a3%80%e6%9f%a5">健康检查</a></li>
+<li><a href="/post/docker_review_1/#%e8%b5%84%e6%ba%90%e9%99%90%e5%88%b6">资源限制</a></li>
+<li><a href="/post/docker_review_1/#%e5%ae%89%e5%85%a8%e4%b8%8e%e7%94%a8%e6%88%b7">安全与用户</a></li>
+<li><a href="/post/docker_review_1/#%e6%97%a5%e5%bf%97%e4%b8%8e%e9%87%8d%e5%90%af%e7%ad%96%e7%95%a5">日志与重启策略</a></li>
+</ul>
+</li>
+<li><a href="/post/docker_review_1/#3-volumes%e5%91%bd%e5%90%8d%e5%8d%b7%e5%ae%9a%e4%b9%89">3. <code>volumes</code>（命名卷定义）</a></li>
+<li><a href="/post/docker_review_1/#4-networks%e8%87%aa%e5%ae%9a%e4%b9%89%e7%bd%91%e7%bb%9c%e5%ae%9a%e4%b9%89">4. <code>networks</code>（自定义网络定义）</a></li>
+<li><a href="/post/docker_review_1/#5-configs-%e4%b8%8e-secrets-swarm-%e6%a8%a1%e5%bc%8f">5. <code>configs</code> 与 <code>secrets</code>（Swarm 模式）</a></li>
+<li><a href="/post/docker_review_1/#6-%e5%85%b6%e4%bb%96%e9%ab%98%e7%ba%a7%e5%8a%9f%e8%83%bd">6. 其他高级功能</a></li>
+</ul>
+<hr>
+<h2 id="顶层结构">顶层结构</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;3.8&#34;</span><span class="w">        </span><span class="c"># （可选，新版 Compose 忽略）</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="nt">services</span><span class="p">:</span><span class="w">             </span><span class="c"># 必填：定义所有服务</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="w">  </span><span class="nt">web</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="w">    </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l">nginx</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="w">  </span><span class="nt">db</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 6</span><span class="cl"><span class="w">    </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l">postgres</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="nt">volumes</span><span class="p">:</span><span class="w">              </span><span class="c"># 可选：定义命名卷</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 9</span><span class="cl"><span class="w">  </span><span class="nt">db_data</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="ln">11</span><span class="cl"><span class="nt">networks</span><span class="p">:</span><span class="w">             </span><span class="c"># 可选：定义自定义网络</span><span class="w">
+</span></span></span><span class="line"><span class="ln">12</span><span class="cl"><span class="w">  </span><span class="nt">frontend</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln">13</span><span class="cl"><span class="w">  </span><span class="nt">backend</span><span class="p">:</span><span class="w">
+</span></span></span></code></pre></div><blockquote>
+<p>💡 <strong>注意</strong>：从 Docker Compose v2.0+ 开始，<code>version</code> 字段<strong>不再强制要求</strong>，推荐省略以使用最新规范。</p>
+</blockquote>
+<hr>
+<h2 id="1-version已弃用但常见">1. <code>version</code>（已弃用但常见）</h2>
+<ul>
+<li>旧版用于指定 Compose 文件格式版本（如 <code>3.8</code>、<code>2.4</code>）。</li>
+<li><strong>新版本 Compose（v2+）自动兼容，建议省略</strong>。</li>
+<li>若保留，需与 Docker Engine 版本匹配。</li>
+</ul>
+<hr>
+<h2 id="2-services核心">2. <code>services</code>（核心）</h2>
+<p>每个服务对应一个容器。</p>
+<h3 id="通用服务配置">通用服务配置</h3>
+<table>
+  <thead>
+      <tr>
+          <th>指令</th>
+          <th>类型</th>
+          <th>说明</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>image</code></td>
+          <td>string</td>
+          <td>使用的镜像（如 <code>nginx:alpine</code>）</td>
+      </tr>
+      <tr>
+          <td><code>build</code></td>
+          <td>string / object</td>
+          <td>构建上下文或详细构建配置</td>
+      </tr>
+      <tr>
+          <td><code>container_name</code></td>
+          <td>string</td>
+          <td>自定义容器名（不推荐，破坏可扩展性）</td>
+      </tr>
+      <tr>
+          <td><code>command</code></td>
+          <td>string / list</td>
+          <td>覆盖镜像的 <code>CMD</code></td>
+      </tr>
+      <tr>
+          <td><code>entrypoint</code></td>
+          <td>string / list</td>
+          <td>覆盖镜像的 <code>ENTRYPOINT</code></td>
+      </tr>
+      <tr>
+          <td><code>environment</code></td>
+          <td>map / list</td>
+          <td>设置环境变量</td>
+      </tr>
+      <tr>
+          <td><code>env_file</code></td>
+          <td>string / list</td>
+          <td>从文件加载环境变量</td>
+      </tr>
+      <tr>
+          <td><code>ports</code></td>
+          <td>list</td>
+          <td>端口映射（主机:容器）</td>
+      </tr>
+      <tr>
+          <td><code>expose</code></td>
+          <td>list</td>
+          <td>仅暴露端口给 linked 服务（不发布到主机）</td>
+      </tr>
+  </tbody>
+</table>
+<h4 id="示例">示例：</h4>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="nt">services</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="w">  </span><span class="nt">app</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="w">    </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l">myapp:latest</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="w">    </span><span class="nt">container_name</span><span class="p">:</span><span class="w"> </span><span class="l">myapp-prod</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="w">    </span><span class="nt">command</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&#34;python&#34;</span><span class="p">,</span><span class="w"> </span><span class="s2">&#34;app.py&#34;</span><span class="p">]</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 6</span><span class="cl"><span class="w">    </span><span class="nt">environment</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="w">      </span>- <span class="l">DEBUG=1</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="w">      </span>- <span class="l">DB_HOST=db</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 9</span><span class="cl"><span class="w">    </span><span class="nt">env_file</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="w">      </span>- <span class="l">.env</span><span class="w">
+</span></span></span><span class="line"><span class="ln">11</span><span class="cl"><span class="w">      </span>- <span class="l">./config/prod.env</span><span class="w">
+</span></span></span></code></pre></div><hr>
+<h3 id="构建相关">构建相关</h3>
+<table>
+  <thead>
+      <tr>
+          <th>指令</th>
+          <th>说明</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>build</code></td>
+          <td>支持简写或对象形式</td>
+      </tr>
+      <tr>
+          <td><code>context</code></td>
+          <td>构建上下文路径（默认当前目录）</td>
+      </tr>
+      <tr>
+          <td><code>dockerfile</code></td>
+          <td>指定 Dockerfile 路径</td>
+      </tr>
+      <tr>
+          <td><code>args</code></td>
+          <td>传递构建参数（对应 Dockerfile 中的 <code>ARG</code>）</td>
+      </tr>
+      <tr>
+          <td><code>target</code></td>
+          <td>多阶段构建的目标阶段</td>
+      </tr>
+  </tbody>
+</table>
+<h4 id="示例-1">示例：</h4>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="ln">1</span><span class="cl"><span class="nt">services</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="w">  </span><span class="nt">web</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="w">    </span><span class="nt">build</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="w">      </span><span class="nt">context</span><span class="p">:</span><span class="w"> </span><span class="l">./app</span><span class="w">
+</span></span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="w">      </span><span class="nt">dockerfile</span><span class="p">:</span><span class="w"> </span><span class="l">Dockerfile.prod</span><span class="w">
+</span></span></span><span class="line"><span class="ln">6</span><span class="cl"><span class="w">      </span><span class="nt">args</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln">7</span><span class="cl"><span class="w">        </span><span class="nt">NODE_ENV</span><span class="p">:</span><span class="w"> </span><span class="l">production</span><span class="w">
+</span></span></span><span class="line"><span class="ln">8</span><span class="cl"><span class="w">      </span><span class="nt">target</span><span class="p">:</span><span class="w"> </span><span class="l">runner</span><span class="w">
+</span></span></span></code></pre></div><hr>
+<h3 id="运行时行为">运行时行为</h3>
+<table>
+  <thead>
+      <tr>
+          <th>指令</th>
+          <th>说明</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>restart</code></td>
+          <td>重启策略：<code>no</code>（默认）、<code>always</code>、<code>on-failure[:max-retries]</code>、<code>unless-stopped</code></td>
+      </tr>
+      <tr>
+          <td><code>stop_grace_period</code></td>
+          <td>停止容器前等待时间（如 <code>10s</code>）</td>
+      </tr>
+      <tr>
+          <td><code>stop_signal</code></td>
+          <td>自定义停止信号（如 <code>SIGINT</code>）</td>
+      </tr>
+      <tr>
+          <td><code>init</code></td>
+          <td>是否启用 init 进程（解决僵尸进程，默认 <code>false</code>）</td>
+      </tr>
+      <tr>
+          <td><code>stdin_open</code> / <code>tty</code></td>
+          <td>保持 STDIN 打开 / 分配 TTY（类似 <code>docker run -it</code>）</td>
+      </tr>
+  </tbody>
+</table>
+<h4 id="示例-2">示例：</h4>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="ln">1</span><span class="cl"><span class="nt">restart</span><span class="p">:</span><span class="w"> </span><span class="l">unless-stopped</span><span class="w">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="nt">stop_grace_period</span><span class="p">:</span><span class="w"> </span><span class="l">30s</span><span class="w">
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="nt">init</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
+</span></span></span></code></pre></div><hr>
+<h3 id="网络与端口">网络与端口</h3>
+<table>
+  <thead>
+      <tr>
+          <th>指令</th>
+          <th>说明</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>ports</code></td>
+          <td>格式：<code>[&quot;3000:3000&quot;, &quot;8080:80&quot;]</code> 或短语法 <code>&quot;3000&quot;</code>（随机主机端口）</td>
+      </tr>
+      <tr>
+          <td><code>networks</code></td>
+          <td>加入自定义网络（支持别名）</td>
+      </tr>
+      <tr>
+          <td><code>network_mode</code></td>
+          <td>覆盖网络模式（如 <code>host</code>, <code>none</code>）——<strong>与 <code>networks</code> 互斥</strong></td>
+      </tr>
+  </tbody>
+</table>
+<h4 id="示例-3">示例：</h4>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="ln">1</span><span class="cl"><span class="nt">ports</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="w">  </span>- <span class="s2">&#34;80:80&#34;</span><span class="w">
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="w">  </span>- <span class="s2">&#34;443:443&#34;</span><span class="w">
+</span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="nt">networks</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="w">  </span>- <span class="l">frontend</span><span class="w">
+</span></span></span><span class="line"><span class="ln">6</span><span class="cl"><span class="w">  </span>- <span class="l">backend</span><span class="w">
+</span></span></span></code></pre></div><blockquote>
+<p>⚠️ <code>ports</code> 发布到主机；<code>expose</code> 仅在容器间可见。</p>
+</blockquote>
+<hr>
+<h3 id="存储卷">存储卷</h3>
+<table>
+  <thead>
+      <tr>
+          <th>指令</th>
+          <th>说明</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>volumes</code></td>
+          <td>挂载卷或绑定挂载</td>
+      </tr>
+      <tr>
+          <td>类型</td>
+          <td>语法</td>
+      </tr>
+      <tr>
+          <td>------</td>
+          <td>------</td>
+      </tr>
+      <tr>
+          <td>命名卷</td>
+          <td><code>- vol_name:/container/path</code></td>
+      </tr>
+      <tr>
+          <td>绑定挂载</td>
+          <td><code>- /host/path:/container/path</code></td>
+      </tr>
+      <tr>
+          <td>tmpfs</td>
+          <td><code>- type: tmpfs&lt;br&gt;  target: /tmp</code></td>
+      </tr>
+  </tbody>
+</table>
+<h4 id="示例-4">示例：</h4>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="ln">1</span><span class="cl"><span class="nt">volumes</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="w">  </span>- <span class="l">db_data:/var/lib/postgresql/data</span><span class="w">
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="w">  </span>- <span class="l">./logs:/app/logs:ro</span><span class="w">
+</span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="w">  </span>- <span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l">bind</span><span class="w">
+</span></span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="w">    </span><span class="nt">source</span><span class="p">:</span><span class="w"> </span><span class="l">./config</span><span class="w">
+</span></span></span><span class="line"><span class="ln">6</span><span class="cl"><span class="w">    </span><span class="nt">target</span><span class="p">:</span><span class="w"> </span><span class="l">/etc/app</span><span class="w">
+</span></span></span><span class="line"><span class="ln">7</span><span class="cl"><span class="w">    </span><span class="nt">read_only</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
+</span></span></span></code></pre></div><hr>
+<h3 id="依赖与启动顺序">依赖与启动顺序</h3>
+<table>
+  <thead>
+      <tr>
+          <th>指令</th>
+          <th>说明</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>depends_on</code></td>
+          <td>控制启动顺序（<strong>不等待服务就绪！</strong>）</td>
+      </tr>
+      <tr>
+          <td><code>condition</code>（旧版）</td>
+          <td>已废弃，改用健康检查 + 脚本等待</td>
+      </tr>
+  </tbody>
+</table>
+<h4 id="示例仅控制顺序">示例（仅控制顺序）：</h4>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="ln">1</span><span class="cl"><span class="nt">depends_on</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="w">  </span>- <span class="l">db</span><span class="w">
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="w">  </span>- <span class="l">redis</span><span class="w">
+</span></span></span></code></pre></div><blockquote>
+<p>✅ <strong>正确做法</strong>：应用内实现重试机制，或使用 <code>wait-for-it.sh</code>。</p>
+</blockquote>
+<hr>
+<h3 id="健康检查">健康检查</h3>
+<table>
+  <thead>
+      <tr>
+          <th>指令</th>
+          <th>说明</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>healthcheck</code></td>
+          <td>定义健康检测命令</td>
+      </tr>
+  </tbody>
+</table>
+<h4 id="示例-5">示例：</h4>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="ln">1</span><span class="cl"><span class="nt">healthcheck</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="w">  </span><span class="nt">test</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&#34;CMD&#34;</span><span class="p">,</span><span class="w"> </span><span class="s2">&#34;curl&#34;</span><span class="p">,</span><span class="w"> </span><span class="s2">&#34;-f&#34;</span><span class="p">,</span><span class="w"> </span><span class="s2">&#34;http://localhost:8080/health&#34;</span><span class="p">]</span><span class="w">
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="w">  </span><span class="nt">interval</span><span class="p">:</span><span class="w"> </span><span class="l">30s</span><span class="w">
+</span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="w">  </span><span class="nt">timeout</span><span class="p">:</span><span class="w"> </span><span class="l">10s</span><span class="w">
+</span></span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="w">  </span><span class="nt">retries</span><span class="p">:</span><span class="w"> </span><span class="m">3</span><span class="w">
+</span></span></span><span class="line"><span class="ln">6</span><span class="cl"><span class="w">  </span><span class="nt">start_period</span><span class="p">:</span><span class="w"> </span><span class="l">40s</span><span class="w">
+</span></span></span></code></pre></div><hr>
+<h3 id="资源限制">资源限制</h3>
+<table>
+  <thead>
+      <tr>
+          <th>指令</th>
+          <th>说明</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>deploy.resources</code>（Swarm）</td>
+          <td>生产资源限制</td>
+      </tr>
+      <tr>
+          <td><code>mem_limit</code> / <code>mem_reservation</code></td>
+          <td>内存限制（旧版）</td>
+      </tr>
+      <tr>
+          <td><code>cpus</code> / <code>cpu_shares</code></td>
+          <td>CPU 限制</td>
+      </tr>
+  </tbody>
+</table>
+<blockquote>
+<p>💡 在非 Swarm 模式下，使用：</p>
+</blockquote>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="ln">1</span><span class="cl"><span class="nt">mem_limit</span><span class="p">:</span><span class="w"> </span><span class="l">512m</span><span class="w">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="nt">cpus</span><span class="p">:</span><span class="w"> </span><span class="m">1.5</span><span class="w">
+</span></span></span></code></pre></div><hr>
+<h3 id="安全与用户">安全与用户</h3>
+<table>
+  <thead>
+      <tr>
+          <th>指令</th>
+          <th>说明</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>user</code></td>
+          <td>指定运行用户（如 <code>&quot;1000:1000&quot;</code>）</td>
+      </tr>
+      <tr>
+          <td><code>read_only</code></td>
+          <td>挂载根文件系统为只读</td>
+      </tr>
+      <tr>
+          <td><code>tmpfs</code></td>
+          <td>挂载临时内存文件系统</td>
+      </tr>
+      <tr>
+          <td><code>cap_add</code> / <code>cap_drop</code></td>
+          <td>添加/删除 Linux 能力</td>
+      </tr>
+      <tr>
+          <td><code>security_opt</code></td>
+          <td>安全选项（如 <code>no-new-privileges</code>）</td>
+      </tr>
+  </tbody>
+</table>
+<h4 id="示例-6">示例：</h4>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="ln">1</span><span class="cl"><span class="nt">user</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;1000:1000&#34;</span><span class="w">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="nt">read_only</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="nt">tmpfs</span><span class="p">:</span><span class="w"> </span><span class="l">/tmp</span><span class="w">
+</span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="nt">cap_drop</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="w">  </span>- <span class="l">ALL</span><span class="w">
+</span></span></span><span class="line"><span class="ln">6</span><span class="cl"><span class="nt">security_opt</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln">7</span><span class="cl"><span class="w">  </span>- <span class="kc">no</span>-<span class="l">new-privileges:true</span><span class="w">
+</span></span></span></code></pre></div><hr>
+<h3 id="日志与重启策略">日志与重启策略</h3>
+<table>
+  <thead>
+      <tr>
+          <th>指令</th>
+          <th>说明</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>logging</code></td>
+          <td>配置日志驱动</td>
+      </tr>
+      <tr>
+          <td><code>restart</code></td>
+          <td>重启策略（见上文）</td>
+      </tr>
+  </tbody>
+</table>
+<h4 id="日志示例">日志示例：</h4>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="ln">1</span><span class="cl"><span class="nt">logging</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="w">  </span><span class="nt">driver</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;json-file&#34;</span><span class="w">
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="w">  </span><span class="nt">options</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="w">    </span><span class="nt">max-size</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;10m&#34;</span><span class="w">
+</span></span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="w">    </span><span class="nt">max-file</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;3&#34;</span><span class="w">
+</span></span></span></code></pre></div><hr>
+<h2 id="3-volumes命名卷定义">3. <code>volumes</code>（命名卷定义）</h2>
+<p>定义可在多个服务间共享的命名卷。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="ln">1</span><span class="cl"><span class="nt">volumes</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="w">  </span><span class="nt">db_data</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="w">    </span><span class="nt">driver</span><span class="p">:</span><span class="w"> </span><span class="l">local</span><span class="w">
+</span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="w">  </span><span class="nt">nfs_volume</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="w">    </span><span class="nt">driver</span><span class="p">:</span><span class="w"> </span><span class="l">local</span><span class="w">
+</span></span></span><span class="line"><span class="ln">6</span><span class="cl"><span class="w">    </span><span class="nt">driver_opts</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln">7</span><span class="cl"><span class="w">      </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l">nfs</span><span class="w">
+</span></span></span><span class="line"><span class="ln">8</span><span class="cl"><span class="w">      </span><span class="nt">o</span><span class="p">:</span><span class="w"> </span><span class="l">addr=192.168.1.100,rw</span><span class="w">
+</span></span></span><span class="line"><span class="ln">9</span><span class="cl"><span class="w">      </span><span class="nt">device</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;:/export/data&#34;</span><span class="w">
+</span></span></span></code></pre></div><blockquote>
+<p>默认驱动为 <code>local</code>，支持外部卷：<code>external: true</code></p>
+</blockquote>
+<hr>
+<h2 id="4-networks自定义网络定义">4. <code>networks</code>（自定义网络定义）</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="ln">1</span><span class="cl"><span class="nt">networks</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="w">  </span><span class="nt">frontend</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="w">    </span><span class="nt">driver</span><span class="p">:</span><span class="w"> </span><span class="l">bridge</span><span class="w">
+</span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="w">  </span><span class="nt">backend</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="w">    </span><span class="nt">external</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">   </span><span class="c"># 使用已存在的网络</span><span class="w">
+</span></span></span><span class="line"><span class="ln">6</span><span class="cl"><span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">my-backend-net</span><span class="w">
+</span></span></span></code></pre></div><hr>
+<h2 id="5-configs-与-secretsswarm-模式">5. <code>configs</code> 与 <code>secrets</code>（Swarm 模式）</h2>
+<blockquote>
+<p>仅在 Docker Swarm 中有效，普通 Compose 忽略。</p>
+</blockquote>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="ln">1</span><span class="cl"><span class="nt">configs</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="w">  </span><span class="nt">app-config</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="w">    </span><span class="nt">file</span><span class="p">:</span><span class="w"> </span><span class="l">./config.yaml</span><span class="w">
+</span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="nt">secrets</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln">6</span><span class="cl"><span class="w">  </span><span class="nt">db-password</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln">7</span><span class="cl"><span class="w">    </span><span class="nt">file</span><span class="p">:</span><span class="w"> </span><span class="l">./db-pass.txt</span><span class="w">
+</span></span></span></code></pre></div><p>在服务中引用：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="ln">1</span><span class="cl"><span class="nt">services</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="w">  </span><span class="nt">app</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="w">    </span><span class="nt">configs</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="w">      </span>- <span class="nt">source</span><span class="p">:</span><span class="w"> </span><span class="l">app-config</span><span class="w">
+</span></span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="w">        </span><span class="nt">target</span><span class="p">:</span><span class="w"> </span><span class="l">/etc/app/config.yaml</span><span class="w">
+</span></span></span><span class="line"><span class="ln">6</span><span class="cl"><span class="w">    </span><span class="nt">secrets</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln">7</span><span class="cl"><span class="w">      </span>- <span class="l">db-password</span><span class="w">
+</span></span></span></code></pre></div><hr>
+<h2 id="6-其他高级功能">6. 其他高级功能</h2>
+<h3 id="变量替换">变量替换</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="ln">1</span><span class="cl"><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;nginx:${NGINX_VERSION:-latest}&#34;</span><span class="w">
+</span></span></span></code></pre></div><p>从 shell 环境或 <code>.env</code> 文件读取。</p>
+<h3 id="扩展x-">扩展（<code>x-*</code>）</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="ln">1</span><span class="cl"><span class="nt">x-common-logging</span><span class="p">:</span><span class="w"> </span><span class="cp">&amp;common-logging</span><span class="w">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="w">  </span><span class="nt">logging</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="w">    </span><span class="nt">driver</span><span class="p">:</span><span class="w"> </span><span class="l">json-file</span><span class="w">
+</span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="nt">services</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln">6</span><span class="cl"><span class="w">  </span><span class="nt">web</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln">7</span><span class="cl"><span class="w">    </span><span class="nt">&lt;&lt;</span><span class="p">:</span><span class="w"> </span><span class="cp">*common-logging</span><span class="w">
+</span></span></span></code></pre></div><h3 id="profiles按需启动服务">Profiles（按需启动服务）</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="ln">1</span><span class="cl"><span class="nt">services</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="w">  </span><span class="nt">debug-tool</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="w">    </span><span class="nt">profiles</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&#34;debug&#34;</span><span class="p">]</span><span class="w">
+</span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="w">    </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l">busybox</span><span class="w">
+</span></span></span></code></pre></div><p>启动：<code>docker compose --profile debug up</code></p>
+<hr>
+<h2 id="-最佳实践总结">✅ 最佳实践总结</h2>
+<table>
+  <thead>
+      <tr>
+          <th>场景</th>
+          <th>推荐做法</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>开发环境</td>
+          <td>使用 <code>volumes</code> 挂载代码，热更新</td>
+      </tr>
+      <tr>
+          <td>生产环境</td>
+          <td>使用多阶段构建，禁用 <code>ports</code>（通过反向代理暴露）</td>
+      </tr>
+      <tr>
+          <td>安全</td>
+          <td>非 root 用户运行，只读文件系统，最小权限</td>
+      </tr>
+      <tr>
+          <td>可维护性</td>
+          <td>使用 <code>.env</code> 管理配置，避免硬编码</td>
+      </tr>
+      <tr>
+          <td>启动顺序</td>
+          <td>应用层实现重试，而非依赖 <code>depends_on</code></td>
+      </tr>
+  </tbody>
+</table>
+<hr>
+<blockquote>
+<p>📌 <strong>提示</strong>：任何字段均可通过 <code>docker compose config</code> 验证并展开最终配置。</p>
+</blockquote>
 <hr>
 
     </div><div class="post_comments">
