@@ -168,7 +168,7 @@
     <span class="post_date">
       2026-01-19	  
     </span>
-    <span class="post_time"> · 10 分钟阅读</span><span>&nbsp;· <a href='https://jianlin-li.github.io/tags/docker/' title="Docker" class="post_tag button button_translucent">Docker
+    <span class="post_time"> · 12 分钟阅读</span><span>&nbsp;· <a href='https://jianlin-li.github.io/tags/docker/' title="Docker" class="post_tag button button_translucent">Docker
         </a>
     </span>
     <span class="page_only">&nbsp;·
@@ -1701,6 +1701,288 @@
 <blockquote>
 <p>📌 <strong>提示</strong>：任何字段均可通过 <code>docker compose config</code> 验证并展开最终配置。</p>
 </blockquote>
+<hr>
+<h1 id="在-docker-中网络驱动network-driver-决定了容器之间以及容器与外部如何通信docker-提供了多种内置网络驱动适用于不同场景单机多机安全隔离等">在 Docker 中，<strong>网络驱动（Network Driver）</strong> 决定了容器之间以及容器与外部如何通信。Docker 提供了多种内置网络驱动，适用于不同场景（单机、多机、安全隔离等）。</h1>
+<p>以下是 <strong>Docker 支持的所有网络驱动类型详解</strong>（截至 Docker 26.x）：</p>
+<hr>
+<h2 id="-docker-网络驱动类型总览">🧩 Docker 网络驱动类型总览</h2>
+<table>
+  <thead>
+      <tr>
+          <th>驱动类型</th>
+          <th>适用场景</th>
+          <th>是否内置</th>
+          <th>跨主机通信</th>
+          <th>说明</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>bridge</code></td>
+          <td>单机开发/测试</td>
+          <td>✅ 是</td>
+          <td>❌ 否</td>
+          <td>默认驱动，适用于同一主机上的容器通信</td>
+      </tr>
+      <tr>
+          <td><code>host</code></td>
+          <td>高性能、无网络隔离</td>
+          <td>✅ 是</td>
+          <td>N/A</td>
+          <td>容器共享主机网络命名空间</td>
+      </tr>
+      <tr>
+          <td><code>none</code></td>
+          <td>完全隔离</td>
+          <td>✅ 是</td>
+          <td>❌ 否</td>
+          <td>容器无网络接口（仅 loopback）</td>
+      </tr>
+      <tr>
+          <td><code>overlay</code></td>
+          <td>Docker Swarm 多节点集群</td>
+          <td>✅ 是</td>
+          <td>✅ 是</td>
+          <td>支持跨主机容器通信（需 Swarm 模式）</td>
+      </tr>
+      <tr>
+          <td><code>macvlan</code></td>
+          <td>容器拥有独立 MAC/IP</td>
+          <td>✅ 是</td>
+          <td>✅ 是</td>
+          <td>容器直接接入物理网络（像物理机）</td>
+      </tr>
+      <tr>
+          <td><code>ipvlan</code></td>
+          <td>类似 macvlan，但共享 MAC</td>
+          <td>✅ 是</td>
+          <td>✅ 是</td>
+          <td>更节省交换机 MAC 表项</td>
+      </tr>
+      <tr>
+          <td>第三方插件</td>
+          <td>自定义网络（如 Calico、Weave、Flannel）</td>
+          <td>❌ 否</td>
+          <td>✅ 是</td>
+          <td>通过 Docker Plugin 机制扩展</td>
+      </tr>
+  </tbody>
+</table>
+<hr>
+<h2 id="1-bridge默认驱动">1. <code>bridge</code>（默认驱动）</h2>
+<h3 id="特点">特点：</h3>
+<ul>
+<li><strong>单机模式</strong>下默认使用。</li>
+<li>所有容器连接到一个虚拟网桥（通常是 <code>docker0</code>）。</li>
+<li>容器通过 <strong>NAT</strong> 访问外网，外部通过 <strong>端口映射（<code>-p</code>）</strong> 访问容器。</li>
+<li>容器间可通过 IP 或自定义网络中的服务名通信。</li>
+</ul>
+<h3 id="创建方式">创建方式：</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl"><span class="c1"># 默认 bridge（不推荐用于多容器通信）</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl">docker run -d nginx
+</span></span><span class="line"><span class="ln">3</span><span class="cl">
+</span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="c1"># 自定义 bridge 网络（推荐！）</span>
+</span></span><span class="line"><span class="ln">5</span><span class="cl">docker network create --driver bridge mynet
+</span></span><span class="line"><span class="ln">6</span><span class="cl">docker run -d --network mynet --name web nginx
+</span></span><span class="line"><span class="ln">7</span><span class="cl">docker run -it --network mynet alpine ping web
+</span></span></code></pre></div><blockquote>
+<p>✅ <strong>最佳实践</strong>：始终使用 <strong>自定义 bridge 网络</strong>（支持 DNS 解析、隔离性更好）。</p>
+</blockquote>
+<hr>
+<h2 id="2-host">2. <code>host</code></h2>
+<h3 id="特点-1">特点：</h3>
+<ul>
+<li>容器<strong>直接使用主机的网络命名空间</strong>。</li>
+<li>无网络隔离，无 NAT，<strong>性能最高</strong>。</li>
+<li>容器端口直接暴露在主机上（无需 <code>-p</code> 映射）。</li>
+<li>仅适用于 <strong>Linux</strong>，Windows 不支持。</li>
+</ul>
+<h3 id="使用场景">使用场景：</h3>
+<ul>
+<li>高性能网络应用（如监控代理、网络工具）。</li>
+<li>主机端口资源充足，且无需隔离。</li>
+</ul>
+<h3 id="示例-7">示例：</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">docker run -d --network host nginx
+</span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="c1"># 此时访问 http://localhost:80 即可（无需 -p 80:80）</span>
+</span></span></code></pre></div><blockquote>
+<p>⚠️ <strong>注意</strong>：多个容器不能绑定同一端口（会冲突）。</p>
+</blockquote>
+<hr>
+<h2 id="3-none">3. <code>none</code></h2>
+<h3 id="特点-2">特点：</h3>
+<ul>
+<li>容器<strong>只有 loopback 接口</strong>（<code>lo</code>），无任何网络。</li>
+<li>完全网络隔离。</li>
+<li>适用于运行离线任务或后续手动配置网络。</li>
+</ul>
+<h3 id="示例-8">示例：</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">docker run -it --network none alpine ip addr
+</span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="c1"># 输出只有 lo: 127.0.0.1</span>
+</span></span></code></pre></div><hr>
+<h2 id="4-overlayswarm-模式专用">4. <code>overlay</code>（Swarm 模式专用）</h2>
+<h3 id="特点-3">特点：</h3>
+<ul>
+<li>用于 <strong>Docker Swarm 集群</strong>，实现<strong>跨主机容器通信</strong>。</li>
+<li>基于 VXLAN 封装，自动加密（可选）。</li>
+<li>服务加入 Swarm 后自动创建 <code>ingress</code> 和 <code>attachable</code> overlay 网络。</li>
+</ul>
+<h3 id="使用前提">使用前提：</h3>
+<ul>
+<li>初始化 Swarm：<code>docker swarm init</code></li>
+<li>服务部署在 Swarm 节点上</li>
+</ul>
+<h3 id="示例-9">示例：</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">docker network create -d overlay my_overlay_net
+</span></span><span class="line"><span class="ln">2</span><span class="cl">docker service create --network my_overlay_net --name web nginx
+</span></span></code></pre></div><blockquote>
+<p>✅ <strong>生产推荐</strong>：微服务架构中跨节点通信的标准方案。</p>
+</blockquote>
+<hr>
+<h2 id="5-macvlan">5. <code>macvlan</code></h2>
+<h3 id="特点-4">特点：</h3>
+<ul>
+<li>为每个容器分配<strong>独立的 MAC 地址和 IP</strong>，使其在物理网络中表现为<strong>独立设备</strong>。</li>
+<li>需要<strong>物理网络支持</strong>（交换机允许混杂模式或配置子接口）。</li>
+<li>容器 IP 由<strong>外部 DHCP 或手动分配</strong>，可被局域网直接访问。</li>
+</ul>
+<h3 id="适用场景">适用场景：</h3>
+<ul>
+<li>遗留系统要求固定 IP/MAC。</li>
+<li>网络设备需要直接识别容器（如防火墙策略）。</li>
+</ul>
+<h3 id="创建示例">创建示例：</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl"><span class="c1"># 假设主机网卡为 eth0</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl">docker network create -d macvlan <span class="se">\
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl">  --subnet<span class="o">=</span>192.168.1.0/24 <span class="se">\
+</span></span></span><span class="line"><span class="ln">4</span><span class="cl">  --gateway<span class="o">=</span>192.168.1.1 <span class="se">\
+</span></span></span><span class="line"><span class="ln">5</span><span class="cl">  -o <span class="nv">parent</span><span class="o">=</span>eth0 <span class="se">\
+</span></span></span><span class="line"><span class="ln">6</span><span class="cl">  macvlan_net
+</span></span><span class="line"><span class="ln">7</span><span class="cl">
+</span></span><span class="line"><span class="ln">8</span><span class="cl">docker run -it --network macvlan_net --ip<span class="o">=</span>192.168.1.100 alpine
+</span></span></code></pre></div><blockquote>
+<p>⚠️ <strong>限制</strong>：</p>
+<ul>
+<li>主机无法直接与 macvlan 容器通信（需额外配置）。</li>
+<li>某些云平台（如 AWS、GCP）禁用混杂模式，不支持。</li>
+</ul>
+</blockquote>
+<hr>
+<h2 id="6-ipvlan">6. <code>ipvlan</code></h2>
+<h3 id="特点-5">特点：</h3>
+<ul>
+<li>类似 <code>macvlan</code>，但<strong>所有容器共享主机的 MAC 地址</strong>，使用不同 IP。</li>
+<li>分为 <code>L2</code>（二层）和 <code>L3</code>（三层）模式。</li>
+<li>更节省交换机 MAC 表项，适合大规模部署。</li>
+</ul>
+<h3 id="模式对比">模式对比：</h3>
+<table>
+  <thead>
+      <tr>
+          <th>模式</th>
+          <th>通信范围</th>
+          <th>说明</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>ipvlan L2</code></td>
+          <td>同一子网</td>
+          <td>类似 macvlan，但共用 MAC</td>
+      </tr>
+      <tr>
+          <td><code>ipvlan L3</code></td>
+          <td>跨子网路由</td>
+          <td>需要路由器支持</td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="示例l2-模式">示例（L2 模式）：</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">docker network create -d ipvlan <span class="se">\
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl">  --subnet<span class="o">=</span>192.168.1.0/24 <span class="se">\
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl">  --gateway<span class="o">=</span>192.168.1.1 <span class="se">\
+</span></span></span><span class="line"><span class="ln">4</span><span class="cl">  -o <span class="nv">ipvlan_mode</span><span class="o">=</span>l2 <span class="se">\
+</span></span></span><span class="line"><span class="ln">5</span><span class="cl">  -o <span class="nv">parent</span><span class="o">=</span>eth0 <span class="se">\
+</span></span></span><span class="line"><span class="ln">6</span><span class="cl">  ipvlan_net
+</span></span></code></pre></div><hr>
+<h2 id="7-第三方网络插件cni-兼容">7. 第三方网络插件（CNI 兼容）</h2>
+<p>Docker 支持通过 <strong>Plugin 机制</strong>集成第三方网络方案，常用于 Kubernetes 或高级 SDN 场景：</p>
+<table>
+  <thead>
+      <tr>
+          <th>插件</th>
+          <th>说明</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><strong>Calico</strong></td>
+          <td>基于 BGP 的高性能网络，支持 NetworkPolicy</td>
+      </tr>
+      <tr>
+          <td><strong>Weave</strong></td>
+          <td>自动加密、服务发现</td>
+      </tr>
+      <tr>
+          <td><strong>Flannel</strong></td>
+          <td>简单 overlay 网络（常用于 K8s）</td>
+      </tr>
+      <tr>
+          <td><strong>Contiv</strong></td>
+          <td>思科出品，支持多租户</td>
+      </tr>
+  </tbody>
+</table>
+<p>安装后可通过 <code>-d plugin_name</code> 使用：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">docker network create -d calico my_calico_net
+</span></span></code></pre></div><hr>
+<h2 id="-如何查看当前驱动">🔍 如何查看当前驱动？</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl"><span class="c1"># 列出所有网络及驱动</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl">docker network ls
+</span></span><span class="line"><span class="ln">3</span><span class="cl">
+</span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="c1"># 查看某网络详情</span>
+</span></span><span class="line"><span class="ln">5</span><span class="cl">docker network inspect mynet
+</span></span><span class="line"><span class="ln">6</span><span class="cl"><span class="c1"># 输出中包含 &#34;Driver&#34;: &#34;bridge&#34;</span>
+</span></span></code></pre></div><hr>
+<h2 id="-选择建议">✅ 选择建议</h2>
+<table>
+  <thead>
+      <tr>
+          <th>需求</th>
+          <th>推荐驱动</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>本地开发、单机多容器</td>
+          <td><code>bridge</code>（自定义网络）</td>
+      </tr>
+      <tr>
+          <td>最大性能、无隔离</td>
+          <td><code>host</code></td>
+      </tr>
+      <tr>
+          <td>完全断网</td>
+          <td><code>none</code></td>
+      </tr>
+      <tr>
+          <td>Docker Swarm 集群</td>
+          <td><code>overlay</code></td>
+      </tr>
+      <tr>
+          <td>容器需独立 IP/MAC（物理网络）</td>
+          <td><code>macvlan</code></td>
+      </tr>
+      <tr>
+          <td>大规模容器、节省 MAC 表</td>
+          <td><code>ipvlan</code></td>
+      </tr>
+      <tr>
+          <td>企业级网络策略、K8s 集成</td>
+          <td>第三方插件（如 Calico）</td>
+      </tr>
+  </tbody>
+</table>
 <hr>
 
     </div><div class="post_comments">
