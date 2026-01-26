@@ -786,7 +786,7 @@ Broker:它提供一种传输服务,它的角色就是维护一条从生产者到
     <span class="post_date">
       2025-06-03	  
     </span>
-    <span class="post_time"> · 31 分钟阅读</span><span>&nbsp;· <a href='https://jianlin-li.github.io/tags/php/' title="PHP" class="post_tag button button_translucent">PHP
+    <span class="post_time"> · 32 分钟阅读</span><span>&nbsp;· <a href='https://jianlin-li.github.io/tags/php/' title="PHP" class="post_tag button button_translucent">PHP
         </a>
     </span>
     <span class="page_only">&nbsp;·
@@ -828,9 +828,8 @@ Broker:它提供一种传输服务,它的角色就是维护一条从生产者到
       <div class="excerpt_footer">
         <div class="pale">
           
-            <p>PHP 的 SPL autoloader（Standard PHP Library Autoloading）是 PHP 提供的一套标准化、可扩展的自动加载机制，用于在运行时按需加载类、接口或 trait 文件，避免手动写大量 require/include。 它是现代 PHP 自动加载（如 PSR-4、Composer）的基础。
-📌 一、什么是 SPL Autoloader？ SPL（Standard PHP Library）从 PHP 5.1 开始内置，其中最关键的功能之一就是 spl_autoload_register() 函数。
-✅ 它允许你注册一个或多个自动加载函数，当 PHP 遇到未定义的类时，会依次调用这些函数尝试加载。 …</p>
+            <p>在 PHP 的自动加载（Autoloading）机制中，有几种常见的方式用于加载类文件，包括 PSR-0、PSR-4、classmap 和 files includes。它们各自有不同的使用场景和实现方式。 1. PSR-0（已废弃） 简介： PSR-0 是 PHP-FIG（PHP Framework Interop Group）最早提出的自动加载规范，现已被 PSR-4 取代并废弃，但一些老项目仍在使用。
+规则： 类名必须映射到文件系统路径。 下划线 _ 被视为目录分隔符。 命名空间分隔符 \ 也被视为目录分隔符。 文件必须以 .php 结尾。 示例： 1// 类：Vendor\Package\ClassName 2// 对应路径 …</p>
           
           <br>
           <a href="https://jianlin-li.github.io/post/php_review_3/" title="阅读更多" class="excerpt_more button">阅读更多</a>

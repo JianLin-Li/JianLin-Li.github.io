@@ -168,7 +168,7 @@
     <span class="post_date">
       2025-06-03	  
     </span>
-    <span class="post_time"> · 31 分钟阅读</span><span>&nbsp;· <a href='https://jianlin-li.github.io/tags/php/' title="PHP" class="post_tag button button_translucent">PHP
+    <span class="post_time"> · 32 分钟阅读</span><span>&nbsp;· <a href='https://jianlin-li.github.io/tags/php/' title="PHP" class="post_tag button button_translucent">PHP
         </a>
     </span>
     <span class="page_only">&nbsp;·
@@ -206,7 +206,190 @@
   </span>
   </div>
 
-    <div class="post_body"><h1 id="php-的-spl-autoloaderstandard-php-library-autoloading是-php-提供的一套标准化可扩展的自动加载机制用于在运行时按需加载类接口或-trait-文件避免手动写大量-requireinclude">PHP 的 <strong>SPL autoloader</strong>（Standard PHP Library Autoloading）是 PHP 提供的一套标准化、可扩展的自动加载机制，用于在运行时按需加载类、接口或 trait 文件，避免手动写大量 <code>require</code>/<code>include</code>。</h1>
+    <div class="post_body"><h1 id="在-php-的自动加载autoloading机制中有几种常见的方式用于加载类文件包括-psr-0psr-4classmap-和-files-includes它们各自有不同的使用场景和实现方式">在 PHP 的自动加载（Autoloading）机制中，有几种常见的方式用于加载类文件，包括 <strong>PSR-0</strong>、<strong>PSR-4</strong>、<strong>classmap</strong> 和 <strong>files includes</strong>。它们各自有不同的使用场景和实现方式。</h1>
+<hr>
+<h2 id="1-psr-0已废弃">1. PSR-0（已废弃）</h2>
+<h3 id="简介">简介：</h3>
+<p>PSR-0 是 PHP-FIG（PHP Framework Interop Group）最早提出的自动加载规范，现已<strong>被 PSR-4 取代并废弃</strong>，但一些老项目仍在使用。</p>
+<h3 id="规则">规则：</h3>
+<ul>
+<li>类名必须映射到文件系统路径。</li>
+<li>下划线 <code>_</code> 被视为目录分隔符。</li>
+<li>命名空间分隔符 <code>\</code> 也被视为目录分隔符。</li>
+<li>文件必须以 <code>.php</code> 结尾。</li>
+</ul>
+<h3 id="示例">示例：</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln">1</span><span class="cl"><span class="c1">// 类：Vendor\Package\ClassName
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="c1">// 对应路径：/path/to/project/Vendor/Package/ClassName.php
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl">
+</span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="c1">// 或者带下划线的类（旧式 PEAR 风格）
+</span></span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="c1">// 类：Vendor_Package_ClassName
+</span></span></span><span class="line"><span class="ln">6</span><span class="cl"><span class="c1">// 对应路径：/path/to/project/Vendor/Package/ClassName.php
+</span></span></span></code></pre></div><h3 id="composer-中的配置已不推荐">Composer 中的配置（已不推荐）：</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="ln">1</span><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl">    <span class="nt">&#34;autoload&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">3</span><span class="cl">        <span class="nt">&#34;psr-0&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">4</span><span class="cl">            <span class="nt">&#34;Vendor\\&#34;</span><span class="p">:</span> <span class="s2">&#34;src/&#34;</span>
+</span></span><span class="line"><span class="ln">5</span><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="ln">6</span><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="ln">7</span><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><blockquote>
+<p>⚠️ 注意：PSR-0 不支持灵活的目录结构，比如不能将 <code>src/</code> 直接映射到命名空间根，必须包含 Vendor 名。</p>
+</blockquote>
+<hr>
+<h2 id="2-psr-4现代标准">2. PSR-4（现代标准）</h2>
+<h3 id="简介-1">简介：</h3>
+<p>PSR-4 是目前推荐的标准，更加灵活简洁，是现代 PHP 项目的首选。</p>
+<h3 id="规则-1">规则：</h3>
+<ul>
+<li>命名空间前缀映射到一个基础目录。</li>
+<li>类名的剩余部分直接对应子目录和文件名。</li>
+<li>不再支持下划线 <code>_</code> 作为路径分隔符。</li>
+</ul>
+<h3 id="示例-1">示例：</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln">1</span><span class="cl"><span class="c1">// 命名空间：App\Controller\UserController
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="c1">// 如果配置了 &#34;App\\&#34;: &#34;src/&#34;
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="c1">// 则对应文件路径为：src/Controller/UserController.php
+</span></span></span></code></pre></div><h3 id="composer-配置">Composer 配置：</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="ln">1</span><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl">    <span class="nt">&#34;autoload&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">3</span><span class="cl">        <span class="nt">&#34;psr-4&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">4</span><span class="cl">            <span class="nt">&#34;App\\&#34;</span><span class="p">:</span> <span class="s2">&#34;src/&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">5</span><span class="cl">            <span class="nt">&#34;MyLib\\&#34;</span><span class="p">:</span> <span class="s2">&#34;lib/&#34;</span>
+</span></span><span class="line"><span class="ln">6</span><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="ln">7</span><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="ln">8</span><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><blockquote>
+<p>✅ 优点：结构清晰、支持任意深度目录、与命名空间完美契合。</p>
+</blockquote>
+<hr>
+<h2 id="3-classmap类映射">3. classmap（类映射）</h2>
+<h3 id="简介-2">简介：</h3>
+<p>Composer 扫描指定目录或文件，<strong>生成一个类名到文件路径的映射表</strong>（在 <code>vendor/composer/autoload_classmap.php</code> 中）。适用于无法遵循 PSR-4 的老旧代码或第三方库。</p>
+<h3 id="特点">特点：</h3>
+<ul>
+<li>不依赖命名空间或文件命名规则。</li>
+<li>扫描时读取所有 PHP 文件，提取 <code>class</code>、<code>interface</code>、<code>trait</code> 声明。</li>
+<li>加载速度快（直接查表），但每次新增类需重新 dump。</li>
+</ul>
+<h3 id="示例-2">示例：</h3>
+<p>假设你有如下文件：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln">1</span><span class="cl"><span class="c1">// lib/OldStyleClass.php
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="k">class</span> <span class="nc">OldStyleClass</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">3</span><span class="cl">    <span class="c1">// ...
+</span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><h3 id="composer-配置-1">Composer 配置：</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="ln">1</span><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl">    <span class="nt">&#34;autoload&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">3</span><span class="cl">        <span class="nt">&#34;classmap&#34;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&#34;lib/&#34;</span><span class="p">,</span> <span class="s2">&#34;database/seeds/&#34;</span><span class="p">]</span>
+</span></span><span class="line"><span class="ln">4</span><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>运行 <code>composer dump-autoload</code> 后，会生成类似：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln">1</span><span class="cl"><span class="s1">&#39;OldStyleClass&#39;</span> <span class="o">=&gt;</span> <span class="nv">$baseDir</span> <span class="o">.</span> <span class="s1">&#39;/lib/OldStyleClass.php&#39;</span><span class="p">,</span>
+</span></span></code></pre></div><blockquote>
+<p>✅ 适合非标准命名的遗留代码。</p>
+</blockquote>
+<hr>
+<h2 id="4-files-includes直接包含文件">4. files includes（直接包含文件）</h2>
+<h3 id="简介-3">简介：</h3>
+<p>有些文件不包含类，而是定义函数、常量或全局逻辑（如 helpers.php）。这些文件无法通过类名自动加载，需手动 include。</p>
+<h3 id="特点-1">特点：</h3>
+<ul>
+<li>每次请求都会加载这些文件（无条件包含）。</li>
+<li>适用于函数库、全局宏等。</li>
+</ul>
+<h3 id="示例-3">示例：</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln">1</span><span class="cl"><span class="c1">// helpers.php
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="k">function</span> <span class="nf">dd</span><span class="p">(</span><span class="nv">$data</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">3</span><span class="cl">    <span class="nx">var_dump</span><span class="p">(</span><span class="nv">$data</span><span class="p">);</span>
+</span></span><span class="line"><span class="ln">4</span><span class="cl">    <span class="k">die</span><span class="p">();</span>
+</span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><h3 id="composer-配置-2">Composer 配置：</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="ln">1</span><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl">    <span class="nt">&#34;autoload&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">3</span><span class="cl">        <span class="nt">&#34;files&#34;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&#34;src/helpers.php&#34;</span><span class="p">,</span> <span class="s2">&#34;src/constants.php&#34;</span><span class="p">]</span>
+</span></span><span class="line"><span class="ln">4</span><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><blockquote>
+<p>⚠️ 注意：这些文件会在每次请求时被包含，影响性能，应尽量精简。</p>
+</blockquote>
+<hr>
+<h2 id="四种方式对比总结">四种方式对比总结</h2>
+<table>
+  <thead>
+      <tr>
+          <th>方式</th>
+          <th>是否基于命名空间</th>
+          <th>是否需要符合命名规则</th>
+          <th>是否每次扫描</th>
+          <th>适用场景</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><strong>PSR-0</strong></td>
+          <td>✅</td>
+          <td>✅（含下划线支持）</td>
+          <td>❌（实时计算）</td>
+          <td>老旧项目（已废弃）</td>
+      </tr>
+      <tr>
+          <td><strong>PSR-4</strong></td>
+          <td>✅</td>
+          <td>✅（严格命名空间匹配）</td>
+          <td>❌（实时计算）</td>
+          <td>现代 PHP 项目（推荐）</td>
+      </tr>
+      <tr>
+          <td><strong>classmap</strong></td>
+          <td>❌</td>
+          <td>❌（任意命名）</td>
+          <td>✅（需 dump）</td>
+          <td>遗留代码、闭源库</td>
+      </tr>
+      <tr>
+          <td><strong>files</strong></td>
+          <td>❌</td>
+          <td>❌（不加载类）</td>
+          <td>✅（始终加载）</td>
+          <td>全局函数、常量、辅助脚本</td>
+      </tr>
+  </tbody>
+</table>
+<hr>
+<h2 id="综合示例composerjson">综合示例（Composer.json）</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl">    <span class="nt">&#34;autoload&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl">        <span class="nt">&#34;psr-4&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl">            <span class="nt">&#34;App\\&#34;</span><span class="p">:</span> <span class="s2">&#34;src/&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl">            <span class="nt">&#34;Tests\\&#34;</span><span class="p">:</span> <span class="s2">&#34;tests/&#34;</span>
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">        <span class="p">},</span>
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl">        <span class="nt">&#34;classmap&#34;</span><span class="p">:</span> <span class="p">[</span>
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl">            <span class="s2">&#34;database/seeds&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">            <span class="s2">&#34;legacy/&#34;</span>
+</span></span><span class="line"><span class="ln">10</span><span class="cl">        <span class="p">],</span>
+</span></span><span class="line"><span class="ln">11</span><span class="cl">        <span class="nt">&#34;files&#34;</span><span class="p">:</span> <span class="p">[</span>
+</span></span><span class="line"><span class="ln">12</span><span class="cl">            <span class="s2">&#34;src/helpers.php&#34;</span>
+</span></span><span class="line"><span class="ln">13</span><span class="cl">        <span class="p">]</span>
+</span></span><span class="line"><span class="ln">14</span><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="ln">15</span><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>运行：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">composer dump-autoload
+</span></span></code></pre></div><p>之后就可以在项目中直接使用：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln">1</span><span class="cl"><span class="k">use</span> <span class="nx">App\Controller\HomeController</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="nv">$controller</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">HomeController</span><span class="p">();</span> <span class="c1">// 自动通过 PSR-4 加载
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl">
+</span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="nx">dd</span><span class="p">(</span><span class="s1">&#39;debug&#39;</span><span class="p">);</span> <span class="c1">// 来自 files 中的 helpers.php
+</span></span></span></code></pre></div><hr>
+<h2 id="总结建议">总结建议</h2>
+<ul>
+<li><strong>新项目一律用 PSR-4</strong>。</li>
+<li><strong>老旧无命名空间的类用 classmap</strong>。</li>
+<li><strong>全局函数用 files</strong>。</li>
+<li><strong>避免使用 PSR-0</strong>，除非维护非常老的系统。</li>
+</ul>
+<hr>
+<h1 id="php-的-spl-autoloaderstandard-php-library-autoloading是-php-提供的一套标准化可扩展的自动加载机制用于在运行时按需加载类接口或-trait-文件避免手动写大量-requireinclude">PHP 的 <strong>SPL autoloader</strong>（Standard PHP Library Autoloading）是 PHP 提供的一套标准化、可扩展的自动加载机制，用于在运行时按需加载类、接口或 trait 文件，避免手动写大量 <code>require</code>/<code>include</code>。</h1>
 <p>它是现代 PHP 自动加载（如 PSR-4、Composer）的基础。</p>
 <hr>
 <h2 id="-一什么是-spl-autoloader">📌 一、什么是 SPL Autoloader？</h2>
@@ -1849,7 +2032,7 @@
 </span></span><span class="line"><span class="ln">5</span><span class="cl">libmysqlclient (由 Oracle/MySQL AB 提供的 C 库)
 </span></span><span class="line"><span class="ln">6</span><span class="cl">   ↓
 </span></span><span class="line"><span class="ln">7</span><span class="cl">MySQL Server
-</span></span></code></pre></div><h3 id="特点">特点：</h3>
+</span></span></code></pre></div><h3 id="特点-2">特点：</h3>
 <ul>
 <li>所有 MySQL 扩展（<code>mysql_*</code>, <code>mysqli</code>, <code>pdo_mysql</code>）都依赖系统安装的 <strong><code>libmysqlclient.so</code></strong>。</li>
 <li>必须在编译 PHP 时链接该库（<code>--with-mysql=/path</code>）。</li>
