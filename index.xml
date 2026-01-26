@@ -2373,5 +2373,500 @@ as long as it is not inside another &lt;strong&gt;leaf&lt;/strong&gt; bundle.&lt
       </description>
     </item>
     
+    <item>
+      <title></title>
+      <link>https://jianlin-li.github.io/post/composer/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://jianlin-li.github.io/post/composer/</guid>
+      <description>
+        
+          
+            &lt;!DOCTYPE html&gt;
+&lt;!-- saved from url=(0029)https://docs.phpcomposer.com/ --&gt;
+&lt;html class=&#34;no-js&#34; lang=&#34;zh-CN&#34;&gt;&lt;head&gt;&lt;meta http-equiv=&#34;Content-Type&#34; content=&#34;text/html; charset=UTF-8&#34;&gt;
+        
+        &lt;meta http-equiv=&#34;X-UA-Compatible&#34; content=&#34;IE=edge,chrome=1&#34;&gt;
+        &lt;meta name=&#34;viewport&#34; content=&#34;width=device-width,initial-scale=1&#34;&gt;
+
+        &lt;title&gt;Composer 中文文档 | Composer 中文网&lt;/title&gt;
+        &lt;meta name=&#34;description&#34; content=&#34;Composer 是 PHP 中用来管理依赖（dependency）关系的工具&#34;&gt;
+        &lt;meta name=&#34;keywords&#34; content=&#34;PHP, Composer, Packagist, 依赖管理, npm, Symfony, Laravel&#34;&gt;
+
+        &lt;link href=&#34;./data_files/bootstrap.min.css&#34; rel=&#34;stylesheet&#34;&gt;
+        &lt;link rel=&#34;stylesheet&#34; href=&#34;./data_files/style.css&#34;&gt;
+        &lt;link rel=&#34;stylesheet&#34; href=&#34;./data_files/prism.css&#34;&gt;
+
+    &lt;style type=&#34;text/css&#34;&gt;
+                        .zhmMask{
+                            z-index:999999999;
+                            background-color:#000;
+                            position: fixed;top: 0;right: 0;bottom: 0;left: 0;
+                            opacity:0.8;
+                        }
+                        .wrap-box{
+                            z-index:1000000000;
+                            position:fixed;;top: 50%;left: 50%;transform: translate(-50%, -200px);
+                            width: 300px;
+                            color: #555;
+                            background-color: #fff;
+                            border-radius: 5px;
+                            overflow:hidden;
+                            font:16px numFont,PingFangSC-Regular,Tahoma,Microsoft Yahei,sans-serif !important;
+                            font-weight:400 !important;
+                        }
+                        .setWrapHead{
+                            background-color:#f24443;height:40px;color:#fff;text-align:center;line-height:40px;
+                        }
+                        .setWrapLi{
+                            margin:0px;padding:0px;
+                        }
+                        .setWrapLi li{
+                            background-color: #fff;
+                            border-bottom:1px solid #eee;
+                            margin:0px !important;
+                            padding:12px 20px;
+                            display: flex;
+                            justify-content: space-between;align-items: center;
+                            list-style: none;
+                        }
+
+                        .setWrapLiContent{
+                            display: flex;justify-content: space-between;align-items: center;
+                        }
+                        .setWrapSave{
+                            position:absolute;top:-2px;right:10px;font-size:24px;cursor:pointer
+                        }
+                        .iconSetFoot{
+                            position:absolute;bottom:0px;padding:10px 20px;width:100%;
+                        z-index:1000000009;background:#fef9ef;
+                        }
+                        .iconSetFootLi{
+                            margin:0px;padding:0px;
+                        }
+
+                        .iconSetFootLi li{
+                            display: inline-flex;
+                            padding:0px 2px;
+                            justify-content: space-between;align-items: center;
+                            font-size: 12px;
+                        }
+                        .iconSetFootLi li a{
+                            color:#555;
+                        }
+                        .iconSetFootLi a:hover {
+                            color:#fe6d73;
+                        }
+                        .iconSetPage{
+                            z-index:1000000001;
+                            position:absolute;top:0px;left:300px;
+                            background:#fff;
+                            width:300px;
+                            height:100%;
+                        }
+                        .iconSetUlHead{
+                        padding:0px;
+                        margin:0px;
+                        }
+                        .iconSetPageHead{
+                            border-bottom:1px solid #ccc;
+                            height:40px;
+                            line-height:40px;
+                            display: flex;
+                            justify-content: space-between;
+                            align-items: center;
+                            background-color:#fe6d73;
+                            color:#fff;
+                            font-size: 15px;
+                        }
+                        .iconSetPageLi{
+                            margin:0px;padding:0px;
+                        }
+                        .iconSetPageLi li{
+                            list-style: none;
+                            padding:8px 20px;
+                            border-bottom:1px solid #eee;
+                        }
+                        .zhihuSetPage{
+                            z-index:1000000002;position:absolute;top:0px;left:300px;background:#fff;width:300px;height:100%;
+                        }
+                        .iconSetPageInput{
+                            display: flex !important;justify-content: space-between;align-items: center;
+                        }
+                        .zhihuSetPageLi{
+                            margin:0px;padding:0px;
+                            height:258px;
+                            overflow-y: scroll;
+                        }
+
+                        .zhihuSetPageContent{
+                            display: flex !important;justify-content: space-between;align-items: center;
+                        }
+
+                        .zhm_circular{
+                            width: 40px;height: 20px;border-radius: 16px;transition: .3s;cursor: pointer;box-shadow: 0 0 3px #999 inset;
+                        }
+                        .round-button{
+                            width: 20px;height: 20px;;border-radius: 50%;box-shadow: 0 1px 5px rgba(0,0,0,.5);transition: .3s;position: relative;
+                        }
+                        .zhm_back{
+                            border: solid #FFF; border-width: 0 3px 3px 0; display: inline-block; padding: 3px;transform: rotate(135deg);  -webkit-transform: rotate(135deg);margin-left:10px;cursor:pointer;
+                        }
+                        .to-right{
+                            margin-left:20px; display: inline-block; padding: 3px;transform: rotate(-45deg); -webkit-transform: rotate(-45deg);cursor:pointer;
+
+                        }
+                        .iconSetSave{
+                            font-size:24px;cursor:pointer;margin-right:5px;margin-bottom:4px;color:#FFF;
+                        }
+                        .zhm_set_page{
+                            z-index:1000000003;
+                            position:absolute;
+                            top:0px;left:300px;
+                            background:#fff;
+                            width:300px;
+                            height:100%;
+                        }
+                        .zhm_set_page_header{
+                            border-bottom:1px solid #ccc;
+                            height:40px;
+                            line-height:40px;
+                            display: flex;
+                            justify-content: space-between;
+                            align-items: center;
+                            background-color:#fe6d73;
+                            color:#fff;
+                            font-size: 15px;
+                        }
+                        .zhm_set_page_content{
+                            display: flex !important;justify-content: space-between;align-items: center;
+                        }
+                        .zhm_set_page_list{
+                            margin:0px;padding:0px;
+                            height: 220px;
+                            overflow-y: scroll;
+                        }
+
+                        .zhm_set_page_list::-webkit-scrollbar {
+                            /*滚动条整体样式*/
+                            width : 0px;  /*高宽分别对应横竖滚动条的尺寸*/
+                            height: 1px;
+                        }
+                        .zhm_set_page_list::-webkit-scrollbar-thumb {
+                            /*滚动条里面小方块*/
+                            border-radius   : 2px;
+                            background-color: #fe6d73;
+                        }
+                        .zhm_set_page_list::-webkit-scrollbar-track {
+                            /*滚动条里面轨道*/
+                            box-shadow   : inset 0 0 5px rgba(0, 0, 0, 0.2);
+                            background   : #ededed;
+                            border-radius: 10px;
+                        }
+                        .zhm_set_page_list li{
+                            /*border-bottom:1px solid #ccc;*/
+                            padding:12px 20px;
+                            display:block;
+                            border-bottom:1px solid #eee;
+                        }
+                        li:last-child{
+                            border-bottom:none;
+                        }
+                        .zhm_scroll{
+                        overflow-y: scroll !important;
+                        }
+                        .zhm_scroll::-webkit-scrollbar {
+                            /*滚动条整体样式*/
+                            width : 0px;  /*高宽分别对应横竖滚动条的尺寸*/
+                            height: 1px;
+                        }
+                        .zhm_scroll::-webkit-scrollbar-thumb {
+                            /*滚动条里面小方块*/
+                            border-radius   : 2px;
+                            background-color: #fe6d73;
+                        }
+                        .zhm_scroll::-webkit-scrollbar-track {
+                            /*滚动条里面轨道*/
+                            box-shadow   : inset 0 0 5px rgba(0, 0, 0, 0.2);
+                            background   : #ededed;
+                            border-radius: 10px;
+                        }
+                        /*-form-*/
+                        :root {
+                            --base-color: #434a56;
+                            --white-color-primary: #f7f8f8;
+                            --white-color-secondary: #fefefe;
+                            --gray-color-primary: #c2c2c2;
+                            --gray-color-secondary: #c2c2c2;
+                            --gray-color-tertiary: #676f79;
+                            --active-color: #227c9d;
+                            --valid-color: #c2c2c2;
+                            --invalid-color: #f72f47;
+                            --invalid-icon: url(&#34;data:image/svg+xml;charset=utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%3E%20%3Cpath%20d%3D%22M13.41%2012l4.3-4.29a1%201%200%201%200-1.42-1.42L12%2010.59l-4.29-4.3a1%201%200%200%200-1.42%201.42l4.3%204.29-4.3%204.29a1%201%200%200%200%200%201.42%201%201%200%200%200%201.42%200l4.29-4.3%204.29%204.3a1%201%200%200%200%201.42%200%201%201%200%200%200%200-1.42z%22%20fill%3D%22%23f72f47%22%20%2F%3E%3C%2Fsvg%3E&#34;);
+                        }
+                        .text-input {
+                            font-size: 16px;
+                            position: relative;
+                            right:0px;
+                            z-index: 0;
+                        }
+                        .text-input__body {
+                            -webkit-appearance: none;
+                            -moz-appearance: none;
+                            appearance: none;
+                            background-color: transparent;
+                            border: 1px solid var(--gray-color-primary);
+                            border-radius: 3px;
+                            height: 1.7em;
+                            line-height: 1.7;
+                            overflow: hidden;
+                            padding: 2px 1em;
+                            text-overflow: ellipsis;
+                            transition: background-color 0.3s;
+                            width:55%;
+                            font-size:14px;
+                            box-sizing: initial;
+                        }
+                        .text-input__body:-ms-input-placeholder {
+                            color: var(--gray-color-secondary);
+                        }
+                        .text-input__body::-moz-placeholder {
+                            color: var(--gray-color-secondary);
+                        }
+                        .text-input__body::placeholder {
+                            color: var(--gray-color-secondary);
+                        }
+
+                        .text-input__body[data-is-valid] {
+                            padding-right: 1em;
+
+                        }
+                        .text-input__body[data-is-valid=true] {
+                            border-color: var(--valid-color);
+                        }
+                        .text-input__body[data-is-valid=false] {
+                            border-color: var(--invalid-color);
+                            box-shadow: inset 0 0 0 1px var(--invalid-color);
+                        }
+                        .text-input__body:focus {
+                            border-color: var(--active-color);
+                            box-shadow: inset 0 0 0 1px var(--active-color);
+                            outline: none;
+                        }
+                        .text-input__body:-webkit-autofill {
+                            transition-delay: 9999s;
+                            -webkit-transition-property: background-color;
+                            transition-property: background-color;
+                        }
+                        .text-input__validator {
+                            background-position: right 0.5em center;
+                            background-repeat: no-repeat;
+                            background-size: 1.5em;
+                            display: inline-block;
+                            height: 100%;
+                            left: 0;
+                            position: absolute;
+                            top: 0;
+                            width: 100%;
+                            z-index: -1;
+                        }
+                        .text-input__body[data-is-valid=false] + .text-input__validator {
+                            background-image: var(--invalid-icon);
+                        }
+                        .select-box {
+                            box-sizing: inherit;
+                            font-size: 16px;
+                            position: relative;
+                            transition: background-color 0.5s ease-out;
+                            width:90px;
+                        }
+                        .select-box::after {
+                            border-color: var(--gray-color-secondary) transparent transparent transparent;
+                            border-style: solid;
+                            border-width: 6px 4px 0;
+                            bottom: 0;
+                            content: &#34;&#34;;
+                            display: inline-block;
+                            height: 0;
+                            margin: auto 0;
+                            pointer-events: none;
+                            position: absolute;
+                            right: -72px;
+                            top: 0;
+                            width: 0;
+                            z-index: 1;
+                        }
+                        .select-box__body {
+                            box-sizing: initial;
+                            -webkit-appearance: none;
+                            -moz-appearance: none;
+                            appearance: none;
+                            background-color: transparent;
+                            border: 1px solid var(--gray-color-primary);
+                            border-radius: 3px;
+                            cursor: pointer;
+                            height: 1.7em;
+                            line-height: 1.7;
+                            padding-left: 1em;
+                            padding-right: calc(1em + 16px);
+                            width: 140%;
+                            font-size:14px;
+                            padding-top:2px;
+                            padding-bottom:2px;
+                        }
+                        .select-box__body[data-is-valid=true] {
+                            border-color: var(--valid-color);
+                            box-shadow: inset 0 0 0 1px var(--valid-color);
+                        }
+                        .select-box__body[data-is-valid=false] {
+                            border-color: var(--invalid-color);
+                            box-shadow: inset 0 0 0 1px var(--invalid-color);
+                        }
+                        .select-box__body.focus-visible {
+                            border-color: var(--active-color);
+                            box-shadow: inset 0 0 0 1px var(--active-color);
+                            outline: none;
+                        }
+                        .select-box__body:-webkit-autofill {
+                            transition-delay: 9999s;
+                            -webkit-transition-property: background-color;
+                            transition-property: background-color;
+                        }
+                        .textarea__body {
+                            -webkit-appearance: none;
+                            -moz-appearance: none;
+                            appearance: none;
+                            background-color: transparent;
+                            border: 1px solid var(--gray-color-primary);
+                            border-radius: 0;
+                            box-sizing: initial;
+                            font: inherit;
+                            left: 0;
+                            letter-spacing: inherit;
+                            overflow: hidden;
+                            padding: 1em;
+                            position: absolute;
+                            resize: none;
+                            top: 0;
+                            transition: background-color 0.5s ease-out;
+                            width: 100%;
+                            }
+                        .textarea__body:only-child {
+                            position: relative;
+                            resize: vertical;
+                        }
+                        .textarea__body:focus {
+                            border-color: var(--active-color);
+                            box-shadow: inset 0 0 0 1px var(--active-color);
+                            outline: none;
+                        }
+                        .textarea__body[data-is-valid=true] {
+                            border-color: var(--valid-color);
+                            box-shadow: inset 0 0 0 1px var(--valid-color);
+                        }
+                        .textarea__body[data-is-valid=false] {
+                            border-color: var(--invalid-color);
+                            box-shadow: inset 0 0 0 1px var(--invalid-color);
+                        }
+
+                        .textarea ._dummy-box {
+                            border: 1px solid;
+                            box-sizing: border-box;
+                            min-height: 240px;
+                            overflow: hidden;
+                            overflow-wrap: break-word;
+                            padding: 1em;
+                            visibility: hidden;
+                            white-space: pre-wrap;
+                            word-wrap: break-word;
+                        }
+                        .toLeftMove{
+                            nimation:moveToLeft 0.5s infinite;
+                            -webkit-animation:moveToLeft 0.5s infinite; /*Safari and Chrome*/
+                            animation-iteration-count:1;
+                            animation-fill-mode: forwards;
+                        }
+
+                        @keyframes moveToLeft{
+                            from {left:200px;}
+                            to {left:0px;}
+                        }
+
+                        @-webkit-keyframes moveToLeft /*Safari and Chrome*/{
+                            from {left:200px;}
+                            to {left:0px;}
+                        }
+
+                        .toRightMove{
+                            nimation:moveToRight 2s infinite;
+                            -webkit-animation:moveToRight 2s infinite; /*Safari and Chrome*/
+                            animation-iteration-count:1;
+                            animation-fill-mode: forwards;
+                        }
+                        @keyframes moveToRight{
+                            from {left:0px;}
+                            to {left:2000px;}
+                        }
+
+                        @-webkit-keyframes moveToRight /*Safari and Chrome*/{
+                            from {left:0px;}
+                            to {left:200px;}
+                        }
+
+                    &lt;/style&gt;&lt;/head&gt;
+
+    &lt;body&gt;
+        &lt;div id=&#34;container&#34;&gt;
+            &lt;header&gt;
+                    &lt;a href=&#34;https://docs.phpcomposer.com/&#34;&gt;首页&lt;/a&gt;
+                    &lt;a href=&#34;./intro.html&#34;&gt;入门&lt;/a&gt;
+                    &lt;a href=&#34;https://getcomposer.org/download/&#34; target=&#34;_blank&#34;&gt;下载&lt;/a&gt;
+                    &lt;a href=&#34;https://packagist.org/&#34; target=&#34;_blank&#34;&gt;安装包列表&lt;/a&gt;
+                    &lt;a class=&#34;last&#34; href=&#34;https://pkg.phpcomposer.com/&#34; target=&#34;_blank&#34;&gt;中国镜像&lt;/a&gt;
+            &lt;/header&gt;
+            &lt;div id=&#34;main&#34; role=&#34;main&#34;&gt;
+    &lt;h2&gt;中文文档&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;./intro.html&#34;&gt;简介&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;./basic-usage.html&#34;&gt;基本用法&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;./libraries.html&#34;&gt;库（资源包）&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;./cli.html&#34;&gt;命令行&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;./schema.html&#34;&gt;架构&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;./repositories.html&#34;&gt;资源库&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;./community.html&#34;&gt;社区&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2&gt;相关文章&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;./aliases.html&#34;&gt;别名&lt;/a&gt;&lt;br&gt;
+版本分支名称的别名。&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;./custom-installers.html&#34;&gt;自定义安装程序&lt;/a&gt;&lt;br&gt;
+修改某些特殊类型包的安装方式。&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://docs.phpcomposer.com/articles/handling-private-packages-with-satis.md&#34;&gt;Handling Private Packages With Satis&lt;/a&gt;&lt;br&gt;
+Host your own composer repository&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://docs.phpcomposer.com/articles/plugins.md&#34;&gt;插件&lt;/a&gt;&lt;br&gt;
+修改和扩展 Composer 的功能。&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;./scripts.html&#34;&gt;脚本&lt;/a&gt;&lt;br&gt;
+脚本是指一些 Composer 事件的回调，它们在安装资源包的过程中被触发执行。&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://docs.phpcomposer.com/articles/troubleshooting.md&#34;&gt;Troubleshooting&lt;/a&gt;&lt;br&gt;
+Solving problems&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://docs.phpcomposer.com/articles/vendor-binaries.md&#34;&gt;Vendor Binaries&lt;/a&gt;&lt;br&gt;
+Expose command-line scripts from packages&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2&gt;常见问题&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://docs.phpcomposer.com/faqs/how-do-i-install-a-package-to-a-custom-path-for-my-framework.md&#34;&gt;如何为我的框架自定义一个资源包安装目录？&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://docs.phpcomposer.com/faqs/should-i-commit-the-dependencies-in-my-vendor-directory.md&#34;&gt;我应该提交 vendor 目录中的依赖包吗？&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://docs.phpcomposer.com/faqs/why-are-unbound-version-constraints-a-bad-idea.md&#34;&gt;Why are unbound version constraints a bad idea?&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://docs.phpcomposer.com/faqs/why-are-version-constraints-combining-comparisons-and-wildcards-a-bad-idea.md&#34;&gt;为什么说“比较符”和“通配符”相结合的版本约束是坏主意？&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://docs.phpcomposer.com/faqs/why-can%27t-composer-load-repositories-recursively.md&#34;&gt;为什么 Composer 不递归加载储存库？&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2&gt;API 文档&lt;/h2&gt;
+&lt;p&gt;如果你需要在工作中使用 composer 作为库的管理，你或许也想看看 &lt;a href=&#34;http://getcomposer.org/apidoc/master/index.html&#34;&gt;API 文档&lt;/a&gt;。&lt;/p&gt;
+          
+          
+        
+      </description>
+    </item>
+    
   </channel>
 </rss>
