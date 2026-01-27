@@ -168,7 +168,7 @@
     <span class="post_date">
       2025-06-04	  
     </span>
-    <span class="post_time"> · 4 分钟阅读</span><span>&nbsp;· <a href='https://jianlin-li.github.io/tags/php/' title="PHP" class="post_tag button button_translucent">PHP
+    <span class="post_time"> · 6 分钟阅读</span><span>&nbsp;· <a href='https://jianlin-li.github.io/tags/php/' title="PHP" class="post_tag button button_translucent">PHP
         </a>
     </span>
     <span class="page_only">&nbsp;·
@@ -652,7 +652,155 @@
   </tbody>
 </table>
 <p>完成以上步骤后，你就可以安全地监控 PHP-FPM 的运行状态了！</p>
-
+<hr>
+<h1 id="使用-php-openssl-扩展生成-rsa-2048-位密钥对并实现短字符串加密解密的完整可运行示例包含关键说明错误处理长度限制提示及长文本解决方案建议">使用 PHP OpenSSL 扩展生成 RSA 2048 位密钥对，并实现<strong>短字符串加密/解密</strong>的完整可运行示例，包含关键说明、错误处理、长度限制提示及长文本解决方案建议。</h1>
+<hr>
+<h2 id="-完整可运行示例短字符串">🔒 完整可运行示例（短字符串）</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="o">&lt;?</span><span class="nx">php</span>
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="sd">/**
+</span></span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="sd"> * RSA 2048 位密钥生成 + 公钥加密 / 私钥解密示例
+</span></span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="sd"> * 注意：仅适用于短字符串（≤245字节），长文本需用混合加密（见文末说明）
+</span></span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="sd"> */</span>
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="c1">// ============= 1. 生成 RSA 密钥对 =============
+</span></span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="nv">$config</span> <span class="o">=</span> <span class="p">[</span>
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">    <span class="s1">&#39;digest_alg&#39;</span>       <span class="o">=&gt;</span> <span class="s1">&#39;sha512&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">10</span><span class="cl">    <span class="s1">&#39;private_key_bits&#39;</span> <span class="o">=&gt;</span> <span class="mi">2048</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">11</span><span class="cl">    <span class="s1">&#39;private_key_type&#39;</span> <span class="o">=&gt;</span> <span class="nx">OPENSSL_KEYTYPE_RSA</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">12</span><span class="cl"><span class="p">];</span>
+</span></span><span class="line"><span class="ln">13</span><span class="cl">
+</span></span><span class="line"><span class="ln">14</span><span class="cl"><span class="c1">// 生成私钥资源
+</span></span></span><span class="line"><span class="ln">15</span><span class="cl"><span class="nv">$privateKeyRes</span> <span class="o">=</span> <span class="nx">openssl_pkey_new</span><span class="p">(</span><span class="nv">$config</span><span class="p">);</span>
+</span></span><span class="line"><span class="ln">16</span><span class="cl"><span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nv">$privateKeyRes</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">17</span><span class="cl">    <span class="k">die</span><span class="p">(</span><span class="s2">&#34;❌ 密钥生成失败: &#34;</span> <span class="o">.</span> <span class="nx">openssl_error_string</span><span class="p">()</span> <span class="o">.</span> <span class="s2">&#34;</span><span class="se">\n</span><span class="s2">&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="ln">18</span><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="ln">19</span><span class="cl">
+</span></span><span class="line"><span class="ln">20</span><span class="cl"><span class="c1">// 导出 PEM 格式私钥字符串
+</span></span></span><span class="line"><span class="ln">21</span><span class="cl"><span class="nx">openssl_pkey_export</span><span class="p">(</span><span class="nv">$privateKeyRes</span><span class="p">,</span> <span class="nv">$privateKeyPem</span><span class="p">);</span>
+</span></span><span class="line"><span class="ln">22</span><span class="cl">
+</span></span><span class="line"><span class="ln">23</span><span class="cl"><span class="c1">// 从私钥资源提取公钥 PEM 字符串
+</span></span></span><span class="line"><span class="ln">24</span><span class="cl"><span class="nv">$pubKeyDetails</span> <span class="o">=</span> <span class="nx">openssl_pkey_get_details</span><span class="p">(</span><span class="nv">$privateKeyRes</span><span class="p">);</span>
+</span></span><span class="line"><span class="ln">25</span><span class="cl"><span class="nv">$publicKeyPem</span> <span class="o">=</span> <span class="nv">$pubKeyDetails</span><span class="p">[</span><span class="s1">&#39;key&#39;</span><span class="p">];</span>
+</span></span><span class="line"><span class="ln">26</span><span class="cl">
+</span></span><span class="line"><span class="ln">27</span><span class="cl"><span class="c1">// 释放资源（可选）
+</span></span></span><span class="line"><span class="ln">28</span><span class="cl"><span class="nx">openssl_pkey_free</span><span class="p">(</span><span class="nv">$privateKeyRes</span><span class="p">);</span>
+</span></span><span class="line"><span class="ln">29</span><span class="cl">
+</span></span><span class="line"><span class="ln">30</span><span class="cl"><span class="k">echo</span> <span class="s2">&#34;✅ 密钥对生成成功！</span><span class="se">\n</span><span class="s2">&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln">31</span><span class="cl"><span class="k">echo</span> <span class="s2">&#34;🔐 私钥 (PEM):</span><span class="se">\n</span><span class="s2">&#34;</span> <span class="o">.</span> <span class="nx">wordwrap</span><span class="p">(</span><span class="nv">$privateKeyPem</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="s2">&#34;</span><span class="se">\n</span><span class="s2">&#34;</span><span class="p">,</span> <span class="k">true</span><span class="p">)</span> <span class="o">.</span> <span class="s2">&#34;</span><span class="se">\n</span><span class="s2">&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln">32</span><span class="cl"><span class="k">echo</span> <span class="s2">&#34;🔓 公钥 (PEM):</span><span class="se">\n</span><span class="s2">&#34;</span> <span class="o">.</span> <span class="nx">wordwrap</span><span class="p">(</span><span class="nv">$publicKeyPem</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="s2">&#34;</span><span class="se">\n</span><span class="s2">&#34;</span><span class="p">,</span> <span class="k">true</span><span class="p">)</span> <span class="o">.</span> <span class="s2">&#34;</span><span class="se">\n\n</span><span class="s2">&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln">33</span><span class="cl">
+</span></span><span class="line"><span class="ln">34</span><span class="cl"><span class="c1">// ============= 2. 加密（公钥） =============
+</span></span></span><span class="line"><span class="ln">35</span><span class="cl"><span class="nv">$original</span> <span class="o">=</span> <span class="s2">&#34;Hello RSA! 这是测试消息。&#34;</span><span class="p">;</span> <span class="c1">// 中文需注意编码，UTF-8 安全
+</span></span></span><span class="line"><span class="ln">36</span><span class="cl"><span class="k">echo</span> <span class="s2">&#34;📝 原始消息: </span><span class="si">$original</span><span class="s2"> (长度: &#34;</span> <span class="o">.</span> <span class="nx">strlen</span><span class="p">(</span><span class="nv">$original</span><span class="p">)</span> <span class="o">.</span> <span class="s2">&#34; 字节)</span><span class="se">\n</span><span class="s2">&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln">37</span><span class="cl">
+</span></span><span class="line"><span class="ln">38</span><span class="cl"><span class="c1">// 检查长度（2048位RSA + PKCS1 padding 最大245字节）
+</span></span></span><span class="line"><span class="ln">39</span><span class="cl"><span class="k">if</span> <span class="p">(</span><span class="nx">strlen</span><span class="p">(</span><span class="nv">$original</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">245</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">40</span><span class="cl">    <span class="k">die</span><span class="p">(</span><span class="s2">&#34;❌ 消息过长！RSA 2048 仅支持 ≤245 字节（使用 PKCS1 padding）。</span><span class="se">\n</span><span class="s2">&#34;</span> <span class="o">.</span>
+</span></span><span class="line"><span class="ln">41</span><span class="cl">        <span class="s2">&#34;💡 建议：使用混合加密（RSA+AES）处理长文本。</span><span class="se">\n</span><span class="s2">&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="ln">42</span><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="ln">43</span><span class="cl">
+</span></span><span class="line"><span class="ln">44</span><span class="cl"><span class="nv">$encryptedRaw</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln">45</span><span class="cl"><span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">openssl_public_encrypt</span><span class="p">(</span><span class="nv">$original</span><span class="p">,</span> <span class="nv">$encryptedRaw</span><span class="p">,</span> <span class="nv">$publicKeyPem</span><span class="p">,</span> <span class="nx">OPENSSL_PKCS1_PADDING</span><span class="p">))</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">46</span><span class="cl">    <span class="k">die</span><span class="p">(</span><span class="s2">&#34;❌ 加密失败: &#34;</span> <span class="o">.</span> <span class="nx">openssl_error_string</span><span class="p">()</span> <span class="o">.</span> <span class="s2">&#34;</span><span class="se">\n</span><span class="s2">&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="ln">47</span><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="ln">48</span><span class="cl">
+</span></span><span class="line"><span class="ln">49</span><span class="cl"><span class="nv">$encryptedBase64</span> <span class="o">=</span> <span class="nx">base64_encode</span><span class="p">(</span><span class="nv">$encryptedRaw</span><span class="p">);</span>
+</span></span><span class="line"><span class="ln">50</span><span class="cl"><span class="k">echo</span> <span class="s2">&#34;🔒 加密后 (Base64): &#34;</span> <span class="o">.</span> <span class="nv">$encryptedBase64</span> <span class="o">.</span> <span class="s2">&#34;</span><span class="se">\n\n</span><span class="s2">&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln">51</span><span class="cl">
+</span></span><span class="line"><span class="ln">52</span><span class="cl"><span class="c1">// ============= 3. 解密（私钥） =============
+</span></span></span><span class="line"><span class="ln">53</span><span class="cl"><span class="nv">$decrypted</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln">54</span><span class="cl"><span class="nv">$encryptedBinary</span> <span class="o">=</span> <span class="nx">base64_decode</span><span class="p">(</span><span class="nv">$encryptedBase64</span><span class="p">);</span>
+</span></span><span class="line"><span class="ln">55</span><span class="cl">
+</span></span><span class="line"><span class="ln">56</span><span class="cl"><span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">openssl_private_decrypt</span><span class="p">(</span><span class="nv">$encryptedBinary</span><span class="p">,</span> <span class="nv">$decrypted</span><span class="p">,</span> <span class="nv">$privateKeyPem</span><span class="p">,</span> <span class="nx">OPENSSL_PKCS1_PADDING</span><span class="p">))</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">57</span><span class="cl">    <span class="k">die</span><span class="p">(</span><span class="s2">&#34;❌ 解密失败: &#34;</span> <span class="o">.</span> <span class="nx">openssl_error_string</span><span class="p">()</span> <span class="o">.</span> <span class="s2">&#34;</span><span class="se">\n</span><span class="s2">&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="ln">58</span><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="ln">59</span><span class="cl">
+</span></span><span class="line"><span class="ln">60</span><span class="cl"><span class="k">echo</span> <span class="s2">&#34;✅ 解密结果: </span><span class="si">$decrypted\n</span><span class="s2">&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln">61</span><span class="cl"><span class="k">echo</span> <span class="s2">&#34;matchCondition: &#34;</span> <span class="o">.</span> <span class="p">(</span><span class="nv">$original</span> <span class="o">===</span> <span class="nv">$decrypted</span> <span class="o">?</span> <span class="s2">&#34;✅ 一致&#34;</span> <span class="o">:</span> <span class="s2">&#34;❌ 不一致&#34;</span><span class="p">)</span> <span class="o">.</span> <span class="s2">&#34;</span><span class="se">\n</span><span class="s2">&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln">62</span><span class="cl">
+</span></span><span class="line"><span class="ln">63</span><span class="cl"><span class="c1">// ============= 4. （可选）保存密钥到文件 =============
+</span></span></span><span class="line"><span class="ln">64</span><span class="cl"><span class="c1">// file_put_contents(&#39;private.key&#39;, $privateKeyPem);
+</span></span></span><span class="line"><span class="ln">65</span><span class="cl"><span class="c1">// file_put_contents(&#39;public.key&#39;, $publicKeyPem);
+</span></span></span><span class="line"><span class="ln">66</span><span class="cl"><span class="c1">// echo &#34;\n🔑 密钥已保存至 private.key / public.key\n&#34;;
+</span></span></span><span class="line"><span class="ln">67</span><span class="cl"><span class="cp">?&gt;</span><span class="err">
+</span></span></span></code></pre></div><hr>
+<h2 id="-重要说明与最佳实践">⚠️ 重要说明与最佳实践</h2>
+<h3 id="-密钥安全">🔑 密钥安全</h3>
+<ul>
+<li><strong>私钥必须严格保密</strong>，切勿提交到 Git 或暴露在前端。</li>
+<li>生产环境建议使用 <code>chmod 600 private.key</code> 限制文件权限。</li>
+<li>密钥应存储在安全位置（如环境变量、密钥管理服务）。</li>
+</ul>
+<h3 id="-长度限制关键">📏 长度限制（关键！）</h3>
+<table>
+  <thead>
+      <tr>
+          <th>密钥长度</th>
+          <th>填充方式</th>
+          <th>最大加密数据长度</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>2048 位</td>
+          <td>PKCS1 (默认)</td>
+          <td><strong>245 字节</strong></td>
+      </tr>
+      <tr>
+          <td>2048 位</td>
+          <td>OAEP (更安全)</td>
+          <td><strong>214 字节</strong></td>
+      </tr>
+  </tbody>
+</table>
+<ul>
+<li>示例中使用 <code>OPENSSL_PKCS1_PADDING</code>（兼容性好），如需更高安全性可改用 <code>OPENSSL_PKCS1_OAEP_PADDING</code>（需加解密端一致）。</li>
+<li><strong>中文/UTF-8 字符</strong>：<code>strlen()</code> 按字节计算，中文通常占 3 字节，需特别注意长度。</li>
+</ul>
+<h3 id="-长文本解决方案强烈推荐">🌐 长文本解决方案（强烈推荐）</h3>
+<p>RSA <strong>不适合直接加密长文本</strong>。工业级做法是 <strong>混合加密</strong>：</p>
+<ol>
+<li>生成随机 AES 密钥（如 256 位）</li>
+<li>用 <strong>RSA 公钥加密 AES 密钥</strong></li>
+<li>用 <strong>AES 加密实际数据</strong></li>
+<li>传输：<code>[加密的AES密钥] + [AES加密的数据]</code></li>
+<li>接收方用 RSA 私钥解密 AES 密钥，再用 AES 解密数据</li>
+</ol>
+<p>✅ 优势：安全、高效、无长度限制<br>
+📚 参考：PHP <code>openssl_encrypt()</code> / <code>openssl_decrypt()</code> + <code>random_bytes()</code></p>
+<h3 id="-常见问题排查">🛠️ 常见问题排查</h3>
+<table>
+  <thead>
+      <tr>
+          <th>问题</th>
+          <th>解决方案</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>openssl_pkey_new</code> 失败</td>
+          <td>检查 <code>php.ini</code> 中 <code>openssl.cnf</code> 路径是否正确（Windows 常见）</td>
+      </tr>
+      <tr>
+          <td>中文乱码</td>
+          <td>确保脚本、数据、终端均为 UTF-8 编码</td>
+      </tr>
+      <tr>
+          <td>解密后为空</td>
+          <td>检查 Base64 编解码、填充方式是否一致</td>
+      </tr>
+  </tbody>
+</table>
+<hr>
+<h2 id="-总结-2">💡 总结</h2>
+<ul>
+<li>✅ 本示例适用于<strong>短消息</strong>（如 token、密钥片段）的加解密验证。</li>
+<li>🔒 <strong>切勿用 RSA 直接加密用户密码、长文本</strong>——应使用哈希（密码）或混合加密（长数据）。</li>
+<li>🌱 新项目建议结合 <code>libsodium</code>（PHP 7.2+ 内置）使用更现代的加密方案（如 <code>sodium_crypto_box</code>）。</li>
+</ul>
+<p>运行前请确保：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">php -m <span class="p">|</span> grep openssl  <span class="c1"># 确认 openssl 扩展已启用</span>
+</span></span></code></pre></div>
     </div><div class="post_comments">
   
   
