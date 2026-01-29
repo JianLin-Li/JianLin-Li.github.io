@@ -7,7 +7,45 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
     <copyright>Copyright © 1989–2025, 李建林 </copyright>
-    <lastBuildDate>Thu, 22 Jan 2026 10:29:12 +0800</lastBuildDate><atom:link href="https://jianlin-li.github.io/tags/elasticsearch/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Wed, 28 Jan 2026 09:29:12 +0800</lastBuildDate><atom:link href="https://jianlin-li.github.io/tags/elasticsearch/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Elasticsearch的知识点-2</title>
+      <link>https://jianlin-li.github.io/post/elasticsearch_review_2/</link>
+      <pubDate>Wed, 28 Jan 2026 09:29:12 +0800</pubDate>
+      
+      <guid>https://jianlin-li.github.io/post/elasticsearch_review_2/</guid>
+      <description>
+        
+          
+            &lt;p&gt;本地环境部署Elasticsearch8.19.10 + Kibana8.19.10的一份&lt;strong&gt;完整、可直接落地使用&lt;/strong&gt;的 &lt;code&gt;docker-compose.yml&lt;/code&gt;，并且&lt;strong&gt;把 ES 8.19.x 的安全机制（证书、HTTP/Transport SSL、Kibana 连接安全）一次性配齐&lt;/strong&gt;，适合 &lt;strong&gt;本地目录挂载 + 三节点集群 + 单节点对外暴露&lt;/strong&gt; 的场景。&lt;/p&gt;
+&lt;p&gt;按 &lt;strong&gt;官方推荐的“自签 CA + 节点证书”方案&lt;/strong&gt; ，&lt;strong&gt;不走 enrollment token&lt;/strong&gt;，更可控，也方便长期维护。&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2 id=&#34;一目录结构非常重要&#34;&gt;一、目录结构（非常重要）&lt;/h2&gt;
+&lt;p&gt;我的本地目录(可按需变更)
+&lt;code&gt;/Users/lijianlin/opt/elasticsearch-8.19.10&lt;/code&gt;
+准备如下结构（没有就先建好）：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-text&#34; data-lang=&#34;text&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt; 1&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;/Users/lijianlin/opt/elasticsearch-8.19.10
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt; 2&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;├── docker-compose.yml
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt; 3&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;├── certs
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt; 4&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;│   ├── ca
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt; 5&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;│   ├── es01
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt; 6&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;│   ├── es02
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt; 7&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;│   ├── es03
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt; 8&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;│   └── kibana
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt; 9&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;├── esdata
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt;10&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;│   ├── es01
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt;11&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;│   ├── es02
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt;12&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;│   └── es03
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt;13&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;└── kibana-data
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;blockquote&gt;
+&lt;p&gt;⚠️ &lt;strong&gt;certs 目录必须存在&lt;/strong&gt;，证书由 &lt;code&gt;setup&lt;/code&gt; 容器自动生成
+⚠️ macOS 下 Docker Desktop 建议给这个目录 &lt;strong&gt;Full Disk Access&lt;/strong&gt;&lt;/p&gt;
+          
+          
+        
+      </description>
+    </item>
+    
     <item>
       <title>Elasticsearch的知识点-1</title>
       <link>https://jianlin-li.github.io/post/elasticsearch_review_1/</link>
