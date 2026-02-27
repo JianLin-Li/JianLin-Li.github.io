@@ -214,13 +214,13 @@
 </span></span><span class="line"><span class="ln">  3</span><span class="cl"><span class="k">class</span> <span class="nc">HttpStatus</span>
 </span></span><span class="line"><span class="ln">  4</span><span class="cl"><span class="p">{</span>
 </span></span><span class="line"><span class="ln">  5</span><span class="cl">    <span class="c1">// 1xx Informational
-</span></span></span><span class="line"><span class="ln">  6</span><span class="cl">    <span class="k">const</span> <span class="no">StatusContinue</span>                   <span class="o">=</span> <span class="mi">100</span><span class="p">;</span>
+</span></span></span><span class="line"><span class="ln">  6</span><span class="cl"><span class="c1"></span>    <span class="k">const</span> <span class="no">StatusContinue</span>                   <span class="o">=</span> <span class="mi">100</span><span class="p">;</span>
 </span></span><span class="line"><span class="ln">  7</span><span class="cl">    <span class="k">const</span> <span class="no">StatusSwitchingProtocols</span>         <span class="o">=</span> <span class="mi">101</span><span class="p">;</span>
 </span></span><span class="line"><span class="ln">  8</span><span class="cl">    <span class="k">const</span> <span class="no">StatusProcessing</span>                 <span class="o">=</span> <span class="mi">102</span><span class="p">;</span>
 </span></span><span class="line"><span class="ln">  9</span><span class="cl">    <span class="k">const</span> <span class="no">StatusEarlyHints</span>                 <span class="o">=</span> <span class="mi">103</span><span class="p">;</span>
 </span></span><span class="line"><span class="ln"> 10</span><span class="cl">
 </span></span><span class="line"><span class="ln"> 11</span><span class="cl">    <span class="c1">// 2xx Success
-</span></span></span><span class="line"><span class="ln"> 12</span><span class="cl">    <span class="k">const</span> <span class="no">StatusOK</span>                         <span class="o">=</span> <span class="mi">200</span><span class="p">;</span>
+</span></span></span><span class="line"><span class="ln"> 12</span><span class="cl"><span class="c1"></span>    <span class="k">const</span> <span class="no">StatusOK</span>                         <span class="o">=</span> <span class="mi">200</span><span class="p">;</span>
 </span></span><span class="line"><span class="ln"> 13</span><span class="cl">    <span class="k">const</span> <span class="no">StatusCreated</span>                    <span class="o">=</span> <span class="mi">201</span><span class="p">;</span>
 </span></span><span class="line"><span class="ln"> 14</span><span class="cl">    <span class="k">const</span> <span class="no">StatusAccepted</span>                   <span class="o">=</span> <span class="mi">202</span><span class="p">;</span>
 </span></span><span class="line"><span class="ln"> 15</span><span class="cl">    <span class="k">const</span> <span class="no">StatusNonAuthoritativeInfo</span>       <span class="o">=</span> <span class="mi">203</span><span class="p">;</span>
@@ -232,18 +232,18 @@
 </span></span><span class="line"><span class="ln"> 21</span><span class="cl">    <span class="k">const</span> <span class="no">StatusIMUsed</span>                     <span class="o">=</span> <span class="mi">226</span><span class="p">;</span>
 </span></span><span class="line"><span class="ln"> 22</span><span class="cl">
 </span></span><span class="line"><span class="ln"> 23</span><span class="cl">    <span class="c1">// 3xx Redirection
-</span></span></span><span class="line"><span class="ln"> 24</span><span class="cl">    <span class="k">const</span> <span class="no">StatusMultipleChoices</span>            <span class="o">=</span> <span class="mi">300</span><span class="p">;</span>
+</span></span></span><span class="line"><span class="ln"> 24</span><span class="cl"><span class="c1"></span>    <span class="k">const</span> <span class="no">StatusMultipleChoices</span>            <span class="o">=</span> <span class="mi">300</span><span class="p">;</span>
 </span></span><span class="line"><span class="ln"> 25</span><span class="cl">    <span class="k">const</span> <span class="no">StatusMovedPermanently</span>           <span class="o">=</span> <span class="mi">301</span><span class="p">;</span>
 </span></span><span class="line"><span class="ln"> 26</span><span class="cl">    <span class="k">const</span> <span class="no">StatusFound</span>                      <span class="o">=</span> <span class="mi">302</span><span class="p">;</span>
 </span></span><span class="line"><span class="ln"> 27</span><span class="cl">    <span class="k">const</span> <span class="no">StatusSeeOther</span>                   <span class="o">=</span> <span class="mi">303</span><span class="p">;</span>
 </span></span><span class="line"><span class="ln"> 28</span><span class="cl">    <span class="k">const</span> <span class="no">StatusNotModified</span>                <span class="o">=</span> <span class="mi">304</span><span class="p">;</span>
 </span></span><span class="line"><span class="ln"> 29</span><span class="cl">    <span class="k">const</span> <span class="no">StatusUseProxy</span>                   <span class="o">=</span> <span class="mi">305</span><span class="p">;</span>
 </span></span><span class="line"><span class="ln"> 30</span><span class="cl">    <span class="c1">// 306 is unused, skipped
-</span></span></span><span class="line"><span class="ln"> 31</span><span class="cl">    <span class="k">const</span> <span class="no">StatusTemporaryRedirect</span>          <span class="o">=</span> <span class="mi">307</span><span class="p">;</span>
+</span></span></span><span class="line"><span class="ln"> 31</span><span class="cl"><span class="c1"></span>    <span class="k">const</span> <span class="no">StatusTemporaryRedirect</span>          <span class="o">=</span> <span class="mi">307</span><span class="p">;</span>
 </span></span><span class="line"><span class="ln"> 32</span><span class="cl">    <span class="k">const</span> <span class="no">StatusPermanentRedirect</span>          <span class="o">=</span> <span class="mi">308</span><span class="p">;</span>
 </span></span><span class="line"><span class="ln"> 33</span><span class="cl">
 </span></span><span class="line"><span class="ln"> 34</span><span class="cl">    <span class="c1">// 4xx Client Error
-</span></span></span><span class="line"><span class="ln"> 35</span><span class="cl">    <span class="k">const</span> <span class="no">StatusBadRequest</span>                 <span class="o">=</span> <span class="mi">400</span><span class="p">;</span>
+</span></span></span><span class="line"><span class="ln"> 35</span><span class="cl"><span class="c1"></span>    <span class="k">const</span> <span class="no">StatusBadRequest</span>                 <span class="o">=</span> <span class="mi">400</span><span class="p">;</span>
 </span></span><span class="line"><span class="ln"> 36</span><span class="cl">    <span class="k">const</span> <span class="no">StatusUnauthorized</span>               <span class="o">=</span> <span class="mi">401</span><span class="p">;</span>
 </span></span><span class="line"><span class="ln"> 37</span><span class="cl">    <span class="k">const</span> <span class="no">StatusPaymentRequired</span>            <span class="o">=</span> <span class="mi">402</span><span class="p">;</span>
 </span></span><span class="line"><span class="ln"> 38</span><span class="cl">    <span class="k">const</span> <span class="no">StatusForbidden</span>                  <span class="o">=</span> <span class="mi">403</span><span class="p">;</span>
@@ -274,7 +274,7 @@
 </span></span><span class="line"><span class="ln"> 63</span><span class="cl">    <span class="k">const</span> <span class="no">StatusUnavailableForLegalReasons</span> <span class="o">=</span> <span class="mi">451</span><span class="p">;</span>
 </span></span><span class="line"><span class="ln"> 64</span><span class="cl">
 </span></span><span class="line"><span class="ln"> 65</span><span class="cl">    <span class="c1">// 5xx Server Error
-</span></span></span><span class="line"><span class="ln"> 66</span><span class="cl">    <span class="k">const</span> <span class="no">StatusInternalServerError</span>        <span class="o">=</span> <span class="mi">500</span><span class="p">;</span>
+</span></span></span><span class="line"><span class="ln"> 66</span><span class="cl"><span class="c1"></span>    <span class="k">const</span> <span class="no">StatusInternalServerError</span>        <span class="o">=</span> <span class="mi">500</span><span class="p">;</span>
 </span></span><span class="line"><span class="ln"> 67</span><span class="cl">    <span class="k">const</span> <span class="no">StatusNotImplemented</span>             <span class="o">=</span> <span class="mi">501</span><span class="p">;</span>
 </span></span><span class="line"><span class="ln"> 68</span><span class="cl">    <span class="k">const</span> <span class="no">StatusBadGateway</span>                 <span class="o">=</span> <span class="mi">502</span><span class="p">;</span>
 </span></span><span class="line"><span class="ln"> 69</span><span class="cl">    <span class="k">const</span> <span class="no">StatusServiceUnavailable</span>         <span class="o">=</span> <span class="mi">503</span><span class="p">;</span>
@@ -390,7 +390,7 @@
 </span></span><span class="line"><span class="ln"> 4</span><span class="cl">         <span class="k">case</span> <span class="nx">self</span><span class="o">::</span><span class="na">StatusContinue</span><span class="o">:</span> <span class="k">return</span> <span class="s1">&#39;Continue&#39;</span><span class="p">;</span>
 </span></span><span class="line"><span class="ln"> 5</span><span class="cl">         <span class="k">case</span> <span class="nx">self</span><span class="o">::</span><span class="na">StatusSwitchingProtocols</span><span class="o">:</span> <span class="k">return</span> <span class="s1">&#39;Switching Protocols&#39;</span><span class="p">;</span>
 </span></span><span class="line"><span class="ln"> 6</span><span class="cl">         <span class="c1">// ... 其他 case
-</span></span></span><span class="line"><span class="ln"> 7</span><span class="cl">         <span class="k">case</span> <span class="nx">self</span><span class="o">::</span><span class="na">StatusNetworkAuthenticationRequired</span><span class="o">:</span> <span class="k">return</span> <span class="s1">&#39;Network Authentication Required&#39;</span><span class="p">;</span>
+</span></span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="c1"></span>         <span class="k">case</span> <span class="nx">self</span><span class="o">::</span><span class="na">StatusNetworkAuthenticationRequired</span><span class="o">:</span> <span class="k">return</span> <span class="s1">&#39;Network Authentication Required&#39;</span><span class="p">;</span>
 </span></span><span class="line"><span class="ln"> 8</span><span class="cl">         <span class="k">default</span><span class="o">:</span> <span class="k">return</span> <span class="s1">&#39;&#39;</span><span class="p">;</span>
 </span></span><span class="line"><span class="ln"> 9</span><span class="cl">     <span class="p">}</span>
 </span></span><span class="line"><span class="ln">10</span><span class="cl"> <span class="p">}</span>
@@ -510,13 +510,13 @@
 </table>
 <h4 id="示例">示例：</h4>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="c1">// 验证邮箱
-</span></span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="nv">$email</span> <span class="o">=</span> <span class="s2">&#34;user@example.com&#34;</span><span class="p">;</span>
+</span></span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="c1"></span><span class="nv">$email</span> <span class="o">=</span> <span class="s2">&#34;user@example.com&#34;</span><span class="p">;</span>
 </span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="k">if</span> <span class="p">(</span><span class="nx">filter_var</span><span class="p">(</span><span class="nv">$email</span><span class="p">,</span> <span class="nx">FILTER_VALIDATE_EMAIL</span><span class="p">))</span> <span class="p">{</span>
 </span></span><span class="line"><span class="ln"> 4</span><span class="cl">    <span class="k">echo</span> <span class="s2">&#34;有效邮箱&#34;</span><span class="p">;</span>
 </span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="p">}</span>
 </span></span><span class="line"><span class="ln"> 6</span><span class="cl">
 </span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="c1">// 验证整数（带范围）
-</span></span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="nv">$age</span> <span class="o">=</span> <span class="s2">&#34;25&#34;</span><span class="p">;</span>
+</span></span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="c1"></span><span class="nv">$age</span> <span class="o">=</span> <span class="s2">&#34;25&#34;</span><span class="p">;</span>
 </span></span><span class="line"><span class="ln"> 9</span><span class="cl"><span class="nv">$options</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;options&#39;</span> <span class="o">=&gt;</span> <span class="p">[</span><span class="s1">&#39;min_range&#39;</span> <span class="o">=&gt;</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;max_range&#39;</span> <span class="o">=&gt;</span> <span class="mi">120</span><span class="p">]];</span>
 </span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="k">if</span> <span class="p">(</span><span class="nx">filter_var</span><span class="p">(</span><span class="nv">$age</span><span class="p">,</span> <span class="nx">FILTER_VALIDATE_INT</span><span class="p">,</span> <span class="nv">$options</span><span class="p">)</span> <span class="o">!==</span> <span class="k">false</span><span class="p">)</span> <span class="p">{</span>
 </span></span><span class="line"><span class="ln">11</span><span class="cl">    <span class="k">echo</span> <span class="s2">&#34;年龄合法&#34;</span><span class="p">;</span>
@@ -561,12 +561,12 @@
 </table>
 <h4 id="示例-1">示例：</h4>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln">1</span><span class="cl"><span class="c1">// 净化 URL
-</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="nv">$url</span> <span class="o">=</span> <span class="s2">&#34;http://exa&lt;mple&gt;.com/?q=&lt;script&gt;&#34;</span><span class="p">;</span>
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="c1"></span><span class="nv">$url</span> <span class="o">=</span> <span class="s2">&#34;http://exa&lt;mple&gt;.com/?q=&lt;script&gt;&#34;</span><span class="p">;</span>
 </span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="nv">$clean</span> <span class="o">=</span> <span class="nx">filter_var</span><span class="p">(</span><span class="nv">$url</span><span class="p">,</span> <span class="nx">FILTER_SANITIZE_URL</span><span class="p">);</span>
 </span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="c1">// 结果: &#34;http://example.com/?q=&#34;
-</span></span></span><span class="line"><span class="ln">5</span><span class="cl">
+</span></span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="c1"></span>
 </span></span><span class="line"><span class="ln">6</span><span class="cl"><span class="c1">// 净化整数
-</span></span></span><span class="line"><span class="ln">7</span><span class="cl"><span class="nv">$input</span> <span class="o">=</span> <span class="s2">&#34;123abc456&#34;</span><span class="p">;</span>
+</span></span></span><span class="line"><span class="ln">7</span><span class="cl"><span class="c1"></span><span class="nv">$input</span> <span class="o">=</span> <span class="s2">&#34;123abc456&#34;</span><span class="p">;</span>
 </span></span><span class="line"><span class="ln">8</span><span class="cl"><span class="nv">$number</span> <span class="o">=</span> <span class="nx">filter_var</span><span class="p">(</span><span class="nv">$input</span><span class="p">,</span> <span class="nx">FILTER_SANITIZE_NUMBER_INT</span><span class="p">);</span> <span class="c1">// &#34;123456&#34;
 </span></span></span></code></pre></div><blockquote>
 <p>💡 注意：净化后仍是<strong>字符串</strong>，如需整数需再转：<code>(int)$number</code></p>
@@ -615,7 +615,7 @@
 </span></span><span class="line"><span class="ln">7</span><span class="cl"><span class="c1">// $result = 0
 </span></span></span></code></pre></div><h3 id="示例-3组合标志">示例 3：组合标志</h3>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln">1</span><span class="cl"><span class="c1">// 验证 URL 且要求有查询字符串
-</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="nv">$url</span> <span class="o">=</span> <span class="s2">&#34;https://example.com?search=test&#34;</span><span class="p">;</span>
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="c1"></span><span class="nv">$url</span> <span class="o">=</span> <span class="s2">&#34;https://example.com?search=test&#34;</span><span class="p">;</span>
 </span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="k">if</span> <span class="p">(</span><span class="nx">filter_var</span><span class="p">(</span><span class="nv">$url</span><span class="p">,</span> <span class="nx">FILTER_VALIDATE_URL</span><span class="p">,</span> <span class="nx">FILTER_FLAG_QUERY_REQUIRED</span><span class="p">))</span> <span class="p">{</span>
 </span></span><span class="line"><span class="ln">4</span><span class="cl">    <span class="k">echo</span> <span class="s2">&#34;URL 合法且含查询参数&#34;</span><span class="p">;</span>
 </span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="p">}</span>
@@ -681,13 +681,13 @@
 </ul>
 <h3 id="3-false">3. <strong><code>false</code> 的陷阱</strong></h3>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln">1</span><span class="cl"><span class="nx">var_dump</span><span class="p">(</span><span class="nx">filter_var</span><span class="p">(</span><span class="s2">&#34;0&#34;</span><span class="p">,</span> <span class="nx">FILTER_VALIDATE_INT</span><span class="p">));</span> <span class="c1">// int(0) → OK
-</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="nx">var_dump</span><span class="p">(</span><span class="nx">filter_var</span><span class="p">(</span><span class="s2">&#34;&#34;</span><span class="p">,</span> <span class="nx">FILTER_VALIDATE_EMAIL</span><span class="p">));</span> <span class="c1">// bool(false)
-</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="nx">var_dump</span><span class="p">(</span><span class="nx">filter_var</span><span class="p">(</span><span class="s2">&#34;0&#34;</span><span class="p">,</span> <span class="nx">FILTER_VALIDATE_BOOLEAN</span><span class="p">));</span> <span class="c1">// bool(false)!
-</span></span></span><span class="line"><span class="ln">4</span><span class="cl">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="c1"></span><span class="nx">var_dump</span><span class="p">(</span><span class="nx">filter_var</span><span class="p">(</span><span class="s2">&#34;&#34;</span><span class="p">,</span> <span class="nx">FILTER_VALIDATE_EMAIL</span><span class="p">));</span> <span class="c1">// bool(false)
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="c1"></span><span class="nx">var_dump</span><span class="p">(</span><span class="nx">filter_var</span><span class="p">(</span><span class="s2">&#34;0&#34;</span><span class="p">,</span> <span class="nx">FILTER_VALIDATE_BOOLEAN</span><span class="p">));</span> <span class="c1">// bool(false)!
+</span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="c1"></span>
 </span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="c1">// 正确判断：
-</span></span></span><span class="line"><span class="ln">6</span><span class="cl"><span class="k">if</span> <span class="p">(</span><span class="nx">filter_var</span><span class="p">(</span><span class="nv">$input</span><span class="p">,</span> <span class="nx">FILTER_VALIDATE_EMAIL</span><span class="p">)</span> <span class="o">===</span> <span class="k">false</span><span class="p">)</span> <span class="p">{</span>
+</span></span></span><span class="line"><span class="ln">6</span><span class="cl"><span class="c1"></span><span class="k">if</span> <span class="p">(</span><span class="nx">filter_var</span><span class="p">(</span><span class="nv">$input</span><span class="p">,</span> <span class="nx">FILTER_VALIDATE_EMAIL</span><span class="p">)</span> <span class="o">===</span> <span class="k">false</span><span class="p">)</span> <span class="p">{</span>
 </span></span><span class="line"><span class="ln">7</span><span class="cl">    <span class="c1">// 无效
-</span></span></span><span class="line"><span class="ln">8</span><span class="cl"><span class="p">}</span>
+</span></span></span><span class="line"><span class="ln">8</span><span class="cl"><span class="c1"></span><span class="p">}</span>
 </span></span></code></pre></div><h3 id="4-邮箱验证不等于可达性">4. <strong>邮箱验证不等于可达性</strong></h3>
 <ul>
 <li><code>FILTER_VALIDATE_EMAIL</code> 只检查格式，不验证邮箱是否存在！</li>
@@ -787,12 +787,12 @@
 </span></span><span class="line"><span class="ln"> 2</span><span class="cl">
 </span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="k">function</span> <span class="nf">curlMultiRequest</span><span class="p">(</span><span class="nv">$urls</span><span class="p">,</span> <span class="nv">$options</span> <span class="o">=</span> <span class="p">[])</span> <span class="p">{</span>
 </span></span><span class="line"><span class="ln"> 4</span><span class="cl">    <span class="c1">// 1. 初始化 multi handle
-</span></span></span><span class="line"><span class="ln"> 5</span><span class="cl">    <span class="nv">$mh</span> <span class="o">=</span> <span class="nx">curl_multi_init</span><span class="p">();</span>
+</span></span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="c1"></span>    <span class="nv">$mh</span> <span class="o">=</span> <span class="nx">curl_multi_init</span><span class="p">();</span>
 </span></span><span class="line"><span class="ln"> 6</span><span class="cl">    <span class="nv">$handles</span> <span class="o">=</span> <span class="p">[];</span>
 </span></span><span class="line"><span class="ln"> 7</span><span class="cl">    <span class="nv">$results</span> <span class="o">=</span> <span class="p">[];</span>
 </span></span><span class="line"><span class="ln"> 8</span><span class="cl">
 </span></span><span class="line"><span class="ln"> 9</span><span class="cl">    <span class="c1">// 2. 为每个 URL 创建 curl handle
-</span></span></span><span class="line"><span class="ln">10</span><span class="cl">    <span class="k">foreach</span> <span class="p">(</span><span class="nv">$urls</span> <span class="k">as</span> <span class="nv">$i</span> <span class="o">=&gt;</span> <span class="nv">$url</span><span class="p">)</span> <span class="p">{</span>
+</span></span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="c1"></span>    <span class="k">foreach</span> <span class="p">(</span><span class="nv">$urls</span> <span class="k">as</span> <span class="nv">$i</span> <span class="o">=&gt;</span> <span class="nv">$url</span><span class="p">)</span> <span class="p">{</span>
 </span></span><span class="line"><span class="ln">11</span><span class="cl">        <span class="nv">$ch</span> <span class="o">=</span> <span class="nx">curl_init</span><span class="p">();</span>
 </span></span><span class="line"><span class="ln">12</span><span class="cl">        <span class="nx">curl_setopt_array</span><span class="p">(</span><span class="nv">$ch</span><span class="p">,</span> <span class="p">[</span>
 </span></span><span class="line"><span class="ln">13</span><span class="cl">            <span class="nx">CURLOPT_URL</span>            <span class="o">=&gt;</span> <span class="nv">$url</span><span class="p">,</span>
@@ -800,27 +800,27 @@
 </span></span><span class="line"><span class="ln">15</span><span class="cl">            <span class="nx">CURLOPT_TIMEOUT</span>        <span class="o">=&gt;</span> <span class="mi">30</span><span class="p">,</span>
 </span></span><span class="line"><span class="ln">16</span><span class="cl">            <span class="nx">CURLOPT_FOLLOWLOCATION</span> <span class="o">=&gt;</span> <span class="k">true</span><span class="p">,</span>
 </span></span><span class="line"><span class="ln">17</span><span class="cl">            <span class="nx">CURLOPT_SSL_VERIFYPEER</span> <span class="o">=&gt;</span> <span class="k">false</span><span class="p">,</span> <span class="c1">// 生产环境建议开启
-</span></span></span><span class="line"><span class="ln">18</span><span class="cl">        <span class="p">]);</span>
+</span></span></span><span class="line"><span class="ln">18</span><span class="cl"><span class="c1"></span>        <span class="p">]);</span>
 </span></span><span class="line"><span class="ln">19</span><span class="cl">        
 </span></span><span class="line"><span class="ln">20</span><span class="cl">        <span class="c1">// 应用自定义选项
-</span></span></span><span class="line"><span class="ln">21</span><span class="cl">        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="k">empty</span><span class="p">(</span><span class="nv">$options</span><span class="p">))</span> <span class="p">{</span>
+</span></span></span><span class="line"><span class="ln">21</span><span class="cl"><span class="c1"></span>        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="k">empty</span><span class="p">(</span><span class="nv">$options</span><span class="p">))</span> <span class="p">{</span>
 </span></span><span class="line"><span class="ln">22</span><span class="cl">            <span class="nx">curl_setopt_array</span><span class="p">(</span><span class="nv">$ch</span><span class="p">,</span> <span class="nv">$options</span><span class="p">);</span>
 </span></span><span class="line"><span class="ln">23</span><span class="cl">        <span class="p">}</span>
 </span></span><span class="line"><span class="ln">24</span><span class="cl">
 </span></span><span class="line"><span class="ln">25</span><span class="cl">        <span class="c1">// 添加到 multi handle
-</span></span></span><span class="line"><span class="ln">26</span><span class="cl">        <span class="nx">curl_multi_add_handle</span><span class="p">(</span><span class="nv">$mh</span><span class="p">,</span> <span class="nv">$ch</span><span class="p">);</span>
+</span></span></span><span class="line"><span class="ln">26</span><span class="cl"><span class="c1"></span>        <span class="nx">curl_multi_add_handle</span><span class="p">(</span><span class="nv">$mh</span><span class="p">,</span> <span class="nv">$ch</span><span class="p">);</span>
 </span></span><span class="line"><span class="ln">27</span><span class="cl">        <span class="nv">$handles</span><span class="p">[</span><span class="nv">$i</span><span class="p">]</span> <span class="o">=</span> <span class="nv">$ch</span><span class="p">;</span>
 </span></span><span class="line"><span class="ln">28</span><span class="cl">    <span class="p">}</span>
 </span></span><span class="line"><span class="ln">29</span><span class="cl">
 </span></span><span class="line"><span class="ln">30</span><span class="cl">    <span class="c1">// 3. 执行并发请求
-</span></span></span><span class="line"><span class="ln">31</span><span class="cl">    <span class="nv">$running</span> <span class="o">=</span> <span class="k">null</span><span class="p">;</span>
+</span></span></span><span class="line"><span class="ln">31</span><span class="cl"><span class="c1"></span>    <span class="nv">$running</span> <span class="o">=</span> <span class="k">null</span><span class="p">;</span>
 </span></span><span class="line"><span class="ln">32</span><span class="cl">    <span class="k">do</span> <span class="p">{</span>
 </span></span><span class="line"><span class="ln">33</span><span class="cl">        <span class="nx">curl_multi_exec</span><span class="p">(</span><span class="nv">$mh</span><span class="p">,</span> <span class="nv">$running</span><span class="p">);</span>
 </span></span><span class="line"><span class="ln">34</span><span class="cl">        <span class="nx">curl_multi_select</span><span class="p">(</span><span class="nv">$mh</span><span class="p">);</span> <span class="c1">// 阻塞直到有活动（节省 CPU）
-</span></span></span><span class="line"><span class="ln">35</span><span class="cl">    <span class="p">}</span> <span class="k">while</span> <span class="p">(</span><span class="nv">$running</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">);</span>
+</span></span></span><span class="line"><span class="ln">35</span><span class="cl"><span class="c1"></span>    <span class="p">}</span> <span class="k">while</span> <span class="p">(</span><span class="nv">$running</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">);</span>
 </span></span><span class="line"><span class="ln">36</span><span class="cl">
 </span></span><span class="line"><span class="ln">37</span><span class="cl">    <span class="c1">// 4. 收集结果
-</span></span></span><span class="line"><span class="ln">38</span><span class="cl">    <span class="k">foreach</span> <span class="p">(</span><span class="nv">$handles</span> <span class="k">as</span> <span class="nv">$i</span> <span class="o">=&gt;</span> <span class="nv">$ch</span><span class="p">)</span> <span class="p">{</span>
+</span></span></span><span class="line"><span class="ln">38</span><span class="cl"><span class="c1"></span>    <span class="k">foreach</span> <span class="p">(</span><span class="nv">$handles</span> <span class="k">as</span> <span class="nv">$i</span> <span class="o">=&gt;</span> <span class="nv">$ch</span><span class="p">)</span> <span class="p">{</span>
 </span></span><span class="line"><span class="ln">39</span><span class="cl">        <span class="nv">$content</span> <span class="o">=</span> <span class="nx">curl_multi_getcontent</span><span class="p">(</span><span class="nv">$ch</span><span class="p">);</span>
 </span></span><span class="line"><span class="ln">40</span><span class="cl">        <span class="nv">$errno</span>   <span class="o">=</span> <span class="nx">curl_errno</span><span class="p">(</span><span class="nv">$ch</span><span class="p">);</span>
 </span></span><span class="line"><span class="ln">41</span><span class="cl">        <span class="nv">$error</span>   <span class="o">=</span> <span class="nx">curl_error</span><span class="p">(</span><span class="nv">$ch</span><span class="p">);</span>
@@ -842,7 +842,7 @@
 </span></span><span class="line"><span class="ln">57</span><span class="cl"><span class="p">}</span>
 </span></span><span class="line"><span class="ln">58</span><span class="cl">
 </span></span><span class="line"><span class="ln">59</span><span class="cl"><span class="c1">// 使用示例
-</span></span></span><span class="line"><span class="ln">60</span><span class="cl"><span class="nv">$urls</span> <span class="o">=</span> <span class="p">[</span>
+</span></span></span><span class="line"><span class="ln">60</span><span class="cl"><span class="c1"></span><span class="nv">$urls</span> <span class="o">=</span> <span class="p">[</span>
 </span></span><span class="line"><span class="ln">61</span><span class="cl">    <span class="s1">&#39;https://httpbin.org/delay/1&#39;</span><span class="p">,</span>
 </span></span><span class="line"><span class="ln">62</span><span class="cl">    <span class="s1">&#39;https://httpbin.org/delay/2&#39;</span><span class="p">,</span>
 </span></span><span class="line"><span class="ln">63</span><span class="cl">    <span class="s1">&#39;https://httpbin.org/get&#39;</span><span class="p">,</span>
@@ -890,11 +890,11 @@
 </span></span><span class="line"><span class="ln">2</span><span class="cl">    <span class="nx">CURLOPT_TIMEOUT</span>        <span class="o">=&gt;</span> <span class="mi">10</span><span class="p">,</span>
 </span></span><span class="line"><span class="ln">3</span><span class="cl">    <span class="nx">CURLOPT_CONNECTTIMEOUT</span> <span class="o">=&gt;</span> <span class="mi">5</span><span class="p">,</span>
 </span></span><span class="line"><span class="ln">4</span><span class="cl">    <span class="c1">// 可配合自定义重试逻辑
-</span></span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="p">];</span>
+</span></span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="c1"></span><span class="p">];</span>
 </span></span></code></pre></div><h3 id="-3-获取详细信息headersredirect-等">✅ 3. <strong>获取详细信息（headers、redirect 等）</strong></h3>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln">1</span><span class="cl"><span class="nx">curl_setopt</span><span class="p">(</span><span class="nv">$ch</span><span class="p">,</span> <span class="nx">CURLOPT_HEADER</span><span class="p">,</span> <span class="k">true</span><span class="p">);</span>
 </span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="c1">// 或
-</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="nv">$info</span> <span class="o">=</span> <span class="nx">curl_getinfo</span><span class="p">(</span><span class="nv">$ch</span><span class="p">);</span>
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="c1"></span><span class="nv">$info</span> <span class="o">=</span> <span class="nx">curl_getinfo</span><span class="p">(</span><span class="nv">$ch</span><span class="p">);</span>
 </span></span></code></pre></div><hr>
 <h2 id="-五替代方案现代推荐">🔹 五、替代方案（现代推荐）</h2>
 <h3 id="-方案-1使用-guzzle-http-client推荐">📌 方案 1：使用 <strong>Guzzle HTTP Client</strong>（推荐！）</h3>
@@ -1007,10 +1007,10 @@
 </span></span><span class="line"><span class="ln">3</span><span class="cl">    <span class="nx">CURLOPT_URL</span>            <span class="o">=&gt;</span> <span class="s1">&#39;https://example.com&#39;</span><span class="p">,</span>
 </span></span><span class="line"><span class="ln">4</span><span class="cl">    <span class="nx">CURLOPT_RETURNTRANSFER</span> <span class="o">=&gt;</span> <span class="k">true</span><span class="p">,</span>
 </span></span><span class="line"><span class="ln">5</span><span class="cl">    <span class="nx">CURLOPT_SSL_VERIFYPEER</span> <span class="o">=&gt;</span> <span class="k">true</span><span class="p">,</span>   <span class="c1">// 验证证书是否由可信 CA 签发
-</span></span></span><span class="line"><span class="ln">6</span><span class="cl">    <span class="nx">CURLOPT_SSL_VERIFYHOST</span> <span class="o">=&gt;</span> <span class="mi">2</span><span class="p">,</span>      <span class="c1">// 验证证书中的域名是否匹配
-</span></span></span><span class="line"><span class="ln">7</span><span class="cl">    <span class="nx">CURLOPT_CAINFO</span>         <span class="o">=&gt;</span> <span class="s1">&#39;/etc/ssl/certs/ca-certificates.crt&#39;</span><span class="p">,</span> <span class="c1">// Linux 常见路径
-</span></span></span><span class="line"><span class="ln">8</span><span class="cl">    <span class="c1">// Windows 可用: &#39;C:\php\extras\ssl\cacert.pem&#39;
-</span></span></span><span class="line"><span class="ln">9</span><span class="cl"><span class="p">]);</span>
+</span></span></span><span class="line"><span class="ln">6</span><span class="cl"><span class="c1"></span>    <span class="nx">CURLOPT_SSL_VERIFYHOST</span> <span class="o">=&gt;</span> <span class="mi">2</span><span class="p">,</span>      <span class="c1">// 验证证书中的域名是否匹配
+</span></span></span><span class="line"><span class="ln">7</span><span class="cl"><span class="c1"></span>    <span class="nx">CURLOPT_CAINFO</span>         <span class="o">=&gt;</span> <span class="s1">&#39;/etc/ssl/certs/ca-certificates.crt&#39;</span><span class="p">,</span> <span class="c1">// Linux 常见路径
+</span></span></span><span class="line"><span class="ln">8</span><span class="cl"><span class="c1"></span>    <span class="c1">// Windows 可用: &#39;C:\php\extras\ssl\cacert.pem&#39;
+</span></span></span><span class="line"><span class="ln">9</span><span class="cl"><span class="c1"></span><span class="p">]);</span>
 </span></span></code></pre></div><blockquote>
 <p>📌 <strong>CA 证书文件获取</strong>：</p>
 <ul>
@@ -1041,7 +1041,7 @@ openssl.cafile = &quot;/path/to/cacert.pem&quot;
 </span></span><span class="line"><span class="ln">3</span><span class="cl">    <span class="nx">CURLOPT_URL</span>            <span class="o">=&gt;</span> <span class="s1">&#39;https://api.example.com/data&#39;</span><span class="p">,</span>
 </span></span><span class="line"><span class="ln">4</span><span class="cl">    <span class="nx">CURLOPT_RETURNTRANSFER</span> <span class="o">=&gt;</span> <span class="k">true</span><span class="p">,</span>
 </span></span><span class="line"><span class="ln">5</span><span class="cl">    <span class="nx">CURLOPT_USERPWD</span>        <span class="o">=&gt;</span> <span class="s1">&#39;myuser:mypassword&#39;</span><span class="p">,</span> <span class="c1">// 格式: &#34;username:password&#34;
-</span></span></span><span class="line"><span class="ln">6</span><span class="cl">    <span class="nx">CURLOPT_HTTPAUTH</span>       <span class="o">=&gt;</span> <span class="nx">CURLAUTH_BASIC</span><span class="p">,</span>
+</span></span></span><span class="line"><span class="ln">6</span><span class="cl"><span class="c1"></span>    <span class="nx">CURLOPT_HTTPAUTH</span>       <span class="o">=&gt;</span> <span class="nx">CURLAUTH_BASIC</span><span class="p">,</span>
 </span></span><span class="line"><span class="ln">7</span><span class="cl"><span class="p">]);</span>
 </span></span></code></pre></div><blockquote>
 <p>💡 等价于手动设置 Header：</p>
@@ -1071,17 +1071,17 @@ openssl.cafile = &quot;/path/to/cacert.pem&quot;
 </span></span><span class="line"><span class="ln"> 5</span><span class="cl">
 </span></span><span class="line"><span class="ln"> 6</span><span class="cl">    <span class="nx">curl_setopt_array</span><span class="p">(</span><span class="nv">$ch</span><span class="p">,</span> <span class="p">[</span>
 </span></span><span class="line"><span class="ln"> 7</span><span class="cl">        <span class="c1">// 目标 URL
-</span></span></span><span class="line"><span class="ln"> 8</span><span class="cl">        <span class="nx">CURLOPT_URL</span>            <span class="o">=&gt;</span> <span class="nv">$url</span><span class="p">,</span>
+</span></span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="c1"></span>        <span class="nx">CURLOPT_URL</span>            <span class="o">=&gt;</span> <span class="nv">$url</span><span class="p">,</span>
 </span></span><span class="line"><span class="ln"> 9</span><span class="cl">        <span class="nx">CURLOPT_RETURNTRANSFER</span> <span class="o">=&gt;</span> <span class="k">true</span><span class="p">,</span>
 </span></span><span class="line"><span class="ln">10</span><span class="cl">        <span class="nx">CURLOPT_TIMEOUT</span>        <span class="o">=&gt;</span> <span class="mi">30</span><span class="p">,</span>
 </span></span><span class="line"><span class="ln">11</span><span class="cl">
 </span></span><span class="line"><span class="ln">12</span><span class="cl">        <span class="c1">// SSL 安全设置（生产环境）
-</span></span></span><span class="line"><span class="ln">13</span><span class="cl">        <span class="nx">CURLOPT_SSL_VERIFYPEER</span> <span class="o">=&gt;</span> <span class="k">true</span><span class="p">,</span>
+</span></span></span><span class="line"><span class="ln">13</span><span class="cl"><span class="c1"></span>        <span class="nx">CURLOPT_SSL_VERIFYPEER</span> <span class="o">=&gt;</span> <span class="k">true</span><span class="p">,</span>
 </span></span><span class="line"><span class="ln">14</span><span class="cl">        <span class="nx">CURLOPT_SSL_VERIFYHOST</span> <span class="o">=&gt;</span> <span class="mi">2</span><span class="p">,</span>
 </span></span><span class="line"><span class="ln">15</span><span class="cl">        <span class="nx">CURLOPT_CAINFO</span>         <span class="o">=&gt;</span> <span class="s1">&#39;/etc/ssl/certs/ca-certificates.crt&#39;</span><span class="p">,</span> <span class="c1">// 根据系统调整
-</span></span></span><span class="line"><span class="ln">16</span><span class="cl">
+</span></span></span><span class="line"><span class="ln">16</span><span class="cl"><span class="c1"></span>
 </span></span><span class="line"><span class="ln">17</span><span class="cl">        <span class="c1">// HTTP Basic 认证
-</span></span></span><span class="line"><span class="ln">18</span><span class="cl">        <span class="nx">CURLOPT_USERPWD</span>        <span class="o">=&gt;</span> <span class="nv">$username</span> <span class="o">.</span> <span class="s1">&#39;:&#39;</span> <span class="o">.</span> <span class="nv">$password</span><span class="p">,</span>
+</span></span></span><span class="line"><span class="ln">18</span><span class="cl"><span class="c1"></span>        <span class="nx">CURLOPT_USERPWD</span>        <span class="o">=&gt;</span> <span class="nv">$username</span> <span class="o">.</span> <span class="s1">&#39;:&#39;</span> <span class="o">.</span> <span class="nv">$password</span><span class="p">,</span>
 </span></span><span class="line"><span class="ln">19</span><span class="cl">        <span class="nx">CURLOPT_HTTPAUTH</span>       <span class="o">=&gt;</span> <span class="nx">CURLAUTH_BASIC</span><span class="p">,</span>
 </span></span><span class="line"><span class="ln">20</span><span class="cl">    <span class="p">]);</span>
 </span></span><span class="line"><span class="ln">21</span><span class="cl">
@@ -1103,7 +1103,7 @@ openssl.cafile = &quot;/path/to/cacert.pem&quot;
 </span></span><span class="line"><span class="ln">37</span><span class="cl"><span class="p">}</span>
 </span></span><span class="line"><span class="ln">38</span><span class="cl">
 </span></span><span class="line"><span class="ln">39</span><span class="cl"><span class="c1">// 使用
-</span></span></span><span class="line"><span class="ln">40</span><span class="cl"><span class="k">try</span> <span class="p">{</span>
+</span></span></span><span class="line"><span class="ln">40</span><span class="cl"><span class="c1"></span><span class="k">try</span> <span class="p">{</span>
 </span></span><span class="line"><span class="ln">41</span><span class="cl">    <span class="nv">$data</span> <span class="o">=</span> <span class="nx">secureCurlRequest</span><span class="p">(</span>
 </span></span><span class="line"><span class="ln">42</span><span class="cl">        <span class="s1">&#39;https://api.myservice.com/v1/users&#39;</span><span class="p">,</span>
 </span></span><span class="line"><span class="ln">43</span><span class="cl">        <span class="s1">&#39;admin&#39;</span><span class="p">,</span>
@@ -1208,8 +1208,8 @@ openssl.cafile = &quot;/path/to/cacert.pem&quot;
 <h2 id="-二快速创建一步生成">🛠 二、快速创建（一步生成）</h2>
 <h3 id="命令推荐用于开发">命令（推荐用于开发）：</h3>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">openssl req -x509 -nodes -days <span class="m">365</span> -newkey rsa:2048 <span class="se">\
-</span></span></span><span class="line"><span class="ln">2</span><span class="cl">  -keyout server.key -out server.crt <span class="se">\
-</span></span></span><span class="line"><span class="ln">3</span><span class="cl">  -subj <span class="s2">&#34;/C=CN/ST=Beijing/L=Beijing/O=MyOrg/CN=localhost&#34;</span>
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="se"></span>  -keyout server.key -out server.crt <span class="se">\
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="se"></span>  -subj <span class="s2">&#34;/C=CN/ST=Beijing/L=Beijing/O=MyOrg/CN=localhost&#34;</span>
 </span></span></code></pre></div><h3 id="参数说明">参数说明：</h3>
 <table>
   <thead>
@@ -1265,7 +1265,7 @@ openssl.cafile = &quot;/path/to/cacert.pem&quot;
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">openssl genrsa -out server.key <span class="m">2048</span>
 </span></span></code></pre></div><h3 id="步骤-2生成-csr证书签名请求">步骤 2：生成 CSR（证书签名请求）</h3>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">openssl req -new -key server.key -out server.csr <span class="se">\
-</span></span></span><span class="line"><span class="ln">2</span><span class="cl">  -subj <span class="s2">&#34;/C=CN/ST=Beijing/L=Beijing/O=MyOrg/CN=localhost&#34;</span>
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="se"></span>  -subj <span class="s2">&#34;/C=CN/ST=Beijing/L=Beijing/O=MyOrg/CN=localhost&#34;</span>
 </span></span></code></pre></div><h3 id="步骤-3用私钥自签名-csr生成证书">步骤 3：用私钥自签名 CSR，生成证书</h3>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">openssl x509 -req -days <span class="m">365</span> -in server.csr -signkey server.key -out server.crt
 </span></span></code></pre></div><blockquote>
@@ -1306,8 +1306,8 @@ openssl.cafile = &quot;/path/to/cacert.pem&quot;
 <li>生成证书：</li>
 </ol>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">openssl req -x509 -nodes -days <span class="m">365</span> -newkey rsa:2048 <span class="se">\
-</span></span></span><span class="line"><span class="ln">2</span><span class="cl">  -keyout server.key -out server.crt <span class="se">\
-</span></span></span><span class="line"><span class="ln">3</span><span class="cl">  -config server.conf -extensions v3_req
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="se"></span>  -keyout server.key -out server.crt <span class="se">\
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="se"></span>  -config server.conf -extensions v3_req
 </span></span></code></pre></div><blockquote>
 <p>✅ 这样生成的证书支持 <code>https://localhost</code>、<code>https://myapp.local</code>、<code>https://127.0.0.1</code> 等。</p>
 </blockquote>
@@ -1439,11 +1439,11 @@ openssl.cafile = &quot;/path/to/cacert.pem&quot;
 <h2 id="-步骤-2使用-openssl-生成证书">✅ 步骤 2：使用 OpenSSL 生成证书</h2>
 <p>在终端执行以下命令（确保 <code>php-sites.conf</code> 在当前目录）：</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">openssl req -x509 -nodes -days <span class="m">365</span> <span class="se">\
-</span></span></span><span class="line"><span class="ln">2</span><span class="cl">  -newkey rsa:2048 <span class="se">\
-</span></span></span><span class="line"><span class="ln">3</span><span class="cl">  -keyout php-sites.key <span class="se">\
-</span></span></span><span class="line"><span class="ln">4</span><span class="cl">  -out php-sites.crt <span class="se">\
-</span></span></span><span class="line"><span class="ln">5</span><span class="cl">  -config php-sites.conf <span class="se">\
-</span></span></span><span class="line"><span class="ln">6</span><span class="cl">  -extensions v3_req
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="se"></span>  -newkey rsa:2048 <span class="se">\
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="se"></span>  -keyout php-sites.key <span class="se">\
+</span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="se"></span>  -out php-sites.crt <span class="se">\
+</span></span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="se"></span>  -config php-sites.conf <span class="se">\
+</span></span></span><span class="line"><span class="ln">6</span><span class="cl"><span class="se"></span>  -extensions v3_req
 </span></span></code></pre></div><h3 id="参数解释">参数解释：</h3>
 <table>
   <thead>
@@ -1645,11 +1645,11 @@ openssl.cafile = &quot;/path/to/cacert.pem&quot;
 <hr>
 <h3 id="步骤-2生成证书和私钥">步骤 2：生成证书和私钥</h3>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">openssl req -x509 -nodes -days <span class="m">365</span> <span class="se">\
-</span></span></span><span class="line"><span class="ln">2</span><span class="cl">  -newkey rsa:2048 <span class="se">\
-</span></span></span><span class="line"><span class="ln">3</span><span class="cl">  -keyout wildcard-demo.key <span class="se">\
-</span></span></span><span class="line"><span class="ln">4</span><span class="cl">  -out wildcard-demo.crt <span class="se">\
-</span></span></span><span class="line"><span class="ln">5</span><span class="cl">  -config wildcard.conf <span class="se">\
-</span></span></span><span class="line"><span class="ln">6</span><span class="cl">  -extensions v3_req
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="se"></span>  -newkey rsa:2048 <span class="se">\
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="se"></span>  -keyout wildcard-demo.key <span class="se">\
+</span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="se"></span>  -out wildcard-demo.crt <span class="se">\
+</span></span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="se"></span>  -config wildcard.conf <span class="se">\
+</span></span></span><span class="line"><span class="ln">6</span><span class="cl"><span class="se"></span>  -extensions v3_req
 </span></span></code></pre></div><p>执行后生成：</p>
 <ul>
 <li><code>wildcard-demo.key</code>：私钥</li>
@@ -1669,7 +1669,7 @@ openssl.cafile = &quot;/path/to/cacert.pem&quot;
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-nginx" data-lang="nginx"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="k">server</span> <span class="p">{</span>
 </span></span><span class="line"><span class="ln"> 2</span><span class="cl">    <span class="kn">listen</span> <span class="mi">443</span> <span class="s">ssl</span> <span class="s">http2</span><span class="p">;</span>
 </span></span><span class="line"><span class="ln"> 3</span><span class="cl">    <span class="kn">server_name</span> <span class="p">~</span><span class="sr">^.*\.demo\.com$</span> <span class="s">demo.com</span><span class="p">;</span>  <span class="c1"># 匹配所有子域 + 主域
-</span></span></span><span class="line"><span class="ln"> 4</span><span class="cl">
+</span></span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="c1"></span>
 </span></span><span class="line"><span class="ln"> 5</span><span class="cl">    <span class="kn">ssl_certificate</span>     <span class="s">/path/to/wildcard-demo.crt</span><span class="p">;</span>
 </span></span><span class="line"><span class="ln"> 6</span><span class="cl">    <span class="kn">ssl_certificate_key</span> <span class="s">/path/to/wildcard-demo.key</span><span class="p">;</span>
 </span></span><span class="line"><span class="ln"> 7</span><span class="cl">
@@ -1739,9 +1739,9 @@ openssl.cafile = &quot;/path/to/cacert.pem&quot;
 <p>如果你有公网域名和 DNS 控制权，推荐用 <strong>Certbot + DNS 插件</strong>申请免费通配符证书：</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl"><span class="c1"># 示例：使用 Cloudflare DNS</span>
 </span></span><span class="line"><span class="ln">2</span><span class="cl">sudo certbot certonly <span class="se">\
-</span></span></span><span class="line"><span class="ln">3</span><span class="cl">  --dns-cloudflare <span class="se">\
-</span></span></span><span class="line"><span class="ln">4</span><span class="cl">  --dns-cloudflare-credentials ~/.secrets/cloudflare.ini <span class="se">\
-</span></span></span><span class="line"><span class="ln">5</span><span class="cl">  -d demo.com -d <span class="s1">&#39;*.demo.com&#39;</span>
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="se"></span>  --dns-cloudflare <span class="se">\
+</span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="se"></span>  --dns-cloudflare-credentials ~/.secrets/cloudflare.ini <span class="se">\
+</span></span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="se"></span>  -d demo.com -d <span class="s1">&#39;*.demo.com&#39;</span>
 </span></span></code></pre></div><blockquote>
 <p>✅ 优点：被所有浏览器信任，自动续期。</p>
 </blockquote>
@@ -2236,7 +2236,7 @@ openssl.cafile = &quot;/path/to/cacert.pem&quot;
 
 <script type="text/javascript" src="https://jianlin-li.github.io/zh-cn/js/bundle.e4e0e4fbe8acb50d7f973828f4138cdbea727800047fc93f9abbd6751e8f3422d6ef193f98da36fdb8488219c25692d73da89480f46abc8421a4ee3526dd6c23.js" integrity="sha512-5ODk&#43;&#43;istQ1/lzgo9BOM2&#43;pyeAAEf8k/mrvWdR6PNCLW7xk/mNo2/bhIghnCVpLXPaiUgPRqvIQhpO41Jt1sIw==" crossorigin="anonymous"></script>
 
-  <script src="https://jianlin-li.github.io/js/search.min.8d141e1e7aa85984a5288b2172ad03540fc235f64379f8df11d062fd3deb9d49bbd9fb0f3df983e9663e322fa8e322a336d5350fbe833c77eb9ee7d907636cff.js"></script>
+  <script src="https://jianlin-li.github.io/js/search.min.4c2b0421d128bbd7c43fc7d662fb5dfd8e439c60ee92c900a26d72d9c3271d2256f5bac9f6f919cddfd55101e9272898716cbb3381b4360bf43a66a5f7664f54.js"></script>
 
   </body>
 </html>

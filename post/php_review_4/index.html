@@ -268,7 +268,7 @@
 </span></span><span class="line"><span class="ln">2</span><span class="cl">  <span class="p">[</span><span class="s2">&#34;global_value&#34;</span><span class="p">]</span> <span class="o">=&gt;</span> <span class="nx">string</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="s2">&#34;1&#34;</span>
 </span></span><span class="line"><span class="ln">3</span><span class="cl">  <span class="p">[</span><span class="s2">&#34;local_value&#34;</span><span class="p">]</span>  <span class="o">=&gt;</span> <span class="nx">string</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="s2">&#34;1&#34;</span>
 </span></span><span class="line"><span class="ln">4</span><span class="cl">  <span class="p">[</span><span class="s2">&#34;access&#34;</span><span class="p">]</span>       <span class="o">=&gt;</span> <span class="nx">int</span><span class="p">(</span><span class="mi">7</span><span class="p">)</span>  <span class="c1">// 7 = PHP_INI_ALL (1+2+4)
-</span></span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="p">}</span>
+</span></span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="c1"></span><span class="p">}</span>
 </span></span></code></pre></div><p>其中 <code>access</code> 字段的值对应：</p>
 <ul>
 <li><code>1</code> = <code>PHP_INI_USER</code></li>
@@ -533,17 +533,17 @@
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">sudo nano /etc/nginx/sites-available/default
 </span></span></code></pre></div><p>在 <code>server { ... }</code> 块中添加以下 location 块：</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-nginx" data-lang="nginx"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="c1"># PHP-FPM 状态页（仅限本地访问）
-</span></span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="k">location</span> <span class="p">~</span> <span class="sr">^/(fpm-status|fpm-ping)$</span> <span class="p">{</span>
+</span></span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="c1"></span><span class="k">location</span> <span class="p">~</span> <span class="sr">^/(fpm-status|fpm-ping)$</span> <span class="p">{</span>
 </span></span><span class="line"><span class="ln"> 3</span><span class="cl">    <span class="kn">access_log</span> <span class="no">off</span><span class="p">;</span>
 </span></span><span class="line"><span class="ln"> 4</span><span class="cl">    <span class="kn">allow</span> <span class="n">127.0.0.1</span><span class="p">;</span>
 </span></span><span class="line"><span class="ln"> 5</span><span class="cl">    <span class="kn">allow</span> <span class="p">::</span><span class="mi">1</span><span class="p">;</span>               <span class="c1"># IPv6 localhost
-</span></span></span><span class="line"><span class="ln"> 6</span><span class="cl">    <span class="c1"># allow 192.168.1.0/24;  # 如需允许内网，取消注释并修改
-</span></span></span><span class="line"><span class="ln"> 7</span><span class="cl">    <span class="kn">deny</span> <span class="s">all</span><span class="p">;</span>
+</span></span></span><span class="line"><span class="ln"> 6</span><span class="cl"><span class="c1"></span>    <span class="c1"># allow 192.168.1.0/24;  # 如需允许内网，取消注释并修改
+</span></span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="c1"></span>    <span class="kn">deny</span> <span class="s">all</span><span class="p">;</span>
 </span></span><span class="line"><span class="ln"> 8</span><span class="cl">
 </span></span><span class="line"><span class="ln"> 9</span><span class="cl">    <span class="kn">include</span> <span class="s">fastcgi_params</span><span class="p">;</span>
 </span></span><span class="line"><span class="ln">10</span><span class="cl">    <span class="kn">fastcgi_param</span> <span class="s">SCRIPT_FILENAME</span> <span class="nv">$document_root$fastcgi_script_name</span><span class="p">;</span>
 </span></span><span class="line"><span class="ln">11</span><span class="cl">    <span class="kn">fastcgi_pass</span> <span class="s">unix:/run/php/php8.2-fpm.sock</span><span class="p">;</span>  <span class="c1"># 根据你的 sock 路径调整
-</span></span></span><span class="line"><span class="ln">12</span><span class="cl"><span class="p">}</span>
+</span></span></span><span class="line"><span class="ln">12</span><span class="cl"><span class="c1"></span><span class="p">}</span>
 </span></span></code></pre></div><blockquote>
 <p>🔍 <strong>关键点说明</strong>：</p>
 <ul>
@@ -663,38 +663,38 @@
 </span></span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="sd"> */</span>
 </span></span><span class="line"><span class="ln"> 6</span><span class="cl">
 </span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="c1">// ============= 1. 生成 RSA 密钥对 =============
-</span></span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="nv">$config</span> <span class="o">=</span> <span class="p">[</span>
+</span></span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="c1"></span><span class="nv">$config</span> <span class="o">=</span> <span class="p">[</span>
 </span></span><span class="line"><span class="ln"> 9</span><span class="cl">    <span class="s1">&#39;digest_alg&#39;</span>       <span class="o">=&gt;</span> <span class="s1">&#39;sha512&#39;</span><span class="p">,</span>
 </span></span><span class="line"><span class="ln">10</span><span class="cl">    <span class="s1">&#39;private_key_bits&#39;</span> <span class="o">=&gt;</span> <span class="mi">2048</span><span class="p">,</span>
 </span></span><span class="line"><span class="ln">11</span><span class="cl">    <span class="s1">&#39;private_key_type&#39;</span> <span class="o">=&gt;</span> <span class="nx">OPENSSL_KEYTYPE_RSA</span><span class="p">,</span>
 </span></span><span class="line"><span class="ln">12</span><span class="cl"><span class="p">];</span>
 </span></span><span class="line"><span class="ln">13</span><span class="cl">
 </span></span><span class="line"><span class="ln">14</span><span class="cl"><span class="c1">// 生成私钥资源
-</span></span></span><span class="line"><span class="ln">15</span><span class="cl"><span class="nv">$privateKeyRes</span> <span class="o">=</span> <span class="nx">openssl_pkey_new</span><span class="p">(</span><span class="nv">$config</span><span class="p">);</span>
+</span></span></span><span class="line"><span class="ln">15</span><span class="cl"><span class="c1"></span><span class="nv">$privateKeyRes</span> <span class="o">=</span> <span class="nx">openssl_pkey_new</span><span class="p">(</span><span class="nv">$config</span><span class="p">);</span>
 </span></span><span class="line"><span class="ln">16</span><span class="cl"><span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nv">$privateKeyRes</span><span class="p">)</span> <span class="p">{</span>
 </span></span><span class="line"><span class="ln">17</span><span class="cl">    <span class="k">die</span><span class="p">(</span><span class="s2">&#34;❌ 密钥生成失败: &#34;</span> <span class="o">.</span> <span class="nx">openssl_error_string</span><span class="p">()</span> <span class="o">.</span> <span class="s2">&#34;</span><span class="se">\n</span><span class="s2">&#34;</span><span class="p">);</span>
 </span></span><span class="line"><span class="ln">18</span><span class="cl"><span class="p">}</span>
 </span></span><span class="line"><span class="ln">19</span><span class="cl">
 </span></span><span class="line"><span class="ln">20</span><span class="cl"><span class="c1">// 导出 PEM 格式私钥字符串
-</span></span></span><span class="line"><span class="ln">21</span><span class="cl"><span class="nx">openssl_pkey_export</span><span class="p">(</span><span class="nv">$privateKeyRes</span><span class="p">,</span> <span class="nv">$privateKeyPem</span><span class="p">);</span>
+</span></span></span><span class="line"><span class="ln">21</span><span class="cl"><span class="c1"></span><span class="nx">openssl_pkey_export</span><span class="p">(</span><span class="nv">$privateKeyRes</span><span class="p">,</span> <span class="nv">$privateKeyPem</span><span class="p">);</span>
 </span></span><span class="line"><span class="ln">22</span><span class="cl">
 </span></span><span class="line"><span class="ln">23</span><span class="cl"><span class="c1">// 从私钥资源提取公钥 PEM 字符串
-</span></span></span><span class="line"><span class="ln">24</span><span class="cl"><span class="nv">$pubKeyDetails</span> <span class="o">=</span> <span class="nx">openssl_pkey_get_details</span><span class="p">(</span><span class="nv">$privateKeyRes</span><span class="p">);</span>
+</span></span></span><span class="line"><span class="ln">24</span><span class="cl"><span class="c1"></span><span class="nv">$pubKeyDetails</span> <span class="o">=</span> <span class="nx">openssl_pkey_get_details</span><span class="p">(</span><span class="nv">$privateKeyRes</span><span class="p">);</span>
 </span></span><span class="line"><span class="ln">25</span><span class="cl"><span class="nv">$publicKeyPem</span> <span class="o">=</span> <span class="nv">$pubKeyDetails</span><span class="p">[</span><span class="s1">&#39;key&#39;</span><span class="p">];</span>
 </span></span><span class="line"><span class="ln">26</span><span class="cl">
 </span></span><span class="line"><span class="ln">27</span><span class="cl"><span class="c1">// 释放资源（可选）
-</span></span></span><span class="line"><span class="ln">28</span><span class="cl"><span class="nx">openssl_pkey_free</span><span class="p">(</span><span class="nv">$privateKeyRes</span><span class="p">);</span>
+</span></span></span><span class="line"><span class="ln">28</span><span class="cl"><span class="c1"></span><span class="nx">openssl_pkey_free</span><span class="p">(</span><span class="nv">$privateKeyRes</span><span class="p">);</span>
 </span></span><span class="line"><span class="ln">29</span><span class="cl">
 </span></span><span class="line"><span class="ln">30</span><span class="cl"><span class="k">echo</span> <span class="s2">&#34;✅ 密钥对生成成功！</span><span class="se">\n</span><span class="s2">&#34;</span><span class="p">;</span>
 </span></span><span class="line"><span class="ln">31</span><span class="cl"><span class="k">echo</span> <span class="s2">&#34;🔐 私钥 (PEM):</span><span class="se">\n</span><span class="s2">&#34;</span> <span class="o">.</span> <span class="nx">wordwrap</span><span class="p">(</span><span class="nv">$privateKeyPem</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="s2">&#34;</span><span class="se">\n</span><span class="s2">&#34;</span><span class="p">,</span> <span class="k">true</span><span class="p">)</span> <span class="o">.</span> <span class="s2">&#34;</span><span class="se">\n</span><span class="s2">&#34;</span><span class="p">;</span>
 </span></span><span class="line"><span class="ln">32</span><span class="cl"><span class="k">echo</span> <span class="s2">&#34;🔓 公钥 (PEM):</span><span class="se">\n</span><span class="s2">&#34;</span> <span class="o">.</span> <span class="nx">wordwrap</span><span class="p">(</span><span class="nv">$publicKeyPem</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="s2">&#34;</span><span class="se">\n</span><span class="s2">&#34;</span><span class="p">,</span> <span class="k">true</span><span class="p">)</span> <span class="o">.</span> <span class="s2">&#34;</span><span class="se">\n\n</span><span class="s2">&#34;</span><span class="p">;</span>
 </span></span><span class="line"><span class="ln">33</span><span class="cl">
 </span></span><span class="line"><span class="ln">34</span><span class="cl"><span class="c1">// ============= 2. 加密（公钥） =============
-</span></span></span><span class="line"><span class="ln">35</span><span class="cl"><span class="nv">$original</span> <span class="o">=</span> <span class="s2">&#34;Hello RSA! 这是测试消息。&#34;</span><span class="p">;</span> <span class="c1">// 中文需注意编码，UTF-8 安全
-</span></span></span><span class="line"><span class="ln">36</span><span class="cl"><span class="k">echo</span> <span class="s2">&#34;📝 原始消息: </span><span class="si">$original</span><span class="s2"> (长度: &#34;</span> <span class="o">.</span> <span class="nx">strlen</span><span class="p">(</span><span class="nv">$original</span><span class="p">)</span> <span class="o">.</span> <span class="s2">&#34; 字节)</span><span class="se">\n</span><span class="s2">&#34;</span><span class="p">;</span>
+</span></span></span><span class="line"><span class="ln">35</span><span class="cl"><span class="c1"></span><span class="nv">$original</span> <span class="o">=</span> <span class="s2">&#34;Hello RSA! 这是测试消息。&#34;</span><span class="p">;</span> <span class="c1">// 中文需注意编码，UTF-8 安全
+</span></span></span><span class="line"><span class="ln">36</span><span class="cl"><span class="c1"></span><span class="k">echo</span> <span class="s2">&#34;📝 原始消息: </span><span class="si">$original</span><span class="s2"> (长度: &#34;</span> <span class="o">.</span> <span class="nx">strlen</span><span class="p">(</span><span class="nv">$original</span><span class="p">)</span> <span class="o">.</span> <span class="s2">&#34; 字节)</span><span class="se">\n</span><span class="s2">&#34;</span><span class="p">;</span>
 </span></span><span class="line"><span class="ln">37</span><span class="cl">
 </span></span><span class="line"><span class="ln">38</span><span class="cl"><span class="c1">// 检查长度（2048位RSA + PKCS1 padding 最大245字节）
-</span></span></span><span class="line"><span class="ln">39</span><span class="cl"><span class="k">if</span> <span class="p">(</span><span class="nx">strlen</span><span class="p">(</span><span class="nv">$original</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">245</span><span class="p">)</span> <span class="p">{</span>
+</span></span></span><span class="line"><span class="ln">39</span><span class="cl"><span class="c1"></span><span class="k">if</span> <span class="p">(</span><span class="nx">strlen</span><span class="p">(</span><span class="nv">$original</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">245</span><span class="p">)</span> <span class="p">{</span>
 </span></span><span class="line"><span class="ln">40</span><span class="cl">    <span class="k">die</span><span class="p">(</span><span class="s2">&#34;❌ 消息过长！RSA 2048 仅支持 ≤245 字节（使用 PKCS1 padding）。</span><span class="se">\n</span><span class="s2">&#34;</span> <span class="o">.</span>
 </span></span><span class="line"><span class="ln">41</span><span class="cl">        <span class="s2">&#34;💡 建议：使用混合加密（RSA+AES）处理长文本。</span><span class="se">\n</span><span class="s2">&#34;</span><span class="p">);</span>
 </span></span><span class="line"><span class="ln">42</span><span class="cl"><span class="p">}</span>
@@ -708,7 +708,7 @@
 </span></span><span class="line"><span class="ln">50</span><span class="cl"><span class="k">echo</span> <span class="s2">&#34;🔒 加密后 (Base64): &#34;</span> <span class="o">.</span> <span class="nv">$encryptedBase64</span> <span class="o">.</span> <span class="s2">&#34;</span><span class="se">\n\n</span><span class="s2">&#34;</span><span class="p">;</span>
 </span></span><span class="line"><span class="ln">51</span><span class="cl">
 </span></span><span class="line"><span class="ln">52</span><span class="cl"><span class="c1">// ============= 3. 解密（私钥） =============
-</span></span></span><span class="line"><span class="ln">53</span><span class="cl"><span class="nv">$decrypted</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">;</span>
+</span></span></span><span class="line"><span class="ln">53</span><span class="cl"><span class="c1"></span><span class="nv">$decrypted</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">;</span>
 </span></span><span class="line"><span class="ln">54</span><span class="cl"><span class="nv">$encryptedBinary</span> <span class="o">=</span> <span class="nx">base64_decode</span><span class="p">(</span><span class="nv">$encryptedBase64</span><span class="p">);</span>
 </span></span><span class="line"><span class="ln">55</span><span class="cl">
 </span></span><span class="line"><span class="ln">56</span><span class="cl"><span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">openssl_private_decrypt</span><span class="p">(</span><span class="nv">$encryptedBinary</span><span class="p">,</span> <span class="nv">$decrypted</span><span class="p">,</span> <span class="nv">$privateKeyPem</span><span class="p">,</span> <span class="nx">OPENSSL_PKCS1_PADDING</span><span class="p">))</span> <span class="p">{</span>
@@ -722,7 +722,7 @@
 </span></span></span><span class="line"><span class="ln">64</span><span class="cl"><span class="c1">// file_put_contents(&#39;private.key&#39;, $privateKeyPem);
 </span></span></span><span class="line"><span class="ln">65</span><span class="cl"><span class="c1">// file_put_contents(&#39;public.key&#39;, $publicKeyPem);
 </span></span></span><span class="line"><span class="ln">66</span><span class="cl"><span class="c1">// echo &#34;\n🔑 密钥已保存至 private.key / public.key\n&#34;;
-</span></span></span><span class="line"><span class="ln">67</span><span class="cl"><span class="cp">?&gt;</span><span class="err">
+</span></span></span><span class="line"><span class="ln">67</span><span class="cl"><span class="c1"></span><span class="cp">?&gt;</span><span class="err">
 </span></span></span></code></pre></div><hr>
 <h2 id="-重要说明与最佳实践">⚠️ 重要说明与最佳实践</h2>
 <h3 id="-密钥安全">🔑 密钥安全</h3>
@@ -1259,7 +1259,7 @@
 
 <script type="text/javascript" src="https://jianlin-li.github.io/zh-cn/js/bundle.e4e0e4fbe8acb50d7f973828f4138cdbea727800047fc93f9abbd6751e8f3422d6ef193f98da36fdb8488219c25692d73da89480f46abc8421a4ee3526dd6c23.js" integrity="sha512-5ODk&#43;&#43;istQ1/lzgo9BOM2&#43;pyeAAEf8k/mrvWdR6PNCLW7xk/mNo2/bhIghnCVpLXPaiUgPRqvIQhpO41Jt1sIw==" crossorigin="anonymous"></script>
 
-  <script src="https://jianlin-li.github.io/js/search.min.8d141e1e7aa85984a5288b2172ad03540fc235f64379f8df11d062fd3deb9d49bbd9fb0f3df983e9663e322fa8e322a336d5350fbe833c77eb9ee7d907636cff.js"></script>
+  <script src="https://jianlin-li.github.io/js/search.min.4c2b0421d128bbd7c43fc7d662fb5dfd8e439c60ee92c900a26d72d9c3271d2256f5bac9f6f919cddfd55101e9272898716cbb3381b4360bf43a66a5f7664f54.js"></script>
 
   </body>
 </html>

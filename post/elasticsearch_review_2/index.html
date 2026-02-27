@@ -243,7 +243,7 @@
 <h4 id="步骤一创建-setupsh-脚本文件">步骤一：创建 <code>setup.sh</code> 脚本文件</h4>
 <p>首先，在 <code>elasticsearch-8.19.10</code> 目录下创建一个新的脚本文件 <code>setup.sh</code>，内容如下：</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="cp">#!/bin/sh
-</span></span></span><span class="line"><span class="ln"> 2</span><span class="cl">
+</span></span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="cp"></span>
 </span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="c1"># Step 1: Check and generate CA certificate</span>
 </span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="k">if</span> <span class="o">[</span> ! -f /usr/share/elasticsearch/config/certs/ca/ca.crt <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
 </span></span><span class="line"><span class="ln"> 5</span><span class="cl">  <span class="nb">echo</span> <span class="s2">&#34;==&gt; Generating CA&#34;</span>
@@ -267,10 +267,10 @@
 </span></span></span><span class="line"><span class="ln">23</span><span class="cl"><span class="s">    dns: [kibana]
 </span></span></span><span class="line"><span class="ln">24</span><span class="cl"><span class="s">EOF</span>
 </span></span><span class="line"><span class="ln">25</span><span class="cl">  /usr/share/elasticsearch/bin/elasticsearch-certutil cert --silent --pem <span class="se">\
-</span></span></span><span class="line"><span class="ln">26</span><span class="cl">    --in /usr/share/elasticsearch/config/certs/instances.yml <span class="se">\
-</span></span></span><span class="line"><span class="ln">27</span><span class="cl">    --ca-cert /usr/share/elasticsearch/config/certs/ca/ca.crt <span class="se">\
-</span></span></span><span class="line"><span class="ln">28</span><span class="cl">    --ca-key /usr/share/elasticsearch/config/certs/ca/ca.key <span class="se">\
-</span></span></span><span class="line"><span class="ln">29</span><span class="cl">    -out /usr/share/elasticsearch/config/certs/certs.zip
+</span></span></span><span class="line"><span class="ln">26</span><span class="cl"><span class="se"></span>    --in /usr/share/elasticsearch/config/certs/instances.yml <span class="se">\
+</span></span></span><span class="line"><span class="ln">27</span><span class="cl"><span class="se"></span>    --ca-cert /usr/share/elasticsearch/config/certs/ca/ca.crt <span class="se">\
+</span></span></span><span class="line"><span class="ln">28</span><span class="cl"><span class="se"></span>    --ca-key /usr/share/elasticsearch/config/certs/ca/ca.key <span class="se">\
+</span></span></span><span class="line"><span class="ln">29</span><span class="cl"><span class="se"></span>    -out /usr/share/elasticsearch/config/certs/certs.zip
 </span></span><span class="line"><span class="ln">30</span><span class="cl">  unzip /usr/share/elasticsearch/config/certs/certs.zip -d /usr/share/elasticsearch/config/certs
 </span></span><span class="line"><span class="ln">31</span><span class="cl"><span class="k">fi</span>
 </span></span><span class="line"><span class="ln">32</span><span class="cl">
@@ -289,7 +289,7 @@
 </span></span></span><span class="line"><span class="ln">  3</span><span class="cl"><span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">elastic</span><span class="w">
 </span></span></span><span class="line"><span class="ln">  4</span><span class="cl"><span class="w">    </span><span class="nt">driver</span><span class="p">:</span><span class="w"> </span><span class="l">bridge</span><span class="w">
 </span></span></span><span class="line"><span class="ln">  5</span><span class="cl"><span class="w">
-</span></span></span><span class="line"><span class="ln">  6</span><span class="cl"><span class="nt">services</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln">  6</span><span class="cl"><span class="w"></span><span class="nt">services</span><span class="p">:</span><span class="w">
 </span></span></span><span class="line"><span class="ln">  7</span><span class="cl"><span class="w">  </span><span class="c"># ========================</span><span class="w">
 </span></span></span><span class="line"><span class="ln">  8</span><span class="cl"><span class="w">  </span><span class="c"># 证书生成 &amp; 初始化</span><span class="w">
 </span></span></span><span class="line"><span class="ln">  9</span><span class="cl"><span class="w">  </span><span class="c"># ========================</span><span class="w">
@@ -521,10 +521,10 @@
 </span></span></code></pre></div><hr>
 <h4 id="-用-elastic-用户设置-kibana_system-密码">③ 用 elastic 用户设置 kibana_system 密码</h4>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">curl -u elastic:elastic123 <span class="se">\
-</span></span></span><span class="line"><span class="ln">2</span><span class="cl">  --cacert /usr/share/elasticsearch/config/certs/ca/ca.crt <span class="se">\
-</span></span></span><span class="line"><span class="ln">3</span><span class="cl">  -X POST https://es01:9200/_security/user/kibana_system/_password <span class="se">\
-</span></span></span><span class="line"><span class="ln">4</span><span class="cl">  -H <span class="s2">&#34;Content-Type: application/json&#34;</span> <span class="se">\
-</span></span></span><span class="line"><span class="ln">5</span><span class="cl">  -d <span class="s1">&#39;{
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="se"></span>  --cacert /usr/share/elasticsearch/config/certs/ca/ca.crt <span class="se">\
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="se"></span>  -X POST https://es01:9200/_security/user/kibana_system/_password <span class="se">\
+</span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="se"></span>  -H <span class="s2">&#34;Content-Type: application/json&#34;</span> <span class="se">\
+</span></span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="se"></span>  -d <span class="s1">&#39;{
 </span></span></span><span class="line"><span class="ln">6</span><span class="cl"><span class="s1">    &#34;password&#34;: &#34;elastic123&#34;
 </span></span></span><span class="line"><span class="ln">7</span><span class="cl"><span class="s1">  }&#39;</span>
 </span></span></code></pre></div><p>返回类似下面就说明成功了：</p>
@@ -625,17 +625,17 @@
 </span></span><span class="line"><span class="ln">14</span><span class="cl">
 </span></span><span class="line"><span class="ln">15</span><span class="cl">
 </span></span><span class="line"><span class="ln">16</span><span class="cl">          <span class="c1"># 允许 Nginx 使用 ES 的自签 CA
-</span></span></span><span class="line"><span class="ln">17</span><span class="cl">          <span class="kn">proxy_ssl_trusted_certificate</span> <span class="s">/Users/lijianlin/opt/elasticsearch-8.19.10/certs/ca/ca.crt</span><span class="p">;</span>
+</span></span></span><span class="line"><span class="ln">17</span><span class="cl"><span class="c1"></span>          <span class="kn">proxy_ssl_trusted_certificate</span> <span class="s">/Users/lijianlin/opt/elasticsearch-8.19.10/certs/ca/ca.crt</span><span class="p">;</span>
 </span></span><span class="line"><span class="ln">18</span><span class="cl">          <span class="kn">proxy_ssl_verify</span> <span class="no">on</span><span class="p">;</span>
 </span></span><span class="line"><span class="ln">19</span><span class="cl">          <span class="kn">proxy_ssl_verify_depth</span> <span class="mi">2</span><span class="p">;</span>
 </span></span><span class="line"><span class="ln">20</span><span class="cl">
 </span></span><span class="line"><span class="ln">21</span><span class="cl">          <span class="c1"># SNI
-</span></span></span><span class="line"><span class="ln">22</span><span class="cl">          <span class="kn">proxy_ssl_server_name</span> <span class="no">on</span><span class="p">;</span>
+</span></span></span><span class="line"><span class="ln">22</span><span class="cl"><span class="c1"></span>          <span class="kn">proxy_ssl_server_name</span> <span class="no">on</span><span class="p">;</span>
 </span></span><span class="line"><span class="ln">23</span><span class="cl">
 </span></span><span class="line"><span class="ln">24</span><span class="cl">        <span class="p">}</span>
 </span></span><span class="line"><span class="ln">25</span><span class="cl">    <span class="c1">#access_log /usr/local/var/log/nginx/local.elasticsearch-docker.com_access.log;
-</span></span></span><span class="line"><span class="ln">26</span><span class="cl">    <span class="c1">#error_log  /usr/local/var/log/nginx/local.elasticsearch-docker.com_error.log;
-</span></span></span><span class="line"><span class="ln">27</span><span class="cl">
+</span></span></span><span class="line"><span class="ln">26</span><span class="cl"><span class="c1"></span>    <span class="c1">#error_log  /usr/local/var/log/nginx/local.elasticsearch-docker.com_error.log;
+</span></span></span><span class="line"><span class="ln">27</span><span class="cl"><span class="c1"></span>
 </span></span><span class="line"><span class="ln">28</span><span class="cl"><span class="p">}</span>
 </span></span></code></pre></div><h3 id="重载-nginx">重载 Nginx</h3>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">brew services restart nginx
@@ -1105,7 +1105,7 @@
 
 <script type="text/javascript" src="https://jianlin-li.github.io/zh-cn/js/bundle.e4e0e4fbe8acb50d7f973828f4138cdbea727800047fc93f9abbd6751e8f3422d6ef193f98da36fdb8488219c25692d73da89480f46abc8421a4ee3526dd6c23.js" integrity="sha512-5ODk&#43;&#43;istQ1/lzgo9BOM2&#43;pyeAAEf8k/mrvWdR6PNCLW7xk/mNo2/bhIghnCVpLXPaiUgPRqvIQhpO41Jt1sIw==" crossorigin="anonymous"></script>
 
-  <script src="https://jianlin-li.github.io/js/search.min.8d141e1e7aa85984a5288b2172ad03540fc235f64379f8df11d062fd3deb9d49bbd9fb0f3df983e9663e322fa8e322a336d5350fbe833c77eb9ee7d907636cff.js"></script>
+  <script src="https://jianlin-li.github.io/js/search.min.4c2b0421d128bbd7c43fc7d662fb5dfd8e439c60ee92c900a26d72d9c3271d2256f5bac9f6f919cddfd55101e9272898716cbb3381b4360bf43a66a5f7664f54.js"></script>
 
   </body>
 </html>

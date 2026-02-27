@@ -764,8 +764,8 @@
 <p><strong>作用</strong>：指定构建镜像的基础镜像（必须是第一条非注释指令）。</p>
 <p><strong>语法</strong>：</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-dockerfile" data-lang="dockerfile"><span class="line"><span class="ln">1</span><span class="cl"><span class="k">FROM</span><span class="w"> </span><span class="s">&lt;image</span>&gt; <span class="o">[</span>AS &lt;name&gt;<span class="o">]</span>                <span class="c1"># 单阶段</span><span class="err">
-</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="k">FROM</span><span class="w"> </span><span class="s">&lt;image&gt;[:&lt;tag</span>&gt;<span class="o">]</span> <span class="o">[</span>AS &lt;name&gt;<span class="o">]</span>        <span class="c1"># 指定 tag</span><span class="err">
-</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="k">FROM</span><span class="w"> </span><span class="s">&lt;image&gt;[@&lt;digest</span>&gt;<span class="o">]</span> <span class="o">[</span>AS &lt;name&gt;<span class="o">]</span>     <span class="c1"># 指定 digest（最安全）</span><span class="err">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="err"></span><span class="k">FROM</span><span class="w"> </span><span class="s">&lt;image&gt;[:&lt;tag</span>&gt;<span class="o">]</span> <span class="o">[</span>AS &lt;name&gt;<span class="o">]</span>        <span class="c1"># 指定 tag</span><span class="err">
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="err"></span><span class="k">FROM</span><span class="w"> </span><span class="s">&lt;image&gt;[@&lt;digest</span>&gt;<span class="o">]</span> <span class="o">[</span>AS &lt;name&gt;<span class="o">]</span>     <span class="c1"># 指定 digest（最安全）</span><span class="err">
 </span></span></span></code></pre></div><p><strong>说明</strong>：</p>
 <ul>
 <li>支持多阶段构建（<code>AS &lt;name&gt;</code>），用于减小最终镜像体积。</li>
@@ -773,16 +773,16 @@
 </ul>
 <p><strong>示例</strong>：</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-dockerfile" data-lang="dockerfile"><span class="line"><span class="ln">1</span><span class="cl"><span class="k">FROM</span><span class="w"> </span><span class="s">alpine:3.18</span><span class="err">
-</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="k">FROM</span><span class="w"> </span><span class="s">node:18-alpine</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="s">builder</span><span class="err">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="err"></span><span class="k">FROM</span><span class="w"> </span><span class="s">node:18-alpine</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="s">builder</span><span class="err">
 </span></span></span></code></pre></div><hr>
 <h3 id="2-run--构建时执行命令">2. <code>RUN</code> —— 构建时执行命令</h3>
 <p><strong>作用</strong>：在镜像构建过程中执行命令（每条 <code>RUN</code> 生成一个新层）。</p>
 <p><strong>语法</strong>：</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-dockerfile" data-lang="dockerfile"><span class="line"><span class="ln">1</span><span class="cl"><span class="c"># Shell 形式（不推荐）</span><span class="err">
-</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="k">RUN</span> &lt;command&gt;<span class="err">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="err"></span><span class="k">RUN</span> &lt;command&gt;<span class="err">
 </span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="err">
-</span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="c"># Exec 形式（推荐）</span><span class="err">
-</span></span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="k">RUN</span> <span class="o">[</span><span class="s2">&#34;executable&#34;</span>, <span class="s2">&#34;param1&#34;</span>, <span class="s2">&#34;param2&#34;</span><span class="o">]</span><span class="err">
+</span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="err"></span><span class="c"># Exec 形式（推荐）</span><span class="err">
+</span></span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="err"></span><span class="k">RUN</span> <span class="o">[</span><span class="s2">&#34;executable&#34;</span>, <span class="s2">&#34;param1&#34;</span>, <span class="s2">&#34;param2&#34;</span><span class="o">]</span><span class="err">
 </span></span></span></code></pre></div><p><strong>最佳实践</strong>：</p>
 <ul>
 <li>合并多个命令减少层数（用 <code>&amp;&amp;</code> 连接）。</li>
@@ -795,15 +795,15 @@
 <p><strong>作用</strong>：提供容器启动时的<strong>默认参数</strong>（可被 <code>docker run</code> 覆盖）。</p>
 <p><strong>语法</strong>（三种形式，仅最后一行生效）：</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-dockerfile" data-lang="dockerfile"><span class="line"><span class="ln">1</span><span class="cl"><span class="k">CMD</span> <span class="p">[</span><span class="s2">&#34;executable&#34;</span><span class="p">,</span><span class="s2">&#34;param1&#34;</span><span class="p">,</span><span class="s2">&#34;param2&#34;</span><span class="p">]</span>   <span class="c1"># exec 形式（推荐）</span><span class="err">
-</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="k">CMD</span> <span class="p">[</span><span class="s2">&#34;param1&#34;</span><span class="p">,</span><span class="s2">&#34;param2&#34;</span><span class="p">]</span>                <span class="c1"># 作为 ENTRYPOINT 的默认参数</span><span class="err">
-</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="k">CMD</span> <span class="nb">command</span> param1 param2              <span class="c1"># shell 形式（不推荐）</span><span class="err">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="err"></span><span class="k">CMD</span> <span class="p">[</span><span class="s2">&#34;param1&#34;</span><span class="p">,</span><span class="s2">&#34;param2&#34;</span><span class="p">]</span>                <span class="c1"># 作为 ENTRYPOINT 的默认参数</span><span class="err">
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="err"></span><span class="k">CMD</span> <span class="nb">command</span> param1 param2              <span class="c1"># shell 形式（不推荐）</span><span class="err">
 </span></span></span></code></pre></div><p><strong>注意</strong>：若与 <code>ENTRYPOINT</code> 共存，<code>CMD</code> 内容作为参数传入。</p>
 <hr>
 <h3 id="4-entrypoint--容器主入口程序">4. <code>ENTRYPOINT</code> —— 容器主入口程序</h3>
 <p><strong>作用</strong>：定义容器的<strong>主程序</strong>（不易被覆盖）。</p>
 <p><strong>语法</strong>：</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-dockerfile" data-lang="dockerfile"><span class="line"><span class="ln">1</span><span class="cl"><span class="k">ENTRYPOINT</span> <span class="p">[</span><span class="s2">&#34;executable&#34;</span><span class="p">,</span> <span class="s2">&#34;param1&#34;</span><span class="p">,</span> <span class="s2">&#34;param2&#34;</span><span class="p">]</span>  <span class="c1"># exec 形式（推荐）</span><span class="err">
-</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="k">ENTRYPOINT</span> <span class="nb">command</span> param1 param2               <span class="c1"># shell 形式（不推荐）</span><span class="err">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="err"></span><span class="k">ENTRYPOINT</span> <span class="nb">command</span> param1 param2               <span class="c1"># shell 形式（不推荐）</span><span class="err">
 </span></span></span></code></pre></div><p><strong>特点</strong>：</p>
 <ul>
 <li><code>docker run &lt;image&gt; arg1</code> → <code>arg1</code> 会追加到 <code>ENTRYPOINT</code> 后。</li>
@@ -817,7 +817,7 @@
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-dockerfile" data-lang="dockerfile"><span class="line"><span class="ln">1</span><span class="cl"><span class="k">LABEL</span> &lt;key&gt;<span class="o">=</span>&lt;value&gt; &lt;key2&gt;<span class="o">=</span>&lt;value2&gt; ...<span class="err">
 </span></span></span></code></pre></div><p><strong>示例</strong>：</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-dockerfile" data-lang="dockerfile"><span class="line"><span class="ln">1</span><span class="cl"><span class="k">LABEL</span> <span class="nv">maintainer</span><span class="o">=</span><span class="s2">&#34;dev@example.com&#34;</span><span class="err">
-</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="k">LABEL</span> <span class="nv">version</span><span class="o">=</span><span class="s2">&#34;1.0&#34;</span> <span class="nv">description</span><span class="o">=</span><span class="s2">&#34;My App&#34;</span><span class="err">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="err"></span><span class="k">LABEL</span> <span class="nv">version</span><span class="o">=</span><span class="s2">&#34;1.0&#34;</span> <span class="nv">description</span><span class="o">=</span><span class="s2">&#34;My App&#34;</span><span class="err">
 </span></span></span></code></pre></div><p>查看标签：<code>docker inspect --format='{{json .Config.Labels}}' image</code></p>
 <hr>
 <h3 id="6-expose--声明监听端口">6. <code>EXPOSE</code> —— 声明监听端口</h3>
@@ -834,7 +834,7 @@
 <p><strong>作用</strong>：设置环境变量（在构建和运行时都可用）。</p>
 <p><strong>语法</strong>：</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-dockerfile" data-lang="dockerfile"><span class="line"><span class="ln">1</span><span class="cl"><span class="k">ENV</span> &lt;key&gt;<span class="o">=</span>&lt;value&gt; ...<span class="err">
-</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="k">ENV</span> &lt;key&gt; &lt;value&gt;<span class="err">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="err"></span><span class="k">ENV</span> &lt;key&gt; &lt;value&gt;<span class="err">
 </span></span></span></code></pre></div><p><strong>示例</strong>：</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-dockerfile" data-lang="dockerfile"><span class="line"><span class="ln">1</span><span class="cl"><span class="k">ENV</span> <span class="nv">NODE_ENV</span><span class="o">=</span>production
 </span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="k">ENV</span> <span class="nv">PATH</span><span class="o">=</span><span class="s2">&#34;/usr/local/bin:</span><span class="nv">$PATH</span><span class="s2">&#34;</span><span class="err">
@@ -862,13 +862,13 @@
 </ul>
 <p><strong>示例</strong>：</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-dockerfile" data-lang="dockerfile"><span class="line"><span class="ln">1</span><span class="cl"><span class="k">COPY</span> app.js /app/<span class="err">
-</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="k">COPY</span> --chown<span class="o">=</span>node:node . /app<span class="err">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="err"></span><span class="k">COPY</span> --chown<span class="o">=</span>node:node . /app<span class="err">
 </span></span></span></code></pre></div><hr>
 <h3 id="10-volume--创建挂载点">10. <code>VOLUME</code> —— 创建挂载点</h3>
 <p><strong>作用</strong>：创建一个挂载点，用于持久化数据或共享数据。</p>
 <p><strong>语法</strong>：</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-dockerfile" data-lang="dockerfile"><span class="line"><span class="ln">1</span><span class="cl"><span class="k">VOLUME</span> <span class="p">[</span><span class="s2">&#34;/data&#34;</span><span class="p">]</span><span class="err">
-</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="k">VOLUME</span><span class="w"> </span><span class="s">/var/log</span> /tmp<span class="err">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="err"></span><span class="k">VOLUME</span><span class="w"> </span><span class="s">/var/log</span> /tmp<span class="err">
 </span></span></span></code></pre></div><p><strong>说明</strong>：</p>
 <ul>
 <li>容器启动时，若未挂载卷，Docker 会自动创建匿名卷。</li>
@@ -879,7 +879,7 @@
 <p><strong>作用</strong>：设置后续 <code>RUN</code>、<code>CMD</code>、<code>ENTRYPOINT</code> 的运行用户。</p>
 <p><strong>语法</strong>：</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-dockerfile" data-lang="dockerfile"><span class="line"><span class="ln">1</span><span class="cl"><span class="k">USER</span><span class="w"> </span><span class="s">&lt;user&gt;[:&lt;group</span>&gt;<span class="o">]</span><span class="err">
-</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="k">USER</span><span class="w"> </span><span class="s">&lt;UID&gt;[:&lt;GID</span>&gt;<span class="o">]</span><span class="err">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="err"></span><span class="k">USER</span><span class="w"> </span><span class="s">&lt;UID&gt;[:&lt;GID</span>&gt;<span class="o">]</span><span class="err">
 </span></span></span></code></pre></div><p><strong>安全建议</strong>：</p>
 <ul>
 <li>避免以 root 运行应用。</li>
@@ -897,8 +897,8 @@
 </ul>
 <p><strong>示例</strong>：</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-dockerfile" data-lang="dockerfile"><span class="line"><span class="ln">1</span><span class="cl"><span class="k">WORKDIR</span><span class="w"> </span><span class="s">/app</span><span class="err">
-</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="k">COPY</span> . .<span class="err">
-</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="k">RUN</span> npm install<span class="err">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="err"></span><span class="k">COPY</span> . .<span class="err">
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="err"></span><span class="k">RUN</span> npm install<span class="err">
 </span></span></span></code></pre></div><hr>
 <h3 id="13-arg--构建参数非持久化">13. <code>ARG</code> —— 构建参数（非持久化）</h3>
 <p><strong>作用</strong>：定义构建时变量（<strong>不会保留在最终镜像中</strong>）。</p>
@@ -911,7 +911,7 @@
 </ul>
 <p><strong>示例</strong>：</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-dockerfile" data-lang="dockerfile"><span class="line"><span class="ln">1</span><span class="cl"><span class="k">ARG</span> <span class="nv">VERSION</span><span class="o">=</span><span class="m">1</span>.0<span class="err">
-</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="k">RUN</span> <span class="nb">echo</span> <span class="nv">$VERSION</span><span class="err">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="err"></span><span class="k">RUN</span> <span class="nb">echo</span> <span class="nv">$VERSION</span><span class="err">
 </span></span></span></code></pre></div><p>构建：<code>docker build --build-arg VERSION=2.0 .</code></p>
 <blockquote>
 <p>⚠️ <code>ARG</code> 和 <code>ENV</code> 区别：<code>ARG</code> 仅在构建时存在，<code>ENV</code> 在运行时也存在。</p>
@@ -923,7 +923,7 @@
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-dockerfile" data-lang="dockerfile"><span class="line"><span class="ln">1</span><span class="cl"><span class="k">ONBUILD</span> &lt;INSTRUCTION&gt;<span class="err">
 </span></span></span></code></pre></div><p><strong>示例</strong>：</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-dockerfile" data-lang="dockerfile"><span class="line"><span class="ln">1</span><span class="cl"><span class="k">ONBUILD</span> <span class="k">COPY</span> . /app/src<span class="err">
-</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="k">ONBUILD</span> <span class="k">RUN</span> npm install<span class="err">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="err"></span><span class="k">ONBUILD</span> <span class="k">RUN</span> npm install<span class="err">
 </span></span></span></code></pre></div><p><strong>应用场景</strong>：构建语言基础镜像（如 <code>node:slim-onbuild</code>），但已<strong>不推荐使用</strong>（多阶段构建更清晰）。</p>
 <hr>
 <h3 id="15-stopsignal--设置停止信号">15. <code>STOPSIGNAL</code> —— 设置停止信号</h3>
@@ -937,7 +937,7 @@
 <p><strong>作用</strong>：定义容器健康状态检测命令。</p>
 <p><strong>语法</strong>：</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-dockerfile" data-lang="dockerfile"><span class="line"><span class="ln">1</span><span class="cl"><span class="k">HEALTHCHECK</span> <span class="o">[</span>OPTIONS<span class="o">]</span> CMD command<span class="err">
-</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="k">HEALTHCHECK</span> NONE   <span class="c1"># 禁用健康检查</span><span class="err">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="err"></span><span class="k">HEALTHCHECK</span> NONE   <span class="c1"># 禁用健康检查</span><span class="err">
 </span></span></span></code></pre></div><p><strong>选项</strong>：</p>
 <ul>
 <li><code>--interval=DURATION</code>（默认 30s）</li>
@@ -947,7 +947,7 @@
 </ul>
 <p><strong>示例</strong>：</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-dockerfile" data-lang="dockerfile"><span class="line"><span class="ln">1</span><span class="cl"><span class="k">HEALTHCHECK</span> --interval<span class="o">=</span>30s --timeout<span class="o">=</span>3s <span class="se">\
-</span></span></span><span class="line"><span class="ln">2</span><span class="cl">  <span class="k">CMD</span> curl -f http://localhost/ <span class="o">||</span> <span class="nb">exit</span> <span class="m">1</span><span class="err">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="se"></span>  <span class="k">CMD</span> curl -f http://localhost/ <span class="o">||</span> <span class="nb">exit</span> <span class="m">1</span><span class="err">
 </span></span></span></code></pre></div><p>查看状态：<code>docker inspect --format='{{.State.Health}}' container</code></p>
 <hr>
 <h3 id="17-shell--指定-runcmdentrypoint-的-shell">17. <code>SHELL</code> —— 指定 RUN/CMD/ENTRYPOINT 的 shell</h3>
@@ -956,7 +956,7 @@
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-dockerfile" data-lang="dockerfile"><span class="line"><span class="ln">1</span><span class="cl"><span class="k">SHELL</span> <span class="p">[</span><span class="s2">&#34;executable&#34;</span><span class="p">,</span> <span class="s2">&#34;parameters&#34;</span><span class="p">]</span><span class="err">
 </span></span></span></code></pre></div><p><strong>示例</strong>（使用 bash）：</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-dockerfile" data-lang="dockerfile"><span class="line"><span class="ln">1</span><span class="cl"><span class="k">SHELL</span> <span class="p">[</span><span class="s2">&#34;/bin/bash&#34;</span><span class="p">,</span> <span class="s2">&#34;-c&#34;</span><span class="p">]</span><span class="err">
-</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="k">RUN</span> <span class="nb">echo</span> <span class="nv">$HOME</span><span class="err">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="err"></span><span class="k">RUN</span> <span class="nb">echo</span> <span class="nv">$HOME</span><span class="err">
 </span></span></span></code></pre></div><hr>
 <h3 id="18-comment-注释-非指令但常用">18. <code>COMMENT</code>（# 注释）—— 非指令但常用</h3>
 <p><strong>作用</strong>：添加注释（以 <code>#</code> 开头）。</p>
@@ -1070,7 +1070,7 @@
 <hr>
 <h3 id="情况-3entrypoint--cmd最常用组合">情况 3：<code>ENTRYPOINT</code> + <code>CMD</code>（最常用组合）</h3>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-Dockerfile" data-lang="Dockerfile"><span class="line"><span class="ln">1</span><span class="cl"><span class="k">ENTRYPOINT</span> <span class="p">[</span><span class="s2">&#34;nginx&#34;</span><span class="p">,</span> <span class="s2">&#34;-g&#34;</span><span class="p">,</span> <span class="s2">&#34;daemon off;&#34;</span><span class="p">]</span><span class="err">
-</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="k">CMD</span> <span class="p">[</span><span class="s2">&#34;-c&#34;</span><span class="p">,</span> <span class="s2">&#34;/etc/nginx/nginx.conf&#34;</span><span class="p">]</span><span class="err">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="err"></span><span class="k">CMD</span> <span class="p">[</span><span class="s2">&#34;-c&#34;</span><span class="p">,</span> <span class="s2">&#34;/etc/nginx/nginx.conf&#34;</span><span class="p">]</span><span class="err">
 </span></span></span></code></pre></div><ul>
 <li>
 <p>实际执行命令 = <code>ENTRYPOINT + CMD</code></p>
@@ -1098,13 +1098,13 @@
 <li>
 <p><strong>Shell 形式</strong>（不推荐）：</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-Dockerfile" data-lang="Dockerfile"><span class="line"><span class="ln">1</span><span class="cl"><span class="k">ENTRYPOINT</span> <span class="nb">echo</span> hello   <span class="c1"># 实际运行 /bin/sh -c &#39;echo hello&#39;</span><span class="err">
-</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="k">CMD</span> <span class="nb">echo</span> world<span class="err">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="err"></span><span class="k">CMD</span> <span class="nb">echo</span> world<span class="err">
 </span></span></span></code></pre></div><p>→ 会导致信号处理异常（如无法响应 <code>SIGTERM</code>），且 <code>CMD</code> 不会被传递给 <code>ENTRYPOINT</code></p>
 </li>
 <li>
 <p><strong>Exec 形式</strong>（强烈推荐）：</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-Dockerfile" data-lang="Dockerfile"><span class="line"><span class="ln">1</span><span class="cl"><span class="k">ENTRYPOINT</span> <span class="p">[</span><span class="s2">&#34;echo&#34;</span><span class="p">,</span> <span class="s2">&#34;hello&#34;</span><span class="p">]</span><span class="err">
-</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="k">CMD</span> <span class="p">[</span><span class="s2">&#34;world&#34;</span><span class="p">]</span><span class="err">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="err"></span><span class="k">CMD</span> <span class="p">[</span><span class="s2">&#34;world&#34;</span><span class="p">]</span><span class="err">
 </span></span></span></code></pre></div></li>
 </ul>
 <h3 id="2-多个-entrypoint-或-cmd">2. 多个 <code>ENTRYPOINT</code> 或 <code>CMD</code>？</h3>
@@ -1209,16 +1209,16 @@
 <hr>
 <h2 id="顶层结构">顶层结构</h2>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;3.8&#34;</span><span class="w">        </span><span class="c"># （可选，新版 Compose 忽略）</span><span class="w">
-</span></span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="nt">services</span><span class="p">:</span><span class="w">             </span><span class="c"># 必填：定义所有服务</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="w"></span><span class="nt">services</span><span class="p">:</span><span class="w">             </span><span class="c"># 必填：定义所有服务</span><span class="w">
 </span></span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="w">  </span><span class="nt">web</span><span class="p">:</span><span class="w">
 </span></span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="w">    </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l">nginx</span><span class="w">
 </span></span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="w">  </span><span class="nt">db</span><span class="p">:</span><span class="w">
 </span></span></span><span class="line"><span class="ln"> 6</span><span class="cl"><span class="w">    </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l">postgres</span><span class="w">
 </span></span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="w">
-</span></span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="nt">volumes</span><span class="p">:</span><span class="w">              </span><span class="c"># 可选：定义命名卷</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="w"></span><span class="nt">volumes</span><span class="p">:</span><span class="w">              </span><span class="c"># 可选：定义命名卷</span><span class="w">
 </span></span></span><span class="line"><span class="ln"> 9</span><span class="cl"><span class="w">  </span><span class="nt">db_data</span><span class="p">:</span><span class="w">
 </span></span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="w">
-</span></span></span><span class="line"><span class="ln">11</span><span class="cl"><span class="nt">networks</span><span class="p">:</span><span class="w">             </span><span class="c"># 可选：定义自定义网络</span><span class="w">
+</span></span></span><span class="line"><span class="ln">11</span><span class="cl"><span class="w"></span><span class="nt">networks</span><span class="p">:</span><span class="w">             </span><span class="c"># 可选：定义自定义网络</span><span class="w">
 </span></span></span><span class="line"><span class="ln">12</span><span class="cl"><span class="w">  </span><span class="nt">frontend</span><span class="p">:</span><span class="w">
 </span></span></span><span class="line"><span class="ln">13</span><span class="cl"><span class="w">  </span><span class="nt">backend</span><span class="p">:</span><span class="w">
 </span></span></span></code></pre></div><blockquote>
@@ -1378,8 +1378,8 @@
 </table>
 <h4 id="示例-2">示例：</h4>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="ln">1</span><span class="cl"><span class="nt">restart</span><span class="p">:</span><span class="w"> </span><span class="l">unless-stopped</span><span class="w">
-</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="nt">stop_grace_period</span><span class="p">:</span><span class="w"> </span><span class="l">30s</span><span class="w">
-</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="nt">init</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="w"></span><span class="nt">stop_grace_period</span><span class="p">:</span><span class="w"> </span><span class="l">30s</span><span class="w">
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="w"></span><span class="nt">init</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
 </span></span></span></code></pre></div><hr>
 <h3 id="网络与端口">网络与端口</h3>
 <table>
@@ -1408,7 +1408,7 @@
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="ln">1</span><span class="cl"><span class="nt">ports</span><span class="p">:</span><span class="w">
 </span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="w">  </span>- <span class="s2">&#34;80:80&#34;</span><span class="w">
 </span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="w">  </span>- <span class="s2">&#34;443:443&#34;</span><span class="w">
-</span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="nt">networks</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="w"></span><span class="nt">networks</span><span class="p">:</span><span class="w">
 </span></span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="w">  </span>- <span class="l">frontend</span><span class="w">
 </span></span></span><span class="line"><span class="ln">6</span><span class="cl"><span class="w">  </span>- <span class="l">backend</span><span class="w">
 </span></span></span></code></pre></div><blockquote>
@@ -1536,7 +1536,7 @@
 <p>💡 在非 Swarm 模式下，使用：</p>
 </blockquote>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="ln">1</span><span class="cl"><span class="nt">mem_limit</span><span class="p">:</span><span class="w"> </span><span class="l">512m</span><span class="w">
-</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="nt">cpus</span><span class="p">:</span><span class="w"> </span><span class="m">1.5</span><span class="w">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="w"></span><span class="nt">cpus</span><span class="p">:</span><span class="w"> </span><span class="m">1.5</span><span class="w">
 </span></span></span></code></pre></div><hr>
 <h3 id="安全与用户">安全与用户</h3>
 <table>
@@ -1571,11 +1571,11 @@
 </table>
 <h4 id="示例-6">示例：</h4>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="ln">1</span><span class="cl"><span class="nt">user</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;1000:1000&#34;</span><span class="w">
-</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="nt">read_only</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
-</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="nt">tmpfs</span><span class="p">:</span><span class="w"> </span><span class="l">/tmp</span><span class="w">
-</span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="nt">cap_drop</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="w"></span><span class="nt">read_only</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="w"></span><span class="nt">tmpfs</span><span class="p">:</span><span class="w"> </span><span class="l">/tmp</span><span class="w">
+</span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="w"></span><span class="nt">cap_drop</span><span class="p">:</span><span class="w">
 </span></span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="w">  </span>- <span class="l">ALL</span><span class="w">
-</span></span></span><span class="line"><span class="ln">6</span><span class="cl"><span class="nt">security_opt</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln">6</span><span class="cl"><span class="w"></span><span class="nt">security_opt</span><span class="p">:</span><span class="w">
 </span></span></span><span class="line"><span class="ln">7</span><span class="cl"><span class="w">  </span>- <span class="kc">no</span>-<span class="l">new-privileges:true</span><span class="w">
 </span></span></span></code></pre></div><hr>
 <h3 id="日志与重启策略">日志与重启策略</h3>
@@ -1635,7 +1635,7 @@
 </span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="w">  </span><span class="nt">app-config</span><span class="p">:</span><span class="w">
 </span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="w">    </span><span class="nt">file</span><span class="p">:</span><span class="w"> </span><span class="l">./config.yaml</span><span class="w">
 </span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="w">
-</span></span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="nt">secrets</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="w"></span><span class="nt">secrets</span><span class="p">:</span><span class="w">
 </span></span></span><span class="line"><span class="ln">6</span><span class="cl"><span class="w">  </span><span class="nt">db-password</span><span class="p">:</span><span class="w">
 </span></span></span><span class="line"><span class="ln">7</span><span class="cl"><span class="w">    </span><span class="nt">file</span><span class="p">:</span><span class="w"> </span><span class="l">./db-pass.txt</span><span class="w">
 </span></span></span></code></pre></div><p>在服务中引用：</p>
@@ -1656,7 +1656,7 @@
 </span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="w">  </span><span class="nt">logging</span><span class="p">:</span><span class="w">
 </span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="w">    </span><span class="nt">driver</span><span class="p">:</span><span class="w"> </span><span class="l">json-file</span><span class="w">
 </span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="w">
-</span></span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="nt">services</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="w"></span><span class="nt">services</span><span class="p">:</span><span class="w">
 </span></span></span><span class="line"><span class="ln">6</span><span class="cl"><span class="w">  </span><span class="nt">web</span><span class="p">:</span><span class="w">
 </span></span></span><span class="line"><span class="ln">7</span><span class="cl"><span class="w">    </span><span class="nt">&lt;&lt;</span><span class="p">:</span><span class="w"> </span><span class="cp">*common-logging</span><span class="w">
 </span></span></span></code></pre></div><h3 id="profiles按需启动服务">Profiles（按需启动服务）</h3>
@@ -1854,10 +1854,10 @@
 <h3 id="创建示例">创建示例：</h3>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl"><span class="c1"># 假设主机网卡为 eth0</span>
 </span></span><span class="line"><span class="ln">2</span><span class="cl">docker network create -d macvlan <span class="se">\
-</span></span></span><span class="line"><span class="ln">3</span><span class="cl">  --subnet<span class="o">=</span>192.168.1.0/24 <span class="se">\
-</span></span></span><span class="line"><span class="ln">4</span><span class="cl">  --gateway<span class="o">=</span>192.168.1.1 <span class="se">\
-</span></span></span><span class="line"><span class="ln">5</span><span class="cl">  -o <span class="nv">parent</span><span class="o">=</span>eth0 <span class="se">\
-</span></span></span><span class="line"><span class="ln">6</span><span class="cl">  macvlan_net
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="se"></span>  --subnet<span class="o">=</span>192.168.1.0/24 <span class="se">\
+</span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="se"></span>  --gateway<span class="o">=</span>192.168.1.1 <span class="se">\
+</span></span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="se"></span>  -o <span class="nv">parent</span><span class="o">=</span>eth0 <span class="se">\
+</span></span></span><span class="line"><span class="ln">6</span><span class="cl"><span class="se"></span>  macvlan_net
 </span></span><span class="line"><span class="ln">7</span><span class="cl">
 </span></span><span class="line"><span class="ln">8</span><span class="cl">docker run -it --network macvlan_net --ip<span class="o">=</span>192.168.1.100 alpine
 </span></span></code></pre></div><blockquote>
@@ -1899,11 +1899,11 @@
 </table>
 <h3 id="示例l2-模式">示例（L2 模式）：</h3>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">docker network create -d ipvlan <span class="se">\
-</span></span></span><span class="line"><span class="ln">2</span><span class="cl">  --subnet<span class="o">=</span>192.168.1.0/24 <span class="se">\
-</span></span></span><span class="line"><span class="ln">3</span><span class="cl">  --gateway<span class="o">=</span>192.168.1.1 <span class="se">\
-</span></span></span><span class="line"><span class="ln">4</span><span class="cl">  -o <span class="nv">ipvlan_mode</span><span class="o">=</span>l2 <span class="se">\
-</span></span></span><span class="line"><span class="ln">5</span><span class="cl">  -o <span class="nv">parent</span><span class="o">=</span>eth0 <span class="se">\
-</span></span></span><span class="line"><span class="ln">6</span><span class="cl">  ipvlan_net
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="se"></span>  --subnet<span class="o">=</span>192.168.1.0/24 <span class="se">\
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="se"></span>  --gateway<span class="o">=</span>192.168.1.1 <span class="se">\
+</span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="se"></span>  -o <span class="nv">ipvlan_mode</span><span class="o">=</span>l2 <span class="se">\
+</span></span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="se"></span>  -o <span class="nv">parent</span><span class="o">=</span>eth0 <span class="se">\
+</span></span></span><span class="line"><span class="ln">6</span><span class="cl"><span class="se"></span>  ipvlan_net
 </span></span></code></pre></div><hr>
 <h2 id="7-第三方网络插件cni-兼容">7. 第三方网络插件（CNI 兼容）</h2>
 <p>Docker 支持通过 <strong>Plugin 机制</strong>集成第三方网络方案，常用于 Kubernetes 或高级 SDN 场景：</p>
@@ -2443,7 +2443,7 @@
 
 <script type="text/javascript" src="https://jianlin-li.github.io/zh-cn/js/bundle.e4e0e4fbe8acb50d7f973828f4138cdbea727800047fc93f9abbd6751e8f3422d6ef193f98da36fdb8488219c25692d73da89480f46abc8421a4ee3526dd6c23.js" integrity="sha512-5ODk&#43;&#43;istQ1/lzgo9BOM2&#43;pyeAAEf8k/mrvWdR6PNCLW7xk/mNo2/bhIghnCVpLXPaiUgPRqvIQhpO41Jt1sIw==" crossorigin="anonymous"></script>
 
-  <script src="https://jianlin-li.github.io/js/search.min.8d141e1e7aa85984a5288b2172ad03540fc235f64379f8df11d062fd3deb9d49bbd9fb0f3df983e9663e322fa8e322a336d5350fbe833c77eb9ee7d907636cff.js"></script>
+  <script src="https://jianlin-li.github.io/js/search.min.4c2b0421d128bbd7c43fc7d662fb5dfd8e439c60ee92c900a26d72d9c3271d2256f5bac9f6f919cddfd55101e9272898716cbb3381b4360bf43a66a5f7664f54.js"></script>
 
   </body>
 </html>

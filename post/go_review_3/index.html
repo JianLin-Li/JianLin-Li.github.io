@@ -239,19 +239,19 @@
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="ln">1</span><span class="cl"><span class="kn">import</span><span class="w"> </span><span class="p">(</span><span class="w">
 </span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="w">    </span><span class="s">&#34;database/sql&#34;</span><span class="w">
 </span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="w">    </span><span class="nx">_</span><span class="w"> </span><span class="s">&#34;github.com/go-sql-driver/mysql&#34;</span><span class="w"> </span><span class="c1">// 注册 mysql 驱动</span><span class="w">
-</span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="w"></span><span class="p">)</span><span class="w">
 </span></span></span></code></pre></div><h3 id="第二步连接并操作数据库">第二步：连接并操作数据库</h3>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="kn">package</span><span class="w"> </span><span class="nx">main</span><span class="w">
 </span></span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="w">
-</span></span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="kn">import</span><span class="w"> </span><span class="p">(</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="w"></span><span class="kn">import</span><span class="w"> </span><span class="p">(</span><span class="w">
 </span></span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="w">    </span><span class="s">&#34;database/sql&#34;</span><span class="w">
 </span></span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="w">    </span><span class="s">&#34;fmt&#34;</span><span class="w">
 </span></span></span><span class="line"><span class="ln"> 6</span><span class="cl"><span class="w">    </span><span class="s">&#34;log&#34;</span><span class="w">
 </span></span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="w">
 </span></span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="w">    </span><span class="nx">_</span><span class="w"> </span><span class="s">&#34;github.com/go-sql-driver/mysql&#34;</span><span class="w">
-</span></span></span><span class="line"><span class="ln"> 9</span><span class="cl"><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 9</span><span class="cl"><span class="w"></span><span class="p">)</span><span class="w">
 </span></span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="w">
-</span></span></span><span class="line"><span class="ln">11</span><span class="cl"><span class="kd">func</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="ln">11</span><span class="cl"><span class="w"></span><span class="kd">func</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
 </span></span></span><span class="line"><span class="ln">12</span><span class="cl"><span class="w">    </span><span class="c1">// DSN (Data Source Name) 格式：</span><span class="w">
 </span></span></span><span class="line"><span class="ln">13</span><span class="cl"><span class="w">    </span><span class="c1">// username:password@tcp(host:port)/dbname?param=value</span><span class="w">
 </span></span></span><span class="line"><span class="ln">14</span><span class="cl"><span class="w">    </span><span class="nx">dsn</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="s">&#34;user:password@tcp(127.0.0.1:3306)/testdb?charset=utf8mb4&amp;parseTime=True&amp;loc=Local&#34;</span><span class="w">
@@ -282,7 +282,7 @@
 </span></span></span><span class="line"><span class="ln">39</span><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
 </span></span></span><span class="line"><span class="ln">40</span><span class="cl"><span class="w">    </span><span class="nx">lastID</span><span class="p">,</span><span class="w"> </span><span class="nx">_</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">result</span><span class="p">.</span><span class="nf">LastInsertId</span><span class="p">()</span><span class="w">
 </span></span></span><span class="line"><span class="ln">41</span><span class="cl"><span class="w">    </span><span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;Inserted ID:&#34;</span><span class="p">,</span><span class="w"> </span><span class="nx">lastID</span><span class="p">)</span><span class="w">
-</span></span></span><span class="line"><span class="ln">42</span><span class="cl"><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="ln">42</span><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
 </span></span></span></code></pre></div><hr>
 <h2 id="-dsn连接字符串常用参数">🔐 DSN（连接字符串）常用参数</h2>
 <table>
@@ -357,10 +357,10 @@
 <li>底层仍使用 <code>go-sql-driver/mysql</code>。</li>
 </ul>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="ln">1</span><span class="cl"><span class="kn">import</span><span class="w"> </span><span class="s">&#34;gorm.io/driver/mysql&#34;</span><span class="w">
-</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="kn">import</span><span class="w"> </span><span class="s">&#34;gorm.io/gorm&#34;</span><span class="w">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="w"></span><span class="kn">import</span><span class="w"> </span><span class="s">&#34;gorm.io/gorm&#34;</span><span class="w">
 </span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="w">
-</span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="nx">dsn</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="s">&#34;user:pass@tcp(127.0.0.1:3306)/dbname?charset=utf8mb4&amp;parseTime=True&amp;loc=Local&#34;</span><span class="w">
-</span></span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="nx">db</span><span class="p">,</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">gorm</span><span class="p">.</span><span class="nf">Open</span><span class="p">(</span><span class="nx">mysql</span><span class="p">.</span><span class="nf">Open</span><span class="p">(</span><span class="nx">dsn</span><span class="p">),</span><span class="w"> </span><span class="o">&amp;</span><span class="nx">gorm</span><span class="p">.</span><span class="nx">Config</span><span class="p">{})</span><span class="w">
+</span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="w"></span><span class="nx">dsn</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="s">&#34;user:pass@tcp(127.0.0.1:3306)/dbname?charset=utf8mb4&amp;parseTime=True&amp;loc=Local&#34;</span><span class="w">
+</span></span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="w"></span><span class="nx">db</span><span class="p">,</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">gorm</span><span class="p">.</span><span class="nf">Open</span><span class="p">(</span><span class="nx">mysql</span><span class="p">.</span><span class="nf">Open</span><span class="p">(</span><span class="nx">dsn</span><span class="p">),</span><span class="w"> </span><span class="o">&amp;</span><span class="nx">gorm</span><span class="p">.</span><span class="nx">Config</span><span class="p">{})</span><span class="w">
 </span></span></span></code></pre></div><h3 id="2-sqlboiler--ent--squirrel">2. <strong>SQLBoiler</strong> / <strong>Ent</strong> / <strong>Squirrel</strong></h3>
 <ul>
 <li>更轻量或类型安全的方案。</li>
@@ -434,15 +434,15 @@
 </span></span></code></pre></div><h4 id="-基本使用示例">📌 基本使用示例</h4>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="kn">package</span><span class="w"> </span><span class="nx">main</span><span class="w">
 </span></span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="w">
-</span></span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="kn">import</span><span class="w"> </span><span class="p">(</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="w"></span><span class="kn">import</span><span class="w"> </span><span class="p">(</span><span class="w">
 </span></span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="w">    </span><span class="s">&#34;context&#34;</span><span class="w">
 </span></span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="w">    </span><span class="s">&#34;fmt&#34;</span><span class="w">
 </span></span></span><span class="line"><span class="ln"> 6</span><span class="cl"><span class="w">    </span><span class="s">&#34;log&#34;</span><span class="w">
 </span></span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="w">
 </span></span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="w">    </span><span class="s">&#34;github.com/redis/go-redis/v9&#34;</span><span class="w">
-</span></span></span><span class="line"><span class="ln"> 9</span><span class="cl"><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 9</span><span class="cl"><span class="w"></span><span class="p">)</span><span class="w">
 </span></span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="w">
-</span></span></span><span class="line"><span class="ln">11</span><span class="cl"><span class="kd">func</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="ln">11</span><span class="cl"><span class="w"></span><span class="kd">func</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
 </span></span></span><span class="line"><span class="ln">12</span><span class="cl"><span class="w">    </span><span class="nx">ctx</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">context</span><span class="p">.</span><span class="nf">Background</span><span class="p">()</span><span class="w">
 </span></span></span><span class="line"><span class="ln">13</span><span class="cl"><span class="w">
 </span></span></span><span class="line"><span class="ln">14</span><span class="cl"><span class="w">    </span><span class="c1">// 单机模式</span><span class="w">
@@ -470,11 +470,11 @@
 </span></span></span><span class="line"><span class="ln">36</span><span class="cl"><span class="w">        </span><span class="nx">log</span><span class="p">.</span><span class="nf">Fatal</span><span class="p">(</span><span class="nx">err</span><span class="p">)</span><span class="w">
 </span></span></span><span class="line"><span class="ln">37</span><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
 </span></span></span><span class="line"><span class="ln">38</span><span class="cl"><span class="w">    </span><span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;name:&#34;</span><span class="p">,</span><span class="w"> </span><span class="nx">val</span><span class="p">)</span><span class="w"> </span><span class="c1">// Alice</span><span class="w">
-</span></span></span><span class="line"><span class="ln">39</span><span class="cl"><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="ln">39</span><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
 </span></span></span></code></pre></div><h4 id="-集群模式示例">🧩 集群模式示例</h4>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="ln">1</span><span class="cl"><span class="nx">rdb</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">redis</span><span class="p">.</span><span class="nf">NewClusterClient</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">redis</span><span class="p">.</span><span class="nx">ClusterOptions</span><span class="p">{</span><span class="w">
 </span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="w">    </span><span class="nx">Addrs</span><span class="p">:</span><span class="w"> </span><span class="p">[]</span><span class="kt">string</span><span class="p">{</span><span class="s">&#34;127.0.0.1:7000&#34;</span><span class="p">,</span><span class="w"> </span><span class="s">&#34;127.0.0.1:7001&#34;</span><span class="p">,</span><span class="w"> </span><span class="s">&#34;127.0.0.1:7002&#34;</span><span class="p">},</span><span class="w">
-</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="p">})</span><span class="w">
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="w"></span><span class="p">})</span><span class="w">
 </span></span></span></code></pre></div><blockquote>
 <p>✅ <strong>适用于 99% 的新项目</strong>，是当前 Go + Redis 的<strong>事实标准</strong>。</p>
 </blockquote>
@@ -495,8 +495,8 @@
 </ul>
 <h4 id="示例不推荐新项目使用">示例（不推荐新项目使用）：</h4>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="ln">1</span><span class="cl"><span class="nx">c</span><span class="p">,</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">redis</span><span class="p">.</span><span class="nf">Dial</span><span class="p">(</span><span class="s">&#34;tcp&#34;</span><span class="p">,</span><span class="w"> </span><span class="s">&#34;:6379&#34;</span><span class="p">)</span><span class="w">
-</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="nx">_</span><span class="p">,</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nx">c</span><span class="p">.</span><span class="nf">Do</span><span class="p">(</span><span class="s">&#34;SET&#34;</span><span class="p">,</span><span class="w"> </span><span class="s">&#34;name&#34;</span><span class="p">,</span><span class="w"> </span><span class="s">&#34;Bob&#34;</span><span class="p">)</span><span class="w">
-</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="nx">reply</span><span class="p">,</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">redis</span><span class="p">.</span><span class="nf">String</span><span class="p">(</span><span class="nx">c</span><span class="p">.</span><span class="nf">Do</span><span class="p">(</span><span class="s">&#34;GET&#34;</span><span class="p">,</span><span class="w"> </span><span class="s">&#34;name&#34;</span><span class="p">))</span><span class="w">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="w"></span><span class="nx">_</span><span class="p">,</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nx">c</span><span class="p">.</span><span class="nf">Do</span><span class="p">(</span><span class="s">&#34;SET&#34;</span><span class="p">,</span><span class="w"> </span><span class="s">&#34;name&#34;</span><span class="p">,</span><span class="w"> </span><span class="s">&#34;Bob&#34;</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="w"></span><span class="nx">reply</span><span class="p">,</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">redis</span><span class="p">.</span><span class="nf">String</span><span class="p">(</span><span class="nx">c</span><span class="p">.</span><span class="nf">Do</span><span class="p">(</span><span class="s">&#34;GET&#34;</span><span class="p">,</span><span class="w"> </span><span class="s">&#34;name&#34;</span><span class="p">))</span><span class="w">
 </span></span></span></code></pre></div><blockquote>
 <p>⚠️ 除非维护遗留系统，否则<strong>不要选择 Redigo</strong>。</p>
 </blockquote>
@@ -577,7 +577,7 @@
 </span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="w">    </span><span class="nx">PoolSize</span><span class="p">:</span><span class="w">     </span><span class="mi">20</span><span class="p">,</span><span class="w">
 </span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="w">    </span><span class="nx">MinIdleConns</span><span class="p">:</span><span class="w"> </span><span class="mi">5</span><span class="p">,</span><span class="w">
 </span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="w">    </span><span class="c1">// ...</span><span class="w">
-</span></span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
 </span></span></span></code></pre></div></li>
 <li><strong>敏感信息（密码）从环境变量或配置中心读取</strong>，不要硬编码。</li>
 </ol>
@@ -650,12 +650,12 @@
 </span></span></code></pre></div><h4 id="-基本使用示例-1">📌 基本使用示例</h4>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="kn">package</span><span class="w"> </span><span class="nx">main</span><span class="w">
 </span></span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="w">
-</span></span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="kn">import</span><span class="w"> </span><span class="p">(</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="w"></span><span class="kn">import</span><span class="w"> </span><span class="p">(</span><span class="w">
 </span></span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="w">    </span><span class="s">&#34;log&#34;</span><span class="w">
 </span></span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="w">    </span><span class="s">&#34;github.com/rabbitmq/amqp091-go&#34;</span><span class="w">
-</span></span></span><span class="line"><span class="ln"> 6</span><span class="cl"><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 6</span><span class="cl"><span class="w"></span><span class="p">)</span><span class="w">
 </span></span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="w">
-</span></span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="kd">func</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="w"></span><span class="kd">func</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
 </span></span></span><span class="line"><span class="ln"> 9</span><span class="cl"><span class="w">    </span><span class="c1">// 1. 连接 RabbitMQ</span><span class="w">
 </span></span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="w">    </span><span class="nx">conn</span><span class="p">,</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">amqp091</span><span class="p">.</span><span class="nf">Dial</span><span class="p">(</span><span class="s">&#34;amqp://guest:guest@localhost:5672/&#34;</span><span class="p">)</span><span class="w">
 </span></span></span><span class="line"><span class="ln">11</span><span class="cl"><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">nil</span><span class="w"> </span><span class="p">{</span><span class="w">
@@ -699,7 +699,7 @@
 </span></span></span><span class="line"><span class="ln">49</span><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
 </span></span></span><span class="line"><span class="ln">50</span><span class="cl"><span class="w">
 </span></span></span><span class="line"><span class="ln">51</span><span class="cl"><span class="w">    </span><span class="nx">log</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34; [x] Sent %s\n&#34;</span><span class="p">,</span><span class="w"> </span><span class="nx">body</span><span class="p">)</span><span class="w">
-</span></span></span><span class="line"><span class="ln">52</span><span class="cl"><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="ln">52</span><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
 </span></span></span></code></pre></div><h4 id="消费者示例">消费者示例</h4>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="nx">msgs</span><span class="p">,</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">ch</span><span class="p">.</span><span class="nf">Consume</span><span class="p">(</span><span class="w">
 </span></span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="w">    </span><span class="nx">q</span><span class="p">.</span><span class="nx">Name</span><span class="p">,</span><span class="w"> </span><span class="c1">// queue</span><span class="w">
@@ -709,20 +709,20 @@
 </span></span></span><span class="line"><span class="ln"> 6</span><span class="cl"><span class="w">    </span><span class="kc">false</span><span class="p">,</span><span class="w">  </span><span class="c1">// noLocal</span><span class="w">
 </span></span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="w">    </span><span class="kc">false</span><span class="p">,</span><span class="w">  </span><span class="c1">// noWait</span><span class="w">
 </span></span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="w">    </span><span class="kc">nil</span><span class="p">,</span><span class="w">    </span><span class="c1">// args</span><span class="w">
-</span></span></span><span class="line"><span class="ln"> 9</span><span class="cl"><span class="p">)</span><span class="w">
-</span></span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="k">if</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">nil</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 9</span><span class="cl"><span class="w"></span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="w"></span><span class="k">if</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">nil</span><span class="w"> </span><span class="p">{</span><span class="w">
 </span></span></span><span class="line"><span class="ln">11</span><span class="cl"><span class="w">    </span><span class="nx">log</span><span class="p">.</span><span class="nf">Fatal</span><span class="p">(</span><span class="s">&#34;Failed to register a consumer:&#34;</span><span class="p">,</span><span class="w"> </span><span class="nx">err</span><span class="p">)</span><span class="w">
-</span></span></span><span class="line"><span class="ln">12</span><span class="cl"><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="ln">12</span><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
 </span></span></span><span class="line"><span class="ln">13</span><span class="cl"><span class="w">
-</span></span></span><span class="line"><span class="ln">14</span><span class="cl"><span class="nx">forever</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nb">make</span><span class="p">(</span><span class="kd">chan</span><span class="w"> </span><span class="kt">bool</span><span class="p">)</span><span class="w">
-</span></span></span><span class="line"><span class="ln">15</span><span class="cl"><span class="k">go</span><span class="w"> </span><span class="kd">func</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="ln">14</span><span class="cl"><span class="w"></span><span class="nx">forever</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nb">make</span><span class="p">(</span><span class="kd">chan</span><span class="w"> </span><span class="kt">bool</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="ln">15</span><span class="cl"><span class="w"></span><span class="k">go</span><span class="w"> </span><span class="kd">func</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
 </span></span></span><span class="line"><span class="ln">16</span><span class="cl"><span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="nx">d</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="k">range</span><span class="w"> </span><span class="nx">msgs</span><span class="w"> </span><span class="p">{</span><span class="w">
 </span></span></span><span class="line"><span class="ln">17</span><span class="cl"><span class="w">        </span><span class="nx">log</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;Received: %s&#34;</span><span class="p">,</span><span class="w"> </span><span class="nx">d</span><span class="p">.</span><span class="nx">Body</span><span class="p">)</span><span class="w">
 </span></span></span><span class="line"><span class="ln">18</span><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
-</span></span></span><span class="line"><span class="ln">19</span><span class="cl"><span class="p">}()</span><span class="w">
+</span></span></span><span class="line"><span class="ln">19</span><span class="cl"><span class="w"></span><span class="p">}()</span><span class="w">
 </span></span></span><span class="line"><span class="ln">20</span><span class="cl"><span class="w">
-</span></span></span><span class="line"><span class="ln">21</span><span class="cl"><span class="nx">log</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34; [*] Waiting for messages. To exit press CTRL+C&#34;</span><span class="p">)</span><span class="w">
-</span></span></span><span class="line"><span class="ln">22</span><span class="cl"><span class="o">&lt;-</span><span class="nx">forever</span><span class="w">
+</span></span></span><span class="line"><span class="ln">21</span><span class="cl"><span class="w"></span><span class="nx">log</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34; [*] Waiting for messages. To exit press CTRL+C&#34;</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="ln">22</span><span class="cl"><span class="w"></span><span class="o">&lt;-</span><span class="nx">forever</span><span class="w">
 </span></span></span></code></pre></div><hr>
 <h2 id="-其他可选库一般不推荐">🆚 其他可选库（一般不推荐）</h2>
 <table>
@@ -875,16 +875,16 @@
 <h4 id="-基本使用示例es-8x">📌 基本使用示例（ES 8.x）</h4>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="kn">package</span><span class="w"> </span><span class="nx">main</span><span class="w">
 </span></span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="w">
-</span></span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="kn">import</span><span class="w"> </span><span class="p">(</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="w"></span><span class="kn">import</span><span class="w"> </span><span class="p">(</span><span class="w">
 </span></span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="w">    </span><span class="s">&#34;context&#34;</span><span class="w">
 </span></span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="w">    </span><span class="s">&#34;fmt&#34;</span><span class="w">
 </span></span></span><span class="line"><span class="ln"> 6</span><span class="cl"><span class="w">    </span><span class="s">&#34;log&#34;</span><span class="w">
 </span></span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="w">
 </span></span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="w">    </span><span class="s">&#34;github.com/elastic/go-elasticsearch/v8&#34;</span><span class="w">
 </span></span></span><span class="line"><span class="ln"> 9</span><span class="cl"><span class="w">    </span><span class="s">&#34;github.com/elastic/go-elasticsearch/v8/esapi&#34;</span><span class="w">
-</span></span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="w"></span><span class="p">)</span><span class="w">
 </span></span></span><span class="line"><span class="ln">11</span><span class="cl"><span class="w">
-</span></span></span><span class="line"><span class="ln">12</span><span class="cl"><span class="kd">func</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="ln">12</span><span class="cl"><span class="w"></span><span class="kd">func</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
 </span></span></span><span class="line"><span class="ln">13</span><span class="cl"><span class="w">    </span><span class="c1">// 1. 创建客户端</span><span class="w">
 </span></span></span><span class="line"><span class="ln">14</span><span class="cl"><span class="w">    </span><span class="nx">cfg</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">elasticsearch</span><span class="p">.</span><span class="nx">Config</span><span class="p">{</span><span class="w">
 </span></span></span><span class="line"><span class="ln">15</span><span class="cl"><span class="w">        </span><span class="nx">Addresses</span><span class="p">:</span><span class="w"> </span><span class="p">[]</span><span class="kt">string</span><span class="p">{</span><span class="s">&#34;http://localhost:9200&#34;</span><span class="p">},</span><span class="w">
@@ -940,7 +940,7 @@
 </span></span></span><span class="line"><span class="ln">65</span><span class="cl"><span class="w">    </span><span class="k">defer</span><span class="w"> </span><span class="nx">searchRes</span><span class="p">.</span><span class="nx">Body</span><span class="p">.</span><span class="nf">Close</span><span class="p">()</span><span class="w">
 </span></span></span><span class="line"><span class="ln">66</span><span class="cl"><span class="w">
 </span></span></span><span class="line"><span class="ln">67</span><span class="cl"><span class="w">    </span><span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="nx">searchRes</span><span class="p">.</span><span class="nf">String</span><span class="p">())</span><span class="w">
-</span></span></span><span class="line"><span class="ln">68</span><span class="cl"><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="ln">68</span><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
 </span></span></span></code></pre></div><hr>
 <h2 id="-其他可选库一般不推荐新项目使用">🆚 其他可选库（一般不推荐新项目使用）</h2>
 <table>
@@ -977,11 +977,11 @@
 </ul>
 <h3 id="2-灵活的底层访问">2. <strong>灵活的底层访问</strong></h3>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="ln">1</span><span class="cl"><span class="c1">// 直接发送原始请求</span><span class="w">
-</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="nx">res</span><span class="p">,</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">es</span><span class="p">.</span><span class="nf">Search</span><span class="p">(</span><span class="w">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="w"></span><span class="nx">res</span><span class="p">,</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">es</span><span class="p">.</span><span class="nf">Search</span><span class="p">(</span><span class="w">
 </span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="w">    </span><span class="nx">es</span><span class="p">.</span><span class="nx">Search</span><span class="p">.</span><span class="nf">WithContext</span><span class="p">(</span><span class="nx">ctx</span><span class="p">),</span><span class="w">
 </span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="w">    </span><span class="nx">es</span><span class="p">.</span><span class="nx">Search</span><span class="p">.</span><span class="nf">WithIndex</span><span class="p">(</span><span class="s">&#34;my-index&#34;</span><span class="p">),</span><span class="w">
 </span></span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="w">    </span><span class="nx">es</span><span class="p">.</span><span class="nx">Search</span><span class="p">.</span><span class="nf">WithBody</span><span class="p">(</span><span class="nx">strings</span><span class="p">.</span><span class="nf">NewReader</span><span class="p">(</span><span class="s">`{&#34;query&#34;: {&#34;match_all&#34;: {}}}`</span><span class="p">)),</span><span class="w">
-</span></span></span><span class="line"><span class="ln">6</span><span class="cl"><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="ln">6</span><span class="cl"><span class="w"></span><span class="p">)</span><span class="w">
 </span></span></span></code></pre></div><h3 id="3-企业级功能支持">3. <strong>企业级功能支持</strong></h3>
 <ul>
 <li>Basic Auth / API Key / OAuth</li>
@@ -1008,7 +1008,7 @@ ES 8 默认启用安全功能，需提供用户名/密码或 API Key：</p>
 </span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="w">    </span><span class="nx">Addresses</span><span class="p">:</span><span class="w"> </span><span class="p">[]</span><span class="kt">string</span><span class="p">{</span><span class="s">&#34;https://localhost:9200&#34;</span><span class="p">},</span><span class="w">
 </span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="w">    </span><span class="nx">Username</span><span class="p">:</span><span class="w">  </span><span class="s">&#34;elastic&#34;</span><span class="p">,</span><span class="w">
 </span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="w">    </span><span class="nx">Password</span><span class="p">:</span><span class="w">  </span><span class="s">&#34;your-strong-password&#34;</span><span class="p">,</span><span class="w">
-</span></span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
 </span></span></span></code></pre></div></li>
 <li>
 <p><strong>不要共享 <code>*esapi.Response</code></strong><br>
@@ -1100,19 +1100,19 @@ ES 8 默认启用安全功能，需提供用户名/密码或 API Key：</p>
 </span></span></code></pre></div><h3 id="基本用法">基本用法</h3>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="kn">package</span><span class="w"> </span><span class="nx">main</span><span class="w">
 </span></span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="w">
-</span></span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="kn">import</span><span class="w"> </span><span class="p">(</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="w"></span><span class="kn">import</span><span class="w"> </span><span class="p">(</span><span class="w">
 </span></span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="w">    </span><span class="s">&#34;fmt&#34;</span><span class="w">
 </span></span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="w">    </span><span class="s">&#34;github.com/go-playground/validator/v10&#34;</span><span class="w">
-</span></span></span><span class="line"><span class="ln"> 6</span><span class="cl"><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 6</span><span class="cl"><span class="w"></span><span class="p">)</span><span class="w">
 </span></span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="w">
-</span></span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="kd">type</span><span class="w"> </span><span class="nx">User</span><span class="w"> </span><span class="kd">struct</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="w"></span><span class="kd">type</span><span class="w"> </span><span class="nx">User</span><span class="w"> </span><span class="kd">struct</span><span class="w"> </span><span class="p">{</span><span class="w">
 </span></span></span><span class="line"><span class="ln"> 9</span><span class="cl"><span class="w">    </span><span class="nx">Name</span><span class="w">     </span><span class="kt">string</span><span class="w"> </span><span class="s">`validate:&#34;required,min=2,max=50&#34;`</span><span class="w">
 </span></span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="w">    </span><span class="nx">Email</span><span class="w">    </span><span class="kt">string</span><span class="w"> </span><span class="s">`validate:&#34;required,email&#34;`</span><span class="w">
 </span></span></span><span class="line"><span class="ln">11</span><span class="cl"><span class="w">    </span><span class="nx">Age</span><span class="w">      </span><span class="kt">int</span><span class="w">    </span><span class="s">`validate:&#34;gte=0,lte=130&#34;`</span><span class="w">
 </span></span></span><span class="line"><span class="ln">12</span><span class="cl"><span class="w">    </span><span class="nx">Password</span><span class="w"> </span><span class="kt">string</span><span class="w"> </span><span class="s">`validate:&#34;required,min=8&#34;`</span><span class="w">
-</span></span></span><span class="line"><span class="ln">13</span><span class="cl"><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="ln">13</span><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
 </span></span></span><span class="line"><span class="ln">14</span><span class="cl"><span class="w">
-</span></span></span><span class="line"><span class="ln">15</span><span class="cl"><span class="kd">func</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="ln">15</span><span class="cl"><span class="w"></span><span class="kd">func</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
 </span></span></span><span class="line"><span class="ln">16</span><span class="cl"><span class="w">    </span><span class="nx">user</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">User</span><span class="p">{</span><span class="w">
 </span></span></span><span class="line"><span class="ln">17</span><span class="cl"><span class="w">        </span><span class="nx">Name</span><span class="p">:</span><span class="w">     </span><span class="s">&#34;a&#34;</span><span class="p">,</span><span class="w"> </span><span class="c1">// too short</span><span class="w">
 </span></span></span><span class="line"><span class="ln">18</span><span class="cl"><span class="w">        </span><span class="nx">Email</span><span class="p">:</span><span class="w">    </span><span class="s">&#34;invalid-email&#34;</span><span class="p">,</span><span class="w">
@@ -1128,7 +1128,7 @@ ES 8 默认启用安全功能，需提供用户名/密码或 API Key：</p>
 </span></span></span><span class="line"><span class="ln">28</span><span class="cl"><span class="w">                </span><span class="nx">err</span><span class="p">.</span><span class="nf">Field</span><span class="p">(),</span><span class="w"> </span><span class="nx">err</span><span class="p">.</span><span class="nf">Tag</span><span class="p">(),</span><span class="w"> </span><span class="nx">err</span><span class="p">.</span><span class="nf">Value</span><span class="p">())</span><span class="w">
 </span></span></span><span class="line"><span class="ln">29</span><span class="cl"><span class="w">        </span><span class="p">}</span><span class="w">
 </span></span></span><span class="line"><span class="ln">30</span><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
-</span></span></span><span class="line"><span class="ln">31</span><span class="cl"><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="ln">31</span><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
 </span></span></span></code></pre></div><h3 id="高级功能">高级功能</h3>
 <ul>
 <li>自定义验证函数</li>
@@ -1146,16 +1146,16 @@ ES 8 默认启用安全功能，需提供用户名/密码或 API Key：</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="kd">type</span><span class="w"> </span><span class="nx">Login</span><span class="w"> </span><span class="kd">struct</span><span class="w"> </span><span class="p">{</span><span class="w">
 </span></span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="w">    </span><span class="nx">Username</span><span class="w"> </span><span class="kt">string</span><span class="w"> </span><span class="s">`json:&#34;username&#34; binding:&#34;required,min=3&#34;`</span><span class="w">
 </span></span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="w">    </span><span class="nx">Password</span><span class="w"> </span><span class="kt">string</span><span class="w"> </span><span class="s">`json:&#34;password&#34; binding:&#34;required,min=6&#34;`</span><span class="w">
-</span></span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
 </span></span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="w">
-</span></span></span><span class="line"><span class="ln"> 6</span><span class="cl"><span class="kd">func</span><span class="w"> </span><span class="nf">loginHandler</span><span class="p">(</span><span class="nx">c</span><span class="w"> </span><span class="o">*</span><span class="nx">gin</span><span class="p">.</span><span class="nx">Context</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 6</span><span class="cl"><span class="w"></span><span class="kd">func</span><span class="w"> </span><span class="nf">loginHandler</span><span class="p">(</span><span class="nx">c</span><span class="w"> </span><span class="o">*</span><span class="nx">gin</span><span class="p">.</span><span class="nx">Context</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
 </span></span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="w">    </span><span class="kd">var</span><span class="w"> </span><span class="nx">req</span><span class="w"> </span><span class="nx">Login</span><span class="w">
 </span></span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">c</span><span class="p">.</span><span class="nf">ShouldBindJSON</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">req</span><span class="p">);</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">nil</span><span class="w"> </span><span class="p">{</span><span class="w">
 </span></span></span><span class="line"><span class="ln"> 9</span><span class="cl"><span class="w">        </span><span class="nx">c</span><span class="p">.</span><span class="nf">JSON</span><span class="p">(</span><span class="mi">400</span><span class="p">,</span><span class="w"> </span><span class="nx">gin</span><span class="p">.</span><span class="nx">H</span><span class="p">{</span><span class="s">&#34;error&#34;</span><span class="p">:</span><span class="w"> </span><span class="nx">err</span><span class="p">.</span><span class="nf">Error</span><span class="p">()})</span><span class="w">
 </span></span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="w">        </span><span class="k">return</span><span class="w">
 </span></span></span><span class="line"><span class="ln">11</span><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
 </span></span></span><span class="line"><span class="ln">12</span><span class="cl"><span class="w">    </span><span class="c1">// ...</span><span class="w">
-</span></span></span><span class="line"><span class="ln">13</span><span class="cl"><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="ln">13</span><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
 </span></span></span></code></pre></div><blockquote>
 <p>Gin 的 <code>binding</code> 标签底层就是调用 <code>validator</code>。</p>
 </blockquote>
@@ -1167,17 +1167,17 @@ ES 8 默认启用安全功能，需提供用户名/密码或 API Key：</p>
 <h3 id="示例">示例</h3>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="kn">import</span><span class="w"> </span><span class="s">&#34;github.com/go-ozzo/ozzo-validation/v4&#34;</span><span class="w">
 </span></span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="w">
-</span></span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="kd">type</span><span class="w"> </span><span class="nx">Address</span><span class="w"> </span><span class="kd">struct</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="w"></span><span class="kd">type</span><span class="w"> </span><span class="nx">Address</span><span class="w"> </span><span class="kd">struct</span><span class="w"> </span><span class="p">{</span><span class="w">
 </span></span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="w">    </span><span class="nx">Street</span><span class="w"> </span><span class="kt">string</span><span class="w">
 </span></span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="w">    </span><span class="nx">City</span><span class="w">   </span><span class="kt">string</span><span class="w">
-</span></span></span><span class="line"><span class="ln"> 6</span><span class="cl"><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 6</span><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
 </span></span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="w">
-</span></span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="kd">func</span><span class="w"> </span><span class="p">(</span><span class="nx">a</span><span class="w"> </span><span class="nx">Address</span><span class="p">)</span><span class="w"> </span><span class="nf">Validate</span><span class="p">()</span><span class="w"> </span><span class="kt">error</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="w"></span><span class="kd">func</span><span class="w"> </span><span class="p">(</span><span class="nx">a</span><span class="w"> </span><span class="nx">Address</span><span class="p">)</span><span class="w"> </span><span class="nf">Validate</span><span class="p">()</span><span class="w"> </span><span class="kt">error</span><span class="w"> </span><span class="p">{</span><span class="w">
 </span></span></span><span class="line"><span class="ln"> 9</span><span class="cl"><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="nx">validation</span><span class="p">.</span><span class="nf">ValidateStruct</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">a</span><span class="p">,</span><span class="w">
 </span></span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="w">        </span><span class="nx">validation</span><span class="p">.</span><span class="nf">Field</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">a</span><span class="p">.</span><span class="nx">Street</span><span class="p">,</span><span class="w"> </span><span class="nx">validation</span><span class="p">.</span><span class="nx">Required</span><span class="p">,</span><span class="w"> </span><span class="nx">validation</span><span class="p">.</span><span class="nf">Length</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="w"> </span><span class="mi">50</span><span class="p">)),</span><span class="w">
 </span></span></span><span class="line"><span class="ln">11</span><span class="cl"><span class="w">        </span><span class="nx">validation</span><span class="p">.</span><span class="nf">Field</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">a</span><span class="p">.</span><span class="nx">City</span><span class="p">,</span><span class="w"> </span><span class="nx">validation</span><span class="p">.</span><span class="nx">Required</span><span class="p">),</span><span class="w">
 </span></span></span><span class="line"><span class="ln">12</span><span class="cl"><span class="w">    </span><span class="p">)</span><span class="w">
-</span></span></span><span class="line"><span class="ln">13</span><span class="cl"><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="ln">13</span><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
 </span></span></span></code></pre></div><p>适合需要<strong>复杂校验逻辑</strong>或<strong>非结构体数据</strong>（如 map、原始值）的场景。</p>
 <hr>
 <h2 id="-4-asaskevichgo-validator较老不推荐新项目">✅ 4. <a href="https://github.com/asaskevich/govalidator">asaskevich/go-validator</a>（较老，不推荐新项目）</h2>
@@ -1192,7 +1192,7 @@ ES 8 默认启用安全功能，需提供用户名/密码或 API Key：</p>
 </span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="nx">errors</span><span class="p">.</span><span class="nf">New</span><span class="p">(</span><span class="s">&#34;invalid email&#34;</span><span class="p">)</span><span class="w">
 </span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
 </span></span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="kc">nil</span><span class="w">
-</span></span></span><span class="line"><span class="ln">6</span><span class="cl"><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="ln">6</span><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
 </span></span></span></code></pre></div><p>但随着字段增多，维护成本高，不推荐用于复杂系统。</p>
 <hr>
 <h2 id="-如何选择">🔧 如何选择？</h2>
@@ -1229,9 +1229,9 @@ ES 8 默认启用安全功能，需提供用户名/密码或 API Key：</p>
 </span></span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="w">    </span><span class="s">&#34;github.com/go-playground/locales/zh&#34;</span><span class="w">
 </span></span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="w">    </span><span class="nx">ut</span><span class="w"> </span><span class="s">&#34;github.com/go-playground/universal-translator&#34;</span><span class="w">
 </span></span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="w">    </span><span class="nx">zh_translations</span><span class="w"> </span><span class="s">&#34;github.com/go-playground/validator/v10/translations/zh&#34;</span><span class="w">
-</span></span></span><span class="line"><span class="ln"> 6</span><span class="cl"><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 6</span><span class="cl"><span class="w"></span><span class="p">)</span><span class="w">
 </span></span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="w">
-</span></span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="kd">func</span><span class="w"> </span><span class="nf">NewValidator</span><span class="p">()</span><span class="w"> </span><span class="p">(</span><span class="o">*</span><span class="nx">validator</span><span class="p">.</span><span class="nx">Validate</span><span class="p">,</span><span class="w"> </span><span class="nx">ut</span><span class="p">.</span><span class="nx">Translator</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="w"></span><span class="kd">func</span><span class="w"> </span><span class="nf">NewValidator</span><span class="p">()</span><span class="w"> </span><span class="p">(</span><span class="o">*</span><span class="nx">validator</span><span class="p">.</span><span class="nx">Validate</span><span class="p">,</span><span class="w"> </span><span class="nx">ut</span><span class="p">.</span><span class="nx">Translator</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
 </span></span></span><span class="line"><span class="ln"> 9</span><span class="cl"><span class="w">    </span><span class="nx">zhs</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">zh</span><span class="p">.</span><span class="nf">New</span><span class="p">()</span><span class="w">
 </span></span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="w">    </span><span class="nx">uni</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">ut</span><span class="p">.</span><span class="nf">New</span><span class="p">(</span><span class="nx">zhs</span><span class="p">,</span><span class="w"> </span><span class="nx">zhs</span><span class="p">)</span><span class="w">
 </span></span></span><span class="line"><span class="ln">11</span><span class="cl"><span class="w">    </span><span class="nx">trans</span><span class="p">,</span><span class="w"> </span><span class="nx">_</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">uni</span><span class="p">.</span><span class="nf">GetTranslator</span><span class="p">(</span><span class="s">&#34;zh&#34;</span><span class="p">)</span><span class="w">
@@ -1240,7 +1240,7 @@ ES 8 默认启用安全功能，需提供用户名/密码或 API Key：</p>
 </span></span></span><span class="line"><span class="ln">14</span><span class="cl"><span class="w">    </span><span class="nx">_</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nx">zh_translations</span><span class="p">.</span><span class="nf">RegisterDefaultTranslations</span><span class="p">(</span><span class="nx">validate</span><span class="p">,</span><span class="w"> </span><span class="nx">trans</span><span class="p">)</span><span class="w">
 </span></span></span><span class="line"><span class="ln">15</span><span class="cl"><span class="w">
 </span></span></span><span class="line"><span class="ln">16</span><span class="cl"><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="nx">validate</span><span class="p">,</span><span class="w"> </span><span class="nx">trans</span><span class="w">
-</span></span></span><span class="line"><span class="ln">17</span><span class="cl"><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="ln">17</span><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
 </span></span></span></code></pre></div><p>这样错误信息会自动变成中文，如：“Email 为必填字段”。</p>
 <hr>
 <h2 id="总结">总结</h2>
@@ -1708,7 +1708,7 @@ ES 8 默认启用安全功能，需提供用户名/密码或 API Key：</p>
 
 <script type="text/javascript" src="https://jianlin-li.github.io/zh-cn/js/bundle.e4e0e4fbe8acb50d7f973828f4138cdbea727800047fc93f9abbd6751e8f3422d6ef193f98da36fdb8488219c25692d73da89480f46abc8421a4ee3526dd6c23.js" integrity="sha512-5ODk&#43;&#43;istQ1/lzgo9BOM2&#43;pyeAAEf8k/mrvWdR6PNCLW7xk/mNo2/bhIghnCVpLXPaiUgPRqvIQhpO41Jt1sIw==" crossorigin="anonymous"></script>
 
-  <script src="https://jianlin-li.github.io/js/search.min.8d141e1e7aa85984a5288b2172ad03540fc235f64379f8df11d062fd3deb9d49bbd9fb0f3df983e9663e322fa8e322a336d5350fbe833c77eb9ee7d907636cff.js"></script>
+  <script src="https://jianlin-li.github.io/js/search.min.4c2b0421d128bbd7c43fc7d662fb5dfd8e439c60ee92c900a26d72d9c3271d2256f5bac9f6f919cddfd55101e9272898716cbb3381b4360bf43a66a5f7664f54.js"></script>
 
   </body>
 </html>
