@@ -7,7 +7,64 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
     <copyright>Copyright © 1989–2025, 李建林 </copyright>
-    <lastBuildDate>Wed, 28 Jan 2026 09:29:12 +0800</lastBuildDate><atom:link href="https://jianlin-li.github.io/tags/elasticsearch/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Wed, 28 Jan 2026 09:30:12 +0800</lastBuildDate><atom:link href="https://jianlin-li.github.io/tags/elasticsearch/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Elasticsearch的知识点-3</title>
+      <link>https://jianlin-li.github.io/post/elasticsearch_review_3/</link>
+      <pubDate>Wed, 28 Jan 2026 09:30:12 +0800</pubDate>
+      
+      <guid>https://jianlin-li.github.io/post/elasticsearch_review_3/</guid>
+      <description>
+        
+          
+            &lt;h1 id=&#34;elasticsearch面试高频问题含标准答案面试必背&#34;&gt;&lt;strong&gt;Elasticsearch面试高频问题（含标准答案，面试必背）&lt;/strong&gt;&lt;/h1&gt;
+&lt;h1 id=&#34;一elasticsearch-基础概念&#34;&gt;一、Elasticsearch 基础概念&lt;/h1&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Elasticsearch是什么？&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;答：开源的分布式全文搜索引擎，基于Lucene构建，支持高可用、高并发、实时检索与分析，采用RESTful API交互，适用于海量数据的快速查询与统计。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;ES和 Solr 的区别？&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;答：① 实时性：ES 实时性更强，近实时索引（秒级可见），Solr 实时性较弱；② 分布式：ES 原生支持分布式，部署维护简单，Solr 需依赖ZooKeeper实现分布式；③ 适用场景：ES 适合实时检索、日志分析，Solr 适合传统全文检索、静态数据查询；④ 社区活跃度：ES 社区更活跃，更新迭代更快。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;ES的核心特点有哪些？&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;答：① 分布式架构：节点对等，自动分片与副本；② 全文检索：支持分词、模糊匹配、高亮等；③ 实时性：近实时索引与查询，延迟低；④ 高可用：副本机制，节点故障不影响服务；⑤ 多维度分析：支持聚合统计、地理位置查询；⑥ 可扩展：水平扩容，支持PB级数据。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;ES的默认端口号有哪些？&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;答：① 9200：HTTP端口，用于RESTful API交互；② 9300：TCP端口，用于集群节点间通信（Java客户端连接端口）。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;ES的核心组件有哪些？&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;答：索引（Index）、类型（Type，7.x后废弃）、文档（Document）、字段（Field）、分片（Shard）、副本（Replica）、集群（Cluster）、节点（Node）。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;索引、文档、分片、副本的关系？&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;答：① 索引：同类文档的集合，类比数据库的“库”；② 文档：索引的最小数据单元，类比数据库的“行”，以JSON格式存储；③ 分片：索引拆分后的子集，分布式存储在不同节点，提升并发与存储能力；④ 副本：分片的备份，保障高可用，同时分担查询压力。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;ES中的节点类型有哪些？&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;答：① 主节点（Master Node）：管理集群元数据（索引创建、分片分配），不处理数据读写；② 数据节点（Data Node）：存储数据，处理索引、查询、聚合操作；③ 协调节点（Coordinating Node）：接收客户端请求，分发任务并汇总结果，默认所有节点都是协调节点；④  ingest节点：数据写入前的预处理（如分词、字段转换）。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;ES集群的最小规模建议？&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;答：生产环境建议3个节点，1个主节点（可配置候选主节点）+2个数据节点，确保分片副本正常分配，避免单点故障。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;ES 7.x 版本的核心变化？&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;答：① 废弃Type：索引下仅支持单类型“_doc”，彻底移除Type概念；② 增强安全特性：默认开启安全校验，需配置账号密码；③ 性能优化：分词、查询效率提升，支持更高效的聚合；④ 新增功能：如向量检索、数据生命周期管理（ILM）。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;ES和数据库（MySQL）的区别？&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;答：① 存储目的：ES 用于全文检索与快速分析，MySQL 用于结构化数据存储与事务；② 数据结构：ES 支持非结构化/半结构化数据，MySQL 强结构化；③ 查询能力：ES 支持分词、模糊查询、聚合，MySQL 适合精确查询与联表；④ 事务支持：MySQL 支持ACID事务，ES 仅支持单文档原子性，无复杂事务。&lt;/p&gt;
+          
+          
+        
+      </description>
+    </item>
+    
     <item>
       <title>Elasticsearch的知识点-2</title>
       <link>https://jianlin-li.github.io/post/elasticsearch_review_2/</link>
