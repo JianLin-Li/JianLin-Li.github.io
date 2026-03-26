@@ -168,7 +168,7 @@
     <span class="post_date">
       2026-03-23	  
     </span>
-    <span class="post_time"> · 5 分钟阅读</span><span>&nbsp;· <a href='https://jianlin-li.github.io/tags/shell/' title="Shell" class="post_tag button button_translucent">Shell
+    <span class="post_time"> · 9 分钟阅读</span><span>&nbsp;· <a href='https://jianlin-li.github.io/tags/shell/' title="Shell" class="post_tag button button_translucent">Shell
         </a>
     </span>
     <span class="page_only">&nbsp;·
@@ -790,6 +790,303 @@
 <li>✅ 参数解析（getopts）</li>
 <li>✅ 安全意识（变量/删除/注入）</li>
 </ol>
+<hr>
+<hr>
+<hr>
+<p>太棒了，这份内容本身就很实用 👍 我帮你整理成一份<strong>结构清晰、日常可查的“Linux 三剑客实战手册”</strong>，顺便统一了格式、补全了空格、增强了可读性，直接可以当文档用 🚀</p>
+<hr>
+<h1 id="-linux-三剑客实战手册grep--sed--awk">🐧 Linux 三剑客实战手册（grep / sed / awk）</h1>
+<hr>
+<h1 id="-一grep文本搜索">🔍 一、grep（文本搜索）</h1>
+<h2 id="1-基本搜索">1️⃣ 基本搜索</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="c1"># 搜索包含 &#34;error&#34; 的行</span>
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl">grep <span class="s2">&#34;error&#34;</span> logfile.txt
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="c1"># 忽略大小写</span>
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl">grep -i <span class="s2">&#34;error&#34;</span> file.txt
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="c1"># 显示行号</span>
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl">grep -n <span class="s2">&#34;pattern&#34;</span> file.txt
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">
+</span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="c1"># 显示不匹配的行</span>
+</span></span><span class="line"><span class="ln">11</span><span class="cl">grep -v <span class="s2">&#34;pattern&#34;</span> file.txt
+</span></span><span class="line"><span class="ln">12</span><span class="cl">
+</span></span><span class="line"><span class="ln">13</span><span class="cl"><span class="c1"># 递归搜索目录</span>
+</span></span><span class="line"><span class="ln">14</span><span class="cl">grep -r <span class="s2">&#34;search_text&#34;</span> /path/to/dir/
+</span></span></code></pre></div><hr>
+<h2 id="2-正则表达式">2️⃣ 正则表达式</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="c1"># 使用扩展正则（OR）</span>
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl">grep -E <span class="s2">&#34;error|warning&#34;</span> file.txt
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="c1"># 以 start 开头</span>
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl">grep <span class="s2">&#34;^start&#34;</span> file.txt
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="c1"># 以 end 结尾</span>
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl">grep <span class="s2">&#34;end</span>$<span class="s2">&#34;</span> file.txt
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">
+</span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="c1"># 包含数字</span>
+</span></span><span class="line"><span class="ln">11</span><span class="cl">grep <span class="s2">&#34;[0-9]&#34;</span> file.txt
+</span></span><span class="line"><span class="ln">12</span><span class="cl">
+</span></span><span class="line"><span class="ln">13</span><span class="cl"><span class="c1"># 空行</span>
+</span></span><span class="line"><span class="ln">14</span><span class="cl">grep <span class="s2">&#34;^</span>$<span class="s2">&#34;</span> file.txt
+</span></span></code></pre></div><hr>
+<h2 id="3-实用组合">3️⃣ 实用组合</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="c1"># 显示匹配行的前后 3 行</span>
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl">grep -A3 -B3 <span class="s2">&#34;pattern&#34;</span> file.txt
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="c1"># 统计匹配次数</span>
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl">grep -c <span class="s2">&#34;pattern&#34;</span> file.txt
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="c1"># 只显示匹配部分</span>
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl">grep -o <span class="s2">&#34;pattern&#34;</span> file.txt
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">
+</span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="c1"># 多文件搜索显示文件名</span>
+</span></span><span class="line"><span class="ln">11</span><span class="cl">grep -H <span class="s2">&#34;pattern&#34;</span> *.txt
+</span></span></code></pre></div><hr>
+<h1 id="-二sed流编辑器">✂️ 二、sed（流编辑器）</h1>
+<h2 id="1-替换操作">1️⃣ 替换操作</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="c1"># 替换第一个匹配</span>
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl">sed <span class="s1">&#39;s/old/new/&#39;</span> file.txt
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="c1"># 替换所有匹配</span>
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl">sed <span class="s1">&#39;s/old/new/g&#39;</span> file.txt
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="c1"># 替换第 2 次匹配</span>
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl">sed <span class="s1">&#39;s/old/new/2&#39;</span> file.txt
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">
+</span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="c1"># 直接修改文件</span>
+</span></span><span class="line"><span class="ln">11</span><span class="cl">sed -i <span class="s1">&#39;s/old/new/g&#39;</span> file.txt
+</span></span><span class="line"><span class="ln">12</span><span class="cl">
+</span></span><span class="line"><span class="ln">13</span><span class="cl"><span class="c1"># 备份后修改</span>
+</span></span><span class="line"><span class="ln">14</span><span class="cl">sed -i.bak <span class="s1">&#39;s/old/new/g&#39;</span> file.txt
+</span></span></code></pre></div><hr>
+<h2 id="2-删除操作">2️⃣ 删除操作</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="c1"># 删除匹配行</span>
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl">sed <span class="s1">&#39;/pattern/d&#39;</span> file.txt
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="c1"># 删除空行</span>
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl">sed <span class="s1">&#39;/^$/d&#39;</span> file.txt
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="c1"># 删除第 5 行</span>
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl">sed <span class="s1">&#39;5d&#39;</span> file.txt
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">
+</span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="c1"># 删除 10~20 行</span>
+</span></span><span class="line"><span class="ln">11</span><span class="cl">sed <span class="s1">&#39;10,20d&#39;</span> file.txt
+</span></span><span class="line"><span class="ln">12</span><span class="cl">
+</span></span><span class="line"><span class="ln">13</span><span class="cl"><span class="c1"># 删除最后一行</span>
+</span></span><span class="line"><span class="ln">14</span><span class="cl">sed <span class="s1">&#39;$d&#39;</span> file.txt
+</span></span></code></pre></div><hr>
+<h2 id="3-插入--追加">3️⃣ 插入 / 追加</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl"><span class="c1"># 第 3 行前插入</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl">sed <span class="s1">&#39;3i\插入的内容&#39;</span> file.txt
+</span></span><span class="line"><span class="ln">3</span><span class="cl">
+</span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="c1"># 第 3 行后追加</span>
+</span></span><span class="line"><span class="ln">5</span><span class="cl">sed <span class="s1">&#39;3a\追加的内容&#39;</span> file.txt
+</span></span><span class="line"><span class="ln">6</span><span class="cl">
+</span></span><span class="line"><span class="ln">7</span><span class="cl"><span class="c1"># 匹配行后追加</span>
+</span></span><span class="line"><span class="ln">8</span><span class="cl">sed <span class="s1">&#39;/pattern/a\新行内容&#39;</span> file.txt
+</span></span></code></pre></div><hr>
+<h2 id="4-高级用法">4️⃣ 高级用法</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="c1"># 多重操作</span>
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl">sed -e <span class="s1">&#39;s/foo/bar/&#39;</span> -e <span class="s1">&#39;/baz/d&#39;</span> file.txt
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="c1"># 使用其他分隔符（路径替换）</span>
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl">sed <span class="s1">&#39;s|/old/path|/new/path|g&#39;</span> file.txt
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="c1"># 只替换匹配行</span>
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl">sed <span class="s1">&#39;/pattern/s/old/new/g&#39;</span> file.txt
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">
+</span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="c1"># 打印指定范围</span>
+</span></span><span class="line"><span class="ln">11</span><span class="cl">sed -n <span class="s1">&#39;10,20p&#39;</span> file.txt
+</span></span></code></pre></div><hr>
+<h1 id="-三awk文本处理">📊 三、awk（文本处理）</h1>
+<h2 id="1-基本打印">1️⃣ 基本打印</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="c1"># 打印整行</span>
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl">awk <span class="s1">&#39;{print}&#39;</span> file.txt
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="c1"># 第一列</span>
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl">awk <span class="s1">&#39;{print $1}&#39;</span> file.txt
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="c1"># 多列</span>
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl">awk <span class="s1">&#39;{print $1, $3}&#39;</span> file.txt
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">
+</span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="c1"># 最后一列</span>
+</span></span><span class="line"><span class="ln">11</span><span class="cl">awk <span class="s1">&#39;{print $NF}&#39;</span> file.txt
+</span></span><span class="line"><span class="ln">12</span><span class="cl">
+</span></span><span class="line"><span class="ln">13</span><span class="cl"><span class="c1"># 倒数第二列</span>
+</span></span><span class="line"><span class="ln">14</span><span class="cl">awk <span class="s1">&#39;{print $(NF-1)}&#39;</span> file.txt
+</span></span></code></pre></div><hr>
+<h2 id="2-条件筛选">2️⃣ 条件筛选</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="c1"># 第一列等于 value</span>
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl">awk <span class="s1">&#39;$1 == &#34;value&#34;&#39;</span> file.txt
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="c1"># 第三列大于 100</span>
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl">awk <span class="s1">&#39;$3 &gt; 100&#39;</span> file.txt
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="c1"># 包含 text</span>
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl">awk <span class="s1">&#39;/text/&#39;</span> file.txt
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">
+</span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="c1"># 多条件</span>
+</span></span><span class="line"><span class="ln">11</span><span class="cl">awk <span class="s1">&#39;$1 == &#34;start&#34; &amp;&amp; $2 &gt; 10&#39;</span> file.txt
+</span></span><span class="line"><span class="ln">12</span><span class="cl">
+</span></span><span class="line"><span class="ln">13</span><span class="cl"><span class="c1"># 正则匹配</span>
+</span></span><span class="line"><span class="ln">14</span><span class="cl">awk <span class="s1">&#39;$1 ~ /^[0-9]+$/&#39;</span> file.txt
+</span></span></code></pre></div><hr>
+<h2 id="3-内置变量">3️⃣ 内置变量</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="c1"># 行号</span>
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl">awk <span class="s1">&#39;{print NR, $0}&#39;</span> file.txt
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="c1"># 字段数</span>
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl">awk <span class="s1">&#39;{print NF, $0}&#39;</span> file.txt
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="c1"># 文件名</span>
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl">awk <span class="s1">&#39;{print FILENAME, $0}&#39;</span> file.txt
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">
+</span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="c1"># 分隔符</span>
+</span></span><span class="line"><span class="ln">11</span><span class="cl">awk -F <span class="s1">&#39;:&#39;</span> <span class="s1">&#39;{print $1}&#39;</span> /etc/passwd
+</span></span><span class="line"><span class="ln">12</span><span class="cl">awk -F <span class="s1">&#39;[;,]&#39;</span> <span class="s1">&#39;{print $1}&#39;</span> file.txt
+</span></span></code></pre></div><hr>
+<h2 id="4-计算统计">4️⃣ 计算统计</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="c1"># 求和</span>
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl">awk <span class="s1">&#39;{sum += $3} END {print sum}&#39;</span> file.txt
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="c1"># 平均值</span>
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl">awk <span class="s1">&#39;{sum += $1; count++} END {print sum/count}&#39;</span> file.txt
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="c1"># 分组统计</span>
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl">awk <span class="s1">&#39;{count[$1]++} END {for (i in count) print i, count[i]}&#39;</span> file.txt
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">
+</span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="c1"># 最大最小值</span>
+</span></span><span class="line"><span class="ln">11</span><span class="cl">awk <span class="s1">&#39;NR==1 {max=$3; min=$3}
+</span></span></span><span class="line"><span class="ln">12</span><span class="cl"><span class="s1">     $3&gt;max {max=$3}
+</span></span></span><span class="line"><span class="ln">13</span><span class="cl"><span class="s1">     $3&lt;min {min=$3}
+</span></span></span><span class="line"><span class="ln">14</span><span class="cl"><span class="s1">     END {print &#34;Max:&#34;, max, &#34;Min:&#34;, min}&#39;</span> file.txt
+</span></span></code></pre></div><hr>
+<h2 id="5-begin--end">5️⃣ BEGIN / END</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl"><span class="c1"># 添加表头</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl">awk <span class="s1">&#39;BEGIN {print &#34;Name Score&#34;} {print $1, $2}&#39;</span> file.txt
+</span></span><span class="line"><span class="ln">3</span><span class="cl">
+</span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="c1"># 格式化输出</span>
+</span></span><span class="line"><span class="ln">5</span><span class="cl">awk <span class="s1">&#39;BEGIN {printf &#34;%-10s %-10s\n&#34;, &#34;Name&#34;, &#34;Score&#34;}
+</span></span></span><span class="line"><span class="ln">6</span><span class="cl"><span class="s1">     {printf &#34;%-10s %-10s\n&#34;, $1, $2}&#39;</span> file.txt
+</span></span><span class="line"><span class="ln">7</span><span class="cl">
+</span></span><span class="line"><span class="ln">8</span><span class="cl"><span class="c1"># 汇总</span>
+</span></span><span class="line"><span class="ln">9</span><span class="cl">awk <span class="s1">&#39;{sum+=$2} END {printf &#34;平均分: %.2f\n&#34;, sum/NR}&#39;</span> scores.txt
+</span></span></code></pre></div><hr>
+<h1 id="-四组合使用实战">🔗 四、组合使用（实战）</h1>
+<h2 id="1-管道组合">1️⃣ 管道组合</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="c1"># 查找进程 PID</span>
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl">ps aux <span class="p">|</span> grep <span class="s2">&#34;nginx&#34;</span> <span class="p">|</span> grep -v grep <span class="p">|</span> awk <span class="s1">&#39;{print $2}&#39;</span>
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="c1"># 统计错误类型</span>
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl">grep <span class="s2">&#34;ERROR&#34;</span> app.log <span class="p">|</span> awk <span class="s1">&#39;{print $5}&#39;</span> <span class="p">|</span> sort <span class="p">|</span> uniq -c <span class="p">|</span> sort -nr
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="c1"># 提取 IP</span>
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl">grep -oE <span class="s1">&#39;[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+&#39;</span> access.log <span class="p">|</span> sort <span class="p">|</span> uniq -c
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">
+</span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="c1"># 替换 + 过滤</span>
+</span></span><span class="line"><span class="ln">11</span><span class="cl">sed <span class="s1">&#39;s/old/new/g&#39;</span> file.txt <span class="p">|</span> grep <span class="s2">&#34;pattern&#34;</span>
+</span></span></code></pre></div><hr>
+<h2 id="2-文件处理">2️⃣ 文件处理</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="c1"># 删除空行</span>
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl">sed <span class="s1">&#39;/^$/d&#39;</span> input.txt &gt; output.txt
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="c1"># CSV 提取列</span>
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl">awk -F <span class="s1">&#39;,&#39;</span> <span class="s1">&#39;{print $1, $3}&#39;</span> data.csv
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="c1"># 批量重命名</span>
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl">ls *.txt <span class="p">|</span> sed <span class="s1">&#39;s/\(.*\)\.txt/mv &#34;&amp;&#34; &#34;\1_backup.txt&#34;/&#39;</span> <span class="p">|</span> sh
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">
+</span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="c1"># 统计代码行数</span>
+</span></span><span class="line"><span class="ln">11</span><span class="cl">grep -v <span class="s1">&#39;^$&#39;</span> source.py <span class="p">|</span> grep -v <span class="s1">&#39;^#&#39;</span> <span class="p">|</span> wc -l
+</span></span></code></pre></div><hr>
+<h1 id="-五实用场景">🚀 五、实用场景</h1>
+<h2 id="1-日志分析">1️⃣ 日志分析</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl"><span class="c1"># 访问最多 IP</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl">awk <span class="s1">&#39;{print $1}&#39;</span> access.log <span class="p">|</span> sort <span class="p">|</span> uniq -c <span class="p">|</span> sort -nr <span class="p">|</span> head -10
+</span></span><span class="line"><span class="ln">3</span><span class="cl">
+</span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="c1"># 最近一小时错误</span>
+</span></span><span class="line"><span class="ln">5</span><span class="cl">grep <span class="s2">&#34;</span><span class="k">$(</span>date -d <span class="s1">&#39;1 hour ago&#39;</span> <span class="s1">&#39;+%H:%M&#39;</span><span class="k">)</span><span class="s2">&#34;</span> error.log
+</span></span><span class="line"><span class="ln">6</span><span class="cl">
+</span></span><span class="line"><span class="ln">7</span><span class="cl"><span class="c1"># HTTP 状态码统计</span>
+</span></span><span class="line"><span class="ln">8</span><span class="cl">awk <span class="s1">&#39;{print $9}&#39;</span> access.log <span class="p">|</span> sort <span class="p">|</span> uniq -c
+</span></span></code></pre></div><hr>
+<h2 id="2-系统监控">2️⃣ 系统监控</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl"><span class="c1"># 内存占用前 10</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl">ps aux --sort<span class="o">=</span>-%mem <span class="p">|</span> head -11
+</span></span><span class="line"><span class="ln">3</span><span class="cl">
+</span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="c1"># 磁盘使用率 &gt; 90%</span>
+</span></span><span class="line"><span class="ln">5</span><span class="cl">df -h <span class="p">|</span> awk <span class="s1">&#39;$5 &gt; 90&#39;</span>
+</span></span><span class="line"><span class="ln">6</span><span class="cl">
+</span></span><span class="line"><span class="ln">7</span><span class="cl"><span class="c1"># 实时日志</span>
+</span></span><span class="line"><span class="ln">8</span><span class="cl">tail -f app.log <span class="p">|</span> grep <span class="s2">&#34;ERROR&#34;</span>
+</span></span></code></pre></div><hr>
+<h2 id="3-数据处理">3️⃣ 数据处理</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl"><span class="c1"># 提取 JSON 字段（简单）</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl">grep -o <span class="s1">&#39;&#34;name&#34;:&#34;[^&#34;]*&#34;&#39;</span> data.json <span class="p">|</span> sed <span class="s1">&#39;s/&#34;name&#34;:&#34;\(.*\)&#34;/\1/&#39;</span>
+</span></span><span class="line"><span class="ln">3</span><span class="cl">
+</span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="c1"># CSV → TSV</span>
+</span></span><span class="line"><span class="ln">5</span><span class="cl">sed <span class="s1">&#39;s/,/\t/g&#39;</span> input.csv &gt; output.tsv
+</span></span><span class="line"><span class="ln">6</span><span class="cl">
+</span></span><span class="line"><span class="ln">7</span><span class="cl"><span class="c1"># 批量修改文件</span>
+</span></span><span class="line"><span class="ln">8</span><span class="cl">find . -name <span class="s2">&#34;*.js&#34;</span> -exec sed -i <span class="s1">&#39;s/foo/bar/g&#39;</span> <span class="o">{}</span> <span class="se">\;</span>
+</span></span></code></pre></div><hr>
+<h1 id="-六小贴士非常重要">💡 六、小贴士（非常重要！）</h1>
+<h3 id="-常用参数速记">🔹 常用参数速记</h3>
+<ul>
+<li>
+<p><strong>grep</strong></p>
+<ul>
+<li><code>-i</code> 忽略大小写</li>
+<li><code>-v</code> 反选</li>
+<li><code>-r</code> 递归</li>
+<li><code>-n</code> 行号</li>
+</ul>
+</li>
+<li>
+<p><strong>sed</strong></p>
+<ul>
+<li><code>-i</code> 直接修改</li>
+<li><code>-n</code> 静默模式</li>
+<li><code>-e</code> 多表达式</li>
+</ul>
+</li>
+<li>
+<p><strong>awk</strong></p>
+<ul>
+<li><code>-F</code> 分隔符</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h3 id="-实战经验">🔹 实战经验</h3>
+<ul>
+<li>
+<p>🧪 测试命令：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl"><span class="nb">echo</span> <span class="s2">&#34;test&#34;</span> <span class="p">|</span> <span class="nb">command</span>
+</span></span></code></pre></div></li>
+<li>
+<p>⚠️ 修改文件前：
+👉 <strong>先不要加 <code>-i</code>，确认结果再执行</strong></p>
+</li>
+<li>
+<p>⚡ 性能建议：</p>
+<ul>
+<li>大文件优先用 <code>awk</code></li>
+<li>少用多层管道</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h3 id="-帮助命令">🔹 帮助命令</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">man grep
+</span></span><span class="line"><span class="ln">2</span><span class="cl">info sed
+</span></span><span class="line"><span class="ln">3</span><span class="cl">awk --help
+</span></span></code></pre></div><hr>
+<h1 id="-总结一句话">🎯 总结一句话</h1>
+<p>👉 <strong>grep = 查找</strong>
+👉 <strong>sed = 修改</strong>
+👉 <strong>awk = 处理/计算</strong></p>
 <hr>
 
     </div><div class="post_comments">
