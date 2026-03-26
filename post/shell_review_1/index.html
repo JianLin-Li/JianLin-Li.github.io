@@ -854,11 +854,11 @@
 </span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="c1"># 替换第 2 次匹配</span>
 </span></span><span class="line"><span class="ln"> 8</span><span class="cl">sed <span class="s1">&#39;s/old/new/2&#39;</span> file.txt
 </span></span><span class="line"><span class="ln"> 9</span><span class="cl">
-</span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="c1"># 直接修改文件</span>
-</span></span><span class="line"><span class="ln">11</span><span class="cl">sed -i <span class="s1">&#39;s/old/new/g&#39;</span> file.txt
-</span></span><span class="line"><span class="ln">12</span><span class="cl">
-</span></span><span class="line"><span class="ln">13</span><span class="cl"><span class="c1"># 备份后修改</span>
-</span></span><span class="line"><span class="ln">14</span><span class="cl">sed -i.bak <span class="s1">&#39;s/old/new/g&#39;</span> file.txt
+</span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="c1"># 直接修改文件 (-i 后面加&#39;&#39; 是为了兼容在macos系统)</span>
+</span></span><span class="line"><span class="ln">11</span><span class="cl">sed -i <span class="s1">&#39;&#39;</span> s/old/new/g<span class="s1">&#39; file.txt
+</span></span></span><span class="line"><span class="ln">12</span><span class="cl"><span class="s1">
+</span></span></span><span class="line"><span class="ln">13</span><span class="cl"><span class="s1"># 备份后修改
+</span></span></span><span class="line"><span class="ln">14</span><span class="cl"><span class="s1">sed -i.bak &#39;</span>s/old/new/g<span class="err">&#39;</span> file.txt
 </span></span></code></pre></div><hr>
 <h2 id="2-删除操作">2️⃣ 删除操作</h2>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="c1"># 删除匹配行</span>
