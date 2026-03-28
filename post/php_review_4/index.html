@@ -168,7 +168,7 @@
     <span class="post_date">
       2025-06-04	  
     </span>
-    <span class="post_time"> · 6 分钟阅读</span><span>&nbsp;· <a href='https://jianlin-li.github.io/tags/php/' title="PHP" class="post_tag button button_translucent">PHP
+    <span class="post_time"> · 8 分钟阅读</span><span>&nbsp;· <a href='https://jianlin-li.github.io/tags/php/' title="PHP" class="post_tag button button_translucent">PHP
         </a>
     </span>
     <span class="page_only">&nbsp;·
@@ -800,7 +800,240 @@
 </ul>
 <p>运行前请确保：</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">php -m <span class="p">|</span> grep openssl  <span class="c1"># 确认 openssl 扩展已启用</span>
-</span></span></code></pre></div>
+</span></span></code></pre></div><hr>
+<hr>
+<hr>
+<h1 id="php-中的--是-解构运算符splat-operator也称为-展开运算符-或-剩余参数它在-php-56-引入用于函数参数和数组操作极大提升了代码的灵活性和可读性">PHP 中的 <strong><code>...</code>（三个点）</strong> 是 <strong>“解构运算符”（Splat Operator）</strong>，也称为 <strong>“展开运算符”</strong> 或 <strong>“剩余参数”</strong>。它在 PHP 5.6 引入，用于<strong>函数参数和数组操作</strong>，极大提升了代码的灵活性和可读性。</h1>
+<blockquote>
+<p>💡 核心作用：</p>
+<ul>
+<li><strong>定义端</strong>：将多个参数“收集”为一个数组（<strong>剩余参数</strong>）；</li>
+<li><strong>调用端</strong>：将一个数组“展开”为多个参数（<strong>参数解包</strong>）。</li>
+</ul>
+</blockquote>
+<hr>
+<h2 id="一基本用法分类">一、基本用法分类</h2>
+<h3 id="1-作为函数参数剩余参数--收集参数">1. <strong>作为函数参数（剩余参数）</strong> —— 收集参数</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln">1</span><span class="cl"><span class="k">function</span> <span class="nf">sum</span><span class="p">(</span><span class="nx">int</span> <span class="o">...</span><span class="nv">$numbers</span><span class="p">)</span><span class="o">:</span> <span class="nx">int</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl">    <span class="k">return</span> <span class="nx">array_sum</span><span class="p">(</span><span class="nv">$numbers</span><span class="p">);</span>
+</span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="ln">4</span><span class="cl">
+</span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="k">echo</span> <span class="nx">sum</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">);</span> <span class="c1">// 10
+</span></span></span><span class="line"><span class="ln">6</span><span class="cl"><span class="c1">// $numbers = [1, 2, 3, 4]
+</span></span></span></code></pre></div><p>✅ 特点：</p>
+<ul>
+<li>必须是<strong>最后一个参数</strong>；</li>
+<li>自动将传入的多个参数打包成<strong>索引数组</strong>；</li>
+<li>可与普通参数混合使用。</li>
+</ul>
+<h4 id="混合示例">混合示例：</h4>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln">1</span><span class="cl"><span class="k">function</span> <span class="nf">log</span><span class="p">(</span><span class="nx">string</span> <span class="nv">$level</span><span class="p">,</span> <span class="nx">string</span> <span class="o">...</span><span class="nv">$messages</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl">    <span class="k">echo</span> <span class="s2">&#34;[</span><span class="si">$level</span><span class="s2">] &#34;</span> <span class="o">.</span> <span class="nx">implode</span><span class="p">(</span><span class="s1">&#39; | &#39;</span><span class="p">,</span> <span class="nv">$messages</span><span class="p">);</span>
+</span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="ln">4</span><span class="cl">
+</span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;ERROR&#39;</span><span class="p">,</span> <span class="s1">&#39;File not found&#39;</span><span class="p">,</span> <span class="s1">&#39;Permission denied&#39;</span><span class="p">);</span>
+</span></span><span class="line"><span class="ln">6</span><span class="cl"><span class="c1">// 输出: [ERROR] File not found | Permission denied
+</span></span></span></code></pre></div><hr>
+<h3 id="2-在函数调用时参数解包--展开数组">2. <strong>在函数调用时（参数解包）</strong> —— 展开数组</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln">1</span><span class="cl"><span class="nv">$values</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">];</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="k">echo</span> <span class="nx">sum</span><span class="p">(</span><span class="o">...</span><span class="nv">$values</span><span class="p">);</span> <span class="c1">// 等价于 sum(1, 2, 3, 4)
+</span></span></span></code></pre></div><p>✅ 特点：</p>
+<ul>
+<li>将<strong>数组或 Traversable 对象</strong>展开为独立参数；</li>
+<li>可与其他参数混合使用。</li>
+</ul>
+<h4 id="混合示例-1">混合示例：</h4>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln">1</span><span class="cl"><span class="nv">$extra</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;c&#39;</span><span class="p">,</span> <span class="s1">&#39;d&#39;</span><span class="p">];</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="nx">array_push</span><span class="p">(</span><span class="nv">$arr</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="o">...</span><span class="nv">$extra</span><span class="p">);</span>
+</span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="c1">// 等价于 array_push($arr, &#39;a&#39;, &#39;b&#39;, &#39;c&#39;, &#39;d&#39;)
+</span></span></span></code></pre></div><hr>
+<h2 id="二常用场景与示例">二、常用场景与示例</h2>
+<h3 id="场景-1替代-call_user_func_array">场景 1：替代 <code>call_user_func_array()</code></h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln">1</span><span class="cl"><span class="c1">// 旧方式（PHP &lt; 5.6）
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="c1"></span><span class="nx">call_user_func_array</span><span class="p">(</span><span class="s1">&#39;array_merge&#39;</span><span class="p">,</span> <span class="p">[</span><span class="nv">$arr1</span><span class="p">,</span> <span class="nv">$arr2</span><span class="p">]);</span>
+</span></span><span class="line"><span class="ln">3</span><span class="cl">
+</span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="c1">// 新方式（PHP ≥ 5.6）
+</span></span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="c1"></span><span class="nx">array_merge</span><span class="p">(</span><span class="o">...</span><span class="p">[</span><span class="nv">$arr1</span><span class="p">,</span> <span class="nv">$arr2</span><span class="p">]);</span>
+</span></span></code></pre></div><h3 id="场景-2安全地合并数组避免空数组问题">场景 2：安全地合并数组（避免空数组问题）</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln">1</span><span class="cl"><span class="k">function</span> <span class="nf">mergeArrays</span><span class="p">(</span><span class="k">array</span> <span class="o">...</span><span class="nv">$arrays</span><span class="p">)</span><span class="o">:</span> <span class="k">array</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl">    <span class="k">return</span> <span class="nx">array_merge</span><span class="p">(</span><span class="o">...</span><span class="nv">$arrays</span><span class="p">);</span>
+</span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="ln">4</span><span class="cl">
+</span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="nv">$result</span> <span class="o">=</span> <span class="nx">mergeArrays</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">],</span> <span class="p">[</span><span class="mi">5</span><span class="p">]);</span> <span class="c1">// [1,2,3,4,5]
+</span></span></span><span class="line"><span class="ln">6</span><span class="cl"><span class="c1"></span><span class="nv">$result</span> <span class="o">=</span> <span class="nx">mergeArrays</span><span class="p">();</span> <span class="c1">// [] （安全，不报错）
+</span></span></span></code></pre></div><h3 id="场景-3构建灵活的构造函数如-dto">场景 3：构建灵活的构造函数（如 DTO）</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="k">class</span> <span class="nc">User</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl">    <span class="k">public</span> <span class="k">function</span> <span class="fm">__construct</span><span class="p">(</span>
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl">        <span class="k">public</span> <span class="nx">string</span> <span class="nv">$name</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl">        <span class="k">public</span> <span class="nx">int</span> <span class="nv">$age</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl">        <span class="k">public</span> <span class="k">array</span> <span class="o">...</span><span class="nv">$tags</span> <span class="c1">// 剩余参数作为标签
+</span></span></span><span class="line"><span class="ln"> 6</span><span class="cl"><span class="c1"></span>    <span class="p">)</span> <span class="p">{}</span>
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl"><span class="nv">$user</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">User</span><span class="p">(</span><span class="s1">&#39;Alice&#39;</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="s1">&#39;admin&#39;</span><span class="p">,</span> <span class="s1">&#39;vip&#39;</span><span class="p">);</span>
+</span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="c1">// $tags = [&#39;admin&#39;, &#39;vip&#39;]
+</span></span></span></code></pre></div><h3 id="场景-4代理方法调用魔术方法">场景 4：代理方法调用（魔术方法）</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="k">class</span> <span class="nc">Proxy</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl">    <span class="k">private</span> <span class="nv">$target</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl">    <span class="k">public</span> <span class="k">function</span> <span class="fm">__construct</span><span class="p">(</span><span class="nv">$target</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl">        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">target</span> <span class="o">=</span> <span class="nv">$target</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl">    <span class="k">public</span> <span class="k">function</span> <span class="fm">__call</span><span class="p">(</span><span class="nv">$method</span><span class="p">,</span> <span class="nv">$args</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">        <span class="c1">// 将 $args 展开传递给目标对象
+</span></span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="c1"></span>        <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">target</span><span class="o">-&gt;</span><span class="nv">$method</span><span class="p">(</span><span class="o">...</span><span class="nv">$args</span><span class="p">);</span>
+</span></span><span class="line"><span class="ln">11</span><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="ln">12</span><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><h3 id="场景-5与命名参数结合php-80">场景 5：与命名参数结合（PHP 8.0+）</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln">1</span><span class="cl"><span class="k">function</span> <span class="nf">greet</span><span class="p">(</span><span class="nx">string</span> <span class="nv">$name</span><span class="p">,</span> <span class="nx">int</span> <span class="nv">$times</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl">    <span class="k">for</span> <span class="p">(</span><span class="nv">$i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nv">$i</span> <span class="o">&lt;</span> <span class="nv">$times</span><span class="p">;</span> <span class="nv">$i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">3</span><span class="cl">        <span class="k">echo</span> <span class="s2">&#34;Hello </span><span class="si">$name</span><span class="s2">!</span><span class="se">\n</span><span class="s2">&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln">4</span><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="ln">6</span><span class="cl">
+</span></span><span class="line"><span class="ln">7</span><span class="cl"><span class="nv">$params</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;name&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Bob&#39;</span><span class="p">,</span> <span class="s1">&#39;times&#39;</span> <span class="o">=&gt;</span> <span class="mi">3</span><span class="p">];</span>
+</span></span><span class="line"><span class="ln">8</span><span class="cl"><span class="nx">greet</span><span class="p">(</span><span class="o">...</span><span class="nv">$params</span><span class="p">);</span> <span class="c1">// PHP 8.1+ 支持关联数组解包！
+</span></span></span></code></pre></div><blockquote>
+<p>⚠️ 注意：<strong>关联数组解包需 PHP 8.1+</strong>，且 key 必须匹配参数名。</p>
+</blockquote>
+<hr>
+<h2 id="三高级技巧">三、高级技巧</h2>
+<h3 id="1-部分解包">1. <strong>部分解包</strong></h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln">1</span><span class="cl"><span class="nv">$data</span> <span class="o">=</span> <span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mi">40</span><span class="p">];</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="k">list</span><span class="p">(</span><span class="nv">$a</span><span class="p">,</span> <span class="nv">$b</span><span class="p">,</span> <span class="o">...</span><span class="nv">$rest</span><span class="p">)</span> <span class="o">=</span> <span class="nv">$data</span><span class="p">;</span> <span class="c1">// PHP 7.1+
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="c1">// $a=10, $b=20, $rest=[30,40]
+</span></span></span></code></pre></div><h3 id="2-在数组字面量中展开php-74">2. <strong>在数组字面量中展开（PHP 7.4+）</strong></h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln">1</span><span class="cl"><span class="nv">$part1</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">];</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="nv">$part2</span> <span class="o">=</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">];</span>
+</span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="nv">$all</span> <span class="o">=</span> <span class="p">[</span><span class="o">...</span><span class="nv">$part1</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="o">...</span><span class="nv">$part2</span><span class="p">];</span> <span class="c1">// [1,2,5,3,4]
+</span></span></span></code></pre></div><blockquote>
+<p>✅ 这是 <strong>“数组展开”</strong>，与函数参数解包语法相同，但用途不同。</p>
+</blockquote>
+<h3 id="3-类型安全的剩余参数">3. <strong>类型安全的剩余参数</strong></h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln">1</span><span class="cl"><span class="k">function</span> <span class="nf">processItems</span><span class="p">(</span><span class="nx">Item</span> <span class="o">...</span><span class="nv">$items</span><span class="p">)</span><span class="o">:</span> <span class="nx">void</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl">    <span class="k">foreach</span> <span class="p">(</span><span class="nv">$items</span> <span class="k">as</span> <span class="nv">$item</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">3</span><span class="cl">        <span class="nv">$item</span><span class="o">-&gt;</span><span class="na">validate</span><span class="p">();</span> <span class="c1">// IDE 知道 $item 是 Item 类型
+</span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="c1"></span>    <span class="p">}</span>
+</span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="ln">6</span><span class="cl">
+</span></span><span class="line"><span class="ln">7</span><span class="cl"><span class="nx">processItems</span><span class="p">(</span><span class="nv">$item1</span><span class="p">,</span> <span class="nv">$item2</span><span class="p">);</span> <span class="c1">// 安全！
+</span></span></span><span class="line"><span class="ln">8</span><span class="cl"><span class="c1"></span><span class="nx">processItems</span><span class="p">(</span><span class="s2">&#34;string&#34;</span><span class="p">);</span> <span class="c1">// TypeError!
+</span></span></span></code></pre></div><hr>
+<h2 id="四注意事项与限制">四、注意事项与限制</h2>
+<table>
+  <thead>
+      <tr>
+          <th>问题</th>
+          <th>说明</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><strong>必须是最后一个参数</strong></td>
+          <td><code>function foo(...$a, $b)</code> ❌ 非法</td>
+      </tr>
+      <tr>
+          <td><strong>只能有一个 <code>...</code> 参数</strong></td>
+          <td><code>function foo(...$a, ...$b)</code> ❌ 非法</td>
+      </tr>
+      <tr>
+          <td><strong>解包非数组/Traversable</strong></td>
+          <td><code>...123</code> → TypeError</td>
+      </tr>
+      <tr>
+          <td><strong>关联数组解包限制</strong></td>
+          <td>PHP 8.1+ 才支持，且 key 必须是字符串且匹配参数名</td>
+      </tr>
+      <tr>
+          <td><strong>性能</strong></td>
+          <td>解包有微小开销，但远优于 <code>call_user_func_array</code></td>
+      </tr>
+  </tbody>
+</table>
+<hr>
+<h2 id="五版本兼容性">五、版本兼容性</h2>
+<table>
+  <thead>
+      <tr>
+          <th>功能</th>
+          <th>PHP 版本</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>函数参数收集（<code>...$args</code>）</td>
+          <td>≥ 5.6</td>
+      </tr>
+      <tr>
+          <td>函数调用解包（<code>func(...$arr)</code>）</td>
+          <td>≥ 5.6</td>
+      </tr>
+      <tr>
+          <td>数组字面量展开（<code>[...$arr]</code>）</td>
+          <td>≥ 7.4</td>
+      </tr>
+      <tr>
+          <td>关联数组解包（<code>func(...['name'=&gt;'x'])</code>）</td>
+          <td>≥ 8.1</td>
+      </tr>
+      <tr>
+          <td><code>list(...$rest)</code> 解构</td>
+          <td>≥ 7.1</td>
+      </tr>
+  </tbody>
+</table>
+<hr>
+<h2 id="六最佳实践建议">六、最佳实践建议</h2>
+<p>✅ <strong>推荐使用 <code>...</code> 当</strong>：</p>
+<ul>
+<li>函数需要接受<strong>可变数量参数</strong>；</li>
+<li>需要将<strong>数组传递给只接受独立参数的函数</strong>（如 <code>array_merge</code>, <code>min</code>, <code>max</code>）；</li>
+<li>构建<strong>灵活的 API 或 DSL</strong>；</li>
+<li>替代老旧的 <code>func_get_args()</code>。</li>
+</ul>
+<p>❌ <strong>避免滥用</strong>：</p>
+<ul>
+<li>简单固定参数函数无需 <code>...</code>；</li>
+<li>过度嵌套解包影响可读性。</li>
+</ul>
+<hr>
+<h2 id="总结">总结</h2>
+<table>
+  <thead>
+      <tr>
+          <th>语法位置</th>
+          <th>作用</th>
+          <th>示例</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><strong>函数定义</strong></td>
+          <td>收集剩余参数为数组</td>
+          <td><code>function f(...$args)</code></td>
+      </tr>
+      <tr>
+          <td><strong>函数调用</strong></td>
+          <td>展开数组为参数</td>
+          <td><code>f(...$arr)</code></td>
+      </tr>
+      <tr>
+          <td><strong>数组字面量</strong></td>
+          <td>合并数组</td>
+          <td><code>$arr = [...$a, ...$b]</code></td>
+      </tr>
+      <tr>
+          <td><strong>解构赋值</strong></td>
+          <td>提取剩余元素</td>
+          <td><code>[$a, ...$rest] = $arr</code></td>
+      </tr>
+  </tbody>
+</table>
+<blockquote>
+<p>✨ <strong><code>...</code> 让 PHP 的参数处理从“僵硬”变得“流动”</strong> —— 它是现代 PHP 函数式和面向对象编程的重要工具。</p>
+</blockquote>
+
     </div><div class="post_comments">
   
   
