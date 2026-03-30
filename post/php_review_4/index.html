@@ -168,7 +168,7 @@
     <span class="post_date">
       2025-06-04	  
     </span>
-    <span class="post_time"> · 13 分钟阅读</span><span>&nbsp;· <a href='https://jianlin-li.github.io/tags/php/' title="PHP" class="post_tag button button_translucent">PHP
+    <span class="post_time"> · 14 分钟阅读</span><span>&nbsp;· <a href='https://jianlin-li.github.io/tags/php/' title="PHP" class="post_tag button button_translucent">PHP
         </a>
     </span>
     <span class="page_only">&nbsp;·
@@ -1102,7 +1102,7 @@
 👉 直接释放内存</li>
 </ul>
 <hr>
-<h1 id="-三php-gc相关函数面试常问">⚙️ 三、PHP GC相关函数（面试常问）</h1>
+<h1 id="-三php-gc相关函数常问">⚙️ 三、PHP GC相关函数（常问）</h1>
 <h2 id="1-开关gc">1️⃣ 开关GC</h2>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln">1</span><span class="cl"><span class="nx">gc_enable</span><span class="p">();</span>   <span class="c1">// 开启（默认开启）
 </span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="c1"></span><span class="nx">gc_disable</span><span class="p">();</span>  <span class="c1">// 关闭
@@ -1137,7 +1137,7 @@
 <li><code>is_ref</code> → 是否引用变量（&amp;）</li>
 </ul>
 <hr>
-<h1 id="-五面试高频问题总结重点背">⚠️ 五、面试高频问题总结（重点背🔥）</h1>
+<h1 id="-五高频问题总结重点背">⚠️ 五、高频问题总结（重点背🔥）</h1>
 <hr>
 <h2 id="1php是如何进行垃圾回收的">❓1：PHP是如何进行垃圾回收的？</h2>
 <p>👉 标准答案：</p>
@@ -1216,7 +1216,7 @@
 <li>脚本结束</li>
 </ol>
 <hr>
-<h1 id="-六面试加分点进阶">🚀 六、面试加分点（进阶🔥）</h1>
+<h1 id="-六加分点进阶">🚀 六、加分点（进阶🔥）</h1>
 <hr>
 <h2 id="1php7-vs-php5-gc优化">⭐1：PHP7 vs PHP5 GC优化</h2>
 <ul>
@@ -1235,7 +1235,7 @@
 </span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="nv">$b</span> <span class="o">=</span> <span class="nv">$a</span><span class="p">;</span> <span class="c1">// 不复制
 </span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="c1"></span>
 </span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="nv">$b</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">100</span><span class="p">;</span> <span class="c1">// 才复制
-</span></span></span></code></pre></div><p>👉 面试加分一句：</p>
+</span></span></span></code></pre></div><p>👉 注意：</p>
 <blockquote>
 <p>PHP通过写时复制减少内存占用，与引用计数配合提高性能。</p>
 </blockquote>
@@ -1248,7 +1248,7 @@
 <li>静态变量</li>
 </ul>
 <hr>
-<h1 id="-七面试总结一句话必背">📌 七、面试总结一句话（必背🔥）</h1>
+<h1 id="-七总结一句话必背">📌 七、总结一句话（必背🔥）</h1>
 <p>👉 推荐你直接背这个：</p>
 <blockquote>
 <p>PHP主要通过引用计数实现内存管理，当引用计数为0时自动释放。但引用计数无法处理循环引用，因此PHP引入了基于标记清除的垃圾回收机制，通过Root Buffer记录可能的垃圾，在达到阈值时触发GC扫描并清理循环引用。</p>
@@ -1312,12 +1312,12 @@
 <h3 id="第四步回收">第四步：回收</h3>
 <p>👉 白色节点 = 垃圾 → 释放</p>
 <hr>
-<p>👉 面试加分一句：</p>
+<p>👉 注意：</p>
 <blockquote>
 <p>PHP GC通过三色标记算法识别不可达的循环引用对象，并在标记-清除阶段释放内存。</p>
 </blockquote>
 <hr>
-<h1 id="-二root-buffer机制面试最爱问">⚙️ 二、Root Buffer机制（面试最爱问🔥）</h1>
+<h1 id="-二root-buffer机制最爱问">⚙️ 二、Root Buffer机制（最爱问🔥）</h1>
 <hr>
 <h2 id="-什么是-root-buffer">🔥 什么是 Root Buffer？</h2>
 <p>👉 本质：</p>
@@ -1337,7 +1337,7 @@
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="ln">1</span><span class="cl"><span class="n">GC_THRESHOLD_DEFAULT</span> <span class="o">=</span> <span class="mi">10000</span>
 </span></span></code></pre></div><p>👉 满了就触发 GC</p>
 <hr>
-<h2 id="-面试关键点">📌 面试关键点</h2>
+<h2 id="-关键点">📌 关键点</h2>
 <p>👉 为什么不用每次都GC？</p>
 <p>答：</p>
 <ul>
@@ -1368,7 +1368,7 @@
 </span></span><span class="line"><span class="ln">2</span><span class="cl">    <span class="kt">uint32_t</span> <span class="n">refcount</span><span class="p">;</span>
 </span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="p">}</span>
 </span></span></code></pre></div><hr>
-<h2 id="-关键点">📌 关键点</h2>
+<h2 id="-关键点-1">📌 关键点</h2>
 <ul>
 <li>
 <p><strong>简单类型（int/string）</strong></p>
@@ -1384,7 +1384,7 @@
 </li>
 </ul>
 <hr>
-<p>👉 面试加分一句：</p>
+<p>👉 注意：</p>
 <blockquote>
 <p>PHP GC主要针对引用类型（如数组和对象），标量类型通常通过引用计数直接释放。</p>
 </blockquote>
@@ -1410,7 +1410,7 @@
 </blockquote>
 <p>🔥 这个点很多人不会说！</p>
 <hr>
-<h1 id="-五面试官追问杀手题重点">⚠️ 五、面试官“追问杀手题”（重点🔥🔥🔥）</h1>
+<h1 id="-五官追问杀手题重点">⚠️ 五、官“追问杀手题”（重点🔥🔥🔥）</h1>
 <hr>
 <h2 id="1gc为什么要试探性减引用">❓1：GC为什么要“试探性减引用”？</h2>
 <p>👉 答：</p>
@@ -1525,7 +1525,7 @@
 <li>不是直接归还OS</li>
 </ul>
 <hr>
-<p>👉 面试加分一句：</p>
+<p>👉 注意：</p>
 <blockquote>
 <p>PHP释放的是“用户空间内存”，不一定归还操作系统。</p>
 </blockquote>
@@ -1540,7 +1540,7 @@
 </span></span><span class="line"><span class="ln">6</span><span class="cl"><span class="nv">$a</span><span class="o">-&gt;</span><span class="na">cb</span> <span class="o">=</span> <span class="k">function</span><span class="p">()</span> <span class="k">use</span> <span class="p">(</span><span class="nv">$a</span><span class="p">)</span> <span class="p">{};</span>
 </span></span></code></pre></div><p>👉 经典循环引用！</p>
 <hr>
-<h1 id="-七终极面试回答模板高级版">🧩 七、终极面试回答模板（高级版🔥）</h1>
+<h1 id="-七终极回答模板高级版">🧩 七、终极回答模板（高级版🔥）</h1>
 <p>直接背这个👇：</p>
 <blockquote>
 <p>PHP的垃圾回收机制主要基于引用计数，当变量引用计数为0时立即释放内存。但引用计数无法处理循环引用问题，因此PHP引入了循环垃圾回收机制。</p>
@@ -1581,7 +1581,7 @@
 </span></span><span class="line"><span class="ln">29</span><span class="cl">                           ↓
 </span></span><span class="line"><span class="ln">30</span><span class="cl">                 释放循环引用 ♻️
 </span></span></code></pre></div><hr>
-<h1 id="-二循环引用问题图解面试必画">🔄 二、循环引用问题图解（面试必画🔥）</h1>
+<h1 id="-二循环引用问题图解必画">🔄 二、循环引用问题图解（必画🔥）</h1>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="ln">1</span><span class="cl">   $a ───────→ $b
 </span></span><span class="line"><span class="ln">2</span><span class="cl">    ↑          ↓
 </span></span><span class="line"><span class="ln">3</span><span class="cl">    └──────────┘
@@ -1686,7 +1686,7 @@
   </tbody>
 </table>
 <hr>
-<h1 id="-六终极记忆口诀面试神器">🧠 六、终极记忆口诀（面试神器🔥）</h1>
+<h1 id="-六终极记忆口诀神器">🧠 六、终极记忆口诀（神器🔥）</h1>
 <p>直接背👇：</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="ln">1</span><span class="cl">引用计数管日常，
 </span></span><span class="line"><span class="ln">2</span><span class="cl">循环引用GC帮。
@@ -1695,8 +1695,8 @@
 </span></span><span class="line"><span class="ln">5</span><span class="cl">先减引用做试探，
 </span></span><span class="line"><span class="ln">6</span><span class="cl">不可达的全清光。
 </span></span></code></pre></div><hr>
-<h1 id="-七面试时怎么画出来超实用">🎯 七、面试时怎么“画出来”（超实用🔥）</h1>
-<p>👉 面试官问：GC原理？</p>
+<h1 id="-七怎么画出来超实用">🎯 七、怎么“画出来”（超实用🔥）</h1>
+<p>👉 GC原理？</p>
 <p>你可以直接在纸上画👇：</p>
 <h3 id="1-先画循环引用">1️⃣ 先画循环引用</h3>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="ln">1</span><span class="cl">A → B → A
@@ -1710,12 +1710,237 @@
 <h3 id="4-再画gc过程">4️⃣ 再画GC过程</h3>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="ln">1</span><span class="cl">试探性减引用 → 判断 → 删除
 </span></span></code></pre></div><hr>
-<p>👉 这样讲的效果：</p>
-<p>💥 面试官会觉得你：</p>
+<hr>
+<hr>
+<h1 id="一http-post-请求常见的四种方式">一、HTTP POST 请求常见的四种方式</h1>
+<h2 id="1-applicationx-www-form-urlencoded最常用">1️⃣ application/x-www-form-urlencoded（最常用）</h2>
+<p>👉 浏览器表单默认提交方式</p>
+<h3 id="-请求示例">📌 请求示例</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="ln">1</span><span class="cl">POST /api HTTP/1.1
+</span></span><span class="line"><span class="ln">2</span><span class="cl">Content-Type: application/x-www-form-urlencoded
+</span></span><span class="line"><span class="ln">3</span><span class="cl">
+</span></span><span class="line"><span class="ln">4</span><span class="cl">username=rosie&amp;age=18
+</span></span></code></pre></div><h3 id="-特点">📌 特点</h3>
 <ul>
-<li>不只是背</li>
-<li>是“理解 + 能讲 + 能画”</li>
+<li>key=value 形式</li>
+<li>多个参数用 <code>&amp;</code> 拼接</li>
+<li>会自动 URL 编码</li>
 </ul>
+<hr>
+<h2 id="2-multipartform-data文件上传">2️⃣ multipart/form-data（文件上传）</h2>
+<p>👉 上传文件必须用这个</p>
+<h3 id="-请求示例-1">📌 请求示例</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-gdscript3" data-lang="gdscript3"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="n">POST</span> <span class="o">/</span><span class="n">upload</span> <span class="n">HTTP</span><span class="o">/</span><span class="mf">1.1</span>
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="n">Content</span><span class="o">-</span><span class="n">Type</span><span class="p">:</span> <span class="n">multipart</span><span class="o">/</span><span class="n">form</span><span class="o">-</span><span class="n">data</span><span class="p">;</span> <span class="n">boundary</span><span class="o">=----</span><span class="n">xxx</span>
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="o">------</span><span class="n">xxx</span>
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="n">Content</span><span class="o">-</span><span class="n">Disposition</span><span class="p">:</span> <span class="n">form</span><span class="o">-</span><span class="n">data</span><span class="p">;</span> <span class="n">name</span><span class="o">=</span><span class="s2">&#34;username&#34;</span>
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="n">rosie</span>
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="o">------</span><span class="n">xxx</span>
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl"><span class="n">Content</span><span class="o">-</span><span class="n">Disposition</span><span class="p">:</span> <span class="n">form</span><span class="o">-</span><span class="n">data</span><span class="p">;</span> <span class="n">name</span><span class="o">=</span><span class="s2">&#34;file&#34;</span><span class="p">;</span> <span class="n">filename</span><span class="o">=</span><span class="s2">&#34;a.jpg&#34;</span>
+</span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="n">Content</span><span class="o">-</span><span class="n">Type</span><span class="p">:</span> <span class="n">image</span><span class="o">/</span><span class="n">jpeg</span>
+</span></span><span class="line"><span class="ln">11</span><span class="cl">
+</span></span><span class="line"><span class="ln">12</span><span class="cl"><span class="p">(</span><span class="n">binary</span> <span class="n">data</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln">13</span><span class="cl"><span class="o">------</span><span class="n">xxx</span><span class="o">--</span>
+</span></span></code></pre></div><h3 id="-特点-1">📌 特点</h3>
+<ul>
+<li>支持文件上传</li>
+<li>数据分块（boundary分隔）</li>
+<li>每个字段有独立 header</li>
+</ul>
+<hr>
+<h2 id="3-applicationjson前后端分离最常用">3️⃣ application/json（前后端分离最常用）</h2>
+<p>👉 Vue / React / 小程序常用</p>
+<h3 id="-请求示例-2">📌 请求示例</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="ln">1</span><span class="cl"><span class="err">POST</span> <span class="err">/api</span> <span class="err">HTTP/</span><span class="mf">1.1</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="err">Content-Type:</span> <span class="err">application/json</span>
+</span></span><span class="line"><span class="ln">3</span><span class="cl">
+</span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="ln">5</span><span class="cl">  <span class="nt">&#34;username&#34;</span><span class="p">:</span> <span class="s2">&#34;rosie&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">6</span><span class="cl">  <span class="nt">&#34;age&#34;</span><span class="p">:</span> <span class="mi">18</span>
+</span></span><span class="line"><span class="ln">7</span><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><h3 id="-特点-2">📌 特点</h3>
+<ul>
+<li>JSON 格式</li>
+<li>结构清晰</li>
+<li>不能直接用 <code>$_POST</code> 获取（重点🔥）</li>
+</ul>
+<hr>
+<h2 id="4-textxml--applicationxml较少用">4️⃣ text/xml / application/xml（较少用）</h2>
+<p>👉 早期系统 / SOAP接口</p>
+<h3 id="-请求示例-3">📌 请求示例</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-xml" data-lang="xml"><span class="line"><span class="ln">1</span><span class="cl">POST /api HTTP/1.1
+</span></span><span class="line"><span class="ln">2</span><span class="cl">Content-Type: application/xml
+</span></span><span class="line"><span class="ln">3</span><span class="cl">
+</span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="nt">&lt;user&gt;</span>
+</span></span><span class="line"><span class="ln">5</span><span class="cl">  <span class="nt">&lt;name&gt;</span>rosie<span class="nt">&lt;/name&gt;</span>
+</span></span><span class="line"><span class="ln">6</span><span class="cl">  <span class="nt">&lt;age&gt;</span>18<span class="nt">&lt;/age&gt;</span>
+</span></span><span class="line"><span class="ln">7</span><span class="cl"><span class="nt">&lt;/user&gt;</span>
+</span></span></code></pre></div><h3 id="-特点-3">📌 特点</h3>
+<ul>
+<li>XML结构</li>
+<li>可读性一般</li>
+<li>逐渐被 JSON 替代</li>
+</ul>
+<hr>
+<h1 id="二php-获取-post-参数的方式">二、PHP 获取 POST 参数的方式</h1>
+<h2 id="1-_post最常用">1️⃣ $_POST（最常用）</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln">1</span><span class="cl"><span class="nv">$username</span> <span class="o">=</span> <span class="nv">$_POST</span><span class="p">[</span><span class="s1">&#39;username&#39;</span><span class="p">];</span>
+</span></span></code></pre></div><h3 id="-支持类型">📌 支持类型</h3>
+<p>✅ application/x-www-form-urlencoded
+✅ multipart/form-data</p>
+<p>❌ 不支持 JSON（重点）</p>
+<hr>
+<h2 id="2-_request不推荐">2️⃣ $_REQUEST（不推荐）</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln">1</span><span class="cl"><span class="nv">$username</span> <span class="o">=</span> <span class="nv">$_REQUEST</span><span class="p">[</span><span class="s1">&#39;username&#39;</span><span class="p">];</span>
+</span></span></code></pre></div><h3 id="-特点-4">📌 特点</h3>
+<ul>
+<li>包含：<code>$_GET + $_POST + $_COOKIE</code></li>
+<li>存在安全隐患（可能被覆盖）</li>
+</ul>
+<p>👉 建议：<strong>明确说不推荐使用</strong></p>
+<hr>
+<h2 id="3-phpinput重点">3️⃣ php://input（重点🔥🔥🔥）</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln">1</span><span class="cl"><span class="nv">$data</span> <span class="o">=</span> <span class="nx">file_get_contents</span><span class="p">(</span><span class="s2">&#34;php://input&#34;</span><span class="p">);</span>
+</span></span></code></pre></div><p>👉 这是<strong>核心考点</strong></p>
+<hr>
+<h1 id="三phpinput-详解重点">三、php://input 详解（重点）</h1>
+<h2 id="-本质">📌 本质</h2>
+<p>👉 <strong>只读输入流（Raw Body）</strong></p>
+<p>可以获取：</p>
+<ul>
+<li>JSON</li>
+<li>XML</li>
+<li>原始二进制数据</li>
+</ul>
+<hr>
+<h2 id="-使用示例json">📌 使用示例（JSON）</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln">1</span><span class="cl"><span class="nv">$json</span> <span class="o">=</span> <span class="nx">file_get_contents</span><span class="p">(</span><span class="s2">&#34;php://input&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="nv">$data</span> <span class="o">=</span> <span class="nx">json_decode</span><span class="p">(</span><span class="nv">$json</span><span class="p">,</span> <span class="k">true</span><span class="p">);</span>
+</span></span><span class="line"><span class="ln">3</span><span class="cl">
+</span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="k">echo</span> <span class="nv">$data</span><span class="p">[</span><span class="s1">&#39;username&#39;</span><span class="p">];</span>
+</span></span></code></pre></div><hr>
+<h2 id="-使用示例xml">📌 使用示例（XML）</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln">1</span><span class="cl"><span class="nv">$xml</span> <span class="o">=</span> <span class="nx">file_get_contents</span><span class="p">(</span><span class="s2">&#34;php://input&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="nv">$data</span> <span class="o">=</span> <span class="nx">simplexml_load_string</span><span class="p">(</span><span class="nv">$xml</span><span class="p">);</span>
+</span></span></code></pre></div><hr>
+<h2 id="-重要特点总结-">📌 重要特点总结 ⭐⭐⭐</h2>
+<table>
+  <thead>
+      <tr>
+          <th>特性</th>
+          <th>说明</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>只能读一次</td>
+          <td>读取后流会被清空</td>
+      </tr>
+      <tr>
+          <td>不支持 multipart/form-data</td>
+          <td>文件上传读取不到</td>
+      </tr>
+      <tr>
+          <td>可获取原始数据</td>
+          <td>比 $_POST 更底层</td>
+      </tr>
+      <tr>
+          <td>适合 JSON/XML</td>
+          <td>前后端分离必用</td>
+      </tr>
+  </tbody>
+</table>
+<hr>
+<h2 id="-为什么-json-获取不到">📌 为什么 JSON 获取不到？</h2>
+<p>👉 因为 PHP 只会自动解析：</p>
+<ul>
+<li><code>application/x-www-form-urlencoded</code></li>
+<li><code>multipart/form-data</code></li>
+</ul>
+<p>👉 不会解析：</p>
+<ul>
+<li><code>application/json</code></li>
+</ul>
+<p>所以：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="ln">1</span><span class="cl">$_POST = 空
+</span></span><span class="line"><span class="ln">2</span><span class="cl">php://input = 有数据
+</span></span></code></pre></div><hr>
+<h1 id="四四种方式--php获取-对照表">四、四种方式 + PHP获取 对照表（🔥）</h1>
+<table>
+  <thead>
+      <tr>
+          <th>Content-Type</th>
+          <th>示例</th>
+          <th>$_POST</th>
+          <th>php://input</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>x-www-form-urlencoded</td>
+          <td>表单</td>
+          <td>✅</td>
+          <td>✅</td>
+      </tr>
+      <tr>
+          <td>multipart/form-data</td>
+          <td>文件上传</td>
+          <td>✅</td>
+          <td>❌</td>
+      </tr>
+      <tr>
+          <td>application/json</td>
+          <td>JSON</td>
+          <td>❌</td>
+          <td>✅</td>
+      </tr>
+      <tr>
+          <td>application/xml</td>
+          <td>XML</td>
+          <td>❌</td>
+          <td>✅</td>
+      </tr>
+  </tbody>
+</table>
+<hr>
+<h1 id="五进阶加分">五、进阶（加分🔥）</h1>
+<h2 id="1-phpinput-vs-http_raw_post_data">1️⃣ php://input vs $HTTP_RAW_POST_DATA</h2>
+<p>👉 已废弃（PHP 5.6后）</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln">1</span><span class="cl"><span class="nv">$HTTP_RAW_POST_DATA</span> <span class="c1">// ❌ 不推荐
+</span></span></span></code></pre></div><hr>
+<h2 id="2-为什么-phpinput-不能读取文件">2️⃣ 为什么 php://input 不能读取文件？</h2>
+<p>👉 因为：</p>
+<ul>
+<li>multipart/form-data 被 PHP 内部解析</li>
+<li>文件被放入：</li>
+</ul>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln">1</span><span class="cl"><span class="nv">$_FILES</span>
+</span></span></code></pre></div><hr>
+<h2 id="3-如何统一处理请求实际项目">3️⃣ 如何统一处理请求（实际项目）</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln">1</span><span class="cl"><span class="k">function</span> <span class="nf">getRequestData</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl">    <span class="nv">$contentType</span> <span class="o">=</span> <span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">&#39;CONTENT_TYPE&#39;</span><span class="p">]</span> <span class="o">??</span> <span class="s1">&#39;&#39;</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln">3</span><span class="cl">
+</span></span><span class="line"><span class="ln">4</span><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="nx">strpos</span><span class="p">(</span><span class="nv">$contentType</span><span class="p">,</span> <span class="s1">&#39;application/json&#39;</span><span class="p">)</span> <span class="o">!==</span> <span class="k">false</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">5</span><span class="cl">        <span class="k">return</span> <span class="nx">json_decode</span><span class="p">(</span><span class="nx">file_get_contents</span><span class="p">(</span><span class="s2">&#34;php://input&#34;</span><span class="p">),</span> <span class="k">true</span><span class="p">);</span>
+</span></span><span class="line"><span class="ln">6</span><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="ln">7</span><span class="cl">
+</span></span><span class="line"><span class="ln">8</span><span class="cl">    <span class="k">return</span> <span class="nv">$_POST</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln">9</span><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><hr>
+<h1 id="六总结背诵版">六、总结（背诵版🔥）</h1>
+<blockquote>
+<p>HTTP POST 常见有四种：
+application/x-www-form-urlencoded、multipart/form-data、application/json、application/xml。</p>
+<p>PHP中：</p>
+<ul>
+<li>表单数据用 $_POST 获取</li>
+<li>JSON/XML 用 php://input 获取</li>
+</ul>
+<p>php://input 是一个只读输入流，可以获取原始请求体，但不能处理 multipart/form-data。</p>
+<p>在前后端分离项目中，一般通过 php://input + json_decode 来处理 JSON 请求。</p>
+</blockquote>
 <hr>
 
     </div><div class="post_comments">
