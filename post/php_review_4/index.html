@@ -168,7 +168,7 @@
     <span class="post_date">
       2025-06-04	  
     </span>
-    <span class="post_time"> · 14 分钟阅读</span><span>&nbsp;· <a href='https://jianlin-li.github.io/tags/php/' title="PHP" class="post_tag button button_translucent">PHP
+    <span class="post_time"> · 16 分钟阅读</span><span>&nbsp;· <a href='https://jianlin-li.github.io/tags/php/' title="PHP" class="post_tag button button_translucent">PHP
         </a>
     </span>
     <span class="page_only">&nbsp;·
@@ -1941,6 +1941,300 @@ application/x-www-form-urlencoded、multipart/form-data、application/json、app
 <p>php://input 是一个只读输入流，可以获取原始请求体，但不能处理 multipart/form-data。</p>
 <p>在前后端分离项目中，一般通过 php://input + json_decode 来处理 JSON 请求。</p>
 </blockquote>
+<hr>
+<hr>
+<hr>
+<hr>
+<h1 id="在-php--nginx-环境排查问题时状态码基本就是第一手线索-">在 <strong>PHP + Nginx</strong> 环境排查问题时，状态码基本就是第一手线索 👍</h1>
+<hr>
+<h1 id="-一http状态码总览按类别">🌐 一、HTTP状态码总览（按类别）</h1>
+<table>
+  <thead>
+      <tr>
+          <th>分类</th>
+          <th>范围</th>
+          <th>含义</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>1xx</td>
+          <td>100–199</td>
+          <td>请求已接收，继续处理</td>
+      </tr>
+      <tr>
+          <td>2xx</td>
+          <td>200–299</td>
+          <td>成功</td>
+      </tr>
+      <tr>
+          <td>3xx</td>
+          <td>300–399</td>
+          <td>重定向</td>
+      </tr>
+      <tr>
+          <td>4xx</td>
+          <td>400–499</td>
+          <td>客户端错误</td>
+      </tr>
+      <tr>
+          <td>5xx</td>
+          <td>500–599</td>
+          <td>服务器错误</td>
+      </tr>
+  </tbody>
+</table>
+<hr>
+<h1 id="-二2xx-成功类重点关注">✅ 二、2xx 成功类（重点关注）</h1>
+<h2 id="1-200-ok最常见">1️⃣ 200 OK（最常见）</h2>
+<p><strong>含义：</strong> 请求成功</p>
+<p><strong>常见场景：</strong></p>
+<ul>
+<li>PHP 正常执行</li>
+<li>页面成功返回</li>
+</ul>
+<hr>
+<h2 id="2-204-no-content">2️⃣ 204 No Content</h2>
+<p><strong>含义：</strong> 成功，但没有返回内容</p>
+<p><strong>常见场景：</strong></p>
+<ul>
+<li>AJAX 删除操作</li>
+<li>RESTful API</li>
+</ul>
+<hr>
+<h2 id="3-206-partial-content">3️⃣ 206 Partial Content</h2>
+<p><strong>含义：</strong> 返回部分内容（断点续传）</p>
+<p><strong>常见场景：</strong></p>
+<ul>
+<li>视频播放</li>
+<li>文件下载</li>
+</ul>
+<hr>
+<h1 id="-三3xx-重定向nginx配置常见">🔄 三、3xx 重定向（Nginx配置常见）</h1>
+<h2 id="1-301-moved-permanently">1️⃣ 301 Moved Permanently</h2>
+<p><strong>含义：</strong> 永久重定向</p>
+<p><strong>常见原因：</strong></p>
+<ul>
+<li>HTTP → HTTPS</li>
+<li>域名跳转</li>
+</ul>
+<p><strong>Nginx示例：</strong></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-nginx" data-lang="nginx"><span class="line"><span class="ln">1</span><span class="cl"><span class="k">return</span> <span class="mi">301</span> <span class="s">https://</span><span class="nv">$host$request_uri</span><span class="p">;</span>
+</span></span></code></pre></div><hr>
+<h2 id="2-302-found">2️⃣ 302 Found</h2>
+<p><strong>含义：</strong> 临时重定向</p>
+<p><strong>PHP中常见：</strong></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln">1</span><span class="cl"><span class="nx">header</span><span class="p">(</span><span class="s2">&#34;Location: /login.php&#34;</span><span class="p">);</span>
+</span></span></code></pre></div><hr>
+<h2 id="3-304-not-modified">3️⃣ 304 Not Modified</h2>
+<p><strong>含义：</strong> 资源未修改（缓存命中）</p>
+<p><strong>常见原因：</strong></p>
+<ul>
+<li>浏览器缓存（If-Modified-Since / ETag）</li>
+</ul>
+<hr>
+<h1 id="-四4xx-客户端错误重点排查">⚠️ 四、4xx 客户端错误（重点排查）</h1>
+<h2 id="-400-bad-request">🔴 400 Bad Request</h2>
+<p><strong>含义：</strong> 请求错误</p>
+<p><strong>常见原因：</strong></p>
+<ul>
+<li>请求参数格式错误</li>
+<li>JSON解析失败</li>
+<li>Header非法</li>
+</ul>
+<p><strong>PHP常见坑：</strong></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln">1</span><span class="cl"><span class="nx">json_decode</span><span class="p">(</span><span class="nx">file_get_contents</span><span class="p">(</span><span class="s2">&#34;php://input&#34;</span><span class="p">),</span> <span class="k">true</span><span class="p">);</span>
+</span></span></code></pre></div><p>👉 JSON格式错误会触发</p>
+<hr>
+<h2 id="-401-unauthorized">🔐 401 Unauthorized</h2>
+<p><strong>含义：</strong> 未认证</p>
+<p><strong>常见原因：</strong></p>
+<ul>
+<li>Token缺失</li>
+<li>登录失效</li>
+</ul>
+<hr>
+<h2 id="-403-forbidden">🚫 403 Forbidden</h2>
+<p><strong>含义：</strong> 无权限访问</p>
+<p><strong>Nginx常见原因：</strong></p>
+<ul>
+<li>文件权限问题</li>
+<li>deny all</li>
+</ul>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-nginx" data-lang="nginx"><span class="line"><span class="ln">1</span><span class="cl"><span class="k">location</span> <span class="s">/admin</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl">    <span class="kn">deny</span> <span class="s">all</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><hr>
+<h2 id="-404-not-found最常见">❌ 404 Not Found（最常见）</h2>
+<p><strong>含义：</strong> 资源不存在</p>
+<p><strong>PHP + Nginx常见原因：</strong></p>
+<ul>
+<li>路由未匹配（Laravel/Yii2）</li>
+<li>try_files 配置错误</li>
+<li>文件路径错误</li>
+</ul>
+<p><strong>关键配置：</strong></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-nginx" data-lang="nginx"><span class="line"><span class="ln">1</span><span class="cl"><span class="k">location</span> <span class="s">/</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl">    <span class="kn">try_files</span> <span class="nv">$uri</span> <span class="nv">$uri/</span> <span class="s">/index.php?</span><span class="nv">$query_string</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><hr>
+<h2 id="-405-method-not-allowed">🚷 405 Method Not Allowed</h2>
+<p><strong>含义：</strong> 请求方法不允许</p>
+<p><strong>常见原因：</strong></p>
+<ul>
+<li>GET访问POST接口</li>
+<li>Nginx限制方法</li>
+</ul>
+<hr>
+<h2 id="-413-request-entity-too-large">📦 413 Request Entity Too Large</h2>
+<p><strong>含义：</strong> 请求体太大</p>
+<p><strong>Nginx原因：</strong></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-nginx" data-lang="nginx"><span class="line"><span class="ln">1</span><span class="cl"><span class="k">client_max_body_size</span> <span class="mi">10m</span><span class="p">;</span>
+</span></span></code></pre></div><hr>
+<h2 id="-408-request-timeout">⏱️ 408 Request Timeout</h2>
+<p><strong>含义：</strong> 请求超时</p>
+<hr>
+<h1 id="-五5xx-服务器错误核心重点">💥 五、5xx 服务器错误（核心重点🔥）</h1>
+<hr>
+<h2 id="-500-internal-server-error">💣 500 Internal Server Error</h2>
+<p><strong>含义：</strong> 服务器内部错误</p>
+<p><strong>PHP常见原因：</strong></p>
+<ul>
+<li>代码报错（Fatal error）</li>
+<li>语法错误</li>
+<li>未捕获异常</li>
+</ul>
+<p><strong>排查：</strong></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">tail -f /var/log/php-fpm.log
+</span></span></code></pre></div><hr>
+<h2 id="-502-bad-gateway高频">⚙️ 502 Bad Gateway（高频🔥）</h2>
+<p><strong>含义：</strong> 网关错误（Nginx → PHP-FPM失败）</p>
+<p><strong>常见原因：</strong></p>
+<table>
+  <thead>
+      <tr>
+          <th>原因</th>
+          <th>说明</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>PHP-FPM挂了</td>
+          <td>进程未启动</td>
+      </tr>
+      <tr>
+          <td>socket路径错误</td>
+          <td>fastcgi_pass配置错误</td>
+      </tr>
+      <tr>
+          <td>超时</td>
+          <td>PHP执行太慢</td>
+      </tr>
+      <tr>
+          <td>权限问题</td>
+          <td>socket无法访问</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>检查：</strong></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">ps aux <span class="p">|</span> grep php-fpm
+</span></span></code></pre></div><hr>
+<h2 id="-503-service-unavailable">🚪 503 Service Unavailable</h2>
+<p><strong>含义：</strong> 服务不可用</p>
+<p><strong>常见原因：</strong></p>
+<ul>
+<li>PHP-FPM连接数满了</li>
+<li>Nginx限流</li>
+</ul>
+<hr>
+<h2 id="-504-gateway-timeout超常见">🧱 504 Gateway Timeout（超常见🔥）</h2>
+<p><strong>含义：</strong> 网关超时</p>
+<p><strong>典型原因：</strong></p>
+<ul>
+<li>PHP执行太慢</li>
+<li>数据库慢查询</li>
+</ul>
+<p><strong>Nginx配置：</strong></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-nginx" data-lang="nginx"><span class="line"><span class="ln">1</span><span class="cl"><span class="k">fastcgi_read_timeout</span> <span class="mi">60</span><span class="p">;</span>
+</span></span></code></pre></div><hr>
+<h1 id="-六php--nginx-高频问题总结重点">🧠 六、PHP + Nginx 高频问题总结（重点🔥）</h1>
+<h2 id="-top问题汇总">🎯 TOP问题汇总</h2>
+<h3 id="1-502-vs-504-区别必问">1️⃣ 502 vs 504 区别（必问）</h3>
+<table>
+  <thead>
+      <tr>
+          <th>状态码</th>
+          <th>含义</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>502</td>
+          <td>PHP挂了/连不上</td>
+      </tr>
+      <tr>
+          <td>504</td>
+          <td>PHP太慢</td>
+      </tr>
+  </tbody>
+</table>
+<hr>
+<h3 id="2-404但文件存在">2️⃣ 404但文件存在</h3>
+<p>👉 原因：</p>
+<ul>
+<li>try_files没配置</li>
+<li>路由未进入index.php</li>
+</ul>
+<hr>
+<h3 id="3-上传失败413">3️⃣ 上传失败（413）</h3>
+<p>👉 原因：</p>
+<ul>
+<li>Nginx限制</li>
+<li>PHP限制</li>
+</ul>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ini" data-lang="ini"><span class="line"><span class="ln">1</span><span class="cl"><span class="na">upload_max_filesize</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="na">post_max_size</span>
+</span></span></code></pre></div><hr>
+<h3 id="4-500但页面空白">4️⃣ 500但页面空白</h3>
+<p>👉 原因：</p>
+<ul>
+<li>display_errors关闭</li>
+</ul>
+<hr>
+<h3 id="5-接口偶尔502">5️⃣ 接口偶尔502</h3>
+<p>👉 原因：</p>
+<ul>
+<li>PHP-FPM进程不够</li>
+</ul>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ini" data-lang="ini"><span class="line"><span class="ln">1</span><span class="cl"><span class="na">pm.max_children</span>
+</span></span></code></pre></div><hr>
+<h1 id="-七排查问题通用流程实战">🔧 七、排查问题通用流程（实战🔥）</h1>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln"> 1</span><span class="cl">1️⃣ 看状态码（第一步）
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl">2️⃣ 看Nginx日志
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl">   access.log / error.log
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl">3️⃣ 看PHP日志
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">   php-fpm.log
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl">4️⃣ 看进程状态
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">   ps / top
+</span></span><span class="line"><span class="ln">10</span><span class="cl">
+</span></span><span class="line"><span class="ln">11</span><span class="cl">5️⃣ 检查配置
+</span></span><span class="line"><span class="ln">12</span><span class="cl">   nginx.conf / php.ini
+</span></span></code></pre></div><hr>
+<h1 id="-八一句话速记版">🎁 八、一句话速记版</h1>
+<ul>
+<li>200：成功</li>
+<li>301/302：重定向</li>
+<li>304：缓存</li>
+<li>400：请求错误</li>
+<li>403：权限问题</li>
+<li>404：资源不存在</li>
+<li>413：请求过大</li>
+<li>500：PHP错误</li>
+<li>502：PHP挂了</li>
+<li>504：PHP慢了</li>
+</ul>
 <hr>
 
     </div><div class="post_comments">
