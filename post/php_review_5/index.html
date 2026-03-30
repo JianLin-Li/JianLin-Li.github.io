@@ -168,7 +168,7 @@
     <span class="post_date">
       2026-03-30	  
     </span>
-    <span class="post_time"> · 3 分钟阅读</span><span>&nbsp;· <a href='https://jianlin-li.github.io/tags/php/' title="PHP" class="post_tag button button_translucent">PHP
+    <span class="post_time"> · 5 分钟阅读</span><span>&nbsp;· <a href='https://jianlin-li.github.io/tags/php/' title="PHP" class="post_tag button button_translucent">PHP
         </a>
     </span>
     <span class="page_only">&nbsp;·
@@ -509,6 +509,209 @@
 <li>✅ 装饰器：功能增强</li>
 <li>✅ DI：解耦依赖</li>
 </ul>
+<hr>
+<hr>
+<hr>
+<h1 id="一php数组本质是什么核心认知">一、PHP数组本质是什么？（核心认知）</h1>
+<p>👉 一句话总结：</p>
+<blockquote>
+<p><strong>PHP数组 = 有序 HashTable（哈希表）</strong></p>
+</blockquote>
+<p>它既能：</p>
+<ul>
+<li>当 <strong>普通数组（list）</strong></li>
+<li>又能当 <strong>字典（map）</strong></li>
+</ul>
+<p>例如：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln">1</span><span class="cl"><span class="nv">$arr</span> <span class="o">=</span> <span class="p">[</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl">    <span class="mi">0</span> <span class="o">=&gt;</span> <span class="s1">&#39;a&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">3</span><span class="cl">    <span class="mi">1</span> <span class="o">=&gt;</span> <span class="s1">&#39;b&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">4</span><span class="cl">    <span class="s1">&#39;name&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Tom&#39;</span>
+</span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="p">];</span>
+</span></span></code></pre></div><p>👉 这在C/C++里其实是两种结构，但PHP用一个结构统一了。</p>
+<hr>
+<h1 id="二php数组底层结构zend引擎">二、PHP数组底层结构（Zend引擎）</h1>
+<p>PHP7以后（重点！），数组结构大幅优化，核心是：</p>
+<h2 id="1-hashtable结构">1️⃣ HashTable结构</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="ln">1</span><span class="cl"><span class="k">typedef</span> <span class="k">struct</span> <span class="n">_zend_array</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl">    <span class="n">zend_refcounted_h</span> <span class="n">gc</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln">3</span><span class="cl">    <span class="kt">uint32_t</span> <span class="n">flags</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln">4</span><span class="cl">    <span class="kt">uint32_t</span> <span class="n">nTableMask</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln">5</span><span class="cl">    <span class="n">Bucket</span> <span class="o">*</span><span class="n">arData</span><span class="p">;</span>      <span class="c1">// 数据区
+</span></span></span><span class="line"><span class="ln">6</span><span class="cl"><span class="c1"></span>    <span class="kt">uint32_t</span> <span class="n">nNumUsed</span><span class="p">;</span>   <span class="c1">// 已使用槽位
+</span></span></span><span class="line"><span class="ln">7</span><span class="cl"><span class="c1"></span>    <span class="kt">uint32_t</span> <span class="n">nNumOfElements</span><span class="p">;</span> <span class="c1">// 实际元素个数
+</span></span></span><span class="line"><span class="ln">8</span><span class="cl"><span class="c1"></span>    <span class="kt">uint32_t</span> <span class="n">nTableSize</span><span class="p">;</span> <span class="c1">// 表大小（2^n）
+</span></span></span><span class="line"><span class="ln">9</span><span class="cl"><span class="c1"></span><span class="p">}</span> <span class="n">zend_array</span><span class="p">;</span>
+</span></span></code></pre></div><hr>
+<h2 id="2-bucket结构重点">2️⃣ Bucket结构（重点）</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="ln">1</span><span class="cl"><span class="k">typedef</span> <span class="k">struct</span> <span class="n">_Bucket</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl">    <span class="n">zval</span> <span class="n">val</span><span class="p">;</span>        <span class="c1">// 值
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="c1"></span>    <span class="n">zend_ulong</span> <span class="n">h</span><span class="p">;</span>    <span class="c1">// hash值（或数字索引）
+</span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="c1"></span>    <span class="n">zend_string</span> <span class="o">*</span><span class="n">key</span><span class="p">;</span> <span class="c1">// 字符串key
+</span></span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="c1"></span><span class="p">}</span> <span class="n">Bucket</span><span class="p">;</span>
+</span></span></code></pre></div><p>👉 可以理解为：</p>
+<table>
+  <thead>
+      <tr>
+          <th>字段</th>
+          <th>作用</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>key</td>
+          <td>键</td>
+      </tr>
+      <tr>
+          <td>h</td>
+          <td>hash值</td>
+      </tr>
+      <tr>
+          <td>val</td>
+          <td>值</td>
+      </tr>
+  </tbody>
+</table>
+<hr>
+<h2 id="3-内存结构简化理解">3️⃣ 内存结构（简化理解）</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="ln">1</span><span class="cl">HashTable
+</span></span><span class="line"><span class="ln">2</span><span class="cl">   ↓
+</span></span><span class="line"><span class="ln">3</span><span class="cl">arData（数组）
+</span></span><span class="line"><span class="ln">4</span><span class="cl">   ↓
+</span></span><span class="line"><span class="ln">5</span><span class="cl">+--------+--------+--------+
+</span></span><span class="line"><span class="ln">6</span><span class="cl">|Bucket0 |Bucket1 |Bucket2 |
+</span></span><span class="line"><span class="ln">7</span><span class="cl">+--------+--------+--------+
+</span></span></code></pre></div><hr>
+<h1 id="三php数组如何存数据">三、PHP数组如何存数据？</h1>
+<h2 id="1-key处理">1️⃣ key处理</h2>
+<p>PHP对key会做两种处理：</p>
+<h3 id="-数字key">✔ 数字key</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln">1</span><span class="cl"><span class="nv">$arr</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;a&#39;</span><span class="p">;</span>
+</span></span></code></pre></div><p>👉 直接用 <code>1</code> 作为 hash</p>
+<hr>
+<h3 id="-字符串key">✔ 字符串key</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln">1</span><span class="cl"><span class="nv">$arr</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;Tom&#39;</span><span class="p">;</span>
+</span></span></code></pre></div><p>👉 会执行：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="ln">1</span><span class="cl"><span class="n">hash</span> <span class="o">=</span> <span class="nf">zend_string_hash_func</span><span class="p">(</span><span class="s">&#34;name&#34;</span><span class="p">);</span>
+</span></span></code></pre></div><hr>
+<h2 id="2-找位置核心公式">2️⃣ 找位置（核心公式）</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">index = hash &amp; (nTableSize - 1)
+</span></span></code></pre></div><p>👉 本质是 <strong>位运算取模（比%更快）</strong></p>
+<hr>
+<h1 id="四哈希冲突是怎么发生的">四、哈希冲突是怎么发生的？</h1>
+<p>当两个不同key：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln">1</span><span class="cl"><span class="nv">$arr</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;Tom&#39;</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="nv">$arr</span><span class="p">[</span><span class="s1">&#39;age&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">18</span><span class="p">;</span>
+</span></span></code></pre></div><p>👉 如果：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="ln">1</span><span class="cl">hash(&#39;name&#39;) &amp; mask == hash(&#39;age&#39;) &amp; mask
+</span></span></code></pre></div><p>➡️ 就会落在同一个槽位</p>
+<p>👉 这就是 <strong>哈希冲突</strong></p>
+<hr>
+<h1 id="五php如何解决哈希冲突重点">五、PHP如何解决哈希冲突？（重点！！！）</h1>
+<p>PHP使用的是：</p>
+<h1 id="-链地址法拉链法--索引链表优化版">👉 <strong>链地址法（拉链法） + 索引链表（优化版）</strong></h1>
+<p>但注意⚠️：</p>
+<p>👉 <strong>PHP7不是传统链表，而是“隐式链表”</strong></p>
+<hr>
+<h2 id="1-php5旧版本">1️⃣ PHP5（旧版本）</h2>
+<p>👉 使用 <strong>真正链表</strong></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="ln">1</span><span class="cl">index -&gt; Bucket -&gt; Bucket -&gt; Bucket
+</span></span></code></pre></div><p>缺点：</p>
+<ul>
+<li>内存碎片多</li>
+<li>cache不友好</li>
+</ul>
+<hr>
+<h2 id="2-php7重点">2️⃣ PHP7（重点）</h2>
+<p>👉 改成：</p>
+<h3 id="-数组--索引链非常关键">✅ 数组 + 索引链（非常关键）</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="ln">1</span><span class="cl">arData（连续内存）
+</span></span><span class="line"><span class="ln">2</span><span class="cl">+--------+--------+--------+--------+
+</span></span><span class="line"><span class="ln">3</span><span class="cl">|Bucket0 |Bucket1 |Bucket2 |Bucket3 |
+</span></span><span class="line"><span class="ln">4</span><span class="cl">+--------+--------+--------+--------+
+</span></span><span class="line"><span class="ln">5</span><span class="cl">
+</span></span><span class="line"><span class="ln">6</span><span class="cl">hash槽（存索引）
+</span></span><span class="line"><span class="ln">7</span><span class="cl">index -&gt; 2 -&gt; 5 -&gt; 8
+</span></span></code></pre></div><p>👉 冲突时：</p>
+<p>不是指针链表，而是：</p>
+<p>👉 <strong>用“下标”串起来</strong></p>
+<hr>
+<h2 id="3-冲突解决过程举例">3️⃣ 冲突解决过程（举例）</h2>
+<h3 id="插入">插入：</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln">1</span><span class="cl"><span class="nv">$arr</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;Tom&#39;</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="nv">$arr</span><span class="p">[</span><span class="s1">&#39;age&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">18</span><span class="p">;</span>
+</span></span></code></pre></div><p>假设冲突：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="ln">1</span><span class="cl">index = 3
+</span></span></code></pre></div><hr>
+<h3 id="存储">存储：</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="ln">1</span><span class="cl">槽3 → Bucket0 (name)
+</span></span><span class="line"><span class="ln">2</span><span class="cl">     ↓
+</span></span><span class="line"><span class="ln">3</span><span class="cl">     Bucket1 (age)
+</span></span></code></pre></div><p>👉 实际是：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="ln">1</span><span class="cl">hash[3] = 0   // Bucket0
+</span></span><span class="line"><span class="ln">2</span><span class="cl">Bucket0.next = 1
+</span></span><span class="line"><span class="ln">3</span><span class="cl">Bucket1.next = -1
+</span></span></code></pre></div><hr>
+<h2 id="-查找流程非常重要">🔥 查找流程（非常重要）</h2>
+<p>查找：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln">1</span><span class="cl"><span class="nv">$arr</span><span class="p">[</span><span class="s1">&#39;age&#39;</span><span class="p">]</span>
+</span></span></code></pre></div><p>步骤：</p>
+<p>1️⃣ 算hash
+2️⃣ 找槽位
+3️⃣ 拿到第一个Bucket
+4️⃣ 比较key
+5️⃣ 不等 → 找next
+6️⃣ 直到找到</p>
+<hr>
+<p>👉 时间复杂度：</p>
+<ul>
+<li>理想：<strong>O(1)</strong></li>
+<li>冲突严重：<strong>O(n)</strong></li>
+</ul>
+<hr>
+<h1 id="六php数组的优化点">六、PHP数组的优化点</h1>
+<h2 id="1-packed-array压缩数组">1️⃣ Packed Array（压缩数组）</h2>
+<p>当数组是：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln">1</span><span class="cl"><span class="nv">$arr</span> <span class="o">=</span> <span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">30</span><span class="p">];</span>
+</span></span></code></pre></div><p>👉 PHP不会用哈希表！</p>
+<p>👉 而是：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="ln">1</span><span class="cl">连续内存（vector）
+</span></span></code></pre></div><p>👉 查找变成：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="ln">1</span><span class="cl">O(1) + 极致cache友好
+</span></span></code></pre></div><hr>
+<h2 id="2-自动扩容">2️⃣ 自动扩容</h2>
+<p>当元素变多：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">nNumUsed &gt; nTableSize
+</span></span></code></pre></div><p>👉 触发：</p>
+<ul>
+<li>扩容为 <strong>2倍</strong></li>
+<li>重新hash（rehash）</li>
+</ul>
+<hr>
+<h2 id="3-删除优化懒删除">3️⃣ 删除优化（懒删除）</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln">1</span><span class="cl"><span class="nx">unset</span><span class="p">(</span><span class="nv">$arr</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]);</span>
+</span></span></code></pre></div><p>👉 不会立即移动数据，而是：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="ln">1</span><span class="cl">标记为 UNDEF
+</span></span></code></pre></div><p>避免频繁移动内存</p>
+<hr>
+<h1 id="七总结">七、总结</h1>
+<hr>
+<p>👉 <strong>标准总结版：</strong></p>
+<blockquote>
+<p>PHP数组底层是HashTable（哈希表），在PHP7中采用连续内存存储Bucket，并通过hash计算定位索引。
+当发生哈希冲突时，PHP采用链地址法，但不是传统链表，而是通过数组下标形成隐式链表来解决冲突。
+查找时通过hash定位槽位，再沿链查找key。
+同时PHP针对纯数字索引数组做了Packed Array优化，提高性能和内存利用率。</p>
+</blockquote>
+<hr>
+<h1 id="八再给你一个理解口诀">八、再给你一个“理解口诀”🧠</h1>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="ln">1</span><span class="cl">PHP数组不简单，
+</span></span><span class="line"><span class="ln">2</span><span class="cl">本质其实是Hash链。
+</span></span><span class="line"><span class="ln">3</span><span class="cl">冲突不用真链表，
+</span></span><span class="line"><span class="ln">4</span><span class="cl">下标串联更高效。
+</span></span><span class="line"><span class="ln">5</span><span class="cl">纯数字走优化路，
+</span></span><span class="line"><span class="ln">6</span><span class="cl">Packed数组飞一般。
+</span></span></code></pre></div><hr>
 
     </div><div class="post_comments">
   

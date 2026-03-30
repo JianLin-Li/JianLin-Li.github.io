@@ -168,7 +168,7 @@
     <span class="post_date">
       2026-03-30	  
     </span>
-    <span class="post_time"> · 4 分钟阅读</span><span>&nbsp;· <a href='https://jianlin-li.github.io/tags/nginx/' title="Nginx" class="post_tag button button_translucent">Nginx
+    <span class="post_time"> · 5 分钟阅读</span><span>&nbsp;· <a href='https://jianlin-li.github.io/tags/nginx/' title="Nginx" class="post_tag button button_translucent">Nginx
         </a>
     </span>
     <span class="page_only">&nbsp;·
@@ -672,6 +672,118 @@
 先进行前缀或正则匹配，进入 rewrite 阶段后可能通过 rewrite 或 try_files 改写 URI，从而触发新的 location 匹配。
 其中 ^~ 可以阻断正则匹配，try_files 本质是内部重定向，proxy_pass 是否带 / 会影响 URI 拼接规则。</p>
 </blockquote>
+<hr>
+<hr>
+<hr>
+<h1 id="在-nginx-的反向代理配置中支持多种负载均衡load-balancing策略用于将客户端请求分发到多个后端服务器以下是-nginx-中常用的几种负载均衡方式">在 Nginx 的反向代理配置中，支持多种<strong>负载均衡（Load Balancing）策略</strong>，用于将客户端请求分发到多个后端服务器。以下是 Nginx 中常用的几种负载均衡方式：</h1>
+<hr>
+<h3 id="1-轮询round-robin--默认方式">1. <strong>轮询（Round Robin）</strong> —— 默认方式</h3>
+<ul>
+<li>按照顺序逐一分配请求到后端服务器。</li>
+<li>如果某台服务器宕机，Nginx 会自动跳过该服务器（前提是配置了 <code>max_fails</code> 和 <code>fail_timeout</code>）。</li>
+</ul>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-nginx" data-lang="nginx"><span class="line"><span class="ln">1</span><span class="cl"><span class="k">upstream</span> <span class="s">backend</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl">    <span class="kn">server</span> <span class="n">192.168.1.10</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln">3</span><span class="cl">    <span class="kn">server</span> <span class="n">192.168.1.11</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><hr>
+<h3 id="2-加权轮询weighted-round-robin">2. <strong>加权轮询（Weighted Round Robin）</strong></h3>
+<ul>
+<li>通过 <code>weight</code> 参数指定每台服务器的权重，权重越高，分配到的请求越多。</li>
+<li>适用于后端服务器性能不均的情况。</li>
+</ul>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-nginx" data-lang="nginx"><span class="line"><span class="ln">1</span><span class="cl"><span class="k">upstream</span> <span class="s">backend</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl">    <span class="kn">server</span> <span class="n">192.168.1.10</span> <span class="s">weight=3</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln">3</span><span class="cl">    <span class="kn">server</span> <span class="n">192.168.1.11</span> <span class="s">weight=1</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><blockquote>
+<p>上例中，10 号服务器大约处理 75% 的请求，11 号处理 25%。</p>
+</blockquote>
+<hr>
+<h3 id="3-ip-哈希ip_">3. <strong>IP 哈希（ip_hash）</strong></h3>
+<ul>
+<li>根据客户端 IP 地址的哈希值，将请求固定分配到某一台后端服务器。</li>
+<li>保证同一客户端始终访问同一台后端（<strong>会话保持</strong>的一种简单实现）。</li>
+<li>注意：不适用于 IPv6 或 CDN 等多用户共享 IP 的场景。</li>
+</ul>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-nginx" data-lang="nginx"><span class="line"><span class="ln">1</span><span class="cl"><span class="k">upstream</span> <span class="s">backend</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl">    <span class="kn">ip_hash</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln">3</span><span class="cl">    <span class="kn">server</span> <span class="n">192.168.1.10</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln">4</span><span class="cl">    <span class="kn">server</span> <span class="n">192.168.1.11</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><hr>
+<h3 id="4-最少连接least_">4. <strong>最少连接（least_conn）</strong></h3>
+<ul>
+<li>将新请求分配给当前活跃连接数最少的服务器。</li>
+<li>适合处理长连接或请求处理时间差异较大的场景。</li>
+</ul>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-nginx" data-lang="nginx"><span class="line"><span class="ln">1</span><span class="cl"><span class="k">upstream</span> <span class="s">backend</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl">    <span class="kn">least_conn</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln">3</span><span class="cl">    <span class="kn">server</span> <span class="n">192.168.1.10</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln">4</span><span class="cl">    <span class="kn">server</span> <span class="n">192.168.1.11</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><hr>
+<h3 id="5-通用哈希hash--nginx-plus-或开源版-172-支持">5. <strong>通用哈希（hash）</strong> —— Nginx Plus 或开源版 1.7.2+ 支持</h3>
+<ul>
+<li>可基于任意变量（如 <code>$request_uri</code>、<code>$cookie_jsessionid</code> 等）进行哈希。</li>
+<li>实现更灵活的会话保持或缓存一致性。</li>
+</ul>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-nginx" data-lang="nginx"><span class="line"><span class="ln">1</span><span class="cl"><span class="k">upstream</span> <span class="s">backend</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl">    <span class="kn">hash</span> <span class="nv">$request_uri</span> <span class="s">consistent</span><span class="p">;</span>  <span class="c1"># consistent 表示使用一致性哈希
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="c1"></span>    <span class="kn">server</span> <span class="n">192.168.1.10</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln">4</span><span class="cl">    <span class="kn">server</span> <span class="n">192.168.1.11</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><blockquote>
+<p><code>consistent</code> 关键字启用<strong>一致性哈希</strong>，在后端服务器增减时减少缓存失效范围。</p>
+</blockquote>
+<hr>
+<h3 id="补充说明">补充说明：</h3>
+<ul>
+<li><strong>健康检查</strong>：Nginx 开源版仅支持被动健康检查（通过 <code>max_fails</code> 和 <code>fail_timeout</code>），而 Nginx Plus 支持主动健康检查。</li>
+<li><strong>backup 服务器</strong>：可标记备用服务器，在主服务器全部宕机时启用。</li>
+</ul>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-nginx" data-lang="nginx"><span class="line"><span class="ln">1</span><span class="cl"><span class="k">upstream</span> <span class="s">backend</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl">    <span class="kn">server</span> <span class="n">192.168.1.10</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln">3</span><span class="cl">    <span class="kn">server</span> <span class="n">192.168.1.11</span> <span class="s">backup</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><hr>
+<h3 id="总结对比">总结对比</h3>
+<table>
+  <thead>
+      <tr>
+          <th>负载均衡方式</th>
+          <th>特点</th>
+          <th>适用场景</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>轮询</td>
+          <td>默认，均匀分配</td>
+          <td>后端性能相近</td>
+      </tr>
+      <tr>
+          <td>加权轮询</td>
+          <td>按权重分配</td>
+          <td>后端性能不均</td>
+      </tr>
+      <tr>
+          <td>IP 哈希</td>
+          <td>同一 IP 固定到同一后端</td>
+          <td>需要简单会话保持</td>
+      </tr>
+      <tr>
+          <td>最少连接</td>
+          <td>分配给连接最少的服务器</td>
+          <td>长连接、处理时间不均</td>
+      </tr>
+      <tr>
+          <td>通用哈希</td>
+          <td>自定义 key 哈希（如 URI、Cookie）</td>
+          <td>缓存一致性、高级会话保持</td>
+      </tr>
+  </tbody>
+</table>
 <hr>
 
     </div><div class="post_comments">
