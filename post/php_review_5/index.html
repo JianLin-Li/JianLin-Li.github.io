@@ -168,7 +168,7 @@
     <span class="post_date">
       2026-03-30	  
     </span>
-    <span class="post_time"> · 5 分钟阅读</span><span>&nbsp;· <a href='https://jianlin-li.github.io/tags/php/' title="PHP" class="post_tag button button_translucent">PHP
+    <span class="post_time"> · 6 分钟阅读</span><span>&nbsp;· <a href='https://jianlin-li.github.io/tags/php/' title="PHP" class="post_tag button button_translucent">PHP
         </a>
     </span>
     <span class="page_only">&nbsp;·
@@ -512,205 +512,903 @@
 <hr>
 <hr>
 <hr>
-<h1 id="一php数组本质是什么核心认知">一、PHP数组本质是什么？（核心认知）</h1>
-<p>👉 一句话总结：</p>
+<h1 id="一-php数组底层--两块东西">一、👉 PHP数组底层 = <strong>两块东西</strong></h1>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="ln">1</span><span class="cl">1️⃣ 索引表（hash槽位）
+</span></span><span class="line"><span class="ln">2</span><span class="cl">2️⃣ 数据区（Bucket数组）
+</span></span></code></pre></div><p>可以理解成：</p>
 <blockquote>
-<p><strong>PHP数组 = 有序 HashTable（哈希表）</strong></p>
+<p>📦 “目录 + 仓库”</p>
 </blockquote>
-<p>它既能：</p>
-<ul>
-<li>当 <strong>普通数组（list）</strong></li>
-<li>又能当 <strong>字典（map）</strong></li>
-</ul>
-<p>例如：</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln">1</span><span class="cl"><span class="nv">$arr</span> <span class="o">=</span> <span class="p">[</span>
-</span></span><span class="line"><span class="ln">2</span><span class="cl">    <span class="mi">0</span> <span class="o">=&gt;</span> <span class="s1">&#39;a&#39;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">3</span><span class="cl">    <span class="mi">1</span> <span class="o">=&gt;</span> <span class="s1">&#39;b&#39;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">4</span><span class="cl">    <span class="s1">&#39;name&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Tom&#39;</span>
-</span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="p">];</span>
-</span></span></code></pre></div><p>👉 这在C/C++里其实是两种结构，但PHP用一个结构统一了。</p>
 <hr>
-<h1 id="二php数组底层结构zend引擎">二、PHP数组底层结构（Zend引擎）</h1>
-<p>PHP7以后（重点！），数组结构大幅优化，核心是：</p>
-<h2 id="1-hashtable结构">1️⃣ HashTable结构</h2>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="ln">1</span><span class="cl"><span class="k">typedef</span> <span class="k">struct</span> <span class="n">_zend_array</span> <span class="p">{</span>
-</span></span><span class="line"><span class="ln">2</span><span class="cl">    <span class="n">zend_refcounted_h</span> <span class="n">gc</span><span class="p">;</span>
-</span></span><span class="line"><span class="ln">3</span><span class="cl">    <span class="kt">uint32_t</span> <span class="n">flags</span><span class="p">;</span>
-</span></span><span class="line"><span class="ln">4</span><span class="cl">    <span class="kt">uint32_t</span> <span class="n">nTableMask</span><span class="p">;</span>
-</span></span><span class="line"><span class="ln">5</span><span class="cl">    <span class="n">Bucket</span> <span class="o">*</span><span class="n">arData</span><span class="p">;</span>      <span class="c1">// 数据区
-</span></span></span><span class="line"><span class="ln">6</span><span class="cl"><span class="c1"></span>    <span class="kt">uint32_t</span> <span class="n">nNumUsed</span><span class="p">;</span>   <span class="c1">// 已使用槽位
-</span></span></span><span class="line"><span class="ln">7</span><span class="cl"><span class="c1"></span>    <span class="kt">uint32_t</span> <span class="n">nNumOfElements</span><span class="p">;</span> <span class="c1">// 实际元素个数
-</span></span></span><span class="line"><span class="ln">8</span><span class="cl"><span class="c1"></span>    <span class="kt">uint32_t</span> <span class="n">nTableSize</span><span class="p">;</span> <span class="c1">// 表大小（2^n）
-</span></span></span><span class="line"><span class="ln">9</span><span class="cl"><span class="c1"></span><span class="p">}</span> <span class="n">zend_array</span><span class="p">;</span>
+<h1 id="二整体结构图先建立全局认知">二、整体结构图（先建立全局认知）🧠</h1>
+<p><figure>
+  <picture>
+
+    
+      
+        
+        
+        
+        
+        
+        
+    <img
+      loading="lazy"
+      decoding="async"
+      alt="Image"
+      
+        class="image_figure image_external image_processed"
+        width="1100"
+        height="472"
+        src="https://jianlin-li.github.io/images/HU4Zw97AdcxvMPtxpd4PtKNEpM8n9cam-fN5QTRV-U6EGpJbmope2VzVqyFuNLHsbwNFQWPWfp84FBZTY5CyJWoO_ldf7oWmL2gkQN7RibInytESkqMoxIYAgkhDQ5Cy5GY3VmYfv2fIdXLu3icoU9ktSJG5-0-tteMK8VpdYlx92-XvRXqrI9NZOx6HsY0q_17162678888688154082.jpg"
+      
+      
+    />
+
+    </picture>
+</figure>
+</p>
+<p><figure>
+  <picture>
+
+    
+      
+        
+        
+        
+        
+        
+        
+    <img
+      loading="lazy"
+      decoding="async"
+      alt="Image"
+      
+        class="image_figure image_external image_processed"
+        width="545"
+        height="431"
+        src="https://jianlin-li.github.io/images/9E6KOJzPO3Mn1UWf12zF7lnXCW9q3GF078QhRUqNYeTQ71bn08h-9Qrir1zafJBcNgEXdoO4WuZGJs3wFLTUzq1ogydWUtd5qJQED-ioHPkKwNyP0YE1H_O2eWwqEUbcnzkY1qm9G-BUpMSc_UcYeZbOWXU4Vc9Z8APV039WToTvrKRYiXwiIga69qF_9yMY_5435036919117922980.jpg"
+      
+      
+    />
+
+    </picture>
+</figure>
+</p>
+<p>👉 对应关系我给你翻译成人话：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="ln">1</span><span class="cl">索引表（arHash）         数据区（arData / Bucket数组）
+</span></span><span class="line"><span class="ln">2</span><span class="cl">
+</span></span><span class="line"><span class="ln">3</span><span class="cl">  [0]  ─────────────▶  Bucket[0]
+</span></span><span class="line"><span class="ln">4</span><span class="cl">  [1]  ─────────────▶  Bucket[1]
+</span></span><span class="line"><span class="ln">5</span><span class="cl">  [2]  ─────────────▶  Bucket[2]
+</span></span><span class="line"><span class="ln">6</span><span class="cl">  [3]  ─────────────▶  Bucket[3]
 </span></span></code></pre></div><hr>
-<h2 id="2-bucket结构重点">2️⃣ Bucket结构（重点）</h2>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="ln">1</span><span class="cl"><span class="k">typedef</span> <span class="k">struct</span> <span class="n">_Bucket</span> <span class="p">{</span>
-</span></span><span class="line"><span class="ln">2</span><span class="cl">    <span class="n">zval</span> <span class="n">val</span><span class="p">;</span>        <span class="c1">// 值
-</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="c1"></span>    <span class="n">zend_ulong</span> <span class="n">h</span><span class="p">;</span>    <span class="c1">// hash值（或数字索引）
-</span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="c1"></span>    <span class="n">zend_string</span> <span class="o">*</span><span class="n">key</span><span class="p">;</span> <span class="c1">// 字符串key
-</span></span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="c1"></span><span class="p">}</span> <span class="n">Bucket</span><span class="p">;</span>
-</span></span></code></pre></div><p>👉 可以理解为：</p>
+<h1 id="三什么是-bucket-数组重点">三、什么是 Bucket 数组？（重点🔥）</h1>
+<p>👉 你可以把它理解为：</p>
+<blockquote>
+<p>📦 <strong>一个连续的数组，每个格子都是一个“数据对象”</strong></p>
+</blockquote>
+<h3 id="举例">举例：</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln">1</span><span class="cl"><span class="nv">$arr</span> <span class="o">=</span> <span class="p">[</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl">  <span class="s2">&#34;name&#34;</span> <span class="o">=&gt;</span> <span class="s2">&#34;Tom&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">3</span><span class="cl">  <span class="s2">&#34;age&#34;</span>  <span class="o">=&gt;</span> <span class="mi">18</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">4</span><span class="cl">  <span class="s2">&#34;city&#34;</span> <span class="o">=&gt;</span> <span class="s2">&#34;NY&#34;</span>
+</span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="p">];</span>
+</span></span></code></pre></div><hr>
+<h3 id="在内存中的-bucket数组">在内存中的 Bucket数组：</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="ln">1</span><span class="cl">Bucket[0]: key=name, value=Tom
+</span></span><span class="line"><span class="ln">2</span><span class="cl">Bucket[1]: key=age,  value=18
+</span></span><span class="line"><span class="ln">3</span><span class="cl">Bucket[2]: key=city, value=NY
+</span></span></code></pre></div><p>👉 特点：</p>
+<ul>
+<li>连续存储（像普通数组）</li>
+<li>保证顺序（插入顺序）</li>
+</ul>
+<hr>
+<h1 id="四索引表是干嘛的">四、索引表是干嘛的？🤔</h1>
+<p>👉 用来“快速找到 Bucket”</p>
+<p>不是直接存数据，而是：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="ln">1</span><span class="cl">hash(key) → index → 找到 Bucket位置
+</span></span></code></pre></div><hr>
+<h1 id="五重点来了哈希冲突怎么解决-">五、重点来了：哈希冲突怎么解决 🔥🔥🔥</h1>
+<p>我们一步一步来 👇</p>
+<hr>
+<h2 id="-场景发生冲突">🎯 场景：发生冲突</h2>
+<p>假设：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="ln">1</span><span class="cl">&#34;name&#34; → index = 2
+</span></span><span class="line"><span class="ln">2</span><span class="cl">&#34;age&#34;  → index = 2   ❗冲突
+</span></span></code></pre></div><hr>
+<h2 id="-php-的解决方式">🧠 PHP 的解决方式：</h2>
+<p>👉 <strong>用 next 索引，把冲突的元素串起来</strong></p>
+<hr>
+<h1 id="六核心结构图你必须看懂这个">六、核心结构图（你必须看懂这个）👇</h1>
+<p><figure>
+  <picture>
+
+    
+      
+        
+        
+        
+        
+        
+        
+    <img
+      loading="lazy"
+      decoding="async"
+      alt="Image"
+      
+        class="image_figure image_external image_processed"
+        width="545"
+        height="431"
+        src="https://jianlin-li.github.io/images/9E6KOJzPO3Mn1UWf12zF7lnXCW9q3GF078QhRUqNYeTQ71bn08h-9Qrir1zafJBcNgEXdoO4WuZGJs3wFLTUzq1ogydWUtd5qJQED-ioHPkKwNyP0YE1H_O2eWwqEUbcnzkY1qm9G-BUpMSc_UcYeZbOWXU4Vc9Z8APV039WToTvrKRYiXwiIga69qF_9yMY_5435036919117922980.jpg"
+      
+      
+    />
+
+    </picture>
+</figure>
+</p>
+<p><figure>
+  <picture>
+
+    
+      
+        
+        
+        
+        
+        
+        
+    <img
+      loading="lazy"
+      decoding="async"
+      alt="Image"
+      
+        class="image_figure image_external image_processed"
+        width="800"
+        height="400"
+        src="https://jianlin-li.github.io/images/cLvBoAkHR8S_KV1iYCC9D9eiJMFwd-DfrsPC5rBwL7n68gZXoOymNyMv108k07POAjkqioUEBdiIx4mV0HPP79Eo2EipSNN0inXl3X42_5QkHZP9bAVbMweRaymhpIroh271-YKcCjGTit6Xmvu0-fyn8bL9Rx19cQLty6L-zsV7DQ-NYvjY34BEcUdmOBvk_10536901112149932415.jpg"
+      
+      
+    />
+
+    </picture>
+</figure>
+</p>
+<p><figure>
+  <picture>
+
+    
+      
+        
+        
+        
+        
+        
+        
+    <img
+      loading="lazy"
+      decoding="async"
+      alt="Image"
+      
+        class="image_figure image_external image_processed"
+        width="545"
+        height="431"
+        src="https://jianlin-li.github.io/images/9E6KOJzPO3Mn1UWf12zF7lnXCW9q3GF078QhRUqNYeTQ71bn08h-9Qrir1zafJBcNgEXdoO4WuZGJs3wFLTUzq1ogydWUtd5qJQED-ioHPkKwNyP0YE1H_O2eWwqEUbcnzkY1qm9G-BUpMSc_UcYeZbOWXU4Vc9Z8APV039WToTvrKRYiXwiIga69qF_9yMY_5435036919117922980.jpg"
+      
+      
+    />
+
+    </picture>
+</figure>
+</p>
+<p><figure>
+  <picture>
+
+    
+      
+        
+        
+        
+        
+        
+        
+    <img
+      loading="lazy"
+      decoding="async"
+      alt="Image"
+      
+        class="image_figure image_external image_processed"
+        width="545"
+        height="431"
+        src="https://jianlin-li.github.io/images/9E6KOJzPO3Mn1UWf12zF7lnXCW9q3GF078QhRUqNYeTQ71bn08h-9Qrir1zafJBcNgEXdoO4WuZGJs3wFLTUzq1ogydWUtd5qJQED-ioHPkKwNyP0YE1H_O2eWwqEUbcnzkY1qm9G-BUpMSc_UcYeZbOWXU4Vc9Z8APV039WToTvrKRYiXwiIga69qF_9yMY_5435036919117922980.jpg"
+      
+      
+    />
+
+    </picture>
+</figure>
+</p>
+<hr>
+<h2 id="-我给你翻译这个图超关键">👉 我给你翻译这个图（超关键）</h2>
+<h3 id="数据区bucket数组">数据区（Bucket数组）：</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="ln">1</span><span class="cl">Bucket[0]: name=Tom, next = -1
+</span></span><span class="line"><span class="ln">2</span><span class="cl">Bucket[1]: age=18,  next = -1
+</span></span><span class="line"><span class="ln">3</span><span class="cl">Bucket[2]: city=NY, next = -1
+</span></span></code></pre></div><p>现在插入冲突数据：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="ln">1</span><span class="cl">Bucket[3]: key=xxx, next = ?
+</span></span></code></pre></div><hr>
+<h2 id="-冲突发生时的变化">🔥 冲突发生时的变化：</h2>
+<p>假设：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="ln">1</span><span class="cl">&#34;name&#34; 在 index=2
+</span></span><span class="line"><span class="ln">2</span><span class="cl">&#34;age&#34;  也算出 index=2
+</span></span></code></pre></div><hr>
+<h2 id="-串联过程">🔗 串联过程：</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="ln">1</span><span class="cl">索引表 index[2] → Bucket[0]
+</span></span><span class="line"><span class="ln">2</span><span class="cl">
+</span></span><span class="line"><span class="ln">3</span><span class="cl">Bucket[0] (name)
+</span></span><span class="line"><span class="ln">4</span><span class="cl">   ↓ next
+</span></span><span class="line"><span class="ln">5</span><span class="cl">Bucket[1] (age)
+</span></span></code></pre></div><hr>
+<p>👉 实际结构变成：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="ln">1</span><span class="cl">index[2]
+</span></span><span class="line"><span class="ln">2</span><span class="cl">   ↓
+</span></span><span class="line"><span class="ln">3</span><span class="cl">Bucket[0] (name)
+</span></span><span class="line"><span class="ln">4</span><span class="cl">   ↓ next
+</span></span><span class="line"><span class="ln">5</span><span class="cl">Bucket[1] (age)
+</span></span></code></pre></div><hr>
+<h1 id="七查找流程冲突情况下">七、查找流程（冲突情况下）🚀</h1>
+<p>查找：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln">1</span><span class="cl"><span class="nv">$arr</span><span class="p">[</span><span class="s1">&#39;age&#39;</span><span class="p">]</span>
+</span></span></code></pre></div><hr>
+<h3 id="步骤">步骤：</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="ln"> 1</span><span class="cl">1️⃣ hash(&#39;age&#39;) → index=2
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl">2️⃣ 找 index[2] → Bucket[0]
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl">3️⃣ 比较 key：
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">    name ≠ age ❌
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl">4️⃣ 看 next → Bucket[1]
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">
+</span></span><span class="line"><span class="ln">10</span><span class="cl">5️⃣ 再比较：
+</span></span><span class="line"><span class="ln">11</span><span class="cl">    age == age ✅ 找到了
+</span></span></code></pre></div><hr>
+<p>👉 本质就是：</p>
+<blockquote>
+<p>❗“数组版链表查找”</p>
+</blockquote>
+<hr>
+<h1 id="八为什么不用真正链表">八、为什么不用真正链表？🤔</h1>
+<p>传统链表：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="ln">1</span><span class="cl">node → node → node （指针）
+</span></span></code></pre></div><p>PHP 用的是：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="ln">1</span><span class="cl">数组下标（index）代替指针
+</span></span></code></pre></div><p>👉 优点：</p>
+<ul>
+<li>更省内存（没有指针）</li>
+<li>CPU缓存友好（连续内存）</li>
+<li>更快 🚀</li>
+</ul>
+<hr>
+<h1 id="九再帮你用生活类比一下-">九、再帮你用生活类比一下 🧠</h1>
+<p>想象：</p>
+<h2 id="-场景图书馆">🏢 场景：图书馆</h2>
+<h3 id="-索引表--目录">📌 索引表 = 目录</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="ln">1</span><span class="cl">“编程类” → 第3排
+</span></span></code></pre></div><hr>
+<h3 id="-bucket数组--书架">📦 Bucket数组 = 书架</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="ln">1</span><span class="cl">第3排：
+</span></span><span class="line"><span class="ln">2</span><span class="cl">  第1本：PHP
+</span></span><span class="line"><span class="ln">3</span><span class="cl">  第2本：Java
+</span></span><span class="line"><span class="ln">4</span><span class="cl">  第3本：Python
+</span></span></code></pre></div><hr>
+<h3 id="冲突--同一类别太多">❗冲突 = 同一类别太多</h3>
+<p>解决：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="ln">1</span><span class="cl">PHP → next → Java → next → Python
+</span></span></code></pre></div><p>👉 一本找不到，就顺着 next 往下找</p>
+<hr>
+<h1 id="十总结一句话你必须记住">十、总结一句话（你必须记住🔥）</h1>
+<p>👉 PHP数组冲突解决：</p>
+<blockquote>
+<p><strong>不是覆盖，也不是开放寻址，而是用 next 索引形成“链式结构”</strong></p>
+</blockquote>
+<hr>
+<h1 id="十一给你一个满分回答模板-">十一、给你一个“满分回答模板” 🎯</h1>
+<p>你可以这样说：</p>
+<blockquote>
+<p>PHP数组底层是 HashTable，数据存储在 Bucket数组中。
+通过 hash 计算索引定位元素。</p>
+<p>当发生哈希冲突时，PHP 使用类似链地址法的方式，通过 next 索引将多个冲突元素串联起来。
+查找时会沿着 next 链逐个比较 key，直到找到目标。</p>
+</blockquote>
+<hr>
+<h1 id="-场景设定我们先固定规则-彻底理解bucket数组--next-串联是怎么工作的">🎯 场景设定（我们先固定规则） 彻底理解「Bucket数组 + next 串联」是怎么工作的。</h1>
+<p>假设：</p>
+<ul>
+<li>哈希表大小：<code>8</code></li>
+<li>计算规则：<code>index = hash(key) % 8</code></li>
+<li>我们<strong>人为制造冲突</strong>（方便理解）</li>
+</ul>
+<p>插入顺序：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln">1</span><span class="cl"><span class="nv">$arr</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;Tom&#39;</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="nv">$arr</span><span class="p">[</span><span class="s1">&#39;age&#39;</span><span class="p">]</span>  <span class="o">=</span> <span class="mi">18</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="nv">$arr</span><span class="p">[</span><span class="s1">&#39;city&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;NY&#39;</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="nv">$arr</span><span class="p">[</span><span class="s1">&#39;sex&#39;</span><span class="p">]</span>  <span class="o">=</span> <span class="s1">&#39;male&#39;</span><span class="p">;</span>
+</span></span></code></pre></div><p>假设 hash 结果如下：</p>
 <table>
   <thead>
       <tr>
-          <th>字段</th>
-          <th>作用</th>
+          <th>key</th>
+          <th>index</th>
       </tr>
   </thead>
   <tbody>
       <tr>
-          <td>key</td>
-          <td>键</td>
+          <td>name</td>
+          <td>2</td>
       </tr>
       <tr>
-          <td>h</td>
-          <td>hash值</td>
+          <td>age</td>
+          <td>2 ❗冲突</td>
       </tr>
       <tr>
-          <td>val</td>
-          <td>值</td>
+          <td>city</td>
+          <td>5</td>
+      </tr>
+      <tr>
+          <td>sex</td>
+          <td>2 ❗再次冲突</td>
       </tr>
   </tbody>
 </table>
 <hr>
-<h2 id="3-内存结构简化理解">3️⃣ 内存结构（简化理解）</h2>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="ln">1</span><span class="cl">HashTable
+<h1 id="-第-1-步插入-name">🧩 第 1 步：插入 name</h1>
+<p><figure>
+  <picture>
+
+    
+      
+        
+        
+        
+        
+        
+        
+    <img
+      loading="lazy"
+      decoding="async"
+      alt="Image"
+      
+        class="image_figure image_external image_processed"
+        width="800"
+        height="400"
+        src="https://jianlin-li.github.io/images/munKnw6_gP9JEE4puRMQX4KqmgdvqnNCHKzPPo86ysZRlW4_JjYy0tbXGD1zPzWjYpo8_OmYgcL_XafANOa74r6FdpZJ-TL2lgvaQiyhL0aCWucKnguIrVSzKa6Us7hEO-zONxD5vto-zwka6YVYBPMA9KoiVRFowiSp73EOeZE_H6nYXaDSH1ckNi4giWAh_3403687953015802407.jpg"
+      
+      
+    />
+
+    </picture>
+</figure>
+</p>
+<p><figure>
+  <picture>
+
+    
+      
+        
+        
+        
+        
+        
+        
+    <img
+      loading="lazy"
+      decoding="async"
+      alt="Image"
+      
+        class="image_figure image_external image_processed"
+        width="545"
+        height="431"
+        src="https://jianlin-li.github.io/images/9E6KOJzPO3Mn1UWf12zF7lnXCW9q3GF078QhRUqNYeTQ71bn08h-9Qrir1zafJBcNgEXdoO4WuZGJs3wFLTUzq1ogydWUtd5qJQED-ioHPkKwNyP0YE1H_O2eWwqEUbcnzkY1qm9G-BUpMSc_UcYeZbOWXU4Vc9Z8APV039WToTvrKRYiXwiIga69qF_9yMY_5435036919117922980.jpg"
+      
+      
+    />
+
+    </picture>
+</figure>
+</p>
+<p><figure>
+  <picture>
+
+    
+      
+        
+        
+        
+        
+        
+        
+    <img
+      loading="lazy"
+      decoding="async"
+      alt="Image"
+      
+        class="image_figure image_external image_processed"
+        width="380"
+        height="346"
+        src="https://jianlin-li.github.io/images/lI85r8sUUTMyFZ3IoxEygw8rtVNBB8Iv9z3qAl8muNbS_kMEps9vDqdIPtsgepayTRuAmt2ZFyXNKUAA76YoEEG-N4g-TYJwXJlUbl_HQhgnLYUyHce5INtcE3GF319nQB7wlaxexzZjMCyx2J_f68PFO8rtYgZXtMPZaDP__xkyzvS9pqp6YDVb3F7b-w2l_8668000365600490178.jpg"
+      
+      
+    />
+
+    </picture>
+</figure>
+</p>
+<p><figure>
+  <picture>
+
+    
+      
+        
+        
+        
+        
+        
+        
+    <img
+      loading="lazy"
+      decoding="async"
+      alt="Image"
+      
+        class="image_figure image_external image_processed"
+        width="804"
+        height="450"
+        src="https://jianlin-li.github.io/images/187Sun028l3ZsSrZGfZmK6MaUB5DRKgRFtZQJdmor9DHNYQfcvMGNBXTCHybrkhR2pqUSreCqw1OJbBtoMb8PTKFR0asONrH2LuX4GSxFKAojJu7a6thw6j_em-maU9ETFklBZ7z_9fx9G15Ad_H1dzuFgOG7O-EjYCtMsJBjCyvSkC0Be4XO0RJktikrcRw_8315311241257384731.jpg"
+      
+      
+    />
+
+    </picture>
+</figure>
+</p>
+<h3 id="内存结构">内存结构：</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="ln">1</span><span class="cl">索引表:
+</span></span><span class="line"><span class="ln">2</span><span class="cl">[2] → 0
+</span></span><span class="line"><span class="ln">3</span><span class="cl">
+</span></span><span class="line"><span class="ln">4</span><span class="cl">Bucket数组:
+</span></span><span class="line"><span class="ln">5</span><span class="cl">[0] name=Tom, next=-1
+</span></span></code></pre></div><p>👉 含义：</p>
+<ul>
+<li>index[2] 指向 Bucket[0]</li>
+<li>没有冲突，next = -1（结束）</li>
+</ul>
+<hr>
+<h1 id="-第-2-步插入-age发生冲突">🧩 第 2 步：插入 age（发生冲突❗）</h1>
+<p><figure>
+  <picture>
+
+    
+      
+        
+        
+        
+        
+        
+        
+    <img
+      loading="lazy"
+      decoding="async"
+      alt="Image"
+      
+        class="image_figure image_external image_processed"
+        width="545"
+        height="431"
+        src="https://jianlin-li.github.io/images/9E6KOJzPO3Mn1UWf12zF7lnXCW9q3GF078QhRUqNYeTQ71bn08h-9Qrir1zafJBcNgEXdoO4WuZGJs3wFLTUzq1ogydWUtd5qJQED-ioHPkKwNyP0YE1H_O2eWwqEUbcnzkY1qm9G-BUpMSc_UcYeZbOWXU4Vc9Z8APV039WToTvrKRYiXwiIga69qF_9yMY_5435036919117922980.jpg"
+      
+      
+    />
+
+    </picture>
+</figure>
+</p>
+<p><figure>
+  <picture>
+
+    
+      
+        
+        
+        
+        
+        
+        
+    <img
+      loading="lazy"
+      decoding="async"
+      alt="Image"
+      
+        class="image_figure image_external image_processed"
+        width="1024"
+        height="768"
+        src="https://jianlin-li.github.io/images/MVRFPPWviKw4nexnxmxULL0p2Rvhdv9GwXmcn39kpEUz9DW0mrm606RR4zLwFQ01dPegyoMKahRb9gxDHZEmMI7KEzdsRD9lphnYS6SAbhViQoMNJU-lBffPcZdylg_2Loe79jcEOoEUVFGYhLliCBPF5I_58F_KekICeUc2APC7V3LP_OoDUAfQhwmt_3aJ_16783591273347250923.jpg"
+      
+      
+    />
+
+    </picture>
+</figure>
+</p>
+<p><figure>
+  <picture>
+
+    
+      
+        
+        
+        
+        
+        
+        
+    <img
+      loading="lazy"
+      decoding="async"
+      alt="Image"
+      
+        class="image_figure image_external image_processed"
+        width="505"
+        height="436"
+        src="https://jianlin-li.github.io/images/82oCt--OCAuLxP4cWw3xmCDXLkV1Uz_MdJXTwgZCTBwTPDm1HGajHUXWq1glAYoCiIaRlh-qNC9uzfOoyAqzB2xlDwOozRKz8E0ap4jDEut-gtSnz7GYCEMzuN81vMIPoKtAeqiptOvjkw3M-843TgZVju_OuSKOjc_4xmpsOvaGNjN6PGDTtv8J7ZVCn4HF_14394535605291482742.jpg"
+      
+      
+    />
+
+    </picture>
+</figure>
+</p>
+<p><figure>
+  <picture>
+
+    
+      
+        
+        
+        
+        
+        
+        
+    <img
+      loading="lazy"
+      decoding="async"
+      alt="Image"
+      
+        class="image_figure image_external image_processed"
+        width="572"
+        height="333"
+        src="https://jianlin-li.github.io/images/4S3RDPUiCSvTtxXs6ArykhRiuZszn0aoMzxA0E60GQFTKFonwqv-oR05_3n-LEgDoyivThE1vq45KLHw3V-Ku1mJW4XrhZoFqetFrMhLeiKd1iMQqOfo8PmLwv44QMQTH_qBws2RtNMzjS7SBNtk168j6Zqf5aG4JR3ZWoCpAHe9Z1P2jHacVs42KonzWgUw_2160720882397364744.jpg"
+      
+      
+    />
+
+    </picture>
+</figure>
+</p>
+<h3 id="发生了什么">发生了什么？</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="ln">1</span><span class="cl">age → index=2（和 name 冲突）
+</span></span></code></pre></div><hr>
+<h3 id="php-的操作">PHP 的操作：</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="ln">1</span><span class="cl">1️⃣ 新建 Bucket[1]
+</span></span><span class="line"><span class="ln">2</span><span class="cl">2️⃣ 挂到 Bucket[0] 后面
+</span></span></code></pre></div><hr>
+<h3 id="内存结构变成">内存结构变成：</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="ln">1</span><span class="cl">索引表:
+</span></span><span class="line"><span class="ln">2</span><span class="cl">[2] → 0
+</span></span><span class="line"><span class="ln">3</span><span class="cl">
+</span></span><span class="line"><span class="ln">4</span><span class="cl">Bucket数组:
+</span></span><span class="line"><span class="ln">5</span><span class="cl">[0] name=Tom, next=1
+</span></span><span class="line"><span class="ln">6</span><span class="cl">[1] age=18,  next=-1
+</span></span></code></pre></div><hr>
+<p>👉 链结构：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="ln">1</span><span class="cl">index[2]
 </span></span><span class="line"><span class="ln">2</span><span class="cl">   ↓
-</span></span><span class="line"><span class="ln">3</span><span class="cl">arData（数组）
-</span></span><span class="line"><span class="ln">4</span><span class="cl">   ↓
-</span></span><span class="line"><span class="ln">5</span><span class="cl">+--------+--------+--------+
-</span></span><span class="line"><span class="ln">6</span><span class="cl">|Bucket0 |Bucket1 |Bucket2 |
-</span></span><span class="line"><span class="ln">7</span><span class="cl">+--------+--------+--------+
+</span></span><span class="line"><span class="ln">3</span><span class="cl">name → age
 </span></span></code></pre></div><hr>
-<h1 id="三php数组如何存数据">三、PHP数组如何存数据？</h1>
-<h2 id="1-key处理">1️⃣ key处理</h2>
-<p>PHP对key会做两种处理：</p>
-<h3 id="-数字key">✔ 数字key</h3>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln">1</span><span class="cl"><span class="nv">$arr</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;a&#39;</span><span class="p">;</span>
-</span></span></code></pre></div><p>👉 直接用 <code>1</code> 作为 hash</p>
-<hr>
-<h3 id="-字符串key">✔ 字符串key</h3>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln">1</span><span class="cl"><span class="nv">$arr</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;Tom&#39;</span><span class="p">;</span>
-</span></span></code></pre></div><p>👉 会执行：</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="ln">1</span><span class="cl"><span class="n">hash</span> <span class="o">=</span> <span class="nf">zend_string_hash_func</span><span class="p">(</span><span class="s">&#34;name&#34;</span><span class="p">);</span>
+<h1 id="-第-3-步插入-city无冲突">🧩 第 3 步：插入 city（无冲突）</h1>
+<p><figure>
+  <picture>
+
+    
+      
+        
+        
+        
+        
+        
+        
+    <img
+      loading="lazy"
+      decoding="async"
+      alt="Image"
+      
+        class="image_figure image_external image_processed"
+        width="545"
+        height="431"
+        src="https://jianlin-li.github.io/images/9E6KOJzPO3Mn1UWf12zF7lnXCW9q3GF078QhRUqNYeTQ71bn08h-9Qrir1zafJBcNgEXdoO4WuZGJs3wFLTUzq1ogydWUtd5qJQED-ioHPkKwNyP0YE1H_O2eWwqEUbcnzkY1qm9G-BUpMSc_UcYeZbOWXU4Vc9Z8APV039WToTvrKRYiXwiIga69qF_9yMY_5435036919117922980.jpg"
+      
+      
+    />
+
+    </picture>
+</figure>
+</p>
+<p><figure>
+  <picture>
+
+    
+      
+        
+        
+        
+        
+        
+        
+    <img
+      loading="lazy"
+      decoding="async"
+      alt="Image"
+      
+        class="image_figure image_external image_processed"
+        width="545"
+        height="431"
+        src="https://jianlin-li.github.io/images/9E6KOJzPO3Mn1UWf12zF7lnXCW9q3GF078QhRUqNYeTQ71bn08h-9Qrir1zafJBcNgEXdoO4WuZGJs3wFLTUzq1ogydWUtd5qJQED-ioHPkKwNyP0YE1H_O2eWwqEUbcnzkY1qm9G-BUpMSc_UcYeZbOWXU4Vc9Z8APV039WToTvrKRYiXwiIga69qF_9yMY_5435036919117922980.jpg"
+      
+      
+    />
+
+    </picture>
+</figure>
+</p>
+<p><figure>
+  <picture>
+
+    
+      
+        
+        
+        
+        
+        
+        
+    <img
+      loading="lazy"
+      decoding="async"
+      alt="Image"
+      
+        class="image_figure image_external image_processed"
+        width="1200"
+        height="586"
+        src="https://jianlin-li.github.io/images/HpWQ1nF-nb2VdNzWPHKvdPQXPmhTjO0wNt4zz36Cg3kXgH8TrFdr6Rht2iJf0arNVV_FVTKU5ipUo9-qPc_HQYXPIe_3DdTfrxIFG0RhK0JmfbNJdC12wfcQVs5BStUrWNzhaanQ9DMZpmettVxiwSF6xmTuLqFeQNQZy4odSMMTUJMFfr-a4_uVo2VPbVaL_2542467278525808556.jpg"
+      
+      
+    />
+
+    </picture>
+</figure>
+</p>
+<p><figure>
+  <picture>
+
+    
+      
+        
+        
+        
+        
+        
+        
+    <img
+      loading="lazy"
+      decoding="async"
+      alt="Image"
+      
+        class="image_figure image_external image_processed"
+        width="545"
+        height="431"
+        src="https://jianlin-li.github.io/images/9E6KOJzPO3Mn1UWf12zF7lnXCW9q3GF078QhRUqNYeTQ71bn08h-9Qrir1zafJBcNgEXdoO4WuZGJs3wFLTUzq1ogydWUtd5qJQED-ioHPkKwNyP0YE1H_O2eWwqEUbcnzkY1qm9G-BUpMSc_UcYeZbOWXU4Vc9Z8APV039WToTvrKRYiXwiIga69qF_9yMY_5435036919117922980.jpg"
+      
+      
+    />
+
+    </picture>
+</figure>
+</p>
+<h3 id="结果">结果：</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="ln">1</span><span class="cl">city → index=5
 </span></span></code></pre></div><hr>
-<h2 id="2-找位置核心公式">2️⃣ 找位置（核心公式）</h2>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">index = hash &amp; (nTableSize - 1)
-</span></span></code></pre></div><p>👉 本质是 <strong>位运算取模（比%更快）</strong></p>
-<hr>
-<h1 id="四哈希冲突是怎么发生的">四、哈希冲突是怎么发生的？</h1>
-<p>当两个不同key：</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln">1</span><span class="cl"><span class="nv">$arr</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;Tom&#39;</span><span class="p">;</span>
-</span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="nv">$arr</span><span class="p">[</span><span class="s1">&#39;age&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">18</span><span class="p">;</span>
-</span></span></code></pre></div><p>👉 如果：</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="ln">1</span><span class="cl">hash(&#39;name&#39;) &amp; mask == hash(&#39;age&#39;) &amp; mask
-</span></span></code></pre></div><p>➡️ 就会落在同一个槽位</p>
-<p>👉 这就是 <strong>哈希冲突</strong></p>
-<hr>
-<h1 id="五php如何解决哈希冲突重点">五、PHP如何解决哈希冲突？（重点！！！）</h1>
-<p>PHP使用的是：</p>
-<h1 id="-链地址法拉链法--索引链表优化版">👉 <strong>链地址法（拉链法） + 索引链表（优化版）</strong></h1>
-<p>但注意⚠️：</p>
-<p>👉 <strong>PHP7不是传统链表，而是“隐式链表”</strong></p>
-<hr>
-<h2 id="1-php5旧版本">1️⃣ PHP5（旧版本）</h2>
-<p>👉 使用 <strong>真正链表</strong></p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="ln">1</span><span class="cl">index -&gt; Bucket -&gt; Bucket -&gt; Bucket
-</span></span></code></pre></div><p>缺点：</p>
-<ul>
-<li>内存碎片多</li>
-<li>cache不友好</li>
-</ul>
-<hr>
-<h2 id="2-php7重点">2️⃣ PHP7（重点）</h2>
-<p>👉 改成：</p>
-<h3 id="-数组--索引链非常关键">✅ 数组 + 索引链（非常关键）</h3>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="ln">1</span><span class="cl">arData（连续内存）
-</span></span><span class="line"><span class="ln">2</span><span class="cl">+--------+--------+--------+--------+
-</span></span><span class="line"><span class="ln">3</span><span class="cl">|Bucket0 |Bucket1 |Bucket2 |Bucket3 |
-</span></span><span class="line"><span class="ln">4</span><span class="cl">+--------+--------+--------+--------+
-</span></span><span class="line"><span class="ln">5</span><span class="cl">
-</span></span><span class="line"><span class="ln">6</span><span class="cl">hash槽（存索引）
-</span></span><span class="line"><span class="ln">7</span><span class="cl">index -&gt; 2 -&gt; 5 -&gt; 8
-</span></span></code></pre></div><p>👉 冲突时：</p>
-<p>不是指针链表，而是：</p>
-<p>👉 <strong>用“下标”串起来</strong></p>
-<hr>
-<h2 id="3-冲突解决过程举例">3️⃣ 冲突解决过程（举例）</h2>
-<h3 id="插入">插入：</h3>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln">1</span><span class="cl"><span class="nv">$arr</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;Tom&#39;</span><span class="p">;</span>
-</span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="nv">$arr</span><span class="p">[</span><span class="s1">&#39;age&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">18</span><span class="p">;</span>
-</span></span></code></pre></div><p>假设冲突：</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="ln">1</span><span class="cl">index = 3
+<h3 id="内存">内存：</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="ln">1</span><span class="cl">索引表:
+</span></span><span class="line"><span class="ln">2</span><span class="cl">[2] → 0
+</span></span><span class="line"><span class="ln">3</span><span class="cl">[5] → 2
+</span></span><span class="line"><span class="ln">4</span><span class="cl">
+</span></span><span class="line"><span class="ln">5</span><span class="cl">Bucket数组:
+</span></span><span class="line"><span class="ln">6</span><span class="cl">[0] name=Tom, next=1
+</span></span><span class="line"><span class="ln">7</span><span class="cl">[1] age=18,  next=-1
+</span></span><span class="line"><span class="ln">8</span><span class="cl">[2] city=NY, next=-1
 </span></span></code></pre></div><hr>
-<h3 id="存储">存储：</h3>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="ln">1</span><span class="cl">槽3 → Bucket0 (name)
-</span></span><span class="line"><span class="ln">2</span><span class="cl">     ↓
-</span></span><span class="line"><span class="ln">3</span><span class="cl">     Bucket1 (age)
-</span></span></code></pre></div><p>👉 实际是：</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="ln">1</span><span class="cl">hash[3] = 0   // Bucket0
-</span></span><span class="line"><span class="ln">2</span><span class="cl">Bucket0.next = 1
-</span></span><span class="line"><span class="ln">3</span><span class="cl">Bucket1.next = -1
+<h1 id="-第-4-步插入-sex再次冲突">🧩 第 4 步：插入 sex（再次冲突🔥🔥🔥）</h1>
+<p><figure>
+  <picture>
+
+    
+      
+        
+        
+        
+        
+        
+        
+    <img
+      loading="lazy"
+      decoding="async"
+      alt="Image"
+      
+        class="image_figure image_external image_processed"
+        width="545"
+        height="431"
+        src="https://jianlin-li.github.io/images/9E6KOJzPO3Mn1UWf12zF7lnXCW9q3GF078QhRUqNYeTQ71bn08h-9Qrir1zafJBcNgEXdoO4WuZGJs3wFLTUzq1ogydWUtd5qJQED-ioHPkKwNyP0YE1H_O2eWwqEUbcnzkY1qm9G-BUpMSc_UcYeZbOWXU4Vc9Z8APV039WToTvrKRYiXwiIga69qF_9yMY_5435036919117922980.jpg"
+      
+      
+    />
+
+    </picture>
+</figure>
+</p>
+<p><figure>
+  <picture>
+
+    
+      
+        
+        
+        
+        
+        
+        
+    <img
+      loading="lazy"
+      decoding="async"
+      alt="Image"
+      
+        class="image_figure image_external image_processed"
+        width="505"
+        height="436"
+        src="https://jianlin-li.github.io/images/82oCt--OCAuLxP4cWw3xmCDXLkV1Uz_MdJXTwgZCTBwTPDm1HGajHUXWq1glAYoCiIaRlh-qNC9uzfOoyAqzB2xlDwOozRKz8E0ap4jDEut-gtSnz7GYCEMzuN81vMIPoKtAeqiptOvjkw3M-843TgZVju_OuSKOjc_4xmpsOvaGNjN6PGDTtv8J7ZVCn4HF_14394535605291482742.jpg"
+      
+      
+    />
+
+    </picture>
+</figure>
+</p>
+<p><figure>
+  <picture>
+
+    
+      
+        
+        
+        
+        
+        
+        
+    <img
+      loading="lazy"
+      decoding="async"
+      alt="Image"
+      
+        class="image_figure image_external image_processed"
+        width="1850"
+        height="1445"
+        src="https://jianlin-li.github.io/images/dN7KrMVsSV5p9aMZkaJOroe9_HF9NA6WifOMdugugsOcNW7CN60QzXqIJAqNl49AGfRO4GiMPkIpvduHURG_4W8wREWhUZIe9SglfkAn1MgXUiSBUwmb0Y9oUitjReHCTG1iYNyEogyBP02KlgzpPTCp0Oxr6eEl8GKYeJSwCKDwpYyzUg4mWR0Jut2WQu-C_1548290654660138454.jpg"
+      
+      
+    />
+
+    </picture>
+</figure>
+</p>
+<p><figure>
+  <picture>
+
+    
+      
+        
+        
+        
+        
+        
+        
+    <img
+      loading="lazy"
+      decoding="async"
+      alt="Image"
+      
+        class="image_figure image_external image_processed"
+        width="960"
+        height="504"
+        src="https://jianlin-li.github.io/images/_D5FVv6-kYo3FczvPAbxt462g9_kPo2SYcZLe3N3TtrEuEjffzK4CwteuDKOkTIosVn2UoKX79O9DAOfP_Vse3qZiy-9ZseIz9HiBsJXMTXwFdphzdCVUsEDDPXd_7CkVfljfaRsK8VEt3Rp7Ur85WOPpFN7kGdlZOXVCBaoH77CcroW6lRVqeOGtW3Bt-90_10629093225265031271.jpg"
+      
+      
+    />
+
+    </picture>
+</figure>
+</p>
+<h3 id="冲突情况">冲突情况：</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="ln">1</span><span class="cl">sex → index=2
 </span></span></code></pre></div><hr>
-<h2 id="-查找流程非常重要">🔥 查找流程（非常重要）</h2>
-<p>查找：</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln">1</span><span class="cl"><span class="nv">$arr</span><span class="p">[</span><span class="s1">&#39;age&#39;</span><span class="p">]</span>
+<h3 id="php-操作">PHP 操作：</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="ln">1</span><span class="cl">1️⃣ 找 index[2] → Bucket[0]
+</span></span><span class="line"><span class="ln">2</span><span class="cl">2️⃣ 发现有链：
+</span></span><span class="line"><span class="ln">3</span><span class="cl">   name → age
+</span></span><span class="line"><span class="ln">4</span><span class="cl">
+</span></span><span class="line"><span class="ln">5</span><span class="cl">3️⃣ 挂到链尾：
+</span></span><span class="line"><span class="ln">6</span><span class="cl">   age → sex
+</span></span></code></pre></div><hr>
+<h3 id="最终结构">最终结构：</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="ln">1</span><span class="cl">索引表:
+</span></span><span class="line"><span class="ln">2</span><span class="cl">[2] → 0
+</span></span><span class="line"><span class="ln">3</span><span class="cl">[5] → 2
+</span></span><span class="line"><span class="ln">4</span><span class="cl">
+</span></span><span class="line"><span class="ln">5</span><span class="cl">Bucket数组:
+</span></span><span class="line"><span class="ln">6</span><span class="cl">[0] name=Tom, next=1
+</span></span><span class="line"><span class="ln">7</span><span class="cl">[1] age=18,  next=3
+</span></span><span class="line"><span class="ln">8</span><span class="cl">[2] city=NY, next=-1
+</span></span><span class="line"><span class="ln">9</span><span class="cl">[3] sex=male,next=-1
+</span></span></code></pre></div><hr>
+<h1 id="-最终链结构你要记住这个图">🔗 最终链结构（你要记住这个图）</h1>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="ln">1</span><span class="cl">index[2]
+</span></span><span class="line"><span class="ln">2</span><span class="cl">   ↓
+</span></span><span class="line"><span class="ln">3</span><span class="cl">name → age → sex
+</span></span><span class="line"><span class="ln">4</span><span class="cl">
+</span></span><span class="line"><span class="ln">5</span><span class="cl">index[5]
+</span></span><span class="line"><span class="ln">6</span><span class="cl">   ↓
+</span></span><span class="line"><span class="ln">7</span><span class="cl">city
+</span></span></code></pre></div><hr>
+<h1 id="-查找流程演示查-sex">🚀 查找流程演示（查 sex）</h1>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln">1</span><span class="cl"><span class="nv">$arr</span><span class="p">[</span><span class="s1">&#39;sex&#39;</span><span class="p">]</span>
 </span></span></code></pre></div><p>步骤：</p>
-<p>1️⃣ 算hash
-2️⃣ 找槽位
-3️⃣ 拿到第一个Bucket
-4️⃣ 比较key
-5️⃣ 不等 → 找next
-6️⃣ 直到找到</p>
-<hr>
-<p>👉 时间复杂度：</p>
-<ul>
-<li>理想：<strong>O(1)</strong></li>
-<li>冲突严重：<strong>O(n)</strong></li>
-</ul>
-<hr>
-<h1 id="六php数组的优化点">六、PHP数组的优化点</h1>
-<h2 id="1-packed-array压缩数组">1️⃣ Packed Array（压缩数组）</h2>
-<p>当数组是：</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln">1</span><span class="cl"><span class="nv">$arr</span> <span class="o">=</span> <span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">30</span><span class="p">];</span>
-</span></span></code></pre></div><p>👉 PHP不会用哈希表！</p>
-<p>👉 而是：</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="ln">1</span><span class="cl">连续内存（vector）
-</span></span></code></pre></div><p>👉 查找变成：</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="ln">1</span><span class="cl">O(1) + 极致cache友好
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="ln"> 1</span><span class="cl">1️⃣ hash → index=2
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl">2️⃣ 找 index[2] → name
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl">   ❌ 不匹配
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">3️⃣ next → age
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl">   ❌ 不匹配
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">4️⃣ next → sex
+</span></span><span class="line"><span class="ln">10</span><span class="cl">   ✅ 找到
 </span></span></code></pre></div><hr>
-<h2 id="2-自动扩容">2️⃣ 自动扩容</h2>
-<p>当元素变多：</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">nNumUsed &gt; nTableSize
-</span></span></code></pre></div><p>👉 触发：</p>
-<ul>
-<li>扩容为 <strong>2倍</strong></li>
-<li>重新hash（rehash）</li>
-</ul>
-<hr>
-<h2 id="3-删除优化懒删除">3️⃣ 删除优化（懒删除）</h2>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln">1</span><span class="cl"><span class="nx">unset</span><span class="p">(</span><span class="nv">$arr</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]);</span>
-</span></span></code></pre></div><p>👉 不会立即移动数据，而是：</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="ln">1</span><span class="cl">标记为 UNDEF
-</span></span></code></pre></div><p>避免频繁移动内存</p>
-<hr>
-<h1 id="七总结">七、总结</h1>
-<hr>
-<p>👉 <strong>标准总结版：</strong></p>
+<h1 id="-核心理解总结非常关键">🎯 核心理解总结（非常关键）</h1>
+<p>👉 你可以这样理解：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="ln">1</span><span class="cl">Bucket数组 = 真正存数据（连续内存）
+</span></span><span class="line"><span class="ln">2</span><span class="cl">
+</span></span><span class="line"><span class="ln">3</span><span class="cl">索引表 = 指路牌
+</span></span><span class="line"><span class="ln">4</span><span class="cl">
+</span></span><span class="line"><span class="ln">5</span><span class="cl">next = “同一个坑位的排队链”
+</span></span></code></pre></div><hr>
+<h1 id="-一句话彻底理解">💥 一句话彻底理解</h1>
 <blockquote>
-<p>PHP数组底层是HashTable（哈希表），在PHP7中采用连续内存存储Bucket，并通过hash计算定位索引。
-当发生哈希冲突时，PHP采用链地址法，但不是传统链表，而是通过数组下标形成隐式链表来解决冲突。
-查找时通过hash定位槽位，再沿链查找key。
-同时PHP针对纯数字索引数组做了Packed Array优化，提高性能和内存利用率。</p>
+<p>🔥 哈希冲突时，PHP不会覆盖数据
+👉 而是把数据挂成一条“链”，通过 next 一个一个串起来</p>
 </blockquote>
 <hr>
-<h1 id="八再给你一个理解口诀">八、再给你一个“理解口诀”🧠</h1>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="ln">1</span><span class="cl">PHP数组不简单，
-</span></span><span class="line"><span class="ln">2</span><span class="cl">本质其实是Hash链。
-</span></span><span class="line"><span class="ln">3</span><span class="cl">冲突不用真链表，
-</span></span><span class="line"><span class="ln">4</span><span class="cl">下标串联更高效。
-</span></span><span class="line"><span class="ln">5</span><span class="cl">纯数字走优化路，
-</span></span><span class="line"><span class="ln">6</span><span class="cl">Packed数组飞一般。
+<h1 id="-给你一个记忆口诀神器">🎁 给你一个记忆口诀（神器）</h1>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="ln">1</span><span class="cl">定位靠 hash
+</span></span><span class="line"><span class="ln">2</span><span class="cl">存储靠数组
+</span></span><span class="line"><span class="ln">3</span><span class="cl">冲突靠 next
+</span></span><span class="line"><span class="ln">4</span><span class="cl">查找靠遍历链
 </span></span></code></pre></div><hr>
 
     </div><div class="post_comments">
