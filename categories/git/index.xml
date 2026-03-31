@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Git on 浩瀚天空</title>
+    <link>https://jianlin-li.github.io/categories/git/</link>
+    <description>Recent content in Git on 浩瀚天空</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <copyright>Copyright © 1989–2025, 李建林 </copyright>
+    <lastBuildDate>Tue, 31 Mar 2026 23:32:44 +0800</lastBuildDate><atom:link href="https://jianlin-li.github.io/categories/git/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Git的知识点-1</title>
+      <link>https://jianlin-li.github.io/post/git_review_1/</link>
+      <pubDate>Tue, 31 Mar 2026 23:32:44 +0800</pubDate>
+      
+      <guid>https://jianlin-li.github.io/post/git_review_1/</guid>
+      <description>
+        
+          
+            &lt;h1 id=&#34;git-reset-和-git-revert-都是用来撤销更改的但它们的运作方式和对项目历史的影响截然不同&#34;&gt;&lt;code&gt;git reset&lt;/code&gt; 和 &lt;code&gt;git revert&lt;/code&gt; 都是用来撤销更改的，但它们的运作方式和对项目历史的影响截然不同。&lt;/h1&gt;
+&lt;p&gt;简单来说，核心区别在于：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;&lt;code&gt;git revert&lt;/code&gt;&lt;/strong&gt;：&lt;strong&gt;安全地&lt;/strong&gt;撤销。它会&lt;strong&gt;创建一个新的提交&lt;/strong&gt;来抵消之前的更改，从而&lt;strong&gt;保留完整的历史记录&lt;/strong&gt;。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;&lt;code&gt;git reset&lt;/code&gt;&lt;/strong&gt;：&lt;strong&gt;彻底地&lt;/strong&gt;回退。它会将分支指针&lt;strong&gt;直接移动到指定的历史提交&lt;/strong&gt;，从而&lt;strong&gt;修改或抹掉提交历史&lt;/strong&gt;。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;一个形象的比喻是：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;&lt;code&gt;git revert&lt;/code&gt;&lt;/strong&gt; 就像是在文章后面加一个勘误说明，原文还在，但大家都知道哪里错了。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;&lt;code&gt;git reset&lt;/code&gt;&lt;/strong&gt; 就像是直接把文章撕掉几页，然后从某个地方重新开始写。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;-核心区别对比&#34;&gt;🔎 核心区别对比&lt;/h3&gt;
+&lt;table&gt;
+  &lt;thead&gt;
+      &lt;tr&gt;
+          &lt;th style=&#34;text-align: left&#34;&gt;方面&lt;/th&gt;
+          &lt;th style=&#34;text-align: left&#34;&gt;&lt;code&gt;git reset&lt;/code&gt;&lt;/th&gt;
+          &lt;th style=&#34;text-align: left&#34;&gt;&lt;code&gt;git revert&lt;/code&gt;&lt;/th&gt;
+      &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;&lt;strong&gt;对历史的影响&lt;/strong&gt;&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;&lt;strong&gt;修改历史&lt;/strong&gt;，会删除提交记录。&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;&lt;strong&gt;保留历史&lt;/strong&gt;，通过新增提交来反向操作。&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;&lt;strong&gt;操作本质&lt;/strong&gt;&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;将分支指针（HEAD）&lt;strong&gt;向后移动&lt;/strong&gt;。&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;创建一个&lt;strong&gt;新的提交&lt;/strong&gt;。&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;&lt;strong&gt;安全性&lt;/strong&gt;&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;&lt;strong&gt;有风险&lt;/strong&gt;，特别是 &lt;code&gt;--hard&lt;/code&gt; 模式会丢失数据。&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;&lt;strong&gt;非常安全&lt;/strong&gt;，不会丢失任何提交。&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;&lt;strong&gt;适用场景&lt;/strong&gt;&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;适用于&lt;strong&gt;本地、未推送&lt;/strong&gt;的提交。&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;适用于&lt;strong&gt;已推送到远程&lt;/strong&gt;的共享分支。&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;&lt;strong&gt;团队协作&lt;/strong&gt;&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;在公共分支上使用会&lt;strong&gt;影响他人&lt;/strong&gt;。&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;在公共分支上使用&lt;strong&gt;安全无冲突&lt;/strong&gt;。&lt;/td&gt;
+      &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;hr&gt;
+&lt;h3 id=&#34;-git-reset重写历史的后悔药&#34;&gt;🧠 &lt;code&gt;git reset&lt;/code&gt;：重写历史的“后悔药”&lt;/h3&gt;
+&lt;p&gt;&lt;code&gt;git reset&lt;/code&gt; 的核心是移动当前分支的 &lt;code&gt;HEAD&lt;/code&gt; 指针，让它指向一个更早的提交。根据模式不同，它对工作目录和暂存区的影响也不同。&lt;/p&gt;
+&lt;p&gt;它主要有三种模式：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;&lt;code&gt;git reset --soft &amp;lt;commit_id&amp;gt;&lt;/code&gt;&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;效果&lt;/strong&gt;：只移动 &lt;code&gt;HEAD&lt;/code&gt; 指针，&lt;strong&gt;暂存区和工作目录的内容保持不变&lt;/strong&gt;。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;场景&lt;/strong&gt;：当你想撤销提交，但希望保留所有修改，并把它们重新暂存起来，以便合并成一个新的提交。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;&lt;code&gt;git reset --mixed &amp;lt;commit_id&amp;gt;&lt;/code&gt;&lt;/strong&gt; (默认模式)&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;效果&lt;/strong&gt;：移动 &lt;code&gt;HEAD&lt;/code&gt; 指针，并&lt;strong&gt;重置暂存区&lt;/strong&gt;，但工作目录的内容保持不变。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;场景&lt;/strong&gt;：当你想撤销提交，并取消文件的暂存状态，但保留代码修改，以便重新组织提交。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;&lt;code&gt;git reset --hard &amp;lt;commit_id&amp;gt;&lt;/code&gt;&lt;/strong&gt;&lt;/p&gt;
+          
+          
+        
+      </description>
+    </item>
+    
+  </channel>
+</rss>

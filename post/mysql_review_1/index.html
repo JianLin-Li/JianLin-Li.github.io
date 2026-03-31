@@ -168,7 +168,7 @@
     <span class="post_date">
       2026-02-27	  
     </span>
-    <span class="post_time"> · 7 分钟阅读</span><span>&nbsp;· <a href='https://jianlin-li.github.io/tags/mysql/' title="MySQL" class="post_tag button button_translucent">MySQL
+    <span class="post_time"> · 3 分钟阅读</span><span>&nbsp;· <a href='https://jianlin-li.github.io/tags/mysql/' title="MySQL" class="post_tag button button_translucent">MySQL
         </a>
     </span>
     <span class="page_only">&nbsp;·
@@ -499,476 +499,6 @@
 <li>与应用层配合（PHP / Java）</li>
 </ol>
 <hr>
-<hr>
-<hr>
-<h1 id="在-mysql-中count1count-和-countid-都用于统计行数但它们在语义性能和结果上存在细微差别下面详细解释它们的区别">在 MySQL 中，<code>COUNT(1)</code>、<code>COUNT(*)</code> 和 <code>COUNT(id)</code> 都用于统计行数，但它们在<strong>语义、性能和结果</strong>上存在细微差别。下面详细解释它们的区别：</h1>
-<hr>
-<h3 id="-1-count">✅ 1. <code>COUNT(*)</code></h3>
-<ul>
-<li><strong>含义</strong>：统计<strong>表中所有行的数量</strong>，包括 <code>NULL</code> 值和重复行。</li>
-<li><strong>标准 SQL</strong>：这是 SQL 标准推荐的写法，明确表示“计数所有行”。</li>
-<li><strong>优化</strong>：MySQL 对 <code>COUNT(*)</code> 有特殊优化（尤其是 MyISAM 引擎直接读取行数；InnoDB 在某些情况下也能高效处理）。</li>
-</ul>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="ln">1</span><span class="cl"><span class="k">SELECT</span><span class="w"> </span><span class="k">COUNT</span><span class="p">(</span><span class="o">*</span><span class="p">)</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">users</span><span class="p">;</span><span class="w">
-</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="w"></span><span class="c1">-- 返回 users 表的总行数（包括 id 为 NULL 的行）
-</span></span></span></code></pre></div><blockquote>
-<p>📌 <strong>注意</strong>：即使某列全是 <code>NULL</code>，<code>COUNT(*)</code> 依然会计入该行。</p>
-</blockquote>
-<hr>
-<h3 id="-2-count1">✅ 2. <code>COUNT(1)</code></h3>
-<ul>
-<li><strong>含义</strong>：统计<strong>所有行的数量</strong>，因为 <code>1</code> 是一个<strong>永远不为 NULL 的常量表达式</strong>。</li>
-<li><strong>行为</strong>：与 <code>COUNT(*)</code> <strong>完全等价</strong>，结果相同。</li>
-<li><strong>历史原因</strong>：早期有些开发者误以为 <code>COUNT(1)</code> 比 <code>COUNT(*)</code> 快（因为“不用读取整行”），但实际上：
-<ul>
-<li><strong>现代 MySQL 优化器会将 <code>COUNT(1)</code> 转换为 <code>COUNT(*)</code></strong>。</li>
-<li><strong>性能无差别</strong>。</li>
-</ul>
-</li>
-</ul>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="ln">1</span><span class="cl"><span class="k">SELECT</span><span class="w"> </span><span class="k">COUNT</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">users</span><span class="p">;</span><span class="w">
-</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="w"></span><span class="c1">-- 结果与 COUNT(*) 完全一致
-</span></span></span></code></pre></div><blockquote>
-<p>✅ <strong>结论</strong>：<code>COUNT(1)</code> ≡ <code>COUNT(*)</code>，只是写法不同。</p>
-</blockquote>
-<hr>
-<h3 id="-3-countid">✅ 3. <code>COUNT(id)</code></h3>
-<ul>
-<li><strong>含义</strong>：统计 <strong><code>id</code> 列中非 NULL 值的行数</strong>。</li>
-<li><strong>关键区别</strong>：
-<ul>
-<li>如果 <code>id</code> 是 <strong>主键（PRIMARY KEY）或 NOT NULL</strong>，那么 <code>COUNT(id) = COUNT(*)</code>。</li>
-<li>如果 <code>id</code> <strong>允许为 NULL</strong>，则 <code>NULL</code> 的行<strong>不会被计入</strong>。</li>
-</ul>
-</li>
-</ul>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="ln">1</span><span class="cl"><span class="c1">-- 假设 id 是主键（NOT NULL）
-</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="c1"></span><span class="k">SELECT</span><span class="w"> </span><span class="k">COUNT</span><span class="p">(</span><span class="n">id</span><span class="p">)</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">users</span><span class="p">;</span><span class="w">  </span><span class="c1">-- = COUNT(*)
-</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="c1"></span><span class="w">
-</span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="w"></span><span class="c1">-- 假设 phone 允许 NULL
-</span></span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="c1"></span><span class="k">SELECT</span><span class="w"> </span><span class="k">COUNT</span><span class="p">(</span><span class="n">phone</span><span class="p">)</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">users</span><span class="p">;</span><span class="w">  </span><span class="c1">-- 只统计 phone 不为 NULL 的行
-</span></span></span></code></pre></div><blockquote>
-<p>⚠️ <strong>陷阱</strong>：如果误用 <code>COUNT(column)</code> 且该列有 <code>NULL</code>，会导致结果偏小！</p>
-</blockquote>
-<hr>
-<h3 id="-对比总结">🔍 对比总结</h3>
-<table>
-  <thead>
-      <tr>
-          <th>写法</th>
-          <th>是否忽略 NULL</th>
-          <th>是否依赖列</th>
-          <th>性能（InnoDB）</th>
-          <th>推荐场景</th>
-      </tr>
-  </thead>
-  <tbody>
-      <tr>
-          <td><code>COUNT(*)</code></td>
-          <td>❌ 不忽略</td>
-          <td>❌ 否</td>
-          <td>最优（标准优化）</td>
-          <td><strong>通用计数</strong> ✅</td>
-      </tr>
-      <tr>
-          <td><code>COUNT(1)</code></td>
-          <td>❌ 不忽略</td>
-          <td>❌ 否</td>
-          <td>同 <code>COUNT(*)</code></td>
-          <td>可用，但没必要</td>
-      </tr>
-      <tr>
-          <td><code>COUNT(col)</code></td>
-          <td>✅ 忽略 NULL</td>
-          <td>✅ 是</td>
-          <td>需读取该列</td>
-          <td><strong>仅当需要排除 NULL 时</strong></td>
-      </tr>
-  </tbody>
-</table>
-<hr>
-<h3 id="-示例演示">🧪 示例演示</h3>
-<p>假设表 <code>t</code> 数据如下：</p>
-<table>
-  <thead>
-      <tr>
-          <th>id</th>
-          <th>name</th>
-      </tr>
-  </thead>
-  <tbody>
-      <tr>
-          <td>1</td>
-          <td>Alice</td>
-      </tr>
-      <tr>
-          <td>2</td>
-          <td>NULL</td>
-      </tr>
-      <tr>
-          <td>NULL</td>
-          <td>Bob</td>
-      </tr>
-  </tbody>
-</table>
-<p>执行结果：</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="ln">1</span><span class="cl"><span class="k">SELECT</span><span class="w"> 
-</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="w">  </span><span class="k">COUNT</span><span class="p">(</span><span class="o">*</span><span class="p">),</span><span class="w">    </span><span class="c1">-- 3（所有行）
-</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="c1"></span><span class="w">  </span><span class="k">COUNT</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span><span class="w">    </span><span class="c1">-- 3（所有行）
-</span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="c1"></span><span class="w">  </span><span class="k">COUNT</span><span class="p">(</span><span class="n">id</span><span class="p">),</span><span class="w">   </span><span class="c1">-- 2（id 为 NULL 的行被忽略）
-</span></span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="c1"></span><span class="w">  </span><span class="k">COUNT</span><span class="p">(</span><span class="n">name</span><span class="p">);</span><span class="w"> </span><span class="c1">-- 2（name 为 NULL 的行被忽略）
-</span></span></span></code></pre></div><hr>
-<h3 id="-最佳实践建议">💡 最佳实践建议</h3>
-<ol>
-<li><strong>统计总行数 → 用 <code>COUNT(*)</code></strong>
-<ul>
-<li>语义清晰，符合 SQL 标准，优化最好。</li>
-</ul>
-</li>
-<li><strong>不要用 <code>COUNT(1)</code></strong>
-<ul>
-<li>虽然结果一样，但无任何优势，反而显得不专业。</li>
-</ul>
-</li>
-<li><strong>只有需要排除 NULL 时才用 <code>COUNT(column)</code></strong>
-<ul>
-<li>例如：统计“有多少用户填写了手机号”。</li>
-</ul>
-</li>
-</ol>
-<hr>
-<h3 id="-常见误区澄清">❓ 常见误区澄清</h3>
-<blockquote>
-<p><strong>误区</strong>：“<code>COUNT(*)</code> 要读取所有列，所以慢；<code>COUNT(1)</code> 只读一个值，所以快。”<br>
-<strong>真相</strong>：MySQL 优化器知道 <code>COUNT(*)</code> 只需要计数，<strong>根本不会去读取数据行的内容</strong>（InnoDB 通过索引或 MVCC 机制高效计算），所以两者性能完全一样。</p>
-</blockquote>
-<hr>
-<p>✅ <strong>总结一句话</strong>：</p>
-<blockquote>
-<p><strong>永远优先使用 <code>COUNT(*)</code> 来统计行数；只有当你明确要忽略某列的 NULL 值时，才使用 <code>COUNT(column)</code>。</strong></p>
-</blockquote>
-<hr>
-<hr>
-<hr>
-<h1 id="mysql-触发器trigger是一种与表事件相关的特殊存储过程它会在特定的数据库操作如-insertupdatedelete发生时自动执行它就像是数据库的自动守门人无需手动调用完全由事件驱动">MySQL 触发器（Trigger）是一种与表事件相关的特殊存储过程，它会在特定的数据库操作（如 <code>INSERT</code>、<code>UPDATE</code>、<code>DELETE</code>）发生时自动执行。它就像是数据库的“自动守门人”，无需手动调用，完全由事件驱动。</h1>
-<h3 id="-触发器核心概念">📖 触发器核心概念</h3>
-<ul>
-<li><strong>自动执行</strong>：触发器不由程序或用户手动调用，而是在满足预设条件时由数据库自动激活。</li>
-<li><strong>与表绑定</strong>：触发器依附于特定的表，不能独立存在。</li>
-<li><strong>行级触发</strong>：MySQL 的触发器是行级触发器，即 <code>FOR EACH ROW</code>，意味着受 SQL 语句影响的每一行都会触发一次。</li>
-<li><strong>事务性</strong>：触发器的执行与原始操作在同一个事务中。如果触发器执行失败，原始操作也会被回滚。</li>
-</ul>
-<h3 id="-触发器的作用与应用场景">🎯 触发器的作用与应用场景</h3>
-<p>触发器主要用于保证数据的一致性和完整性，以及自动化业务逻辑。</p>
-<ul>
-<li><strong>数据校验与完整性</strong>：在数据写入前进行复杂的业务规则检查。例如，确保订单状态只能按预设流程流转，或保证商品库存不为负数。</li>
-<li><strong>自动化业务逻辑</strong>：封装常用逻辑，减少应用层代码。例如，用户注册后自动初始化相关配置，或更新订单后自动记录最后操作时间。</li>
-<li><strong>审计与日志记录</strong>：跟踪重要数据的变更历史。例如，记录员工薪资的每一次修改。</li>
-<li><strong>数据同步与级联操作</strong>：维护不同表之间的数据一致性。例如，当主表数据更新时，自动同步更新从表的相关数据。</li>
-</ul>
-<h3 id="-触发器的六种类型">🧩 触发器的六种类型</h3>
-<p>MySQL 触发器由<strong>触发时机</strong>（<code>BEFORE</code> 或 <code>AFTER</code>）和<strong>触发事件</strong>（<code>INSERT</code>、<code>UPDATE</code> 或 <code>DELETE</code>）组合而成，共六种。</p>
-<table>
-  <thead>
-      <tr>
-          <th style="text-align: left">触发时机</th>
-          <th style="text-align: left">触发事件</th>
-          <th style="text-align: left">描述</th>
-      </tr>
-  </thead>
-  <tbody>
-      <tr>
-          <td style="text-align: left"><code>BEFORE</code></td>
-          <td style="text-align: left"><code>INSERT</code></td>
-          <td style="text-align: left">在插入数据前执行，可用于检查或修改待插入的数据。</td>
-      </tr>
-      <tr>
-          <td style="text-align: left"><code>AFTER</code></td>
-          <td style="text-align: left"><code>INSERT</code></td>
-          <td style="text-align: left">在插入数据后执行，常用于记录日志或同步其他表。</td>
-      </tr>
-      <tr>
-          <td style="text-align: left"><code>BEFORE</code></td>
-          <td style="text-align: left"><code>UPDATE</code></td>
-          <td style="text-align: left">在更新数据前执行，可用于校验或调整待更新的数据。</td>
-      </tr>
-      <tr>
-          <td style="text-align: left"><code>AFTER</code></td>
-          <td style="text-align: left"><code>UPDATE</code></td>
-          <td style="text-align: left">在更新数据后执行，常用于记录变更历史或同步数据。</td>
-      </tr>
-      <tr>
-          <td style="text-align: left"><code>BEFORE</code></td>
-          <td style="text-align: left"><code>DELETE</code></td>
-          <td style="text-align: left">在删除数据前执行，可用于阻止删除或备份数据。</td>
-      </tr>
-      <tr>
-          <td style="text-align: left"><code>AFTER</code></td>
-          <td style="text-align: left"><code>DELETE</code></td>
-          <td style="text-align: left">在删除数据后执行，可用于级联清理关联数据。</td>
-      </tr>
-  </tbody>
-</table>
-<h3 id="-语法与核心要素">🛠️ 语法与核心要素</h3>
-<h4 id="基本语法">基本语法</h4>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="ln">1</span><span class="cl"><span class="k">CREATE</span><span class="w"> </span><span class="k">TRIGGER</span><span class="w"> </span><span class="k">trigger_name</span><span class="w">
-</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="w"></span><span class="n">trigger_time</span><span class="w"> </span><span class="n">trigger_event</span><span class="w">
-</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="w"></span><span class="k">ON</span><span class="w"> </span><span class="k">table_name</span><span class="w"> </span><span class="k">FOR</span><span class="w"> </span><span class="k">EACH</span><span class="w"> </span><span class="k">ROW</span><span class="w">
-</span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="w"></span><span class="k">BEGIN</span><span class="w">
-</span></span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="w">    </span><span class="c1">-- 触发器执行的SQL语句
-</span></span></span><span class="line"><span class="ln">6</span><span class="cl"><span class="c1"></span><span class="k">END</span><span class="p">;</span><span class="w">
-</span></span></span></code></pre></div><ul>
-<li><code>trigger_name</code>：触发器的唯一名称。</li>
-<li><code>trigger_time</code>：触发时机，<code>BEFORE</code> 或 <code>AFTER</code>。</li>
-<li><code>trigger_event</code>：触发事件，<code>INSERT</code>、<code>UPDATE</code> 或 <code>DELETE</code>。</li>
-</ul>
-<h4 id="new-和-old-伪记录">NEW 和 OLD 伪记录</h4>
-<p>在触发器内部，你可以通过 <code>NEW</code> 和 <code>OLD</code> 来访问当前操作行的数据。</p>
-<table>
-  <thead>
-      <tr>
-          <th style="text-align: left">伪记录</th>
-          <th style="text-align: left">适用场景</th>
-          <th style="text-align: left">含义与可用性</th>
-      </tr>
-  </thead>
-  <tbody>
-      <tr>
-          <td style="text-align: left"><code>NEW</code></td>
-          <td style="text-align: left"><code>INSERT</code> / <code>UPDATE</code></td>
-          <td style="text-align: left">代表即将插入或更新后的<strong>新数据</strong>。在 <code>BEFORE</code> 触发器中可修改，在 <code>AFTER</code> 中为只读。</td>
-      </tr>
-      <tr>
-          <td style="text-align: left"><code>OLD</code></td>
-          <td style="text-align: left"><code>UPDATE</code> / <code>DELETE</code></td>
-          <td style="text-align: left">代表更新前或删除前的<strong>旧数据</strong>。在所有触发器中均为只读。</td>
-      </tr>
-  </tbody>
-</table>
-<h3 id="-实战示例">💡 实战示例</h3>
-<p><strong>注意</strong>：创建包含多条语句的触发器时，需要先用 <code>DELIMITER</code> 命令临时更改语句结束符，避免 MySQL 提前解析。</p>
-<h4 id="示例-1数据校验-before-insert">示例 1：数据校验 (<code>BEFORE INSERT</code>)</h4>
-<p>防止插入负数的薪资。</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="k">DELIMITER</span><span class="w"> </span><span class="err">$$</span><span class="w">
-</span></span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="w"></span><span class="k">CREATE</span><span class="w"> </span><span class="k">TRIGGER</span><span class="w"> </span><span class="n">check_salary_before_insert</span><span class="w">
-</span></span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="w"></span><span class="k">BEFORE</span><span class="w"> </span><span class="k">INSERT</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">employees</span><span class="w">
-</span></span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="w"></span><span class="k">FOR</span><span class="w"> </span><span class="k">EACH</span><span class="w"> </span><span class="k">ROW</span><span class="w">
-</span></span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="w"></span><span class="k">BEGIN</span><span class="w">
-</span></span></span><span class="line"><span class="ln"> 6</span><span class="cl"><span class="w">    </span><span class="k">IF</span><span class="w"> </span><span class="k">NEW</span><span class="p">.</span><span class="n">salary</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="k">THEN</span><span class="w">
-</span></span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="w">        </span><span class="n">SIGNAL</span><span class="w"> </span><span class="k">SQLSTATE</span><span class="w"> </span><span class="s1">&#39;45000&#39;</span><span class="w">
-</span></span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="w">        </span><span class="k">SET</span><span class="w"> </span><span class="k">MESSAGE_TEXT</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;薪资不能为负数&#39;</span><span class="p">;</span><span class="w">
-</span></span></span><span class="line"><span class="ln"> 9</span><span class="cl"><span class="w">    </span><span class="k">END</span><span class="w"> </span><span class="k">IF</span><span class="p">;</span><span class="w">
-</span></span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="w"></span><span class="k">END</span><span class="err">$$</span><span class="w">
-</span></span></span><span class="line"><span class="ln">11</span><span class="cl"><span class="w"></span><span class="k">DELIMITER</span><span class="w"> </span><span class="p">;</span><span class="w">
-</span></span></span></code></pre></div><h4 id="示例-2自动填充字段-before-insert">示例 2：自动填充字段 (<code>BEFORE INSERT</code>)</h4>
-<p>在插入员工记录时，自动设置创建时间。</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="ln">1</span><span class="cl"><span class="k">DELIMITER</span><span class="w"> </span><span class="err">$$</span><span class="w">
-</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="w"></span><span class="k">CREATE</span><span class="w"> </span><span class="k">TRIGGER</span><span class="w"> </span><span class="n">before_employee_insert</span><span class="w">
-</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="w"></span><span class="k">BEFORE</span><span class="w"> </span><span class="k">INSERT</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">employees</span><span class="w">
-</span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="w"></span><span class="k">FOR</span><span class="w"> </span><span class="k">EACH</span><span class="w"> </span><span class="k">ROW</span><span class="w">
-</span></span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="w"></span><span class="k">BEGIN</span><span class="w">
-</span></span></span><span class="line"><span class="ln">6</span><span class="cl"><span class="w">    </span><span class="k">SET</span><span class="w"> </span><span class="k">NEW</span><span class="p">.</span><span class="n">created_at</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">NOW</span><span class="p">();</span><span class="w">
-</span></span></span><span class="line"><span class="ln">7</span><span class="cl"><span class="w"></span><span class="k">END</span><span class="err">$$</span><span class="w">
-</span></span></span><span class="line"><span class="ln">8</span><span class="cl"><span class="w"></span><span class="k">DELIMITER</span><span class="w"> </span><span class="p">;</span><span class="w">
-</span></span></span></code></pre></div><h4 id="示例-3记录审计日志-after-update">示例 3：记录审计日志 (<code>AFTER UPDATE</code>)</h4>
-<p>当员工薪资变动时，将变更记录到日志表。</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="k">DELIMITER</span><span class="w"> </span><span class="err">$$</span><span class="w">
-</span></span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="w"></span><span class="k">CREATE</span><span class="w"> </span><span class="k">TRIGGER</span><span class="w"> </span><span class="n">log_salary_change</span><span class="w">
-</span></span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="w"></span><span class="k">AFTER</span><span class="w"> </span><span class="k">UPDATE</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">employees</span><span class="w">
-</span></span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="w"></span><span class="k">FOR</span><span class="w"> </span><span class="k">EACH</span><span class="w"> </span><span class="k">ROW</span><span class="w">
-</span></span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="w"></span><span class="k">BEGIN</span><span class="w">
-</span></span></span><span class="line"><span class="ln"> 6</span><span class="cl"><span class="w">    </span><span class="k">IF</span><span class="w"> </span><span class="k">OLD</span><span class="p">.</span><span class="n">salary</span><span class="w"> </span><span class="o">&lt;&gt;</span><span class="w"> </span><span class="k">NEW</span><span class="p">.</span><span class="n">salary</span><span class="w"> </span><span class="k">THEN</span><span class="w">
-</span></span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="w">        </span><span class="k">INSERT</span><span class="w"> </span><span class="k">INTO</span><span class="w"> </span><span class="n">salary_audit_log</span><span class="w"> </span><span class="p">(</span><span class="n">emp_id</span><span class="p">,</span><span class="w"> </span><span class="n">old_salary</span><span class="p">,</span><span class="w"> </span><span class="n">new_salary</span><span class="p">,</span><span class="w"> </span><span class="n">change_time</span><span class="p">)</span><span class="w">
-</span></span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="w">        </span><span class="k">VALUES</span><span class="w"> </span><span class="p">(</span><span class="k">OLD</span><span class="p">.</span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="k">OLD</span><span class="p">.</span><span class="n">salary</span><span class="p">,</span><span class="w"> </span><span class="k">NEW</span><span class="p">.</span><span class="n">salary</span><span class="p">,</span><span class="w"> </span><span class="n">NOW</span><span class="p">());</span><span class="w">
-</span></span></span><span class="line"><span class="ln"> 9</span><span class="cl"><span class="w">    </span><span class="k">END</span><span class="w"> </span><span class="k">IF</span><span class="p">;</span><span class="w">
-</span></span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="w"></span><span class="k">END</span><span class="err">$$</span><span class="w">
-</span></span></span><span class="line"><span class="ln">11</span><span class="cl"><span class="w"></span><span class="k">DELIMITER</span><span class="w"> </span><span class="p">;</span><span class="w">
-</span></span></span></code></pre></div><h4 id="示例-4级联更新-after-update">示例 4：级联更新 (<code>AFTER UPDATE</code>)</h4>
-<p>当订单状态更新为“已发货”时，自动扣减对应商品的库存。</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="k">DELIMITER</span><span class="w"> </span><span class="err">$$</span><span class="w">
-</span></span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="w"></span><span class="k">CREATE</span><span class="w"> </span><span class="k">TRIGGER</span><span class="w"> </span><span class="n">update_stock_after_ship</span><span class="w">
-</span></span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="w"></span><span class="k">AFTER</span><span class="w"> </span><span class="k">UPDATE</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">orders</span><span class="w">
-</span></span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="w"></span><span class="k">FOR</span><span class="w"> </span><span class="k">EACH</span><span class="w"> </span><span class="k">ROW</span><span class="w">
-</span></span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="w"></span><span class="k">BEGIN</span><span class="w">
-</span></span></span><span class="line"><span class="ln"> 6</span><span class="cl"><span class="w">    </span><span class="k">IF</span><span class="w"> </span><span class="k">OLD</span><span class="p">.</span><span class="n">status</span><span class="w"> </span><span class="o">&lt;&gt;</span><span class="w"> </span><span class="s1">&#39;shipped&#39;</span><span class="w"> </span><span class="k">AND</span><span class="w"> </span><span class="k">NEW</span><span class="p">.</span><span class="n">status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;shipped&#39;</span><span class="w"> </span><span class="k">THEN</span><span class="w">
-</span></span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="w">        </span><span class="k">UPDATE</span><span class="w"> </span><span class="n">products</span><span class="w">
-</span></span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="w">        </span><span class="k">SET</span><span class="w"> </span><span class="n">stock</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">stock</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="k">NEW</span><span class="p">.</span><span class="n">quantity</span><span class="w">
-</span></span></span><span class="line"><span class="ln"> 9</span><span class="cl"><span class="w">        </span><span class="k">WHERE</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">NEW</span><span class="p">.</span><span class="n">product_id</span><span class="p">;</span><span class="w">
-</span></span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="w">    </span><span class="k">END</span><span class="w"> </span><span class="k">IF</span><span class="p">;</span><span class="w">
-</span></span></span><span class="line"><span class="ln">11</span><span class="cl"><span class="w"></span><span class="k">END</span><span class="err">$$</span><span class="w">
-</span></span></span><span class="line"><span class="ln">12</span><span class="cl"><span class="w"></span><span class="k">DELIMITER</span><span class="w"> </span><span class="p">;</span><span class="w">
-</span></span></span></code></pre></div><h3 id="-注意事项与最佳实践">⚠️ 注意事项与最佳实践</h3>
-<p>触发器虽然强大，但也是一把“双刃剑”，使用时需谨慎。</p>
-<ul>
-<li><strong>性能影响</strong>：触发器会自动执行，复杂的逻辑（尤其是包含子查询）在批量操作时会被执行多次，可能严重影响数据库性能。</li>
-<li><strong>维护困难</strong>：触发器是隐式执行的，业务逻辑分散在应用代码和数据库中，会增加调试和排查问题的难度。</li>
-<li><strong>表结构变更</strong>：当表结构发生变化（如增加字段）时，相关的触发器不会自动更新，需要手动检查并重写，否则可能导致运行时错误。</li>
-<li><strong>触发器限制</strong>：
-<ul>
-<li>每个表最多只能创建 6 个触发器（每种类型一个）。</li>
-<li>触发器内不能更新正在触发它的同一张表，否则会报错。</li>
-<li>只响应 <code>INSERT</code>、<code>UPDATE</code>、<code>DELETE</code> 等 DML 操作，不响应 <code>TRUNCATE</code>、<code>DROP</code> 等 DDL 操作。</li>
-</ul>
-</li>
-<li><strong>最佳实践</strong>：保持触发器逻辑尽可能简单，仅用于核心的数据校验、字段修正或日志记录，避免在其中编写复杂的业务逻辑。</li>
-</ul>
-<hr>
-<hr>
-<hr>
-<h1 id="mysql-的自增-idauto-increment-id耗尽是一个理论上存在但在实际业务中可能引发严重故障的问题当自增-id-达到其数据类型的上限时任何新的插入操作都会失败并抛出主键冲突的错误">MySQL 的自增 ID（Auto-Increment ID）耗尽是一个理论上存在、但在实际业务中可能引发严重故障的问题。当自增 ID 达到其数据类型的上限时，任何新的插入操作都会失败，并抛出主键冲突的错误：</h1>
-<p><code>ERROR 1062 (23000): Duplicate entry '...' for key 'PRIMARY'</code></p>
-<p>下面为你详细分析原因并提供从应急到根治的多种解决方案。</p>
-<h3 id="-问题根源id-上限是多少">🔍 问题根源：ID 上限是多少？</h3>
-<p>问题的核心在于自增 ID 字段的数据类型。不同的数据类型决定了 ID 的上限。</p>
-<table>
-  <thead>
-      <tr>
-          <th style="text-align: left">数据类型</th>
-          <th style="text-align: left">最大值 (有符号)</th>
-          <th style="text-align: left">最大值 (无符号)</th>
-          <th style="text-align: left">数量级</th>
-      </tr>
-  </thead>
-  <tbody>
-      <tr>
-          <td style="text-align: left"><code>INT</code> (常用)</td>
-          <td style="text-align: left">2,147,483,647</td>
-          <td style="text-align: left">4,294,967,295</td>
-          <td style="text-align: left">十亿/四十亿</td>
-      </tr>
-      <tr>
-          <td style="text-align: left"><code>BIGINT</code> (推荐)</td>
-          <td style="text-align: left">9.22 x 10¹⁸</td>
-          <td style="text-align: left">1.84 x 10¹⁹</td>
-          <td style="text-align: left">百亿亿/千亿亿</td>
-      </tr>
-  </tbody>
-</table>
-<ul>
-<li><strong>常见场景</strong>：问题通常发生在使用了 <code>INT</code> 类型作为主键且数据量巨大的表中。例如，一个日增百万的订单表，在几年内就可能触及 <code>INT</code> 的上限。</li>
-<li><strong>为何发生</strong>：即使有删除操作，自增 ID 也不会回填，导致 ID 空间被持续消耗。在高并发下，ID 分配可能不连续，进一步加速了耗尽过程。</li>
-</ul>
-<h3 id="-临时应急方案快速恢复服务">🚨 临时应急方案：快速恢复服务</h3>
-<p>当线上服务因 ID 耗尽而告警时，首要目标是快速恢复写入能力。</p>
-<h4 id="重置自增-id-起始值">重置自增 ID 起始值</h4>
-<p>如果表中存在大量已删除的旧数据，可以通过调整自增 ID 的起始值，跳过已用尽的 ID 段，从一个新的、更大的值开始。</p>
-<ol>
-<li><strong>查询当前最大 ID</strong>：
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="ln">1</span><span class="cl"><span class="k">SELECT</span><span class="w"> </span><span class="k">MAX</span><span class="p">(</span><span class="n">id</span><span class="p">)</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">your_table</span><span class="p">;</span><span class="w">
-</span></span></span></code></pre></div></li>
-<li><strong>重置自增值</strong> (假设最大 ID 为 40 亿，我们想从 41 亿开始)：
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="ln">1</span><span class="cl"><span class="k">ALTER</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">your_table</span><span class="w"> </span><span class="n">AUTO_INCREMENT</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">4100000000</span><span class="p">;</span><span class="w">
-</span></span></span></code></pre></div></li>
-</ol>
-<ul>
-<li><strong>优点</strong>：操作简单，能立即恢复服务。</li>
-<li><strong>缺点与风险</strong>：这只是“缓兵之计”，并未解决根本问题。如果旧数据未被彻底清理，后续可能因 ID 冲突导致问题。仅适用于紧急救火场景。</li>
-</ul>
-<h3 id="-长期根治方案彻底解决问题">🛠️ 长期根治方案：彻底解决问题</h3>
-<p>要从根本上解决 ID 耗尽问题，需要从表结构或系统架构层面进行改造。</p>
-<h4 id="方案一扩展-id-列的数据类型-最推荐">方案一：扩展 ID 列的数据类型 (最推荐)</h4>
-<p>这是最直接、最彻底的解决方案。将 ID 字段从 <code>INT</code> 升级为 <code>BIGINT</code>，ID 空间将从 43 亿扩展到 1844 亿亿，足以应对未来几十年的数据增长。</p>
-<ul>
-<li><strong>SQL 命令</strong>：
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="ln">1</span><span class="cl"><span class="k">ALTER</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">your_table</span><span class="w"> </span><span class="k">MODIFY</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="nb">BIGINT</span><span class="w"> </span><span class="n">UNSIGNED</span><span class="w"> </span><span class="n">AUTO_INCREMENT</span><span class="p">;</span><span class="w">
-</span></span></span></code></pre></div></li>
-<li><strong>优点</strong>：一劳永逸，对应用层改动最小。</li>
-<li><strong>风险与注意事项</strong>：
-<ul>
-<li><strong>锁表风险</strong>：对于大表（如数亿行），<code>ALTER TABLE</code> 操作会锁表，可能导致长时间的服务不可用。</li>
-<li><strong>磁盘空间</strong>：操作需要创建新表并复制数据，可能消耗近两倍的磁盘空间。</li>
-<li><strong>安全操作</strong>：务必在业务低峰期执行，并提前备份。强烈建议使用在线 DDL 工具，如 Percona 的 <code>pt-online-schema-change</code> 或 GitHub 的 <code>gh-ost</code>，以最小化对线上业务的影响。</li>
-<li><strong>应用兼容性</strong>：检查应用代码、ORM 框架或 API 接口是否对 <code>INT</code> 类型有隐式依赖。</li>
-</ul>
-</li>
-</ul>
-<h4 id="方案二使用分布式-id-生成策略-架构升级">方案二：使用分布式 ID 生成策略 (架构升级)</h4>
-<p>对于高并发、分布式系统，可以放弃数据库自增 ID，转而使用外部的全局唯一 ID 生成服务。</p>
-<table>
-  <thead>
-      <tr>
-          <th style="text-align: left">生成方式</th>
-          <th style="text-align: left">特点</th>
-          <th style="text-align: left">适用场景</th>
-      </tr>
-  </thead>
-  <tbody>
-      <tr>
-          <td style="text-align: left"><strong>雪花算法 (Snowflake)</strong></td>
-          <td style="text-align: left">生成 64 位长整型 ID (时间戳+机器ID+序列号)，趋势递增，性能高。</td>
-          <td style="text-align: left">高并发分布式系统</td>
-      </tr>
-      <tr>
-          <td style="text-align: left"><strong>UUID</strong></td>
-          <td style="text-align: left">128 位字符串，几乎保证全局唯一。但无序，会导致 B+ 树索引分裂，写入性能下降约 20-30%。</td>
-          <td style="text-align: left">对性能不敏感的小表</td>
-      </tr>
-      <tr>
-          <td style="text-align: left"><strong>Redis 自增</strong></td>
-          <td style="text-align: left">利用 <code>INCR</code> 命令生成全局 ID，需保证 Redis 的高可用性。</td>
-          <td style="text-align: left">已有 Redis 集群的系统</td>
-      </tr>
-  </tbody>
-</table>
-<ul>
-<li><strong>优点</strong>：彻底解决单点瓶颈，支持水平扩展。</li>
-<li><strong>缺点</strong>：需要改造现有架构，引入新的组件，开发和运维复杂度增加。</li>
-</ul>
-<h4 id="方案三数据库分片-sharding">方案三：数据库分片 (Sharding)</h4>
-<p>通过分库分表中间件（如 ShardingSphere、MyCat），将数据水平拆分到多个数据库实例或表中。</p>
-<ul>
-<li><strong>实现方式</strong>：每个分片（表）都拥有自己独立的自增 ID 计数器，从 1 开始计数。</li>
-<li><strong>优点</strong>：不仅解决了 ID 耗尽问题，还提升了系统的整体读写能力和存储容量。</li>
-<li><strong>缺点</strong>：架构改造最为复杂，涉及数据迁移、路由规则配置、跨分片查询等挑战。</li>
-</ul>
-<h3 id="-方案对比与选择">📊 方案对比与选择</h3>
-<table>
-  <thead>
-      <tr>
-          <th style="text-align: left">方案</th>
-          <th style="text-align: left">改造复杂度</th>
-          <th style="text-align: left">性能影响</th>
-          <th style="text-align: left">适用场景</th>
-      </tr>
-  </thead>
-  <tbody>
-      <tr>
-          <td style="text-align: left"><strong>扩展数据类型</strong></td>
-          <td style="text-align: left">⭐⭐</td>
-          <td style="text-align: left">✅ 无影响</td>
-          <td style="text-align: left">绝大多数单表 ID 耗尽场景，首选方案。</td>
-      </tr>
-      <tr>
-          <td style="text-align: left"><strong>分布式ID (Snowflake)</strong></td>
-          <td style="text-align: left">⭐⭐⭐⭐</td>
-          <td style="text-align: left">✅ 提升</td>
-          <td style="text-align: left">高并发、分布式架构的系统。</td>
-      </tr>
-      <tr>
-          <td style="text-align: left"><strong>数据库分片</strong></td>
-          <td style="text-align: left">⭐⭐⭐⭐⭐</td>
-          <td style="text-align: left">✅ 提升</td>
-          <td style="text-align: left">数据量已达 TB 级，需要横向扩展的超大规模系统。</td>
-      </tr>
-      <tr>
-          <td style="text-align: left"><strong>重置自增值</strong></td>
-          <td style="text-align: left">⭐</td>
-          <td style="text-align: left">⚠️ 风险</td>
-          <td style="text-align: left">紧急恢复服务，为实施根治方案争取时间。</td>
-      </tr>
-  </tbody>
-</table>
-<h3 id="-预防与监控建议">💡 预防与监控建议</h3>
-<p>最好的解决方式是预防。</p>
-<ol>
-<li><strong>初始设计</strong>：在新表设计时，除非数据量极小，否则优先使用 <code>BIGINT UNSIGNED</code> 作为自增主键类型。</li>
-<li><strong>实时监控</strong>：建立监控告警机制，定期检查关键表的自增 ID 使用情况。
-<ul>
-<li><strong>监控命令</strong>：<code>SHOW TABLE STATUS LIKE 'your_table_name';</code>，关注 <code>Auto_increment</code> 字段的值。</li>
-<li><strong>告警阈值</strong>：当 <code>INT</code> 类型 ID 接近 20 亿，或 <code>BIGINT</code> 类型 ID 使用率达到一定比例时，触发告警，提前规划扩容。</li>
-</ul>
-</li>
-</ol>
 
     </div><div class="post_comments">
   
@@ -1011,6 +541,9 @@
     <h2 class="mt-4">精选文章</h2>
     <ul>
       <li>
+        <a href="https://jianlin-li.github.io/post/git_review_1/" class="nav-link" title="Git的知识点-1">Git的知识点-1</a>
+      </li>
+      <li>
         <a href="https://jianlin-li.github.io/post/php_review_5/" class="nav-link" title="PHP语言的知识点-5">PHP语言的知识点-5</a>
       </li>
       <li>
@@ -1031,12 +564,12 @@
       <li>
         <a href="https://jianlin-li.github.io/post/elasticsearch_review_1/" class="nav-link" title="Elasticsearch的知识点-1">Elasticsearch的知识点-1</a>
       </li>
-      <li>
-        <a href="https://jianlin-li.github.io/post/docker_review_1/" class="nav-link" title="Docker的知识点-1">Docker的知识点-1</a>
-      </li>
     </ul>
     <h2 class="mt-4">最新文章</h2>
     <ul class="flex-column">
+      <li>
+        <a href="https://jianlin-li.github.io/post/docker_review_1/" class="nav-link" title="Docker的知识点-1">Docker的知识点-1</a>
+      </li>
       <li>
         <a href="https://jianlin-li.github.io/post/go_review_4/" class="nav-link" title="Go语言的知识点-4">Go语言的知识点-4</a>
       </li>
@@ -1057,9 +590,6 @@
       </li>
       <li>
         <a href="https://jianlin-li.github.io/post/php_review_4/" class="nav-link" title="PHP语言的知识点-4">PHP语言的知识点-4</a>
-      </li>
-      <li>
-        <a href="https://jianlin-li.github.io/post/php_review_3/" class="nav-link" title="PHP语言的知识点-3">PHP语言的知识点-3</a>
       </li>
     </ul>
     <div>
@@ -1090,6 +620,11 @@
           <span class="button_tally">1</span>
         </a>
         
+        <a href='https://jianlin-li.github.io/categories/git/' class="post_tag button button_translucent" title="git">
+          GIT
+          <span class="button_tally">1</span>
+        </a>
+        
         <a href='https://jianlin-li.github.io/categories/hugo/' class="post_tag button button_translucent" title="hugo">
           HUGO
           <span class="button_tally">1</span>
@@ -1110,11 +645,6 @@
           <span class="button_tally">1</span>
         </a>
         
-        <a href='https://jianlin-li.github.io/categories/shell/' class="post_tag button button_translucent" title="shell">
-          SHELL
-          <span class="button_tally">1</span>
-        </a>
-        
         
         <br>
         <div class="post_tags_toggle button">所有分类</div>
@@ -1126,6 +656,10 @@
             
             
             <a href='https://jianlin-li.github.io/categories/elasticsearch/' class=" post_tag button button_translucent" data-position=3 title="elasticsearch">ELASTICSEARCH<span class="button_tally">3</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/git/' class=" post_tag button button_translucent" data-position=1 title="git">GIT<span class="button_tally">1</span>
             </a>
             
             
@@ -1217,6 +751,11 @@
           <span class="button_tally">1</span>
         </a>
         
+        <a href='https://jianlin-li.github.io/tags/git/' class="post_tag button button_translucent" title="git">
+          GIT
+          <span class="button_tally">1</span>
+        </a>
+        
         <a href='https://jianlin-li.github.io/tags/hosts/' class="post_tag button button_translucent" title="hosts">
           HOSTS
           <span class="button_tally">1</span>
@@ -1237,11 +776,6 @@
           <span class="button_tally">1</span>
         </a>
         
-        <a href='https://jianlin-li.github.io/tags/mysql/' class="post_tag button button_translucent" title="mysql">
-          MYSQL
-          <span class="button_tally">1</span>
-        </a>
-        
         
         <br>
         <div class="post_tags_toggle button">所有标签</div>
@@ -1257,6 +791,10 @@
             
             
             <a href='https://jianlin-li.github.io/tags/emoji/' class=" post_tag button button_translucent" data-position=1 title="emoji">EMOJI<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/git/' class=" post_tag button button_translucent" data-position=1 title="git">GIT<span class="button_tally">1</span>
             </a>
             
             
