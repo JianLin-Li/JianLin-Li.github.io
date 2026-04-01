@@ -168,7 +168,7 @@
     <span class="post_date">
       2026-02-27	  
     </span>
-    <span class="post_time"> · 3 分钟阅读</span><span>&nbsp;· <a href='https://jianlin-li.github.io/tags/mysql/' title="MySQL" class="post_tag button button_translucent">MySQL
+    <span class="post_time"> · 4 分钟阅读</span><span>&nbsp;· <a href='https://jianlin-li.github.io/tags/mysql/' title="MySQL" class="post_tag button button_translucent">MySQL
         </a>
     </span>
     <span class="page_only">&nbsp;·
@@ -498,6 +498,254 @@
 <li>性能优化</li>
 <li>与应用层配合（PHP / Java）</li>
 </ol>
+<hr>
+<hr>
+<hr>
+<hr>
+<h1 id="mysql-的三大范式3nf是数据库设计中非常核心的一套规范用来减少数据冗余提高数据一致性避免更新异常">MySQL 的“三大范式”（3NF）是数据库设计中非常核心的一套规范，用来<strong>减少数据冗余、提高数据一致性、避免更新异常</strong>。</h1>
+<hr>
+<h1 id="-一什么是数据库范式">🌟 一、什么是数据库范式？</h1>
+<p>简单说一句话：</p>
+<p>👉 <strong>范式 = 表设计的规范标准</strong></p>
+<p>目的就是：</p>
+<ul>
+<li>避免数据重复</li>
+<li>防止插入 / 删除 / 更新异常</li>
+<li>让数据结构更清晰</li>
+</ul>
+<hr>
+<h1 id="-二第一范式1nf字段必须原子化">🧱 二、第一范式（1NF）——字段必须“原子化”</h1>
+<h2 id="-核心规则">📌 核心规则</h2>
+<p>👉 表中的每一列必须是<strong>不可再分的最小单位</strong></p>
+<hr>
+<h2 id="-不符合-1nf错误示例">❌ 不符合 1NF（错误示例）</h2>
+<table>
+  <thead>
+      <tr>
+          <th>学生ID</th>
+          <th>姓名</th>
+          <th>电话</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>1</td>
+          <td>张三</td>
+          <td>138xxx,139xxx</td>
+      </tr>
+  </tbody>
+</table>
+<p>👉 问题：</p>
+<ul>
+<li>一个字段存多个值（电话有多个）</li>
+</ul>
+<hr>
+<h2 id="-符合-1nf正确示例">✅ 符合 1NF（正确示例）</h2>
+<table>
+  <thead>
+      <tr>
+          <th>学生ID</th>
+          <th>姓名</th>
+          <th>电话</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>1</td>
+          <td>张三</td>
+          <td>138xxx</td>
+      </tr>
+      <tr>
+          <td>1</td>
+          <td>张三</td>
+          <td>139xxx</td>
+      </tr>
+  </tbody>
+</table>
+<hr>
+<h2 id="-总结一句话">💡 总结一句话</h2>
+<p>👉 <strong>每个字段只能存一个值，不能是集合或数组</strong></p>
+<hr>
+<h1 id="-三第二范式2nf消除部分依赖">🧱 三、第二范式（2NF）——消除“部分依赖”</h1>
+<h2 id="-前提">📌 前提</h2>
+<p>👉 必须先满足 <strong>1NF</strong></p>
+<hr>
+<h2 id="-核心规则-1">📌 核心规则</h2>
+<p>👉 <strong>非主键字段必须完全依赖主键，不能只依赖主键的一部分</strong></p>
+<hr>
+<h2 id="-不符合-2nf典型示例">❌ 不符合 2NF（典型示例）</h2>
+<p>假设：一个订单表</p>
+<table>
+  <thead>
+      <tr>
+          <th>订单ID</th>
+          <th>商品ID</th>
+          <th>商品名称</th>
+          <th>数量</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>1</td>
+          <td>101</td>
+          <td>苹果</td>
+          <td>2</td>
+      </tr>
+  </tbody>
+</table>
+<p>👉 主键 = (订单ID, 商品ID)</p>
+<p>👉 问题：</p>
+<ul>
+<li>商品名称 只依赖 商品ID ❌</li>
+<li>没有完全依赖联合主键</li>
+</ul>
+<hr>
+<h2 id="-拆分后符合-2nf">✅ 拆分后（符合 2NF）</h2>
+<h3 id="订单表">订单表</h3>
+<table>
+  <thead>
+      <tr>
+          <th>订单ID</th>
+          <th>商品ID</th>
+          <th>数量</th>
+      </tr>
+  </thead>
+  <tbody>
+  </tbody>
+</table>
+<h3 id="商品表">商品表</h3>
+<table>
+  <thead>
+      <tr>
+          <th>商品ID</th>
+          <th>商品名称</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>101</td>
+          <td>苹果</td>
+      </tr>
+  </tbody>
+</table>
+<hr>
+<h2 id="-总结一句话-1">💡 总结一句话</h2>
+<p>👉 <strong>字段不能“只依赖主键的一部分”</strong></p>
+<hr>
+<h1 id="-四第三范式3nf消除传递依赖">🧱 四、第三范式（3NF）——消除“传递依赖”</h1>
+<h2 id="-前提-1">📌 前提</h2>
+<p>👉 必须满足 <strong>2NF</strong></p>
+<hr>
+<h2 id="-核心规则-2">📌 核心规则</h2>
+<p>👉 <strong>非主键字段不能依赖其他非主键字段</strong></p>
+<hr>
+<h2 id="-不符合-3nf经典示例">❌ 不符合 3NF（经典示例）</h2>
+<table>
+  <thead>
+      <tr>
+          <th>学生ID</th>
+          <th>学生名</th>
+          <th>班级ID</th>
+          <th>班级名称</th>
+      </tr>
+  </thead>
+  <tbody>
+  </tbody>
+</table>
+<p>👉 问题：</p>
+<ul>
+<li>班级名称 依赖 班级ID</li>
+<li>珃班级ID 又依赖 学生ID</li>
+</ul>
+<p>👉 形成：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="ln">1</span><span class="cl">学生ID → 班级ID → 班级名称
+</span></span></code></pre></div><p>👉 这就是：<strong>传递依赖 ❌</strong></p>
+<hr>
+<h2 id="-拆分后符合-3nf">✅ 拆分后（符合 3NF）</h2>
+<h3 id="学生表">学生表</h3>
+<p>| 学生ID | 学生名 | 班级ID |</p>
+<h3 id="班级表">班级表</h3>
+<p>| 珻级ID | 珻级名称 |</p>
+<hr>
+<h2 id="-总结一句话-2">💡 总结一句话</h2>
+<p>👉 <strong>不能“间接依赖主键”</strong></p>
+<hr>
+<h1 id="-五三大范式总结超级重点">🧠 五、三大范式总结（超级重点🔥）</h1>
+<table>
+  <thead>
+      <tr>
+          <th>范式</th>
+          <th>解决问题</th>
+          <th>核心思想</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>1NF</td>
+          <td>字段重复</td>
+          <td>原子性</td>
+      </tr>
+      <tr>
+          <td>2NF</td>
+          <td>部分依赖</td>
+          <td>完全依赖主键</td>
+      </tr>
+      <tr>
+          <td>3NF</td>
+          <td>传递依赖</td>
+          <td>直接依赖主键</td>
+      </tr>
+  </tbody>
+</table>
+<hr>
+<h1 id="-六不遵守范式会发生什么">🚨 六、不遵守范式会发生什么？</h1>
+<h3 id="-数据冗余">❌ 数据冗余</h3>
+<ul>
+<li>商品名称重复存储</li>
+</ul>
+<h3 id="-更新异常">❌ 更新异常</h3>
+<ul>
+<li>改商品名要改多行</li>
+</ul>
+<h3 id="-插入异常">❌ 插入异常</h3>
+<ul>
+<li>没订单无法插商品信息</li>
+</ul>
+<h3 id="-删除异常">❌ 删除异常</h3>
+<ul>
+<li>删除订单导致商品信息丢失</li>
+</ul>
+<hr>
+<h1 id="-七实际开发中的取舍很重要">⚖️ 七、实际开发中的取舍（很重要）</h1>
+<p>👉 面试常问！！</p>
+<p>现实中：</p>
+<table>
+  <thead>
+      <tr>
+          <th>场景</th>
+          <th>做法</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>OLTP系统（业务系统）</td>
+          <td>尽量遵守 3NF</td>
+      </tr>
+      <tr>
+          <td>OLAP/报表系统</td>
+          <td>允许反范式（提高查询性能）</td>
+      </tr>
+      <tr>
+          <td>高并发系统</td>
+          <td>适当冗余字段（减少 JOIN）</td>
+      </tr>
+  </tbody>
+</table>
+<hr>
+<h1 id="-八一句话终极总结">🎯 八、一句话终极总结</h1>
+<p>👉 <strong>1NF：字段原子化</strong>
+👉 <strong>2NF：完全依赖主键</strong>
+👉 <strong>3NF：不允许传递依赖</strong></p>
 <hr>
 
     </div><div class="post_comments">
