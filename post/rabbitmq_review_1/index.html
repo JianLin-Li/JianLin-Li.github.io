@@ -567,7 +567,32 @@ fanout是路由广播的形式,将会把消息发给绑定它的全部队列,即
 <p><strong>A客户端发送消息到一个队列A，B服务器消费队列A中的消息，然后B服务器处理消息并且把结果发送到队列B，A客户端再消费队列B中的消息，一般会使用rabbitmq的默认交换器，名字为空字符串 路由key和绑定key就用队列名称</strong></p>
 <ul>
 <li>使用默认交换器（空字符串名称）</li>
-<li>路由键和绑定键使用队列名称</li>
+<li>路由键和绑定键使用队列名称
+<figure>
+  <picture>
+
+    
+      
+        
+        
+        
+        
+        
+        
+    <img
+      loading="lazy"
+      decoding="async"
+      alt="RPC示意图"
+      
+        class="image_figure image_internal image_unprocessed"
+        src="https://jianlin-li.github.io/images/rabbitmqrpc.png"
+      
+      
+    />
+
+    </picture>
+</figure>
+</li>
 </ul>
 <h2 id="持久化机制">持久化机制</h2>
 <p>RabbitMQ 持久化包含三个部分：</p>
@@ -639,13 +664,170 @@ fanout是路由广播的形式,将会把消息发给绑定它的全部队列,即
 <li>支持更长的队列和更多消息存储</li>
 <li>通过 <code>x-queue-mode</code> 参数设置：<code>default</code> 或 <code>lazy</code></li>
 </ul>
-<h3 id="镜像队列-mirror-queue">镜像队列 (Mirror Queue)</h3>
-<p><strong>将队列镜像到集群中的其他 Broker节点之上，如果集群中的一个节点失效了，队列能自动地切换到镜像中的另一个节点上以保证服务的可用性。在通常的用法中，针对每一个配置镜像的队列(以下简称镜像队列〉都包含一个主节点(master) 和若干个从节点 (slave)</strong></p>
+<h1 id="rabbitmq集群通过分布式架构实现高可用性负载均衡和横向扩展能力主要包含三种核心集群模式各具特点和适用场景">RabbitMQ集群通过分布式架构实现高可用性、负载均衡和横向扩展能力，主要包含三种核心集群模式，各具特点和适用场景。</h1>
+<h2 id="一集群模式分类与特点">一、集群模式分类与特点</h2>
+<h3 id="1-普通集群standard-cluster">1. 普通集群（Standard Cluster）</h3>
 <ul>
-<li>将队列镜像到集群中的其他 Broker 节点</li>
-<li>包含一个主节点 (master) 和多个从节点 (slave)</li>
-<li>主节点失效时自动切换到镜像节点</li>
+<li>会在集群的各个节点间共享部分数据，包括：交换机、队列元信息。不包含队列中的消息。</li>
+<li>当访问集群某节点时，如果队列不在该节点，会从数据所在节点传递到当前节点并返回</li>
+<li>队列所在节点宕机，队列中的消息就会丢失</li>
 </ul>
+<p><figure>
+  <picture>
+
+    
+      
+        
+        
+        
+        
+        
+        
+    <img
+      loading="lazy"
+      decoding="async"
+      alt="普通集群"
+      
+        class="image_figure image_internal image_unprocessed"
+        src="https://jianlin-li.github.io/images/ptjq.png"
+      
+      
+    />
+
+    </picture>
+</figure>
+</p>
+<blockquote>
+<p>是一种分布式集群，将队列分散到集群的各个节点，从而提高整个集群的并发能力。
+普通模式集群不进行数据同步，每个MQ都有自己的队列、数据信息（其它元数据信息如交换机等会同步）。例如我们有2个MQ：mq1，和mq2，如果你的消息在mq1，而你连接到了mq2，那么mq2会去mq1拉取消息，然后返回给你。如果mq1宕机，消息就会丢失</p>
+</blockquote>
+<h3 id="2-镜像队列集群mirror-queue">2. 镜像队列集群（Mirror Queue）</h3>
+<ul>
+<li>
+<p>创建队列的节点被称为该队列的主节点，备份到的其它节点叫做该队列的镜像节点。</p>
+</li>
+<li>
+<p>镜像队列结构是一主多从（从就是镜像）</p>
+</li>
+<li>
+<p>交换机、队列、队列中的消息会在各个mq的镜像节点之间同步备份。</p>
+</li>
+<li>
+<p>一个队列的主节点可能是另一个队列的镜像节点</p>
+</li>
+<li>
+<p>所有操作都是主节点完成，然后同步给镜像节点</p>
+</li>
+<li>
+<p>主宕机后，镜像节点会替代成新的主（如果在主从同步完成前，主就已经宕机，可能出现数据丢失）</p>
+</li>
+<li>
+<p>不具备负载均衡功能，因为所有操作都会有主节点完成（但是不同队列，其主节点可以不同，可以利用这个提高吞吐量）</p>
+</li>
+<li>
+<p><strong>适用场景</strong>：老版本RabbitMQ（3.8以下）、必须使用延时队列的业务</p>
+</li>
+<li>
+<p><strong>注意</strong>：官方已弃用（Deprecated）</p>
+</li>
+</ul>
+<p><figure>
+  <picture>
+
+    
+      
+        
+        
+        
+        
+        
+        
+    <img
+      loading="lazy"
+      decoding="async"
+      alt="镜像队列集群"
+      
+        class="image_figure image_internal image_unprocessed"
+        src="https://jianlin-li.github.io/images/jxjq.png"
+      
+      
+    />
+
+    </picture>
+</figure>
+</p>
+<blockquote>
+<p>是一种主从集群，普通集群的基础上，添加了主从备份功能，提高集群的数据可用性。
+与普通模式不同，队列会在各个mq的镜像节点之间同步，因此你连接到任何一个镜像节点，均可获取到消息。而且如果一个节点宕机，并不会导致数据丢失。不过，这种方式增加了数据同步的带宽消耗。
+镜像集群虽然支持主从，但主从同步并不是强一致的，某些情况下可能有数据丢失的风险。因此在RabbitMQ的3.8版本以后，推出了新的功能：仲裁队列来代替镜像集群，底层采用Raft协议确保主从的数据一致性。</p>
+<p>默认情况下，队列只保存在创建该队列的节点上。而镜像模式下，创建队列的节点被称为该队列的主节点，队列还会拷贝到集群中的其它节点，也叫做该队列的镜像节点。
+但是，不同队列可以在集群中的任意节点上创建，因此不同队列的主节点可以不同。甚至，一个队列的主节点可能是另一个队列的镜像节点。
+用户发送给队列的一切请求，例如发送消息、消息回执默认都会在主节点完成，如果是从节点接收到请求，也会路由到主节点去完成。镜像节点仅仅起到备份数据作用。
+当主节点接收到消费者的ACK时，所有镜像都会删除节点中的数据。</p>
+</blockquote>
+<h3 id="3-仲裁队列集群quorum-queue">3. 仲裁队列集群（Quorum Queue）</h3>
+<ul>
+<li><strong>核心特点</strong>：基于Raft分布式一致性协议实现的第二代高可用集群，消息必须同步到多数节点才确认提交</li>
+<li>与镜像队列一样，都是主从模式，支持主从数据同步</li>
+<li>使用非常简单，没有复杂的配置</li>
+<li>主从同步基于Raft协议，保证强一致</li>
+<li><strong>适用场景</strong>：生产核心业务（订单/支付/交易）、要求消息零丢失、高并发高可用场景</li>
+<li><strong>官方状态</strong>：推荐方案，持续维护，未来主流</li>
+</ul>
+<h2 id="二集群工作原理与关键特性">二、集群工作原理与关键特性</h2>
+<h3 id="1-节点类型">1. 节点类型</h3>
+<ul>
+<li><strong>内存节点(RAM Node)</strong>：仅将元数据保存在内存，性能更高但可靠性较低</li>
+<li><strong>磁盘节点(Disc Node)</strong>：将元数据持久化到磁盘，必须包含至少一个磁盘节点，负责集群元数据的持久化</li>
+</ul>
+<h3 id="2-集群组成机制">2. 集群组成机制</h3>
+<ul>
+<li><strong>Erlang Cookie验证</strong>：所有节点必须使用相同的cookie才能通信</li>
+<li><strong>节点发现方式</strong>：
+<ul>
+<li>手动加入：在目标节点执行<code>rabbitmqctl join_cluster rabbit@node1</code></li>
+<li>自动加入：通过配置自动发现服务</li>
+</ul>
+</li>
+</ul>
+<h3 id="3-元数据同步流程">3. 元数据同步流程</h3>
+<ul>
+<li>新增队列时，声明节点将元数据广播到集群</li>
+<li>磁盘节点将元数据写入<code>rabbit@hostname-mnesia</code>目录</li>
+<li>内存节点接收元数据后仅保存在内存</li>
+<li>客户端连接任意节点均可获取完整元数据</li>
+</ul>
+<h3 id="4-网络分区处理">4. 网络分区处理</h3>
+<p>当集群出现脑裂时，RabbitMQ提供三种恢复策略：</p>
+<ul>
+<li><strong>ignore</strong>：自动恢复，适用于短暂网络抖动</li>
+<li><strong>pause_minority</strong>：暂停少数分区节点，确保多数派可用</li>
+<li><strong>autoheal</strong>：选择最大分区保留，最小化数据丢失</li>
+</ul>
+<h2 id="三集群优势与适用场景">三、集群优势与适用场景</h2>
+<h3 id="1-核心优势">1. 核心优势</h3>
+<ul>
+<li><strong>高可用性</strong>：通过镜像队列或Quorum队列实现故障自动转移</li>
+<li><strong>负载均衡</strong>：客户端可连接任意节点，消息自动路由到队列所在节点</li>
+<li><strong>横向扩展</strong>：通过增加节点数量提升整体吞吐量</li>
+<li><strong>数据冗余</strong>：消息在多个节点存储，防止数据丢失</li>
+</ul>
+<h3 id="2-典型应用场景">2. 典型应用场景</h3>
+<ul>
+<li>
+<p><strong>电商秒杀系统</strong>：3节点集群 + 镜像队列（HA策略all）</p>
+</li>
+<li>
+<p><strong>物联网设备上报</strong>：5节点集群 + 磁盘节点占比≥50%</p>
+</li>
+<li>
+<p><strong>金融交易系统</strong>：3节点集群 + 镜像队列 + 持久化队列</p>
+</li>
+<li>
+<p><strong>日志聚合平台</strong>：2节点集群 + 内存节点优化写入性能</p>
+</li>
+</ul>
+<p><strong>总结</strong>：RabbitMQ集群设计应根据业务需求选择合适的模式，<strong>新系统强烈推荐使用Quorum队列</strong>，因其提供强一致性、高可用性和自动故障转移能力，是官方推荐的生产环境标准方案。普通集群仅适合测试环境，镜像队列已逐渐被Quorum队列替代。</p>
 
     </div><div class="post_comments">
   
