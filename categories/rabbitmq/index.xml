@@ -7,9 +7,235 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
     <copyright>Copyright © 1989–2025, 李建林 </copyright>
-    <lastBuildDate>Tue, 10 Jun 2025 15:04:49 +0800</lastBuildDate><atom:link href="https://jianlin-li.github.io/categories/rabbitmq/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Wed, 22 Apr 2026 00:10:37 +0800</lastBuildDate><atom:link href="https://jianlin-li.github.io/categories/rabbitmq/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>RabbitMQ消息中间件详解</title>
+      <title>RabbitMQ消息中间件详解-3</title>
+      <link>https://jianlin-li.github.io/post/rabbitmq_review_3/</link>
+      <pubDate>Wed, 22 Apr 2026 00:10:37 +0800</pubDate>
+      
+      <guid>https://jianlin-li.github.io/post/rabbitmq_review_3/</guid>
+      <description>
+        
+          
+            &lt;h1 id=&#34;mq集群搭建部署仲裁队列集群扩容&#34;&gt;MQ集群搭建、部署、仲裁队列、集群扩容&lt;/h1&gt;
+&lt;h3 id=&#34;目录&#34;&gt;目录&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;1.集群分类&lt;/li&gt;
+&lt;li&gt;2.普通集群
+&lt;ul&gt;
+&lt;li&gt;2.1.集群结构和特征&lt;/li&gt;
+&lt;li&gt;2.2.部署
+&lt;ul&gt;
+&lt;li&gt;2.2.1.集群部署计划&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;2.2.2.获取cookie&lt;/li&gt;
+&lt;li&gt;2.2.3.准备集群配置
+&lt;ul&gt;
+&lt;li&gt;2.2.4.启动集群&lt;/li&gt;
+&lt;li&gt;2.2.5.测试
+&lt;ul&gt;
+&lt;li&gt;2.2.5.1.数据共享测试&lt;/li&gt;
+&lt;li&gt;2.2.5.2.可用性测试&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;3.镜像集群
+&lt;ul&gt;
+&lt;li&gt;3.1.集群结构和特征&lt;/li&gt;
+&lt;li&gt;3.2.镜像模式的配置
+&lt;ul&gt;
+&lt;li&gt;3.2.1.&lt;code&gt;exactly&lt;/code&gt;模式&lt;/li&gt;
+&lt;li&gt;3.2.2.&lt;code&gt;all&lt;/code&gt;模式&lt;/li&gt;
+&lt;li&gt;3.2.3.&lt;code&gt;nodes&lt;/code&gt;模式&lt;/li&gt;
+&lt;li&gt;3.2.4.测试&lt;code&gt;exactly&lt;/code&gt;模式
+&lt;ul&gt;
+&lt;li&gt;3.2.4.1.创建一个新的队列&lt;/li&gt;
+&lt;li&gt;3.2.4.2.测试数据共享&lt;/li&gt;
+&lt;li&gt;3.2.4.3.测试高可用&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;4.仲裁队列
+&lt;ul&gt;
+&lt;li&gt;4.1.集群特征&lt;/li&gt;
+&lt;li&gt;4.2.添加仲裁队列&lt;/li&gt;
+&lt;li&gt;4.3.测试&lt;/li&gt;
+&lt;li&gt;4.4.Java代码创建仲裁队列&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;5.集群扩容
+&lt;ul&gt;
+&lt;li&gt;5.1.加入集群&lt;/li&gt;
+&lt;li&gt;5.2.增加仲裁队列副本&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;hr&gt;
+&lt;h1 id=&#34;1集群分类&#34;&gt;1.集群分类&lt;/h1&gt;
+&lt;p&gt;RabbitMQ的是基于Erlang语言编写，而Erlang又是一个面向并发的语言，天然支持集群模式。
+在RabbitMQ的官方文档中，讲述了两种集群的配置方式：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;普通集群&lt;/strong&gt;：是一种分布式集群，将队列分散到集群的各个节点，从而提高整个集群的并发能力。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;blockquote&gt;
+&lt;p&gt;普通模式集群不进行数据同步，每个MQ都有自己的队列、数据信息（其它元数据信息如交换机等会同步）。例如我们有2个MQ：mq1，和mq2，如果你的消息在mq1，而你连接到了mq2，那么mq2会去mq1拉取消息，然后返回给你。如果mq1宕机，消息就会丢失&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;镜像集群&lt;/strong&gt;：是一种主从集群，普通集群的基础上，添加了主从备份功能，提高集群的数据可用性。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;blockquote&gt;
+&lt;p&gt;与普通模式不同，队列会在各个mq的镜像节点之间同步，因此你连接到任何一个镜像节点，均可获取到消息。而且如果一个节点宕机，并不会导致数据丢失。不过，这种方式增加了数据同步的带宽消耗。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;镜像集群虽然支持主从，但主从同步并不是强一致的，某些情况下可能有数据丢失的风险。因此在RabbitMQ的3.8版本以后，推出了新的功能：&lt;strong&gt;仲裁队列&lt;/strong&gt;来代替镜像集群，底层采用Raft协议确保主从的数据一致性。&lt;/p&gt;
+&lt;hr&gt;
+&lt;h1 id=&#34;2普通集群&#34;&gt;2.普通集群&lt;/h1&gt;
+&lt;h2 id=&#34;21集群结构和特征&#34;&gt;2.1.集群结构和特征&lt;/h2&gt;
+&lt;p&gt;普通集群，或者叫标准集群（&lt;code&gt;classic cluster&lt;/code&gt;），具备下列特征：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;会在集群的各个节点间共享部分数据，包括：交换机、队列元信息。不包含队列中的消息。&lt;/li&gt;
+&lt;li&gt;当访问集群某节点时，如果队列不在该节点，会从数据所在节点传递到当前节点并返回&lt;/li&gt;
+&lt;li&gt;队列所在节点宕机，队列中的消息就会丢失&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;结构如图：
+&lt;figure&gt;
+  &lt;picture&gt;
+
+    
+      
+        
+        
+        
+        
+        
+        
+    &lt;img
+      loading=&#34;lazy&#34;
+      decoding=&#34;async&#34;
+      alt=&#34;图片&#34;
+      
+        class=&#34;image_figure image_external image_processed&#34;
+        width=&#34;738&#34;
+        height=&#34;454&#34;
+        src=&#34;https://jianlin-li.github.io/images/640_7524416724034363070.webp&#34;
+      
+      
+    /&gt;
+
+    &lt;/picture&gt;
+&lt;/figure&gt;
+&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2 id=&#34;22部署&#34;&gt;2.2.部署&lt;/h2&gt;
+&lt;h3 id=&#34;221集群部署计划&#34;&gt;2.2.1.集群部署计划&lt;/h3&gt;
+&lt;p&gt;&lt;strong&gt;我们先来看普通模式集群，我们的计划部署3节点的&lt;code&gt;mq&lt;/code&gt;集群：&lt;/strong&gt;&lt;/p&gt;
+&lt;table&gt;
+  &lt;thead&gt;
+      &lt;tr&gt;
+          &lt;th&gt;主机名&lt;/th&gt;
+          &lt;th&gt;控制台端口&lt;/th&gt;
+          &lt;th&gt;amqp通信端口&lt;/th&gt;
+      &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+      &lt;tr&gt;
+          &lt;td&gt;mq1&lt;/td&gt;
+          &lt;td&gt;8081 —&amp;gt; 15672&lt;/td&gt;
+          &lt;td&gt;8071 —&amp;gt; 5672&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;mq2&lt;/td&gt;
+          &lt;td&gt;8082 —&amp;gt; 15672&lt;/td&gt;
+          &lt;td&gt;8072 —&amp;gt; 5672&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;mq3&lt;/td&gt;
+          &lt;td&gt;8083 —&amp;gt; 15672&lt;/td&gt;
+          &lt;td&gt;8073 —&amp;gt; 5672&lt;/td&gt;
+      &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;&lt;strong&gt;集群中的节点标示默认都是：&lt;code&gt;rabbit@[hostname]&lt;/code&gt;，因此以上三个节点的名称分别为：&lt;/strong&gt;&lt;/p&gt;
+          
+          
+        
+      </description>
+    </item>
+    
+    <item>
+      <title>RabbitMQ消息中间件详解-2</title>
+      <link>https://jianlin-li.github.io/post/rabbitmq_review_2/</link>
+      <pubDate>Wed, 22 Apr 2026 00:09:37 +0800</pubDate>
+      
+      <guid>https://jianlin-li.github.io/post/rabbitmq_review_2/</guid>
+      <description>
+        
+          
+            &lt;h1 id=&#34;惰性队列---解决消息堆积问题&#34;&gt;惰性队列 - 解决消息堆积问题&lt;/h1&gt;
+&lt;h2 id=&#34;消息堆积问题&#34;&gt;消息堆积问题&lt;/h2&gt;
+&lt;blockquote&gt;
+&lt;p&gt;当生产者发送消息的速度超过了消费者处理消息的速度，就会导致队列中的消息堆积，直到队列存储消息达到上限。之后发送的消息就会成为死信，可能会被丢弃，这就是消息堆积问题。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;&lt;figure&gt;
+  &lt;picture&gt;
+
+    
+      
+        
+        
+        
+        
+        
+        
+    &lt;img
+      loading=&#34;lazy&#34;
+      decoding=&#34;async&#34;
+      alt=&#34;消息堆积&#34;
+      
+        class=&#34;image_figure image_internal image_unprocessed&#34;
+        src=&#34;https://jianlin-li.github.io/images/xxdj.png&#34;
+      
+      
+    /&gt;
+
+    &lt;/picture&gt;
+&lt;/figure&gt;
+&lt;/p&gt;
+&lt;h3 id=&#34;解决消息堆积的解决方案&#34;&gt;解决消息堆积的解决方案：&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;队列上绑定多个消费者，提高消费速度&lt;/li&gt;
+&lt;li&gt;给消费者开启多线程，提高消费速度&lt;/li&gt;
+&lt;li&gt;使用惰性队列，可以在mq中保存更多消息&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;设置惰性队列&#34;&gt;设置惰性队列&lt;/h3&gt;
+&lt;blockquote&gt;
+&lt;p&gt;要设置一个队列为惰性队列，只需要在声明队列时，指定x-queue-mode属性为lazy&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h3 id=&#34;惰性队列的优点有哪些&#34;&gt;惰性队列的优点有哪些？&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;基于磁盘存储，消息上限高&lt;/li&gt;
+&lt;li&gt;没有间歇性的page-out，性能比较稳定&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;惰性队列的缺点有哪些&#34;&gt;惰性队列的缺点有哪些？&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;基于磁盘存储，消息时效性会降低&lt;/li&gt;
+&lt;li&gt;性能受限于磁盘的IO&lt;/li&gt;
+&lt;/ul&gt;
+          
+          
+        
+      </description>
+    </item>
+    
+    <item>
+      <title>RabbitMQ消息中间件详解-1</title>
       <link>https://jianlin-li.github.io/post/rabbitmq_review_1/</link>
       <pubDate>Tue, 10 Jun 2025 15:04:49 +0800</pubDate>
       
