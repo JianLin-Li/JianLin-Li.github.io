@@ -10,10 +10,10 @@
     <lastBuildDate>Tue, 10 Jun 2025 15:04:49 +0800</lastBuildDate><atom:link href="https://jianlin-li.github.io/categories/rabbitmq/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>RabbitMQ消息中间件详解</title>
-      <link>https://jianlin-li.github.io/post/rabbitmq_review/</link>
+      <link>https://jianlin-li.github.io/post/rabbitmq_review_1/</link>
       <pubDate>Tue, 10 Jun 2025 15:04:49 +0800</pubDate>
       
-      <guid>https://jianlin-li.github.io/post/rabbitmq_review/</guid>
+      <guid>https://jianlin-li.github.io/post/rabbitmq_review_1/</guid>
       <description>
         
           
@@ -87,7 +87,7 @@
 &lt;li&gt;生产者和Broker建立TCP连接&lt;/li&gt;
 &lt;li&gt;生产者和Broker建立通道&lt;/li&gt;
 &lt;li&gt;生产者通过通道消息发送给Broker，由Exchange将消息进行转发&lt;/li&gt;
-&lt;li&gt;Exchange将消息转发到止跌那个的Queue（队列）&lt;/li&gt;
+&lt;li&gt;Exchange将消息转发到对应那个的Queue（队列）&lt;/li&gt;
 &lt;/ol&gt;
 &lt;p&gt;&lt;strong&gt;二.如何接收消息&lt;/strong&gt;&lt;/p&gt;
 &lt;ol&gt;
