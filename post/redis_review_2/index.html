@@ -168,7 +168,7 @@
     <span class="post_date">
       2026-04-22	  
     </span>
-    <span class="post_time"> · 2 分钟阅读</span><span>&nbsp;· <a href='https://jianlin-li.github.io/tags/redis/' title="Redis" class="post_tag button button_translucent">Redis
+    <span class="post_time"> · 3 分钟阅读</span><span>&nbsp;· <a href='https://jianlin-li.github.io/tags/redis/' title="Redis" class="post_tag button button_translucent">Redis
         </a>
     </span>
     <span class="page_only">&nbsp;·
@@ -637,7 +637,7 @@
 </ul>
 <hr>
 <h3 id="22增量同步">2.2.增量同步</h3>
-<p>全量同步需要先做RDB，然后将RDB文件通过网络传输个slave，成本太高了。因此除了第一次做全量同步，其它大多数时候slave与master都是做<strong>增量同步</strong>。</p>
+<p>全量同步需要先做RDB，然后将RDB文件通过网络传输给slave，成本太高了。因此除了第一次做全量同步，其它大多数时候slave与master都是做<strong>增量同步</strong>。</p>
 <p>什么是增量同步？就是只更新slave与master存在差异的部分数据。如图：
 <figure>
   <picture>
@@ -847,7 +847,7 @@
 <h2></h2>
 <h2 id="3主从同步优化">3.主从同步优化</h2>
 <p><strong>主从同步可以保证主从数据的一致性，非常重要。</strong></p>
-<p><strong>可以从以下几个方面来优化Redis主从就集群：</strong></p>
+<p><strong>可以从以下几个方面来优化Redis主从的集群：</strong></p>
 <ul>
 <li>在master中配置<code>repl-diskless-sync yes</code>启用无磁盘复制，避免全量同步时的磁盘IO。</li>
 <li>Redis单节点上的内存占用不要太大，减少RDB导致的过多磁盘IO</li>
@@ -899,8 +899,55 @@
 <li>slave节点断开又恢复，并且在<code>repl_baklog</code>中能找到<code>offset</code>时</li>
 </ul>
 <hr>
-<h2 id="5注意">5.注意</h2>
-<p><strong>如果继续参考下一篇文章进行哨兵集群搭建，则以上启动的三个主从实例不要宕机</strong></p>
+<hr>
+<hr>
+<h1 id="在全量同步完成后master-上的新数据是通过命令传播机制实时给到-slave-的"><strong>在全量同步完成后，Master 上的新数据是通过</strong>“命令传播”<strong>机制实时给到 Slave 的。</strong></h1>
+<p>简单来说，Master 每执行一条写命令（如 <code>SET</code>、<code>DEL</code>），不仅会更新自己的数据，还会把这条命令<strong>实时转发</strong>给所有的 Slave，Slave 收到后执行相同的命令，从而保持数据一致。</p>
+<p>这个过程是<strong>持续不断</strong>的，主要由以下几个核心环节配合完成：</p>
+<h3 id="1-核心机制命令传播">1. 核心机制：命令传播</h3>
+<p>当主从连接正常时，Master 不会等待 Slave 来“拉取”数据，而是主动“推送”。</p>
+<ul>
+<li><strong>写操作触发：</strong> 当客户端向 Master 发送写命令时，Master 执行该命令。</li>
+<li><strong>实时转发：</strong> Master 在执行完命令后，会将该命令放入<strong>发送缓冲区</strong>，并异步地发送给所有已连接的 Slave 节点。</li>
+<li><strong>Slave 执行：</strong> Slave 接收到命令后，立即在本地执行相同的操作。</li>
+</ul>
+<p><strong>举个例子：</strong></p>
+<ol>
+<li>客户端执行 <code>SET key 100</code>。</li>
+<li>Master 执行 <code>SET key 100</code>，数据变更。</li>
+<li>Master 将 <code>SET key 100</code> 这条指令发送给 Slave。</li>
+<li>Slave 收到指令，执行 <code>SET key 100</code>。</li>
+<li>此时，Master 和 Slave 的数据再次达成一致。</li>
+</ol>
+<h3 id="2-关键角色复制偏移量与缓冲区">2. 关键角色：复制偏移量与缓冲区</h3>
+<p>为了保证数据不丢失、不重复，Redis 使用了你之前提到的两个概念来辅助这个过程：</p>
+<ul>
+<li>
+<p><strong>复制偏移量：</strong></p>
+<ul>
+<li>Master 每发送 1 字节的数据给 Slave，自己的 <code>master_repl_offset</code> 就会增加。</li>
+<li>Slave 每接收到 1 字节数据，自己的 <code>slave_repl_offset</code> 也会增加。</li>
+<li>这两个偏移量就像“进度条”，用来确认数据是否完全同步。</li>
+</ul>
+</li>
+<li>
+<p><strong>复制积压缓冲区：</strong></p>
+<ul>
+<li>在全量同步结束后的<strong>命令传播阶段</strong>，Master 不仅把命令发给 Slave，还会把这些写命令写入 <code>repl_backlog</code>。</li>
+<li><strong>作用：</strong> 它的主要作用不是为了实时同步（实时同步走的是发送缓冲区），而是为了<strong>兜底</strong>。如果网络抖动导致 Slave 断连了一小会儿，当 Slave 重连时，Master 可以通过 <code>repl_backlog</code> 找回断连期间缺失的命令，进行增量同步。</li>
+</ul>
+</li>
+</ul>
+<h3 id="3-进度确认心跳机制">3. 进度确认：心跳机制</h3>
+<p>虽然命令是 Master 主动推送的，但 Master 怎么知道 Slave 有没有收到呢？</p>
+<ul>
+<li><strong>定期汇报：</strong> 正如我们刚才讨论的，Slave 每隔 <strong>1 秒</strong> 会向 Master 发送 <code>REPLCONF ACK &lt;offset&gt;</code>。</li>
+<li><strong>判断依据：</strong> Master 收到汇报后，对比自己的偏移量和 Slave 的偏移量。如果两者一致，说明同步正常；如果 Master 的偏移量更大，说明 Slave 落后了，Master 会尝试补发数据。</li>
+</ul>
+<h3 id="总结">总结</h3>
+<p>全量同步后的数据流转是这样的：
+<strong>Master 执行写命令 -&gt; 写入发送缓冲区 -&gt; 推送给 Slave -&gt; Slave 执行命令 -&gt; Slave 每秒汇报进度 (ACK)</strong>。</p>
+<p>这是一个<strong>长连接下的实时流式传输</strong>过程，而不是 Slave 定时去问 Master“有没有新数据”。</p>
 
     </div><div class="post_comments">
   
