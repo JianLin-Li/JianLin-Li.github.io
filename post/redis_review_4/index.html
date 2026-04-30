@@ -471,7 +471,7 @@
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="ln">1</span><span class="cl">./redis-trib.rb create --replicas 1 192.168.188.128:7001 192.168.188.128:7002 192.168.188.128:7003 192.168.188.128:8001 192.168.188.128:8002 192.168.188.128:8003
 </span></span></code></pre></div><hr>
 <p><strong>2）Redis5.0以后</strong></p>
-<p>我们使用的是<code>Redis6.2.4</code>版本，集群管理以及集成到了<code>redis-cli</code>中，格式如下：</p>
+<p>我们使用的是<code>Redis6.2.4</code>版本，集群管理已经集成到了<code>redis-cli</code>中，格式如下：</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="ln">1</span><span class="cl">redis-cli --cluster create --cluster-replicas 1 192.168.188.128:7001 192.168.188.128:7002 192.168.188.128:7003 192.168.188.128:8001 192.168.188.128:8002 192.168.188.128:8003
 </span></span></code></pre></div><p>命令说明：</p>
 <ul>
@@ -499,7 +499,7 @@
         class="image_figure image_external image_processed"
         width="1080"
         height="374"
-        src="https://jianlin-li.github.io/images/640_9110994936663312506.webp"
+        src="https://jianlin-li.github.io/images/640_9110994936663312506.png"
       
       
     />
@@ -692,7 +692,7 @@
         class="image_figure image_external image_processed"
         width="1044"
         height="189"
-        src="https://jianlin-li.github.io/images/640_10180556935854526263.webp"
+        src="https://jianlin-li.github.io/images/640_10180556935854526263.png"
       
       
     />
@@ -737,7 +737,7 @@
     </picture>
 </figure>
 </p>
-<p>如图，在<code>7001</code>这个节点执行<code>set a 1</code>时，对<code>a</code>做<code>hash</code>运算，对<code>16384</code>取余，得到的结果是<code>15495</code>，因此要存储到<code>103</code>节点。</p>
+<p>如图，在<code>7001</code>这个节点执行<code>set a 1</code>时，对<code>a</code>做<code>hash</code>运算，对<code>16384</code>取余，得到的结果是<code>15495</code>，因此要存储到<code>7003</code>节点。</p>
 <p>到了<code>7003</code>后，执行<code>get num</code>时，对<code>num</code>做<code>hash</code>运算，对<code>16384</code>取余，得到的结果是<code>2765</code>，因此需要切换到<code>7001</code>节点</p>
 <hr>
 <h3 id="23小结">2.3.小结</h3>
@@ -802,7 +802,7 @@
         class="image_figure image_external image_processed"
         width="482"
         height="184"
-        src="https://jianlin-li.github.io/images/640_414107568894145094.webp"
+        src="https://jianlin-li.github.io/images/640_414107568894145094.png"
       
       
     />
@@ -856,7 +856,7 @@
         class="image_figure image_external image_processed"
         width="657"
         height="207"
-        src="https://jianlin-li.github.io/images/640_4460108105966946717.webp"
+        src="https://jianlin-li.github.io/images/640_4460108105966946717.png"
       
       
     />
@@ -886,7 +886,7 @@
         class="image_figure image_external image_processed"
         width="482"
         height="184"
-        src="https://jianlin-li.github.io/images/640_14139543461280281613.webp"
+        src="https://jianlin-li.github.io/images/640_14139543461280281613.png"
       
       
     />
@@ -1349,7 +1349,7 @@
         class="image_figure image_external image_processed"
         width="538"
         height="138"
-        src="https://jianlin-li.github.io/images/640_9295433932286557688.webp"
+        src="https://jianlin-li.github.io/images/640_9295433932286557688.png"
       
       
     />
@@ -1409,7 +1409,7 @@
         class="image_figure image_external image_processed"
         width="815"
         height="119"
-        src="https://jianlin-li.github.io/images/640_13938945850428889674.webp"
+        src="https://jianlin-li.github.io/images/640_13938945850428889674.png"
       
       
     />
