@@ -139,6 +139,73 @@
   <div class="excerpt">
     <div class="excerpt_header">
       <h3 class="post_link">
+        <a href="https://jianlin-li.github.io/post/shell_review_1/" title="Shell的知识点-1">Shell的知识点-1</a>
+      </h3>
+      
+  <div class="post_meta">
+    <span><svg class="icon">
+  <title>calendar</title>
+  <use xlink:href="#calendar"></use>
+</svg>
+</span>
+    <span class="post_date">
+      2026-03-23	  
+    </span>
+    <span class="post_time"> · 9 分钟阅读</span><span>&nbsp;· <a href='https://jianlin-li.github.io/tags/shell/' title="Shell" class="post_tag button button_translucent">Shell
+        </a>
+    </span>
+    <span class="page_only">&nbsp;·
+  <div class="post_share">
+    分享到:
+    <a href="https://twitter.com/intent/tweet?text=Shell%e7%9a%84%e7%9f%a5%e8%af%86%e7%82%b9-1&url=https%3a%2f%2fjianlin-li.github.io%2fpost%2fshell_review_1%2f&tw_p=tweetbutton" class="twitter" title="分享到 Twitter" target="_blank" rel="nofollow">
+      <svg class="icon">
+  <title>twitter</title>
+  <use xlink:href="#twitter"></use>
+</svg>
+
+    </a>
+    <a href="https://www.facebook.com/sharer.php?u=https%3a%2f%2fjianlin-li.github.io%2fpost%2fshell_review_1%2f&t=Shell%e7%9a%84%e7%9f%a5%e8%af%86%e7%82%b9-1" class="facebook" title="分享到 Facebook" target="_blank" rel="nofollow">
+      <svg class="icon">
+  <title>facebook</title>
+  <use xlink:href="#facebook"></use>
+</svg>
+
+    </a>
+    <a href="#linkedinshare" id = "linkedinshare" class="linkedin" title="分享到 LinkedIn" rel="nofollow">
+      <svg class="icon">
+  <title>linkedin</title>
+  <use xlink:href="#linkedin"></use>
+</svg>
+
+    </a>
+    <a href="https://jianlin-li.github.io/post/shell_review_1/" title="Copy Link" class="link link_yank">
+      <svg class="icon">
+  <title>copy</title>
+  <use xlink:href="#copy"></use>
+</svg>
+
+    </a>
+  </div>
+  </span>
+  </div>
+
+    </div>
+      <div class="excerpt_footer">
+        <div class="pale">
+          
+            <p>🐚 Shell 脚本知识整理手册 一、变量与环境 1. 变量操作 1set -- 'a' 'b' 清空所有位置参数，并重新设置 $1 $2 ... 1unset 变量名 删除变量（局部变量 + 环境变量） 1export 变量名=值 2declare -x 变量名=值 导出为环境变量（子进程可用） 1env 查看当前环境变量 1declare 声明变量（可用于定义类型/属性） 2. 特殊变量 变量 含义 $0 脚本名称 $1 ~ $9 参数1~9 ${10} 第10个参数 $# 参数个数 $* 所有参数（整体） $@ 所有参数（逐个） $? 上一个命令执行状态（0成功） $$ 当前进程PID $! 上一个后台进程PID $_ 上一 …</p>
+          
+          <br>
+          <a href="https://jianlin-li.github.io/post/shell_review_1/" title="阅读更多" class="excerpt_more button">阅读更多</a>
+        </div>
+      </div>
+    </div>
+  </li>
+
+        <li class="post_item">
+  <div class="excerpt">
+    <div class="excerpt_header">
+      <h3 class="post_link">
         <a href="https://jianlin-li.github.io/post/mysql_review_1/" title="MySQL的知识点-1">MySQL的知识点-1</a>
       </h3>
       
@@ -219,7 +286,7 @@
     <span class="post_date">
       2026-01-28	  
     </span>
-    <span class="post_time"> · 3 分钟阅读</span><span>&nbsp;· <a href='https://jianlin-li.github.io/tags/elasticsearch/' title="Elasticsearch" class="post_tag button button_translucent">Elasticsearch
+    <span class="post_time"> · 5 分钟阅读</span><span>&nbsp;· <a href='https://jianlin-li.github.io/tags/elasticsearch/' title="Elasticsearch" class="post_tag button button_translucent">Elasticsearch
         </a>
     </span>
     <span class="page_only">&nbsp;·
@@ -261,11 +328,9 @@
       <div class="excerpt_footer">
         <div class="pale">
           
-            <p>Elasticsearch面试高频问题（含标准答案，面试必背） 一、Elasticsearch 基础概念 Elasticsearch是什么？
-答：开源的分布式全文搜索引擎，基于Lucene构建，支持高可用、高并发、实时检索与分析，采用RESTful API交互，适用于海量数据的快速查询与统计。
-ES和 Solr 的区别？
-答：① 实时性：ES 实时性更强，近实时索引（秒级可见），Solr 实时性较弱；② 分布式：ES 原生支持分布式，部署维护简单，Solr 需依赖ZooKeeper实现分布式；③ 适用场景：ES 适合实时检索、日志分析，Solr 适合传统全文检索、静态数据查询；④ 社区活跃度：ES 社区更活跃，更新迭代更快。
-ES的 …</p>
+            <p>在 Elasticsearch 中，如果一个字段需要同时满足全文检索（使用 text）和精确匹配、聚合或排序（使用 keyword）的需求，最佳实践是使用 多字段（Multi-fields）映射。 这种配置允许你在同一个字段名下，同时拥有两种不同的索引方式。
+🛠️ Mapping 映射配置示例 你可以参考以下标准的 JSON 格式来定义 Mapping：
+1{ 2 &quot;mappings&quot;: { 3 &quot;properties&quot;: { 4 &quot;goods_name&quot;: { 5 &quot;type&quot;: &quot;text&quot;, // 主类型：text，用于全文检索 6 &quot;fields&quot;: { 7 &quot;keyword&quot;: { 8 &quot;type&quot;: &quot;keyword&quot;, …</p>
           
           <br>
           <a href="https://jianlin-li.github.io/post/elasticsearch_review_3/" title="阅读更多" class="excerpt_more button">阅读更多</a>
@@ -752,75 +817,6 @@ ES的 …</p>
     </div>
   </li>
 
-        <li class="post_item">
-  <div class="excerpt">
-    <div class="excerpt_header">
-      <h3 class="post_link">
-        <a href="https://jianlin-li.github.io/post/go_review/" title="Go语言的知识点--GOPATH和Go Modules">Go语言的知识点--GOPATH和Go Modules</a>
-      </h3>
-      
-  <div class="post_meta">
-    <span><svg class="icon">
-  <title>calendar</title>
-  <use xlink:href="#calendar"></use>
-</svg>
-</span>
-    <span class="post_date">
-      2025-06-30	  
-    </span>
-    <span class="post_time"> · 3 分钟阅读</span><span>&nbsp;· <a href='https://jianlin-li.github.io/tags/go/' title="Go" class="post_tag button button_translucent">Go
-        </a>
-    </span>
-    <span class="page_only">&nbsp;·
-  <div class="post_share">
-    分享到:
-    <a href="https://twitter.com/intent/tweet?text=Go%e8%af%ad%e8%a8%80%e7%9a%84%e7%9f%a5%e8%af%86%e7%82%b9--GOPATH%e5%92%8cGo%20Modules&url=https%3a%2f%2fjianlin-li.github.io%2fpost%2fgo_review%2f&tw_p=tweetbutton" class="twitter" title="分享到 Twitter" target="_blank" rel="nofollow">
-      <svg class="icon">
-  <title>twitter</title>
-  <use xlink:href="#twitter"></use>
-</svg>
-
-    </a>
-    <a href="https://www.facebook.com/sharer.php?u=https%3a%2f%2fjianlin-li.github.io%2fpost%2fgo_review%2f&t=Go%e8%af%ad%e8%a8%80%e7%9a%84%e7%9f%a5%e8%af%86%e7%82%b9--GOPATH%e5%92%8cGo%20Modules" class="facebook" title="分享到 Facebook" target="_blank" rel="nofollow">
-      <svg class="icon">
-  <title>facebook</title>
-  <use xlink:href="#facebook"></use>
-</svg>
-
-    </a>
-    <a href="#linkedinshare" id = "linkedinshare" class="linkedin" title="分享到 LinkedIn" rel="nofollow">
-      <svg class="icon">
-  <title>linkedin</title>
-  <use xlink:href="#linkedin"></use>
-</svg>
-
-    </a>
-    <a href="https://jianlin-li.github.io/post/go_review/" title="Copy Link" class="link link_yank">
-      <svg class="icon">
-  <title>copy</title>
-  <use xlink:href="#copy"></use>
-</svg>
-
-    </a>
-  </div>
-  </span>
-  </div>
-
-    </div>
-      <div class="excerpt_footer">
-        <div class="pale">
-          
-            <p>在 Go 语言的发展历程中，GOPATH 和 Go Modules（模块系统） 是两种不同的依赖管理和项目组织方式。它们代表了 Go 在不同阶段对“如何构建和管理项目”的哲学演变。
-下面是对 GOPATH 和 Go Modules 的详细对比分析，包括设计思想、工作机制、优缺点、使用场景以及当前的主流趋势。
-一、背景：Go 的依赖管理演进 时间 版本 依赖管理方式 2009–2018 Go 1.0 – Go 1.10 GOPATH 模式 2018 年起 Go 1.11+ 引入 Go Modules 2020 年起 Go 1.14+ Modules 成为推荐方式 2021 年起 Go 1.16+ Modules 默认启用 📌 自 Go …</p>
-          
-          <br>
-          <a href="https://jianlin-li.github.io/post/go_review/" title="阅读更多" class="excerpt_more button">阅读更多</a>
-        </div>
-      </div>
-    </div>
-  </li>
-
       <li>
     <ul class="pagination pagination-default">
       <li class="page-item">
@@ -839,10 +835,13 @@ ES的 …</p>
         <a href="/page/3/" aria-label="Page 3" class="page-link" role="button">3</a>
       </li>
       <li class="page-item">
+        <a href="/page/4/" aria-label="Page 4" class="page-link" role="button">4</a>
+      </li>
+      <li class="page-item">
         <a href="/page/3/" aria-label="Next" class="page-link" role="button"><span aria-hidden="true">&raquo;</span></a>
       </li>
       <li class="page-item">
-        <a href="/page/3/" aria-label="Last" class="page-link" role="button"><span aria-hidden="true">&raquo;&raquo;</span></a>
+        <a href="/page/4/" aria-label="Last" class="page-link" role="button"><span aria-hidden="true">&raquo;&raquo;</span></a>
       </li>
     </ul>
       </li>
@@ -878,6 +877,9 @@ ES的 …</p>
     <h2 class="mt-4">精选文章</h2>
     <ul>
       <li>
+        <a href="https://jianlin-li.github.io/post/elasticsearch_review_4/" class="nav-link" title="Elasticsearch的知识点-4">Elasticsearch的知识点-4</a>
+      </li>
+      <li>
         <a href="https://jianlin-li.github.io/post/redis_review_4/" class="nav-link" title="Redis的知识点-4">Redis的知识点-4</a>
       </li>
       <li>
@@ -898,12 +900,12 @@ ES的 …</p>
       <li>
         <a href="https://jianlin-li.github.io/post/git_review_1/" class="nav-link" title="Git的知识点-1">Git的知识点-1</a>
       </li>
-      <li>
-        <a href="https://jianlin-li.github.io/post/php_review_5/" class="nav-link" title="PHP语言的知识点-5">PHP语言的知识点-5</a>
-      </li>
     </ul>
     <h2 class="mt-4">最新文章</h2>
     <ul class="flex-column">
+      <li>
+        <a href="https://jianlin-li.github.io/post/php_review_5/" class="nav-link" title="PHP语言的知识点-5">PHP语言的知识点-5</a>
+      </li>
       <li>
         <a href="https://jianlin-li.github.io/post/nginx_review_1/" class="nav-link" title="Nginx的知识点-1">Nginx的知识点-1</a>
       </li>
@@ -925,9 +927,6 @@ ES的 …</p>
       <li>
         <a href="https://jianlin-li.github.io/post/docker_review_1/" class="nav-link" title="Docker的知识点-1">Docker的知识点-1</a>
       </li>
-      <li>
-        <a href="https://jianlin-li.github.io/post/go_review_4/" class="nav-link" title="Go语言的知识点-4">Go语言的知识点-4</a>
-      </li>
     </ul>
     <div>
       <h2 class="mt-4 taxonomy" id="categories-section">分类</h2>
@@ -942,14 +941,14 @@ ES的 …</p>
           <span class="button_tally">5</span>
         </a>
         
-        <a href='https://jianlin-li.github.io/categories/redis/' class="post_tag button button_translucent" title="redis">
-          REDIS
+        <a href='https://jianlin-li.github.io/categories/elasticsearch/' class="post_tag button button_translucent" title="elasticsearch">
+          ELASTICSEARCH
           <span class="button_tally">4</span>
         </a>
         
-        <a href='https://jianlin-li.github.io/categories/elasticsearch/' class="post_tag button button_translucent" title="elasticsearch">
-          ELASTICSEARCH
-          <span class="button_tally">3</span>
+        <a href='https://jianlin-li.github.io/categories/redis/' class="post_tag button button_translucent" title="redis">
+          REDIS
+          <span class="button_tally">4</span>
         </a>
         
         <a href='https://jianlin-li.github.io/categories/rabbitmq/' class="post_tag button button_translucent" title="rabbitmq">
@@ -992,7 +991,7 @@ ES的 …</p>
             </a>
             
             
-            <a href='https://jianlin-li.github.io/categories/elasticsearch/' class=" post_tag button button_translucent" data-position=3 title="elasticsearch">ELASTICSEARCH<span class="button_tally">3</span>
+            <a href='https://jianlin-li.github.io/categories/elasticsearch/' class=" post_tag button button_translucent" data-position=4 title="elasticsearch">ELASTICSEARCH<span class="button_tally">4</span>
             </a>
             
             
@@ -1077,14 +1076,14 @@ ES的 …</p>
           <span class="button_tally">5</span>
         </a>
         
-        <a href='https://jianlin-li.github.io/tags/redis/' class="post_tag button button_translucent" title="redis">
-          REDIS
+        <a href='https://jianlin-li.github.io/tags/elasticsearch/' class="post_tag button button_translucent" title="elasticsearch">
+          ELASTICSEARCH
           <span class="button_tally">4</span>
         </a>
         
-        <a href='https://jianlin-li.github.io/tags/elasticsearch/' class="post_tag button button_translucent" title="elasticsearch">
-          ELASTICSEARCH
-          <span class="button_tally">3</span>
+        <a href='https://jianlin-li.github.io/tags/redis/' class="post_tag button button_translucent" title="redis">
+          REDIS
+          <span class="button_tally">4</span>
         </a>
         
         <a href='https://jianlin-li.github.io/tags/rabbitmq/' class="post_tag button button_translucent" title="rabbitmq">
@@ -1127,7 +1126,7 @@ ES的 …</p>
             </a>
             
             
-            <a href='https://jianlin-li.github.io/tags/elasticsearch/' class=" post_tag button button_translucent" data-position=3 title="elasticsearch">ELASTICSEARCH<span class="button_tally">3</span>
+            <a href='https://jianlin-li.github.io/tags/elasticsearch/' class=" post_tag button button_translucent" data-position=4 title="elasticsearch">ELASTICSEARCH<span class="button_tally">4</span>
             </a>
             
             

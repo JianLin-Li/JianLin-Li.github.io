@@ -1,0 +1,1111 @@
+
+<!DOCTYPE html>
+<html
+  lang="zh-cn"
+  data-figures="true"
+  
+    class="page"
+  
+  
+  >
+  <head>
+<title>Elasticsearch的知识点-4 | 浩瀚天空</title>
+<meta charset="utf-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+
+
+
+
+
+<meta property="og:locale" content="zh-cn" />
+
+<meta property="og:type" content="article">
+<meta name="description" content="Article description." />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:creator" content="">
+<meta name="twitter:title" content="Elasticsearch的知识点-4" />
+<meta name="twitter:image" content="https://jianlin-li.github.io/images/thumbnail.png"/>
+<meta property="og:url" content="https://jianlin-li.github.io/post/elasticsearch_review_4/" />
+<meta property="og:title" content="Elasticsearch的知识点-4" />
+<meta property="og:description" content="Article description." />
+<meta property="og:image" content="https://jianlin-li.github.io/images/thumbnail.png" />
+  <meta name="keywords" content="Elasticsearch" />
+  <script type="application/ld+json">
+    {
+      "@context": "http://schema.org",
+      "@type": "BlogPosting",
+      "mainEntityOfPage":"https:\/\/jianlin-li.github.io\/post\/elasticsearch_review_4\/",
+      "name": "浩瀚天空",
+      "headline": "Elasticsearch的知识点-4",
+      "description": "Article description.",
+      "url": "https:\/\/jianlin-li.github.io\/post\/elasticsearch_review_4\/",
+      "datePublished": "2026-04-30T17:43:49+08:00",
+      "dateModified": "2026-04-30T17:43:49+08:00",
+      "keywords": ["Elasticsearch"],
+        "articleSection": ["Elasticsearch"],
+      "author": {
+        "@type": "Person",
+        "name": "map[name:李建林 photo:images\/fish-head.png]"
+      },
+      "image":{
+        "@type":"ImageObject",
+        "url": "https:\/\/jianlin-li.github.io\/images\/thumbnail.png"
+      },
+      "publisher": {
+        "@type": "Organization",
+        "logo": {
+          "@type":"ImageObject",
+          "url": "https:\/\/jianlin-li.github.io\/logos\/logo.png"
+        },
+        "name": "浩瀚天空"
+      }
+    }
+  </script>
+
+<link rel="apple-touch-icon" sizes="180x180" href="https://jianlin-li.github.io/icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://jianlin-li.github.io/icons/favicon-32x32.png">
+<link rel="manifest" href="https://jianlin-li.github.io/icons/site.webmanifest">
+
+<link rel="canonical" href="https://jianlin-li.github.io/post/elasticsearch_review_4/">
+
+
+
+<link rel="preload" href="https://jianlin-li.github.io/css/styles.dc38388a8f0b890e788bd3a99b7495d14e7d5ac4359ed3b49abeb778497863b284ad4cc7e496ef58c84139295f9bafed82f5a41345eda86bd2d429cccb7c2596.css" integrity = "sha512-3Dg4io8LiQ54i9Opm3SV0U59WsQ1ntO0mr63eEl4Y7KErUzH5JbvWMhBOSlfm6/tgvWkE0XtqGvS1CnMy3wllg==" as="style" crossorigin="anonymous">
+
+
+
+<link rel="preload" href="https://jianlin-li.github.io/zh-cn/js/bundle.e4e0e4fbe8acb50d7f973828f4138cdbea727800047fc93f9abbd6751e8f3422d6ef193f98da36fdb8488219c25692d73da89480f46abc8421a4ee3526dd6c23.js" as="script" integrity=
+"sha512-5ODk&#43;&#43;istQ1/lzgo9BOM2&#43;pyeAAEf8k/mrvWdR6PNCLW7xk/mNo2/bhIghnCVpLXPaiUgPRqvIQhpO41Jt1sIw==" crossorigin="anonymous">
+
+
+<link rel="stylesheet" type="text/css" href="https://jianlin-li.github.io/css/styles.dc38388a8f0b890e788bd3a99b7495d14e7d5ac4359ed3b49abeb778497863b284ad4cc7e496ef58c84139295f9bafed82f5a41345eda86bd2d429cccb7c2596.css" integrity="sha512-3Dg4io8LiQ54i9Opm3SV0U59WsQ1ntO0mr63eEl4Y7KErUzH5JbvWMhBOSlfm6/tgvWkE0XtqGvS1CnMy3wllg==" crossorigin="anonymous">
+
+  </head>
+  <body
+    data-code="10"
+    data-lines="false"
+    id="documentTop"
+    data-lang="zh-cn"
+  >
+
+<header class="nav_header" >
+  <nav class="nav"><a href='https://jianlin-li.github.io/' class="nav_brand nav_item" title="浩瀚天空">
+  <img src="https://jianlin-li.github.io/logos/logo.png" class="logo" alt="浩瀚天空">
+  <div class="nav_close">
+    <div><svg class="icon">
+  <title>open-menu</title>
+  <use xlink:href="#open-menu"></use>
+</svg>
+<svg class="icon">
+  <title>closeme</title>
+  <use xlink:href="#closeme"></use>
+</svg>
+</div>
+  </div>
+</a>
+
+    <div class='nav_body nav_body_left'>
+      
+      
+      
+        
+
+  <div class="nav_parent">
+    <a href="https://jianlin-li.github.io/" class="nav_item" title="首页">首页 </a>
+  </div>
+  <div class="nav_parent">
+    <a href="https://jianlin-li.github.io/archives/" class="nav_item" title="归档">归档 </a>
+  </div>
+  <div class="nav_parent">
+    <a href="https://jianlin-li.github.io/categories/" class="nav_item" title="分类">分类 </a>
+  </div>
+  <div class="nav_parent">
+    <a href="https://jianlin-li.github.io/tags/" class="nav_item" title="标签">标签 </a>
+  </div>
+  <div class="nav_parent">
+    <a href="https://jianlin-li.github.io/about/" class="nav_item" title="关于">关于 </a>
+  </div>
+      
+<div class='follow'>
+  <a href="https://github.com/JianLin-Li">
+    <svg class="icon">
+  <title>github</title>
+  <use xlink:href="#github"></use>
+</svg>
+
+  </a>
+  <a href="http://local.gitlab.com">
+    <svg class="icon">
+  <title>gitlab</title>
+  <use xlink:href="#gitlab"></use>
+</svg>
+
+  </a>
+<div class="color_mode">
+  <input type="checkbox" class="color_choice" id="mode">
+</div>
+
+</div>
+
+    </div>
+  </nav>
+</header>
+
+    <main>
+  
+<div class="grid-inverse wrap content">
+  <article class="post_content">
+    <h1 class="post_title">Elasticsearch的知识点-4</h1>
+  <div class="post_meta">
+    <span><svg class="icon">
+  <title>calendar</title>
+  <use xlink:href="#calendar"></use>
+</svg>
+</span>
+    <span class="post_date">
+      2026-04-30	  
+    </span>
+    <span class="post_time"> · 3 分钟阅读</span><span>&nbsp;· <a href='https://jianlin-li.github.io/tags/elasticsearch/' title="Elasticsearch" class="post_tag button button_translucent">Elasticsearch
+        </a>
+    </span>
+    <span class="page_only">&nbsp;·
+  <div class="post_share">
+    分享到:
+    <a href="https://twitter.com/intent/tweet?text=Elasticsearch%e7%9a%84%e7%9f%a5%e8%af%86%e7%82%b9-4&url=https%3a%2f%2fjianlin-li.github.io%2fpost%2felasticsearch_review_4%2f&tw_p=tweetbutton" class="twitter" title="分享到 Twitter" target="_blank" rel="nofollow">
+      <svg class="icon">
+  <title>twitter</title>
+  <use xlink:href="#twitter"></use>
+</svg>
+
+    </a>
+    <a href="https://www.facebook.com/sharer.php?u=https%3a%2f%2fjianlin-li.github.io%2fpost%2felasticsearch_review_4%2f&t=Elasticsearch%e7%9a%84%e7%9f%a5%e8%af%86%e7%82%b9-4" class="facebook" title="分享到 Facebook" target="_blank" rel="nofollow">
+      <svg class="icon">
+  <title>facebook</title>
+  <use xlink:href="#facebook"></use>
+</svg>
+
+    </a>
+    <a href="#linkedinshare" id = "linkedinshare" class="linkedin" title="分享到 LinkedIn" rel="nofollow">
+      <svg class="icon">
+  <title>linkedin</title>
+  <use xlink:href="#linkedin"></use>
+</svg>
+
+    </a>
+    <a href="https://jianlin-li.github.io/post/elasticsearch_review_4/" title="Copy Link" class="link link_yank">
+      <svg class="icon">
+  <title>copy</title>
+  <use xlink:href="#copy"></use>
+</svg>
+
+    </a>
+  </div>
+  </span>
+  </div>
+
+    <div class="post_body"><h1 id="elasticsearch面试高频问题含标准答案面试必背"><strong>Elasticsearch面试高频问题（含标准答案，面试必背）</strong></h1>
+<h1 id="一elasticsearch-基础概念">一、Elasticsearch 基础概念</h1>
+<ol>
+<li>
+<p><strong>Elasticsearch是什么？</strong></p>
+<p>答：开源的分布式全文搜索引擎，基于Lucene构建，支持高可用、高并发、实时检索与分析，采用RESTful API交互，适用于海量数据的快速查询与统计。</p>
+</li>
+<li>
+<p><strong>ES和 Solr 的区别？</strong></p>
+<p>答：① 实时性：ES 实时性更强，近实时索引（秒级可见），Solr 实时性较弱；② 分布式：ES 原生支持分布式，部署维护简单，Solr 需依赖ZooKeeper实现分布式；③ 适用场景：ES 适合实时检索、日志分析，Solr 适合传统全文检索、静态数据查询；④ 社区活跃度：ES 社区更活跃，更新迭代更快。</p>
+</li>
+<li>
+<p><strong>ES的核心特点有哪些？</strong></p>
+<p>答：① 分布式架构：节点对等，自动分片与副本；② 全文检索：支持分词、模糊匹配、高亮等；③ 实时性：近实时索引与查询，延迟低；④ 高可用：副本机制，节点故障不影响服务；⑤ 多维度分析：支持聚合统计、地理位置查询；⑥ 可扩展：水平扩容，支持PB级数据。</p>
+</li>
+<li>
+<p><strong>ES的默认端口号有哪些？</strong></p>
+<p>答：① 9200：HTTP端口，用于RESTful API交互；② 9300：TCP端口，用于集群节点间通信（Java客户端连接端口）。</p>
+</li>
+<li>
+<p><strong>ES的核心组件有哪些？</strong></p>
+<p>答：索引（Index）、类型（Type，7.x后废弃）、文档（Document）、字段（Field）、分片（Shard）、副本（Replica）、集群（Cluster）、节点（Node）。</p>
+</li>
+<li>
+<p><strong>索引、文档、分片、副本的关系？</strong></p>
+<p>答：① 索引：同类文档的集合，类比数据库的“库”；② 文档：索引的最小数据单元，类比数据库的“行”，以JSON格式存储；③ 分片：索引拆分后的子集，分布式存储在不同节点，提升并发与存储能力；④ 副本：分片的备份，保障高可用，同时分担查询压力。</p>
+</li>
+<li>
+<p><strong>ES中的节点类型有哪些？</strong></p>
+<p>答：① 主节点（Master Node）：管理集群元数据（索引创建、分片分配），不处理数据读写；② 数据节点（Data Node）：存储数据，处理索引、查询、聚合操作；③ 协调节点（Coordinating Node）：接收客户端请求，分发任务并汇总结果，默认所有节点都是协调节点；④  ingest节点：数据写入前的预处理（如分词、字段转换）。</p>
+</li>
+<li>
+<p><strong>ES集群的最小规模建议？</strong></p>
+<p>答：生产环境建议3个节点，1个主节点（可配置候选主节点）+2个数据节点，确保分片副本正常分配，避免单点故障。</p>
+</li>
+<li>
+<p><strong>ES 7.x 版本的核心变化？</strong></p>
+<p>答：① 废弃Type：索引下仅支持单类型“_doc”，彻底移除Type概念；② 增强安全特性：默认开启安全校验，需配置账号密码；③ 性能优化：分词、查询效率提升，支持更高效的聚合；④ 新增功能：如向量检索、数据生命周期管理（ILM）。</p>
+</li>
+<li>
+<p><strong>ES和数据库（MySQL）的区别？</strong></p>
+<p>答：① 存储目的：ES 用于全文检索与快速分析，MySQL 用于结构化数据存储与事务；② 数据结构：ES 支持非结构化/半结构化数据，MySQL 强结构化；③ 查询能力：ES 支持分词、模糊查询、聚合，MySQL 适合精确查询与联表；④ 事务支持：MySQL 支持ACID事务，ES 仅支持单文档原子性，无复杂事务。</p>
+</li>
+<li>
+<p><strong>ES的适用场景有哪些？</strong></p>
+<p>答：全文检索（如电商搜索、日志检索）、日志分析（ELK栈核心）、实时数据分析（如用户行为统计）、地理位置查询（如附近的商家）、监控告警（指标聚合分析）。</p>
+</li>
+<li>
+<p><strong>ES不适用于哪些场景？</strong></p>
+<p>答：① 强事务场景（如金融交易）；② 高频更新的结构化数据（MySQL更优）；③ 少量数据的精确查询（数据库效率更高）；④ 对数据一致性要求极高的场景（ES 最终一致性）。</p>
+</li>
+<li>
+<p><strong>ES的核心配置文件有哪些？</strong></p>
+<p>答：① elasticsearch.yml：核心配置（集群名、节点名、端口、分片副本等）；② jvm.options：JVM参数配置（堆内存大小等）；③ log4j2.properties：日志配置。</p>
+</li>
+<li>
+<p><strong>ES堆内存建议设置多大？</strong></p>
+<p>答：① 建议设置为物理内存的50%，但不超过31GB（JVM对32GB以上内存的压缩指针优化失效）；② 最小与最大堆内存设置一致，避免频繁GC。</p>
+</li>
+<li>
+<p><strong>如何查看 ES 集群健康状态？</strong></p>
+<p>答：通过REST API：GET /_cluster/health，返回状态有green（健康，所有分片可用）、yellow（警告，主分片可用，副本不可用）、red（异常，主分片不可用）。</p>
+</li>
+</ol>
+<h1 id="二es-核心原理与数据流程">二、ES 核心原理与数据流程</h1>
+<ol>
+<li>
+<p><strong>ES的索引原理是什么？</strong></p>
+<p>答：基于Lucene的倒排索引，核心流程：① 分词：将文档字段拆分为词条（Term）；② 建立倒排表：记录词条对应的文档ID、位置、频率等信息；③ 写入索引：将倒排表持久化到磁盘，同时维护内存缓存，提升查询效率。</p>
+</li>
+<li>
+<p><strong>倒排索引和正排索引的区别？</strong></p>
+<p>答：① 正排索引：按文档ID映射字段内容（如数据库主键索引），适合精确查找单文档，全文检索效率低；② 倒排索引：按词条映射文档ID，适合全文检索，可快速定位包含目标词条的所有文档，是ES的核心。</p>
+</li>
+<li>
+<p><strong>ES的分词流程是什么？</strong></p>
+<p>答：① 字符过滤：过滤无效字符（如HTML标签、特殊符号）；② 分词器：将文本拆分为词条（如中文分词器拆分为词语）；③ 词条过滤：对词条进行处理（如大小写转换、停用词移除、同义词替换）。</p>
+</li>
+<li>
+<p><strong>ES内置分词器有哪些？各自特点？</strong></p>
+<p>答：① Standard Analyzer：默认分词器，按单词拆分，支持多语言，中文按字符拆分；② Simple Analyzer：按非字母拆分，小写化词条；③ Whitespace Analyzer：仅按空格拆分，不做其他处理；④ Keyword Analyzer：不分词，将整个文本作为一个词条。</p>
+</li>
+<li>
+<p><strong>中文分词如何解决？</strong></p>
+<p>答：集成第三方中文分词器，如IK分词器（最常用，支持细粒度、粗粒度分词，自定义词典）、jieba分词器，通过插件形式安装到ES。</p>
+</li>
+<li>
+<p><strong>ES数据写入流程（近实时原理）？</strong></p>
+<p>答：① 数据写入内存缓冲区（Index Buffer），同时记录事务日志（Translog）；② 缓冲区满（默认512MB）或间隔到期（默认1秒），将数据写入分段（Segment）并刷到磁盘，清空缓冲区；③ 分段不可修改，查询时合并多个分段结果；④ 定期触发分段合并（Merge），减少分段数量，提升查询效率。</p>
+</li>
+<li>
+<p><strong>Translog的作用是什么？</strong></p>
+<p>答：保障数据可靠性，相当于ES的“日志日记”。数据写入时先记录Translog，若ES宕机，重启后可通过Translog恢复未刷到磁盘的数据；默认每5秒或请求完成后刷盘（可配置）。</p>
+</li>
+<li>
+<p><strong>ES数据查询流程？</strong></p>
+<p>答：① 客户端请求协调节点，协调节点计算目标分片（主分片/副本）；② 协调节点将请求分发到对应数据节点；③ 数据节点执行查询，返回结果给协调节点；④ 协调节点汇总结果（排序、分页），返回给客户端。</p>
+</li>
+<li>
+<p><strong>ES中的分段（Segment）是什么？特点？</strong></p>
+<p>答：分段是索引的最小存储单元，对应Lucene的索引段。特点：① 不可修改：一旦创建无法修改，更新/删除操作通过标记删除和新增分段实现；② 独立索引：每个分段有自己的倒排索引，查询时需合并所有分段结果。</p>
+</li>
+<li>
+<p><strong>分段合并（Merge）的目的和影响？</strong></p>
+<p>答：① 目的：减少分段数量，降低查询时的合并开销，释放磁盘空间（清理标记删除的数据）；② 影响：合并操作占用IO和CPU资源，可能影响集群性能，ES默认后台异步合并，可通过配置调整合并策略。</p>
+</li>
+<li>
+<p><strong>ES如何实现数据更新和删除？</strong></p>
+<p>答：① 更新：不直接修改原分段，而是标记原文档为删除，新增一个包含更新内容的文档到新分段；② 删除：仅在分段中标记文档为删除，不立即物理删除，待分段合并时才清理删除的数据，释放空间。</p>
+</li>
+<li>
+<p><strong>ES的刷新（Refresh）和刷盘（Flush）的区别？</strong></p>
+<p>答：① Refresh：将内存缓冲区的数据写入分段（仅加载到文件系统缓存，未刷到磁盘），使数据可查询，默认每1秒执行一次，是近实时的核心；② Flush：将文件系统缓存中的分段刷到磁盘，同时清空Translog，保障数据持久化，默认每30分钟或Translog满时执行。</p>
+</li>
+<li>
+<p><strong>ES的分片策略是什么？</strong></p>
+<p>答：① 分片分配：主分片在集群节点间均匀分配，副本分片不与对应主分片在同一节点；② 分片数量：索引创建时指定主分片数量（默认1），创建后不可修改；副本分片数量可动态调整。</p>
+</li>
+<li>
+<p><strong>为什么主分片数量创建后不可修改？</strong></p>
+<p>答：主分片数量决定了索引数据的分片分布规则（基于哈希算法：shard = hash(routing) % 主分片数），修改主分片数量会导致原有分片哈希映射失效，数据无法正确定位，需重新索引所有数据，成本极高。</p>
+</li>
+<li>
+<p><strong>Routing字段的作用？</strong></p>
+<p>答：用于计算文档所属的主分片，默认使用文档ID作为Routing值，也可自定义（如按用户ID路由）。自定义Routing可实现数据按指定维度聚合存储，提升查询效率，但可能导致分片数据不均。</p>
+</li>
+<li>
+<p><strong>ES的集群发现机制？</strong></p>
+<p>答：基于Zen Discovery机制，通过多播（默认关闭）或单播方式发现集群节点，主节点通过投票选举产生，候选主节点需配置discovery.seed_hosts（种子节点），确保集群稳定组建。</p>
+</li>
+<li>
+<p><strong>主节点选举的条件和流程？</strong></p>
+<p>答：① 条件：节点配置为候选主节点（node.master: true），集群中多数候选主节点在线；② 流程：节点启动后寻找现有主节点，无主节点时发起选举，获得多数投票的节点成为主节点。</p>
+</li>
+<li>
+<p><strong>ES如何处理节点故障？</strong></p>
+<p>答：① 主节点故障：候选主节点重新选举新主节点，新主节点将故障节点的主分片迁移到健康节点；② 数据节点故障：主节点检测到节点下线后，将该节点上的主分片副本提升为主分片，同时补充新的副本分片，确保集群健康。</p>
+</li>
+<li>
+<p><strong>ES的数据一致性保证？</strong></p>
+<p>答：采用最终一致性模型，通过副本同步机制保障。数据写入主分片后，异步同步到副本分片，同步完成前查询可能返回旧数据，最终所有副本数据一致；可通过设置wait_for_active_shards参数，要求写入时至少同步到指定数量的副本才返回成功，提升一致性。</p>
+</li>
+<li>
+<p><strong>ES中的字段类型有哪些核心分类？</strong></p>
+<p>答：① 字符串类型：text（分词，用于全文检索）、keyword（不分词，用于精确匹配、聚合）；② 数值类型：integer、long、float、double、numeric（动态数值）；③ 日期类型：date（支持多种日期格式，自动解析）；④ 布尔类型：boolean；⑤ 复杂类型：object（嵌套对象）、nested（嵌套文档，独立索引）；⑥ 特殊类型：geo_point（地理位置）、ip（IP地址）。</p>
+</li>
+<li>
+<p><strong>text和 keyword 类型的区别？</strong></p>
+<p>答：① text：会分词，建立倒排索引，适合全文检索（如商品名称），不支持聚合；② keyword：不分词，将整个文本作为词条，适合精确匹配、排序、聚合（如商品ID、分类名称）。</p>
+</li>
+<li>
+<p><strong>nested类型和 object 类型的区别？</strong></p>
+<p>答：① object：嵌套对象会被扁平化存储，多个嵌套对象的字段会相互关联，查询时可能出现误匹配；② nested：嵌套文档会被独立索引为单独文档，查询时可精准匹配嵌套内容，支持嵌套聚合，但写入性能略低。</p>
+</li>
+<li>
+<p><strong>ES的动态映射（Dynamic Mapping）是什么？</strong></p>
+<p>答：ES 自动推断文档字段类型并创建映射，无需手动定义。优点：快速上手，适合未知字段结构的场景；缺点：推断可能不准确（如数字被推断为text），需通过动态模板（Dynamic Templates）优化。</p>
+</li>
+<li>
+<p><strong>如何禁用动态映射？</strong></p>
+<p>答：在索引映射中设置dynamic: false（忽略新增字段，不索引）或dynamic: strict（新增字段时报错），避免字段类型推断错误，保障索引结构稳定。</p>
+</li>
+</ol>
+<h1 id="三es-检索与聚合">三、ES 检索与聚合</h1>
+<ol>
+<li>
+<p><strong>ES支持哪些查询类型？</strong></p>
+<p>答：① 全文查询：match（分词匹配）、match_phrase（短语匹配）、multi_match（多字段匹配）；② 精确查询：term（词条精确匹配）、terms（多词条匹配）、range（范围查询）、exists（存在查询）；③ 复合查询：bool（布尔查询）、should（或）、must（与）、must_not（非）、filter（过滤，不计算得分）；④ 特殊查询：fuzzy（模糊查询）、wildcard（通配符查询）、prefix（前缀查询）。</p>
+</li>
+<li>
+<p><strong>match和 term 查询的区别？</strong></p>
+<p>答：① match：对查询条件分词，再匹配索引中的词条，适合全文检索（如查询“手机”，会匹配包含“手机”“智能手机”的文档）；② term：不分词，将查询条件作为完整词条匹配，适合keyword、数值、日期等类型的精确查询（如查询商品ID为“1001”）。</p>
+</li>
+<li>
+<p><strong>match_phrase短语查询的原理？</strong></p>
+<p>答：要求查询的词条必须在文档中连续出现，且顺序一致，同时可通过slop参数设置允许的间隔词数（如slop:1允许词条间间隔1个词）。</p>
+</li>
+<li>
+<p><strong>filter和 query 的区别？</strong></p>
+<p>答：① query：计算文档与查询条件的相关性得分，按得分排序，结果会缓存；② filter：不计算得分，仅筛选符合条件的文档，速度更快，结果会被缓存（Filter Cache），适合高频过滤场景（如按价格范围筛选）。</p>
+</li>
+<li>
+<p><strong>ES的相关性得分（Score）如何计算？</strong></p>
+<p>答：基于Lucene的TF-IDF算法，核心因素：① TF（词频）：词条在文档中出现的次数，次数越多得分越高；② IDF（逆文档频率）：词条在所有文档中出现的频率，频率越低（越稀有）得分越高；③ 字段长度归一化：字段越短，词条权重越高。</p>
+</li>
+<li>
+<p><strong>如何优化相关性得分？</strong></p>
+<p>答：① 调整字段权重（boost参数，默认1，大于1提升权重，小于1降低权重）；② 优化分词（自定义词典，移除停用词）；③ 使用function_score函数，自定义得分计算规则（如按时间衰减、按字段值加权）。</p>
+</li>
+<li>
+<p><strong>模糊查询（fuzzy）的原理？适用场景？</strong></p>
+<p>答：① 原理：基于编辑距离（Levenshtein距离），允许词条有一定的拼写错误（如字母替换、增加、删除、交换），默认编辑距离为2；② 场景：用户输入可能存在拼写错误的场景（如搜索“appel”匹配“apple”）。</p>
+</li>
+<li>
+<p><strong>通配符查询（wildcard）和前缀查询（prefix）的注意事项？</strong></p>
+<p>答：① 通配符查询支持*（任意字符）、?（单个字符），前缀查询匹配以指定词条开头的文档；② 注意：避免以通配符开头（如*phone），会导致全表扫描，严重影响性能。</p>
+</li>
+<li>
+<p><strong>ES如何实现分页查询？</strong></p>
+<p>答：① 基础分页：from（起始位置）+ size（每页条数），适合少量分页（from+size不超过10000）；② 深分页优化：使用scroll API（滚动分页，适合批量导出数据）或search_after（基于上一页最后一条数据的排序值分页，无页数限制，实时性好）。</p>
+</li>
+<li>
+<p><strong>from+size分页的弊端？</strong></p>
+<p>答：① 深分页时，协调节点需从所有分片获取前from+size条数据，再排序筛选，数据传输量大、排序开销高；② ES 默认限制from+size不超过10000，超过会报错，避免性能问题。</p>
+</li>
+<li>
+<p><strong>ES聚合（Aggregation）的核心类型？</strong></p>
+<p>答：① 桶聚合（Bucket）：按条件分组（如terms聚合、range聚合、date_histogram聚合）；② 指标聚合（Metric）：对分组结果计算指标（如sum、avg、max、min、count）；③ 管道聚合（Pipeline）：基于其他聚合结果再聚合（如求多个分组的平均值）。</p>
+</li>
+<li>
+<p><strong>terms聚合的原理和优化？</strong></p>
+<p>答：① 原理：按字段值分组，统计每个分组的文档数量，适合keyword、数值等类型；② 优化：① 开启fielddata（text类型需开启，但占用内存，谨慎使用）；② 限制聚合结果数量（size参数）；③ 使用shard_size参数，提升聚合准确性（从每个分片获取更多数据再合并）。</p>
+</li>
+<li>
+<p><strong>date_histogram聚合的作用？</strong></p>
+<p>答：按日期间隔分组（如按天、小时、分钟），适合时间序列数据的统计分析（如按天统计日志数量、按小时统计订单量）。</p>
+</li>
+<li>
+<p><strong>聚合和查询的执行顺序？</strong></p>
+<p>答：先执行查询（query/filter）筛选出符合条件的文档，再对筛选后的文档执行聚合操作，确保聚合结果仅基于匹配的文档。</p>
+</li>
+<li>
+<p><strong>如何实现嵌套聚合？</strong></p>
+<p>答：在聚合内部嵌套子聚合，如先按分类（terms聚合）分组，再对每个分组按价格区间（range聚合）子分组，最后计算每个子分组的平均价格（avg聚合）。</p>
+</li>
+<li>
+<p><strong>fielddata的作用和风险？</strong></p>
+<p>答：① 作用：将text类型字段的数据加载到内存，支持对text字段进行排序和聚合；② 风险：text字段数据量大时，fielddata会占用大量内存，可能导致OOM，建议优先使用keyword类型做聚合，必要时开启并限制内存使用。</p>
+</li>
+<li>
+<p><strong>ES如何实现高亮查询？</strong></p>
+<p>答：在查询请求中添加highlight参数，指定需要高亮的字段，ES 会在返回结果中标记匹配的词条，支持自定义高亮标签（如<em>）、高亮片段长度等。</p>
+</li>
+<li>
+<p><strong>地理位置查询（geo_query）的核心类型？</strong></p>
+<p>答：① geo_distance：查询指定位置一定距离内的文档；② geo_bounding_box：查询指定矩形范围内的文档；③ geo_polygon：查询指定多边形范围内的文档，适用于“附近的人”“周边商家”场景。</p>
+</li>
+<li>
+<p><strong>如何实现多字段检索并调整权重？</strong></p>
+<p>答：使用multi_match查询，通过fields参数指定多个字段，同时为每个字段设置权重（如fields: [&quot;title^3&quot;, &quot;content^1&quot;]，title权重是content的3倍），提升重要字段的相关性得分。</p>
+</li>
+<li>
+<p><strong>exists查询和 missing 查询的作用？</strong></p>
+<p>答：① exists：查询指定字段存在的文档；② missing：查询指定字段不存在或值为null的文档（ES 7.x后可通过bool+must_not+exists实现）。</p>
+</li>
+</ol>
+<h1 id="四es-集群管理与高可用">四、ES 集群管理与高可用</h1>
+<ol>
+<li>
+<p><strong>如何创建 ES 索引并指定分片和副本？</strong></p>
+<p>答：通过REST API：PUT /索引名，在请求体中设置settings参数，指定主分片数量（number_of_shards）和副本数量（number_of_replicas），示例：{&quot;settings&quot;: {&quot;number_of_shards&quot;: 3, &quot;number_of_replicas&quot;: 1}}。</p>
+</li>
+<li>
+<p><strong>如何动态调整副本数量？</strong></p>
+<p>答：通过API修改索引设置：PUT /索引名/_settings，请求体：{&quot;number_of_replicas&quot;: 2}，无需重启集群，实时生效，适合根据集群负载调整副本数量。</p>
+</li>
+<li>
+<p><strong>ES索引别名（Alias）的作用？</strong></p>
+<p>答：① 隐藏索引名称，客户端通过别名访问索引，便于索引迁移（如将旧索引切换为新索引，无需修改客户端代码）；② 分组管理索引（如按日期创建的日志索引，用别名关联所有日志索引）；③ 支持过滤和路由，实现索引分片的精准访问。</p>
+</li>
+<li>
+<p><strong>如何创建和删除索引别名？</strong></p>
+<p>答：① 创建/修改别名：POST /_aliases，请求体：{&quot;actions&quot;: [{&quot;add&quot;: {&quot;index&quot;: &quot;旧索引名&quot;, &quot;alias&quot;: &quot;索引别名&quot;}}]}；② 删除别名：{&quot;actions&quot;: [{&quot;remove&quot;: {&quot;index&quot;: &quot;旧索引名&quot;, &quot;alias&quot;: &quot;索引别名&quot;}}]}。</p>
+</li>
+<li>
+<p><strong>ES索引模板（Index Template）的作用？</strong></p>
+<p>答：预先定义索引的settings、mappings、aliases，创建索引时若匹配模板规则，自动应用模板配置，避免重复定义，适合批量创建同结构索引（如按日期创建的日志索引）。</p>
+</li>
+<li>
+<p><strong>索引生命周期管理（ILM）的核心阶段？</strong></p>
+<p>答：ES 提供的自动化索引管理功能，核心阶段：① 热阶段（Hot）：数据可写入、可查询，性能优先；② 温阶段（Warm）：数据不再写入，仅查询，可降低副本数量、迁移到低成本节点；③ 冷阶段（Cold）：数据极少查询，可压缩存储、关闭索引；④ 删除阶段（Delete）：数据过期后自动删除。</p>
+</li>
+<li>
+<p><strong>如何实现 ES 集群扩容？</strong></p>
+<p>答：① 新增数据节点，配置与集群一致的集群名、种子节点；② 集群自动发现新节点，主节点将分片重新分配到新节点，平衡负载；③ 扩容后可调整副本数量，提升查询能力。</p>
+</li>
+<li>
+<p><strong>如何处理 ES 集群脑裂（Split Brain）问题？</strong></p>
+<p>答：脑裂指集群因网络分区分裂为多个小集群，各自选举主节点，导致数据不一致。解决方案：① 配置discovery.zen.minimum_master_nodes（候选主节点数量/2 +1），确保只有多数候选主节点在线才能选举主节点；② 优化网络，避免网络分区；③ 配置集群容错机制，及时检测并隔离故障节点。</p>
+</li>
+<li>
+<p><strong>ES集群分片不均衡的原因和解决方法？</strong></p>
+<p>答：① 原因：节点故障、新增节点、分片分配策略不合理；② 解决方法：① 手动触发分片重分配：POST /_cluster/reroute?retry_failed=true；② 调整分片分配参数（如cluster.routing.allocation.enable）；③ 检查节点磁盘空间、负载，确保节点资源充足。</p>
+</li>
+<li>
+<p><strong>如何关闭和删除 ES 索引？</strong></p>
+<p>答：① 关闭索引：POST /索引名/_close（关闭后无法查询和写入，占用磁盘空间）；② 删除索引：DELETE /索引名（彻底删除索引及数据，谨慎操作，可通过别名保护）。</p>
+</li>
+<li>
+<p><strong>ES如何备份和恢复数据？</strong></p>
+<p>答：① 备份（快照）：创建仓库（本地/云存储），对索引创建快照；API：PUT /_snapshot/仓库名/快照名?wait_for_completion=true；② 恢复：从快照恢复索引，API：POST /_snapshot/仓库名/快照名/_restore，可指定恢复的索引和分片配置。</p>
+</li>
+<li>
+<p><strong>ES安全配置有哪些核心项？</strong></p>
+<p>答：① 开启身份认证：配置xpack.security.enabled: true，创建账号密码（elasticsearch-setup-passwords命令）；② 配置网络访问控制：network.host绑定允许访问的IP，设置http.cors允许跨域访问；③ 开启SSL/TLS加密：加密节点间通信和客户端连接，防止数据泄露。</p>
+</li>
+<li>
+<p><strong>如何监控 ES 集群性能？</strong></p>
+<p>答：① 内置API：GET /_cat（查看节点、分片、索引状态）、GET /_nodes/stats（节点性能指标）、GET /_indices/stats（索引性能指标）；② 第三方工具：Kibana（可视化监控）、Prometheus+Grafana（指标采集与展示）、ELK栈自带监控。</p>
+</li>
+<li>
+<p><strong>ES节点磁盘空间不足的处理方法？</strong></p>
+<p>答：① 清理过期数据（通过ILM自动删除或手动删除旧索引）；② 扩容磁盘或新增数据节点，迁移分片；③ 调整索引分片策略，减少单个节点的分片数量；④ 开启索引压缩，降低磁盘占用。</p>
+</li>
+<li>
+<p><strong>如何禁止自动创建索引？</strong></p>
+<p>答：在elasticsearch.yml中设置action.auto_create_index: false，避免客户端误操作创建无用索引，需手动创建所有索引。</p>
+</li>
+</ol>
+<h1 id="五es-性能优化与问题排查">五、ES 性能优化与问题排查</h1>
+<ol>
+<li>
+<p><strong>ES写入性能优化方法？</strong></p>
+<p>答：① 批量写入：使用bulk API，减少请求次数（建议批量大小5-15MB）；② 调整刷新策略：降低refresh频率（如refresh_interval: 30s），或关闭自动刷新（手动触发）；③ 优化Translog：增大translog.flush_threshold_size，减少刷盘次数；④ 减少副本：写入时临时将副本数设为0，写入完成后恢复；⑤ 优化映射：禁用动态映射，合理选择字段类型，避免不必要的分词。</p>
+</li>
+<li>
+<p><strong>ES查询性能优化方法？</strong></p>
+<p>答：① 优先使用filter过滤，利用缓存；② 优化分词：使用高效分词器，自定义词典，减少无用词条；③ 合理设置分片：避免分片过多（建议每个分片大小20-50GB），均衡负载；④ 优化聚合：限制聚合结果数量，使用shard_size提升准确性的同时控制开销；⑤ 避免深分页，使用search_after替代from+size；⑥ 预热缓存：对热点查询提前执行，将结果存入缓存。</p>
+</li>
+<li>
+<p><strong>ES索引性能优化方法？</strong></p>
+<p>答：① 合理设计分片：主分片数量根据集群节点数和数据量调整，避免单分片过大或过小；② 开启索引压缩：设置index.codec: best_compression，降低磁盘占用和IO开销；③ 优化字段映射：text类型仅用于全文检索，聚合、排序用keyword类型；④ 定期合并分段：手动触发分段合并（POST /索引名/_forcemerge），减少分段数量（注意避开业务高峰）。</p>
+</li>
+<li>
+<p><strong>ES堆内存优化建议？</strong></p>
+<p>答：① 控制堆内存大小（物理内存50%，不超过31GB）；② 禁用内存交换（swap），避免GC时内存交换导致性能下降；③ 调整GC策略：默认G1GC，根据堆内存大小优化GC参数（如新生代、老年代比例）；④ 监控GC状态，通过GET /_nodes/jvm/stats查看GC次数和耗时，避免频繁GC。</p>
+</li>
+<li>
+<p><strong>ES慢查询如何排查和优化？</strong></p>
+<p>答：① 开启慢查询日志：在elasticsearch.yml中配置slowlog参数（如index.search.slowlog.threshold.query.warn: 1s），记录慢查询；② 分析慢查询语句：通过Kibana或API查看慢查询详情，优化查询条件（如避免通配符开头、减少聚合字段）；③ 优化索引和分片：确保查询命中索引，均衡分片负载；④ 提升硬件性能：升级CPU、内存、SSD磁盘。</p>
+</li>
+<li>
+<p><strong>ES出现频繁GC的原因和解决方法？</strong></p>
+<p>答：① 原因：堆内存不足、查询/写入压力大、分片过多、大字段过多；② 解决方法：① 调整堆内存大小；② 优化查询和写入（批量写入、减少慢查询）；③ 减少分片数量，合并分段；④ 清理大字段数据，避免fielddata占用过多内存。</p>
+</li>
+<li>
+<p><strong>ES集群红色（red）状态的排查步骤？</strong></p>
+<p>答：① 查看集群健康详情：GET /_cluster/health?level=shards，定位不可用的主分片；② 检查节点状态：GET /_cat/nodes，确认是否有节点故障；③ 查看分片状态：GET /_cluster/allocation/explain，分析分片无法分配的原因（如磁盘不足、节点离线）；④ 解决问题：重启故障节点、清理磁盘空间、手动分配分片（POST /_cluster/reroute）。</p>
+</li>
+<li>
+<p><strong>ES索引分片无法分配的原因？</strong></p>
+<p>答：① 节点资源不足（磁盘空间满、内存不足）；② 副本分片与主分片在同一节点（违反分配策略）；③ 节点离线或网络故障；④ 索引配置错误（如分片数量超出节点数）；⑤ 集群脑裂，分片分配混乱。</p>
+</li>
+<li>
+<p><strong>如何优化 ES 分词性能？</strong></p>
+<p>答：① 选择高效分词器（如IK分词器，避免复杂分词规则）；② 自定义词典：将高频词、专业术语加入自定义词典，减少分词歧义；③ 关闭无用分词：对无需全文检索的字段，使用keyword类型，避免分词开销；④ 分词结果缓存：开启分词结果缓存，减少重复分词的开销。</p>
+</li>
+<li>
+<p><strong>ES大字段（如长文本、附件）的处理建议？</strong></p>
+<p>答：① 避免存储超大字段（如超过10MB），拆分字段或压缩存储；② 对附件类型数据（如PDF、Word），使用ES附件插件（ingest-attachment）提取文本后索引，不存储原附件；③ 禁用大字段的fielddata，避免占用过多内存；④ 单独创建索引存储大字段数据，与核心业务索引分离。</p>
+</li>
+<li>
+<p><strong>ES并发写入冲突如何处理？</strong></p>
+<p>答：① 基于版本号（version）控制：每次写入携带版本号，仅当版本号匹配时才写入，避免覆盖；② 使用乐观锁：通过if_seq_no和if_primary_term参数，确保写入的是最新版本的文档；③ 批量写入时控制并发量，避免过多写入请求导致冲突和性能下降。</p>
+</li>
+<li>
+<p><strong>ES索引迁移的方法有哪些？</strong></p>
+<p>答：① 快照迁移：创建旧索引快照，在新集群恢复；② 重新索引（Reindex）：通过POST /_reindex API，将旧索引数据迁移到新索引（支持跨集群迁移，需配置集群间通信）；③ 日志重放：若为日志索引，重新采集日志写入新索引；④ 别名切换：迁移完成后，通过别名切换客户端访问目标索引，实现无缝迁移。</p>
+</li>
+<li>
+<p><strong>ES跨集群检索（CCR）的作用和实现？</strong></p>
+<p>答：① 作用：实现多个ES集群间的数据同步和检索，适用于跨地域部署、数据备份场景；② 实现：配置主集群（leader）和从集群（follower），从集群同步主集群的索引数据，支持实时同步和只读检索，确保数据一致性。</p>
+</li>
+<li>
+<p><strong>ES与 Kibana、Logstash 的协同工作流程（ELK栈）？</strong></p>
+<p>答：① Logstash：采集多源数据（日志、数据库、消息队列），进行过滤、转换、分词预处理，将数据写入ES；② ES：存储和索引数据，提供全文检索和聚合分析能力；③ Kibana：连接ES，可视化展示数据（如仪表盘、图表、日志分析），支持用户交互查询。</p>
+</li>
+<li>
+<p><strong>ES向量检索的原理和适用场景？</strong></p>
+<p>答：① 原理：将文本、图片等数据转换为向量（通过模型嵌入），存储到ES的dense_vector字段，查询时计算向量间的相似度（如余弦相似度），返回最相似的结果；② 适用场景：语义检索、图片检索、推荐系统（如相似商品推荐）。</p>
+</li>
+<li>
+<p><strong>如何限制 ES 单个索引的大小和文档数量？</strong></p>
+<p>答：① 基于ILM：设置索引大小或文档数量阈值，达到阈值后自动滚动索引（创建新索引，旧索引进入下一生命周期阶段）；② 自定义脚本：通过定时任务监控索引大小和文档数量，达到阈值后手动创建新索引并切换别名。</p>
+</li>
+<li>
+<p><strong>ES索引刷新间隔（refresh_interval）的调整建议？</strong></p>
+<p>答：① 写入密集场景：增大刷新间隔（如30s-1min），减少刷新次数，提升写入性能，容忍更长的查询延迟；② 实时检索场景：保持默认1s或减小间隔（如500ms），确保数据快速可见，牺牲部分写入性能；③ 离线写入场景：关闭自动刷新（refresh_interval: -1），写入完成后手动触发刷新，最大化写入性能。</p>
+</li>
+<li>
+<p><strong>ES常见的硬件优化建议？</strong></p>
+<p>答：① 存储：使用SSD磁盘，提升IO速度（ES 对磁盘IO敏感）；② CPU：选择多核CPU，提升分词、查询、聚合的并行处理能力；③ 内存：充足的物理内存，保障堆内存和文件系统缓存需求；④ 网络：千兆以上网卡，集群节点间通信频繁，避免网络瓶颈。</p>
+</li>
+<li>
+<p><strong>ES中什么是字段折叠（Field Collapsing）？</strong></p>
+<p>答：按指定字段对查询结果去重，仅保留每个分组下的Top N文档，类似SQL的DISTINCT但更灵活，适用于避免重复结果展示（如按商品ID折叠，避免同一商品多条记录），通过collapse参数实现。</p>
+</li>
+<li>
+<p><strong>ES如何实现数据脱敏？</strong></p>
+<p>答：① 预处理阶段：通过ingest节点的processor（如gsub、mask）对敏感字段（手机号、身份证）进行替换、截断；② 索引阶段：自定义映射，不索引敏感字段或仅存储加密后的数据；③ 查询阶段：通过脚本字段（script field）动态脱敏返回结果，避免敏感信息泄露。</p>
+</li>
+<li>
+<p><strong>ES中的脚本（Script）有哪些用途和注意事项？</strong></p>
+<p>答：① 用途：字段计算、条件过滤、自定义排序、更新文档；② 注意事项：避免使用复杂脚本（影响性能），优先使用原生查询；控制脚本执行时间，防止阻塞集群；优先使用参数化脚本，避免注入风险。</p>
+</li>
+<li>
+<p><strong>ES 8.x 版本相比7.x有哪些核心更新？</strong></p>
+<p>答：① 默认开启安全特性，强制要求账号密码登录；② 移除Zen Discovery，采用全新的Cluster Coordinator机制，提升集群稳定性；③ 增强向量检索能力，优化dense_vector字段性能；④ 简化集群部署，支持一键部署集群；⑤ 废弃部分旧API，统一RESTful接口规范。</p>
+</li>
+</ol>
+
+    </div><div class="post_comments">
+  
+  
+  
+  
+</div>
+
+
+
+
+  </article>
+<aside class="sidebar">
+  <section class="sidebar_inner">
+    <br>
+    
+  
+  <div class="search">
+    <input type="search" class="search_field form_field" placeholder='搜索内容...' id="find" autocomplete="off" data-scope='post'>
+    <label for="find" class="search_label"><svg class="icon">
+  <title>search</title>
+  <use xlink:href="#search"></use>
+</svg>
+
+    </label>
+    
+    <div class="search_results results"></div>
+  </div>
+
+        <div class="author_header">
+          <img src="https://jianlin-li.github.io/images/fish-head.png" alt="李建林 photo">
+          <h2>李建林</h2>
+        </div>
+      <div class="author_bio">
+        PHP, GoLang, Docker, Kubernetes, MySQL, Redis, RabbitMQ, Elasticsearch, Yii, Laravel
+      </div>
+      <a href='https://jianlin-li.github.io/about/' class="button mt-1" role="button" title='阅读更多'>阅读更多</a>
+
+    
+    <h2 class="mt-4">精选文章</h2>
+    <ul>
+      <li>
+        <a href="https://jianlin-li.github.io/post/elasticsearch_review_4/" class="nav-link" title="Elasticsearch的知识点-4">Elasticsearch的知识点-4</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/redis_review_4/" class="nav-link" title="Redis的知识点-4">Redis的知识点-4</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/redis_review_3/" class="nav-link" title="Redis的知识点-3">Redis的知识点-3</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/redis_review_2/" class="nav-link" title="Redis的知识点-2">Redis的知识点-2</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/redis_review_1/" class="nav-link" title="Redis的知识点-1">Redis的知识点-1</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/rabbitmq_review_3/" class="nav-link" title="RabbitMQ消息中间件详解-3">RabbitMQ消息中间件详解-3</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/rabbitmq_review_2/" class="nav-link" title="RabbitMQ消息中间件详解-2">RabbitMQ消息中间件详解-2</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/git_review_1/" class="nav-link" title="Git的知识点-1">Git的知识点-1</a>
+      </li>
+    </ul>
+    <h2 class="mt-4">最新文章</h2>
+    <ul class="flex-column">
+      <li>
+        <a href="https://jianlin-li.github.io/post/php_review_5/" class="nav-link" title="PHP语言的知识点-5">PHP语言的知识点-5</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/nginx_review_1/" class="nav-link" title="Nginx的知识点-1">Nginx的知识点-1</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/shell_review_1/" class="nav-link" title="Shell的知识点-1">Shell的知识点-1</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/mysql_review_1/" class="nav-link" title="MySQL的知识点-1">MySQL的知识点-1</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/elasticsearch_review_3/" class="nav-link" title="Elasticsearch的知识点-3">Elasticsearch的知识点-3</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/elasticsearch_review_2/" class="nav-link" title="Elasticsearch的知识点-2">Elasticsearch的知识点-2</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/elasticsearch_review_1/" class="nav-link" title="Elasticsearch的知识点-1">Elasticsearch的知识点-1</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/docker_review_1/" class="nav-link" title="Docker的知识点-1">Docker的知识点-1</a>
+      </li>
+    </ul>
+    <div>
+      <h2 class="mt-4 taxonomy" id="categories-section">分类</h2>
+      <nav class="tags_nav">
+        <a href='https://jianlin-li.github.io/categories/go%E8%AF%AD%E8%A8%80/' class="post_tag button button_translucent" title="go语言">
+          GO语言
+          <span class="button_tally">5</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/categories/php%E8%AF%AD%E8%A8%80/' class="post_tag button button_translucent" title="php语言">
+          PHP语言
+          <span class="button_tally">5</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/categories/elasticsearch/' class="post_tag button button_translucent" title="elasticsearch">
+          ELASTICSEARCH
+          <span class="button_tally">4</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/categories/redis/' class="post_tag button button_translucent" title="redis">
+          REDIS
+          <span class="button_tally">4</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/categories/rabbitmq/' class="post_tag button button_translucent" title="rabbitmq">
+          RABBITMQ
+          <span class="button_tally">3</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/categories/%E6%9C%AC%E5%9C%B0%E7%8E%AF%E5%A2%83/' class="post_tag button button_translucent" title="本地环境">
+          本地环境
+          <span class="button_tally">2</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/categories/docker/' class="post_tag button button_translucent" title="docker">
+          DOCKER
+          <span class="button_tally">1</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/categories/git/' class="post_tag button button_translucent" title="git">
+          GIT
+          <span class="button_tally">1</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/categories/hugo/' class="post_tag button button_translucent" title="hugo">
+          HUGO
+          <span class="button_tally">1</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/categories/mysql/' class="post_tag button button_translucent" title="mysql">
+          MYSQL
+          <span class="button_tally">1</span>
+        </a>
+        
+        
+        <br>
+        <div class="post_tags_toggle button">所有分类</div>
+        <div class="post_tags">
+          <div class="tags_list">
+            
+            <a href='https://jianlin-li.github.io/categories/docker/' class=" post_tag button button_translucent" data-position=1 title="docker">DOCKER<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/elasticsearch/' class=" post_tag button button_translucent" data-position=4 title="elasticsearch">ELASTICSEARCH<span class="button_tally">4</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/git/' class=" post_tag button button_translucent" data-position=1 title="git">GIT<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/go%E8%AF%AD%E8%A8%80/' class=" post_tag button button_translucent" data-position=5 title="go语言">GO语言<span class="button_tally">5</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/hugo/' class=" post_tag button button_translucent" data-position=1 title="hugo">HUGO<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/mysql/' class=" post_tag button button_translucent" data-position=1 title="mysql">MYSQL<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/nginx/' class=" post_tag button button_translucent" data-position=1 title="nginx">NGINX<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/php%E8%AF%AD%E8%A8%80/' class=" post_tag button button_translucent" data-position=5 title="php语言">PHP语言<span class="button_tally">5</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/rabbitmq/' class=" post_tag button button_translucent" data-position=3 title="rabbitmq">RABBITMQ<span class="button_tally">3</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/redis/' class=" post_tag button button_translucent" data-position=4 title="redis">REDIS<span class="button_tally">4</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/shell/' class=" post_tag button button_translucent" data-position=1 title="shell">SHELL<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/%E6%9C%AC%E5%9C%B0%E7%8E%AF%E5%A2%83/' class=" post_tag button button_translucent" data-position=2 title="本地环境">本地环境<span class="button_tally">2</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/%E5%A4%8D%E4%B9%A0/' class=" post_tag button button_translucent" data-position=1 title="复习">复习<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/%E5%8D%8E%E5%BE%AE%E4%B8%96%E7%BA%AA/' class=" post_tag button button_translucent" data-position=1 title="华微世纪">华微世纪<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/%E6%95%99%E7%A8%8B/' class=" post_tag button button_translucent" data-position=1 title="教程">教程<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/%E8%A7%86%E9%A2%91/' class=" post_tag button button_translucent" data-position=1 title="视频">视频<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/%E4%B9%A6%E7%B1%8D/' class=" post_tag button button_translucent" data-position=1 title="书籍">书籍<span class="button_tally">1</span>
+            </a>
+            
+            <div class="tags_sort"><span title="sort alphabetically">[A~Z]</span><span title="sort by count">[0~9]</span>
+            </div>
+            <span class="tags_hide"><svg class="icon">
+            <use xlink:href="#closeme"></use>
+          </svg></span>
+          </div>
+        </div>
+      </nav>
+    </div>
+    <div>
+      <h2 class="mt-4 taxonomy" id="tags-section">标签</h2>
+      <nav class="tags_nav">
+        <a href='https://jianlin-li.github.io/tags/go/' class="post_tag button button_translucent" title="go">
+          GO
+          <span class="button_tally">5</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/tags/php/' class="post_tag button button_translucent" title="php">
+          PHP
+          <span class="button_tally">5</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/tags/elasticsearch/' class="post_tag button button_translucent" title="elasticsearch">
+          ELASTICSEARCH
+          <span class="button_tally">4</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/tags/redis/' class="post_tag button button_translucent" title="redis">
+          REDIS
+          <span class="button_tally">4</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/tags/rabbitmq/' class="post_tag button button_translucent" title="rabbitmq">
+          RABBITMQ
+          <span class="button_tally">3</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/tags/docker/' class="post_tag button button_translucent" title="docker">
+          DOCKER
+          <span class="button_tally">1</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/tags/emoji/' class="post_tag button button_translucent" title="emoji">
+          EMOJI
+          <span class="button_tally">1</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/tags/git/' class="post_tag button button_translucent" title="git">
+          GIT
+          <span class="button_tally">1</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/tags/hosts/' class="post_tag button button_translucent" title="hosts">
+          HOSTS
+          <span class="button_tally">1</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/tags/hugo/' class="post_tag button button_translucent" title="hugo">
+          HUGO
+          <span class="button_tally">1</span>
+        </a>
+        
+        
+        <br>
+        <div class="post_tags_toggle button">所有标签</div>
+        <div class="post_tags">
+          <div class="tags_list">
+            
+            <a href='https://jianlin-li.github.io/tags/docker/' class=" post_tag button button_translucent" data-position=1 title="docker">DOCKER<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/elasticsearch/' class=" post_tag button button_translucent" data-position=4 title="elasticsearch">ELASTICSEARCH<span class="button_tally">4</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/emoji/' class=" post_tag button button_translucent" data-position=1 title="emoji">EMOJI<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/git/' class=" post_tag button button_translucent" data-position=1 title="git">GIT<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/go/' class=" post_tag button button_translucent" data-position=5 title="go">GO<span class="button_tally">5</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/hosts/' class=" post_tag button button_translucent" data-position=1 title="hosts">HOSTS<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/hugo/' class=" post_tag button button_translucent" data-position=1 title="hugo">HUGO<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/markdown/' class=" post_tag button button_translucent" data-position=1 title="markdown">MARKDOWN<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/math/' class=" post_tag button button_translucent" data-position=1 title="math">MATH<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/mysql/' class=" post_tag button button_translucent" data-position=1 title="mysql">MYSQL<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/nginx/' class=" post_tag button button_translucent" data-position=1 title="nginx">NGINX<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/notices/' class=" post_tag button button_translucent" data-position=1 title="notices">NOTICES<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/openstreetmap/' class=" post_tag button button_translucent" data-position=1 title="openstreetmap">OPENSTREETMAP<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/php/' class=" post_tag button button_translucent" data-position=5 title="php">PHP<span class="button_tally">5</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/rabbitmq/' class=" post_tag button button_translucent" data-position=3 title="rabbitmq">RABBITMQ<span class="button_tally">3</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/redis/' class=" post_tag button button_translucent" data-position=4 title="redis">REDIS<span class="button_tally">4</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/shell/' class=" post_tag button button_translucent" data-position=1 title="shell">SHELL<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/sql/' class=" post_tag button button_translucent" data-position=1 title="sql">SQL<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/%E6%9C%AC%E5%9C%B0%E7%8E%AF%E5%A2%83/' class=" post_tag button button_translucent" data-position=1 title="本地环境">本地环境<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/%E5%A4%8D%E4%B9%A0/' class=" post_tag button button_translucent" data-position=1 title="复习">复习<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/%E6%95%99%E7%A8%8B/' class=" post_tag button button_translucent" data-position=1 title="教程">教程<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/%E4%B9%B1%E7%A0%81/' class=" post_tag button button_translucent" data-position=1 title="乱码">乱码<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/%E8%A7%86%E9%A2%91/' class=" post_tag button button_translucent" data-position=1 title="视频">视频<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/%E4%B9%A6%E7%B1%8D/' class=" post_tag button button_translucent" data-position=1 title="书籍">书籍<span class="button_tally">1</span>
+            </a>
+            
+            <div class="tags_sort"><span title="sort alphabetically">[A~Z]</span><span title="sort by count">[0~9]</span>
+            </div>
+            <span class="tags_hide"><svg class="icon">
+            <use xlink:href="#closeme"></use>
+          </svg></span>
+          </div>
+        </div>
+      </nav>
+    </div>
+  </section>
+</aside>
+
+  
+</div>
+    </main><svg width="0" height="0" class="hidden">
+  <symbol viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" id="facebook">
+    <path d="M437 0H75C33.648 0 0 33.648 0 75v362c0 41.352 33.648 75 75 75h151V331h-60v-90h60v-61c0-49.629 40.371-90 90-90h91v90h-91v61h91l-15 90h-76v181h121c41.352 0 75-33.648 75-75V75c0-41.352-33.648-75-75-75zm0 0"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18.001 18.001" id="twitter">
+    <path d="M15.891 4.013c.808-.496 1.343-1.173 1.605-2.034a8.68 8.68 0 0 1-2.351.861c-.703-.756-1.593-1.14-2.66-1.14-1.043 0-1.924.366-2.643 1.078a3.56 3.56 0 0 0-1.076 2.605c0 .309.039.585.117.819-3.076-.105-5.622-1.381-7.628-3.837-.34.601-.51 1.213-.51 1.846 0 1.301.549 2.332 1.645 3.089-.625-.053-1.176-.211-1.645-.47 0 .929.273 1.705.82 2.388a3.623 3.623 0 0 0 2.115 1.291c-.312.08-.641.118-.979.118-.312 0-.533-.026-.664-.083.23.757.664 1.371 1.291 1.841a3.652 3.652 0 0 0 2.152.743C4.148 14.173 2.625 14.69.902 14.69c-.422 0-.721-.006-.902-.038 1.697 1.102 3.586 1.649 5.676 1.649 2.139 0 4.029-.542 5.674-1.626 1.645-1.078 2.859-2.408 3.639-3.974a10.77 10.77 0 0 0 1.172-4.892v-.468a7.788 7.788 0 0 0 1.84-1.921 8.142 8.142 0 0 1-2.11.593z"
+      ></path>
+  </symbol>
+  <symbol aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" id="mail">
+    <path  d="M502.3 190.8c3.9-3.1 9.7-.2 9.7 4.7V400c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V195.6c0-5 5.7-7.8 9.7-4.7 22.4 17.4 52.1 39.5 154.1 113.6 21.1 15.4 56.7 47.8 92.2 47.6 35.7.3 72-32.8 92.3-47.6 102-74.1 131.6-96.3 154-113.7zM256 320c23.2.4 56.6-29.2 73.4-41.4 132.7-96.3 142.8-104.7 173.4-128.7 5.8-4.5 9.2-11.5 9.2-18.9v-19c0-26.5-21.5-48-48-48H48C21.5 64 0 85.5 0 112v19c0 7.4 3.4 14.3 9.2 18.9 30.6 23.9 40.7 32.4 173.4 128.7 16.8 12.2 50.2 41.8 73.4 41.4z"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" id="calendar">
+    <path d="M452 40h-24V0h-40v40H124V0H84v40H60C26.916 40 0 66.916 0 100v352c0 33.084 26.916 60 60 60h392c33.084 0 60-26.916 60-60V100c0-33.084-26.916-60-60-60zm20 412c0 11.028-8.972 20-20 20H60c-11.028 0-20-8.972-20-20V188h432v264zm0-304H40v-48c0-11.028 8.972-20 20-20h24v40h40V80h264v40h40V80h24c11.028 0 20 8.972 20 20v48z"></path>
+    <path d="M76 230h40v40H76zm80 0h40v40h-40zm80 0h40v40h-40zm80 0h40v40h-40zm80 0h40v40h-40zM76 310h40v40H76zm80 0h40v40h-40zm80 0h40v40h-40zm80 0h40v40h-40zM76 390h40v40H76zm80 0h40v40h-40zm80 0h40v40h-40zm80 0h40v40h-40zm80-80h40v40h-40z"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" id="github">
+    <path d="M255.968 5.329C114.624 5.329 0 120.401 0 262.353c0 113.536 73.344 209.856 175.104 243.872 12.8 2.368 17.472-5.568 17.472-12.384 0-6.112-.224-22.272-.352-43.712-71.2 15.52-86.24-34.464-86.24-34.464-11.616-29.696-28.416-37.6-28.416-37.6-23.264-15.936 1.728-15.616 1.728-15.616 25.696 1.824 39.2 26.496 39.2 26.496 22.848 39.264 59.936 27.936 74.528 21.344 2.304-16.608 8.928-27.936 16.256-34.368-56.832-6.496-116.608-28.544-116.608-127.008 0-28.064 9.984-51.008 26.368-68.992-2.656-6.496-11.424-32.64 2.496-68 0 0 21.504-6.912 70.4 26.336 20.416-5.696 42.304-8.544 64.096-8.64 21.728.128 43.648 2.944 64.096 8.672 48.864-33.248 70.336-26.336 70.336-26.336 13.952 35.392 5.184 61.504 2.56 68 16.416 17.984 26.304 40.928 26.304 68.992 0 98.72-59.84 120.448-116.864 126.816 9.184 7.936 17.376 23.616 17.376 47.584 0 34.368-.32 62.08-.32 70.496 0 6.88 4.608 14.88 17.6 12.352C438.72 472.145 512 375.857 512 262.353 512 120.401 397.376 5.329 255.968 5.329z"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 212 212" id="gitlab">
+    <path d="M12.3 74.7h54L43.3 3c-1-3.6-6.4-3.6-7.6 0L12.3 74.8z" />
+    <path d="M12.3 74.7L.5 111c-1 3.2 0 6.8 3 8.8l101.6 74-92.5-119z"/>
+    <path d="M105 193.7l-38.6-119h-54l92.7 119z"/>
+    <path d="M105 193.7l38.7-119H66.4l38.7 119z"/>
+    <path d="M105 193.7l38.7-119H198l-93 119z"/>
+    <path d="M198 74.7l11.6 36.2c1 3 0 6.6-3 8.6l-101.5 74 93-119z"/>
+    <path d="M198 74.7h-54.3L167 3c1.2-3.6 6.4-3.6 7.6 0L198 74.8z"/>
+  </symbol>
+  <symbol viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" id="rss">
+    <circle cx="3.429" cy="20.571" r="3.429"></circle>
+    <path d="M11.429 24h4.57C15.999 15.179 8.821 8.001 0 8v4.572c6.302.001 11.429 5.126 11.429 11.428z"></path>
+    <path d="M24 24C24 10.766 13.234 0 0 0v4.571c10.714 0 19.43 8.714 19.43 19.429z"></path>
+  </symbol>
+  <symbol viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" id="linkedin">
+    <path d="M437 0H75C33.648 0 0 33.648 0 75v362c0 41.352 33.648 75 75 75h362c41.352 0 75-33.648 75-75V75c0-41.352-33.648-75-75-75zM181 406h-60V196h60zm0-240h-60v-60h60zm210 240h-60V286c0-16.54-13.46-30-30-30s-30 13.46-30 30v120h-60V196h60v11.309C286.719 202.422 296.93 196 316 196c40.691.043 75 36.547 75 79.688zm0 0"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 612 612" id="to-top">
+    <path d="M604.501 440.509L325.398 134.956c-5.331-5.357-12.423-7.627-19.386-7.27-6.989-.357-14.056 1.913-19.387 7.27L7.499 440.509c-9.999 10.024-9.999 26.298 0 36.323s26.223 10.024 36.222 0l262.293-287.164L568.28 476.832c9.999 10.024 26.222 10.024 36.221 0 9.999-10.023 9.999-26.298 0-36.323z"></path>
+  </symbol>
+  <symbol viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" id="carly">
+    <path d="M504.971 239.029L448 182.059V84c0-46.317-37.682-84-84-84h-44c-13.255 0-24 10.745-24 24s10.745 24 24 24h44c19.851 0 36 16.149 36 36v108c0 6.365 2.529 12.47 7.029 16.971L454.059 256l-47.029 47.029A24.002 24.002 0 0 0 400 320v108c0 19.851-16.149 36-36 36h-44c-13.255 0-24 10.745-24 24s10.745 24 24 24h44c46.318 0 84-37.683 84-84v-98.059l56.971-56.971c9.372-9.372 9.372-24.568 0-33.941zM112 192V84c0-19.851 16.149-36 36-36h44c13.255 0 24-10.745 24-24S205.255 0 192 0h-44c-46.318 0-84 37.683-84 84v98.059l-56.971 56.97c-9.373 9.373-9.373 24.568 0 33.941L64 329.941V428c0 46.317 37.682 84 84 84h44c13.255 0 24-10.745 24-24s-10.745-24-24-24h-44c-19.851 0-36-16.149-36-36V320c0-6.365-2.529-12.47-7.029-16.971L57.941 256l47.029-47.029A24.002 24.002 0 0 0 112 192z"></path>
+  </symbol>
+  <symbol viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" id="copy">
+    <path d="M23 2.75A2.75 2.75 0 0 0 20.25 0H8.75A2.75 2.75 0 0 0 6 2.75v13.5A2.75 2.75 0 0 0 8.75 19h11.5A2.75 2.75 0 0 0 23 16.25zM18.25 14.5h-7.5a.75.75 0 0 1 0-1.5h7.5a.75.75 0 0 1 0 1.5zm0-3h-7.5a.75.75 0 0 1 0-1.5h7.5a.75.75 0 0 1 0 1.5zm0-3h-7.5a.75.75 0 0 1 0-1.5h7.5a.75.75 0 0 1 0 1.5z"></path>
+    <path d="M8.75 20.5a4.255 4.255 0 0 1-4.25-4.25V2.75c0-.086.02-.166.025-.25H3.75A2.752 2.752 0 0 0 1 5.25v16A2.752 2.752 0 0 0 3.75 24h12a2.752 2.752 0 0 0 2.75-2.75v-.75z"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512.001 512.001" id="closeme">
+    <path d="M284.286 256.002L506.143 34.144c7.811-7.811 7.811-20.475 0-28.285-7.811-7.81-20.475-7.811-28.285 0L256 227.717 34.143 5.859c-7.811-7.811-20.475-7.811-28.285 0-7.81 7.811-7.811 20.475 0 28.285l221.857 221.857L5.858 477.859c-7.811 7.811-7.811 20.475 0 28.285a19.938 19.938 0 0 0 14.143 5.857 19.94 19.94 0 0 0 14.143-5.857L256 284.287l221.857 221.857c3.905 3.905 9.024 5.857 14.143 5.857s10.237-1.952 14.143-5.857c7.811-7.811 7.811-20.475 0-28.285L284.286 256.002z"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" id="open-menu">
+    <path d="M492 236H20c-11.046 0-20 8.954-20 20s8.954 20 20 20h472c11.046 0 20-8.954 20-20s-8.954-20-20-20zm0-160H20C8.954 76 0 84.954 0 96s8.954 20 20 20h472c11.046 0 20-8.954 20-20s-8.954-20-20-20zm0 320H20c-11.046 0-20 8.954-20 20s8.954 20 20 20h472c11.046 0 20-8.954 20-20s-8.954-20-20-20z"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" id="instagram">
+    <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" id=youtube>
+    <path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" id="stackoverflow">
+    <path d="M21 27v-8h3v11H0V19h3v8h18z"></path><path d="M17.1.2L15 1.8l7.9 10.6 2.1-1.6L17.1.2zm3.7 14.7L10.6 6.4l1.7-2 10.2 8.5-1.7 2zM7.2 12.3l12 5.6 1.1-2.4-12-5.6-1.1 2.4zm-1.8 6.8l13.56 1.96.17-2.38-13.26-2.55-.47 2.97zM19 25H5v-3h14v3z"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" id="xing">
+    <path d="M18.188 0c-.517 0-.741.325-.927.66 0 0-7.455 13.224-7.702 13.657.015.024 4.919 9.023 4.919 9.023.17.308.436.66.967.66h3.454c.211 0 .375-.078.463-.22.089-.151.089-.346-.009-.536l-4.879-8.916c-.004-.006-.004-.016 0-.022L22.139.756c.095-.191.097-.387.006-.535C22.056.078 21.894 0 21.686 0h-3.498zM3.648 4.74c-.211 0-.385.074-.473.216-.09.149-.078.339.02.531l2.34 4.05c.004.01.004.016 0 .021L1.86 16.051c-.099.188-.093.381 0 .529.085.142.239.234.45.234h3.461c.518 0 .766-.348.945-.667l3.734-6.609-2.378-4.155c-.172-.315-.434-.659-.962-.659H3.648v.016z"/>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 71 55" id="discord">
+    <path d="M60.1045 4.8978C55.5792 2.8214 50.7265 1.2916 45.6527 0.41542C45.5603 0.39851 45.468 0.440769 45.4204 0.525289C44.7963 1.6353 44.105 3.0834 43.6209 4.2216C38.1637 3.4046 32.7345 3.4046 27.3892 4.2216C26.905 3.0581 26.1886 1.6353 25.5617 0.525289C25.5141 0.443589 25.4218 0.40133 25.3294 0.41542C20.2584 1.2888 15.4057 2.8186 10.8776 4.8978C10.8384 4.9147 10.8048 4.9429 10.7825 4.9795C1.57795 18.7309 -0.943561 32.1443 0.293408 45.3914C0.299005 45.4562 0.335386 45.5182 0.385761 45.5576C6.45866 50.0174 12.3413 52.7249 18.1147 54.5195C18.2071 54.5477 18.305 54.5139 18.3638 54.4378C19.7295 52.5728 20.9469 50.6063 21.9907 48.5383C22.0523 48.4172 21.9935 48.2735 21.8676 48.2256C19.9366 47.4931 18.0979 46.6 16.3292 45.5858C16.1893 45.5041 16.1781 45.304 16.3068 45.2082C16.679 44.9293 17.0513 44.6391 17.4067 44.3461C17.471 44.2926 17.5606 44.2813 17.6362 44.3151C29.2558 49.6202 41.8354 49.6202 53.3179 44.3151C53.3935 44.2785 53.4831 44.2898 53.5502 44.3433C53.9057 44.6363 54.2779 44.9293 54.6529 45.2082C54.7816 45.304 54.7732 45.5041 54.6333 45.5858C52.8646 46.6197 51.0259 47.4931 49.0921 48.2228C48.9662 48.2707 48.9102 48.4172 48.9718 48.5383C50.038 50.6034 51.2554 52.5699 52.5959 54.435C52.6519 54.5139 52.7526 54.5477 52.845 54.5195C58.6464 52.7249 64.529 50.0174 70.6019 45.5576C70.6551 45.5182 70.6887 45.459 70.6943 45.3942C72.1747 30.0791 68.2147 16.7757 60.1968 4.9823C60.1772 4.9429 60.1437 4.9147 60.1045 4.8978ZM23.7259 37.3253C20.2276 37.3253 17.3451 34.1136 17.3451 30.1693C17.3451 26.225 20.1717 23.0133 23.7259 23.0133C27.308 23.0133 30.1626 26.2532 30.1066 30.1693C30.1066 34.1136 27.28 37.3253 23.7259 37.3253ZM47.3178 37.3253C43.8196 37.3253 40.9371 34.1136 40.9371 30.1693C40.9371 26.225 43.7636 23.0133 47.3178 23.0133C50.9 23.0133 53.7545 26.2532 53.6986 30.1693C53.6986 34.1136 50.9 37.3253 47.3178 37.3253Z"/>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 17 18" id="mastodon">
+    <path
+    fill="#ffffff"
+    d="m 15.054695,9.8859583 c -0.22611,1.1632697 -2.02517,2.4363497 -4.09138,2.6830797 -1.0774504,0.12856 -2.1382704,0.24673 -3.2694704,0.19484 -1.84996,-0.0848 -3.30971,-0.44157 -3.30971,-0.44157 0,0.1801 0.0111,0.35157 0.0333,0.51194 0.24051,1.82571 1.81034,1.93508 3.29737,1.98607 1.50088,0.0514 2.8373104,-0.37004 2.8373104,-0.37004 l 0.0617,1.35686 c 0,0 -1.0498104,0.56374 -2.9199404,0.66742 -1.03124,0.0567 -2.3117,-0.0259 -3.80308,-0.42069 -3.23454998,-0.85613 -3.79081998,-4.304 -3.87592998,-7.8024197 -0.026,-1.03871 -0.01,-2.01815 -0.01,-2.83732 0,-3.57732 2.34385998,-4.62587996 2.34385998,-4.62587996 1.18184,-0.54277 3.20976,-0.77101 5.318,-0.7882499985409 h 0.0518 C 9.8267646,0.01719834 11.856025,0.24547834 13.037775,0.78824834 c 0,0 2.34377,1.04855996 2.34377,4.62587996 0,0 0.0294,2.63937 -0.32687,4.47183"/>
+ <path
+    fill="#000000"
+    d="m 12.616925,5.6916583 v 4.3315297 h -1.71607 V 5.8189683 c 0,-0.88624 -0.37289,-1.33607 -1.1187604,-1.33607 -0.82467,0 -1.23799,0.53361 -1.23799,1.58875 v 2.30122 h -1.70594 v -2.30122 c 0,-1.05514 -0.4134,-1.58875 -1.23808,-1.58875 -0.74587,0 -1.11876,0.44983 -1.11876,1.33607 v 4.2042197 h -1.71607 V 5.6916583 c 0,-0.88527 0.22541,-1.58876 0.67817,-2.10922 0.46689,-0.52047 1.07833,-0.78727 1.83735,-0.78727 0.87816,0 1.54317,0.33752 1.98288,1.01267 l 0.42744,0.71655 0.42753,-0.71655 c 0.43961,-0.67515 1.10463,-1.01267 1.9828704,-1.01267 0.75893,0 1.37037,0.2668 1.83735,0.78727 0.45268,0.52046 0.67808,1.22395 0.67808,2.10922"/>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 530" id="bluesky" >
+    <path d="m135.72 44.03c66.496 49.921 138.02 151.14 164.28 205.46 26.262-54.316 97.782-155.54 164.28-205.46 47.98-36.021 125.72-63.892 125.72 24.795 0 17.712-10.155 148.79-16.111 170.07-20.703 73.984-96.144 92.854-163.25 81.433 117.3 19.964 147.14 86.092 82.697 152.22-122.39 125.59-175.91-31.511-189.63-71.766-2.514-7.3797-3.6904-10.832-3.7077-7.8964-0.0174-2.9357-1.1937 0.51669-3.7077 7.8964-13.714 40.255-67.233 197.36-189.63 71.766-64.444-66.128-34.605-132.26 82.697-152.22-67.108 11.421-142.55-7.4491-163.25-81.433-5.9562-21.282-16.111-152.36-16.111-170.07 0-88.687 77.742-60.816 125.72-24.795z"/>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" id="ko-fi">
+    <path fill="#ffffff" d="M4.5,9.8527H32.7947a0,0,0,0,1,0,0v19.225a9.07,9.07,0,0,1-9.07,9.07H13.57a9.07,9.07,0,0,1-9.07-9.07V9.8527A0,0,0,0,1,4.5,9.8527Z"/>
+    <path fill="#000000" d="M12.197,25.9493l6.45,6.45,6.45-6.45a8.2,8.2,0,0,0,2.4016-5.798h0a4.5082,4.5082,0,0,0-4.212-4.5459,4.4262,4.4262,0,0,0-4.64,4.4209,4.4261,4.4261,0,0,0-4.64-4.4209,4.5082,4.5082,0,0,0-4.212,4.5459h0A8.2,8.2,0,0,0,12.197,25.9493Z"/>
+    <path fill="#ffffff" d="M32.7947,9.8527H35.73a7.77,7.77,0,0,1,0,15.5394H32.7947"/>
+  </svg>
+  </symbol>
+</svg>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha512-aOFyMMzZF7l7ei3vOKgQiRhZnYqk9YC/uMzl4T0j5N5D3Kul+QAFU8ssENDRMAqr/lxDOjMF69dSYJ8HYqY+WQ==" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" integrity="sha512-UPFOadao2nEorjtjl0xUTtN3w20Ja143UPEU6EyJ1mi5MB2bDtMkiWmqGDqi47xNLB5z1dy31GKJDEWhjUJFiQ==" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" integrity="sha512-YJVxTjqttjsU3cSvaTRqsSl0wbRgZUNF+NGGCgto/MUbIvaLdXQzGTCQu4CvyJZbZctgflVB0PXw9LLmTWm5/w==" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
+<footer class="footer">
+  <div class="footer_inner wrap pale">
+    <img src='https://jianlin-li.github.io/icons/apple-touch-icon.png' class="icon icon_2 transparent" alt="Copyright © 1989–2025, 李建林 ">
+    <p>Copyright&nbsp;1989-&nbsp;<span class="year"></span>&nbsp;COPYRIGHT © 1989–2025, 李建林 . All Rights Reserved</p><a class="to_top" href="#documentTop">
+  <svg class="icon">
+  <title>to-top</title>
+  <use xlink:href="#to-top"></use>
+</svg>
+
+</a>
+
+  </div>
+</footer>
+
+<script type="text/javascript" src="https://jianlin-li.github.io/zh-cn/js/bundle.e4e0e4fbe8acb50d7f973828f4138cdbea727800047fc93f9abbd6751e8f3422d6ef193f98da36fdb8488219c25692d73da89480f46abc8421a4ee3526dd6c23.js" integrity="sha512-5ODk&#43;&#43;istQ1/lzgo9BOM2&#43;pyeAAEf8k/mrvWdR6PNCLW7xk/mNo2/bhIghnCVpLXPaiUgPRqvIQhpO41Jt1sIw==" crossorigin="anonymous"></script>
+
+  <script src="https://jianlin-li.github.io/js/search.min.4c2b0421d128bbd7c43fc7d662fb5dfd8e439c60ee92c900a26d72d9c3271d2256f5bac9f6f919cddfd55101e9272898716cbb3381b4360bf43a66a5f7664f54.js"></script>
+
+  </body>
+</html>

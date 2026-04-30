@@ -7,13 +7,13 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
     <copyright>Copyright © 1989–2025, 李建林 </copyright>
-    <lastBuildDate>Wed, 28 Jan 2026 09:30:12 +0800</lastBuildDate><atom:link href="https://jianlin-li.github.io/tags/elasticsearch/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Thu, 30 Apr 2026 17:43:49 +0800</lastBuildDate><atom:link href="https://jianlin-li.github.io/tags/elasticsearch/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>Elasticsearch的知识点-3</title>
-      <link>https://jianlin-li.github.io/post/elasticsearch_review_3/</link>
-      <pubDate>Wed, 28 Jan 2026 09:30:12 +0800</pubDate>
+      <title>Elasticsearch的知识点-4</title>
+      <link>https://jianlin-li.github.io/post/elasticsearch_review_4/</link>
+      <pubDate>Thu, 30 Apr 2026 17:43:49 +0800</pubDate>
       
-      <guid>https://jianlin-li.github.io/post/elasticsearch_review_3/</guid>
+      <guid>https://jianlin-li.github.io/post/elasticsearch_review_4/</guid>
       <description>
         
           
@@ -59,6 +59,63 @@
 &lt;li&gt;
 &lt;p&gt;&lt;strong&gt;ES和数据库（MySQL）的区别？&lt;/strong&gt;&lt;/p&gt;
 &lt;p&gt;答：① 存储目的：ES 用于全文检索与快速分析，MySQL 用于结构化数据存储与事务；② 数据结构：ES 支持非结构化/半结构化数据，MySQL 强结构化；③ 查询能力：ES 支持分词、模糊查询、聚合，MySQL 适合精确查询与联表；④ 事务支持：MySQL 支持ACID事务，ES 仅支持单文档原子性，无复杂事务。&lt;/p&gt;
+          
+          
+        
+      </description>
+    </item>
+    
+    <item>
+      <title>Elasticsearch的知识点-3</title>
+      <link>https://jianlin-li.github.io/post/elasticsearch_review_3/</link>
+      <pubDate>Wed, 28 Jan 2026 09:30:12 +0800</pubDate>
+      
+      <guid>https://jianlin-li.github.io/post/elasticsearch_review_3/</guid>
+      <description>
+        
+          
+            &lt;h1 id=&#34;在-elasticsearch-中如果一个字段需要同时满足全文检索使用-text和精确匹配聚合或排序使用-keyword的需求最佳实践是使用-多字段multi-fields映射&#34;&gt;在 Elasticsearch 中，如果一个字段需要同时满足&lt;strong&gt;全文检索&lt;/strong&gt;（使用 &lt;code&gt;text&lt;/code&gt;）和&lt;strong&gt;精确匹配、聚合或排序&lt;/strong&gt;（使用 &lt;code&gt;keyword&lt;/code&gt;）的需求，最佳实践是使用 &lt;strong&gt;多字段（Multi-fields）映射&lt;/strong&gt;。&lt;/h1&gt;
+&lt;p&gt;这种配置允许你在同一个字段名下，同时拥有两种不同的索引方式。&lt;/p&gt;
+&lt;h2 id=&#34;-mapping-映射配置示例&#34;&gt;🛠️ Mapping 映射配置示例&lt;/h2&gt;
+&lt;p&gt;你可以参考以下标准的 JSON 格式来定义 Mapping：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-json&#34; data-lang=&#34;json&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt; 1&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt; 2&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;nt&#34;&gt;&amp;#34;mappings&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt; 3&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;nt&#34;&gt;&amp;#34;properties&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt; 4&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;      &lt;span class=&#34;nt&#34;&gt;&amp;#34;goods_name&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt; 5&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;        &lt;span class=&#34;nt&#34;&gt;&amp;#34;type&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;text&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;  &lt;span class=&#34;c1&#34;&gt;// 主类型：text，用于全文检索
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt; 6&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;        &lt;span class=&#34;nt&#34;&gt;&amp;#34;fields&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt; 7&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;          &lt;span class=&#34;nt&#34;&gt;&amp;#34;keyword&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt; 8&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;            &lt;span class=&#34;nt&#34;&gt;&amp;#34;type&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;keyword&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;  &lt;span class=&#34;c1&#34;&gt;// 子字段：keyword，用于精确匹配、聚合、排序
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt; 9&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;            &lt;span class=&#34;nt&#34;&gt;&amp;#34;ignore_above&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;256&lt;/span&gt;  &lt;span class=&#34;c1&#34;&gt;// 超过256字符的字符串不索引，优化性能
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt;10&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;          &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt;11&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;        &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt;12&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;      &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt;13&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt;14&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt;15&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;-如何查询与使用&#34;&gt;💡 如何查询与使用&lt;/h2&gt;
+&lt;p&gt;配置完成后，同一个字段名就可以根据不同的业务场景，通过不同的路径来调用：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;全文检索&lt;/strong&gt;：直接使用主字段名（如 &lt;code&gt;goods_name&lt;/code&gt;），配合 &lt;code&gt;match&lt;/code&gt; 等查询语句。
+&lt;ul&gt;
+&lt;li&gt;例如：&lt;code&gt;match: { &amp;quot;goods_name&amp;quot;: &amp;quot;智能手机&amp;quot; }&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;精确匹配 / 聚合 / 排序&lt;/strong&gt;：使用带后缀的子字段名（如 &lt;code&gt;goods_name.keyword&lt;/code&gt;），配合 &lt;code&gt;term&lt;/code&gt; 查询或聚合语句。
+&lt;ul&gt;
+&lt;li&gt;例如：&lt;code&gt;term: { &amp;quot;goods_name.keyword&amp;quot;: &amp;quot;华为Mate60 Pro&amp;quot; }&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;-核心参数说明&#34;&gt;⚙️ 核心参数说明&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;&lt;code&gt;type: &amp;quot;text&amp;quot;&lt;/code&gt;&lt;/strong&gt;：该字段的内容会被分词器拆分，建立倒排索引，适合模糊搜索和全文检索。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;&lt;code&gt;type: &amp;quot;keyword&amp;quot;&lt;/code&gt;&lt;/strong&gt;：该字段的内容会作为整体被索引，不会被分词，适合精确查找、过滤、聚合统计和排序。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;&lt;code&gt;ignore_above&lt;/code&gt;&lt;/strong&gt;：这是 &lt;code&gt;keyword&lt;/code&gt; 类型的一个重要参数。它限制了字符串的最大索引长度（默认通常是 256 个字符）。超过这个长度的字符串将不会被 &lt;code&gt;keyword&lt;/code&gt; 子字段索引，这样可以有效防止超长字符串占用过多内存，提升聚合和排序的性能。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h1 id=&#34;在-elasticsearch-的多字段multi-fields映射中fields-里面的子字段名只是你为了方便调用而起的一个别名或后缀虽然大家习惯将其命名为-keyword但这并不是强制的硬性规定&#34;&gt;在 Elasticsearch 的多字段（Multi-fields）映射中，&lt;code&gt;fields&lt;/code&gt; 里面的子字段名只是你为了方便调用而起的一个“别名”或“后缀”。虽然大家习惯将其命名为 &lt;code&gt;keyword&lt;/code&gt;，但这并不是强制的硬性规定。&lt;/h1&gt;
+&lt;h2 id=&#34;-自定义子字段名称示例&#34;&gt;💡 自定义子字段名称示例&lt;/h2&gt;
+&lt;p&gt;你可以根据业务语义或者个人习惯来命名。例如，你可以把 &lt;code&gt;keyword&lt;/code&gt; 子字段命名为 &lt;code&gt;raw&lt;/code&gt;（原始值）、&lt;code&gt;exact&lt;/code&gt;（精确值）或者 &lt;code&gt;agg&lt;/code&gt;（专门用于聚合）：&lt;/p&gt;
           
           
         
