@@ -113,6 +113,7 @@
 &lt;li&gt;&lt;strong&gt;&lt;code&gt;type: &amp;quot;keyword&amp;quot;&lt;/code&gt;&lt;/strong&gt;：该字段的内容会作为整体被索引，不会被分词，适合精确查找、过滤、聚合统计和排序。&lt;/li&gt;
 &lt;li&gt;&lt;strong&gt;&lt;code&gt;ignore_above&lt;/code&gt;&lt;/strong&gt;：这是 &lt;code&gt;keyword&lt;/code&gt; 类型的一个重要参数。它限制了字符串的最大索引长度（默认通常是 256 个字符）。超过这个长度的字符串将不会被 &lt;code&gt;keyword&lt;/code&gt; 子字段索引，这样可以有效防止超长字符串占用过多内存，提升聚合和排序的性能。&lt;/li&gt;
 &lt;/ul&gt;
+&lt;hr&gt;
 &lt;h1 id=&#34;在-elasticsearch-的多字段multi-fields映射中fields-里面的子字段名只是你为了方便调用而起的一个别名或后缀虽然大家习惯将其命名为-keyword但这并不是强制的硬性规定&#34;&gt;在 Elasticsearch 的多字段（Multi-fields）映射中，&lt;code&gt;fields&lt;/code&gt; 里面的子字段名只是你为了方便调用而起的一个“别名”或“后缀”。虽然大家习惯将其命名为 &lt;code&gt;keyword&lt;/code&gt;，但这并不是强制的硬性规定。&lt;/h1&gt;
 &lt;h2 id=&#34;-自定义子字段名称示例&#34;&gt;💡 自定义子字段名称示例&lt;/h2&gt;
 &lt;p&gt;你可以根据业务语义或者个人习惯来命名。例如，你可以把 &lt;code&gt;keyword&lt;/code&gt; 子字段命名为 &lt;code&gt;raw&lt;/code&gt;（原始值）、&lt;code&gt;exact&lt;/code&gt;（精确值）或者 &lt;code&gt;agg&lt;/code&gt;（专门用于聚合）：&lt;/p&gt;
