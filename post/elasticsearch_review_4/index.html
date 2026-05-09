@@ -168,7 +168,7 @@
     <span class="post_date">
       2026-02-02	  
     </span>
-    <span class="post_time"> · 12 分钟阅读</span><span>&nbsp;· <a href='https://jianlin-li.github.io/tags/elasticsearch/' title="Elasticsearch" class="post_tag button button_translucent">Elasticsearch
+    <span class="post_time"> · 13 分钟阅读</span><span>&nbsp;· <a href='https://jianlin-li.github.io/tags/elasticsearch/' title="Elasticsearch" class="post_tag button button_translucent">Elasticsearch
         </a>
     </span>
     <span class="page_only">&nbsp;·
@@ -339,6 +339,30 @@
 </span></span><span class="line"><span class="ln">29</span><span class="cl">
 </span></span><span class="line"><span class="ln">30</span><span class="cl"><span class="nv">$client</span><span class="o">-&gt;</span><span class="na">indices</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">create</span><span class="p">(</span><span class="nv">$params</span><span class="p">);</span>
 </span></span></code></pre></div><hr>
+<h3 id="21-新增单条数据">2.1 新增单条数据</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="nv">$client</span><span class="o">-&gt;</span><span class="na">create</span><span class="p">(</span><span class="k">array</span> <span class="p">(</span>
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl">  <span class="s1">&#39;index&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;student&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl">  <span class="s1">&#39;id&#39;</span> <span class="o">=&gt;</span> <span class="mi">10001</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl">  <span class="s1">&#39;body&#39;</span> <span class="o">=&gt;</span> 
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl">  <span class="k">array</span> <span class="p">(</span>
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">    <span class="s1">&#39;id&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;10001&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl">    <span class="s1">&#39;name&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;学生10001&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl">    <span class="s1">&#39;gender&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;female&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">    <span class="s1">&#39;age&#39;</span> <span class="o">=&gt;</span> <span class="mi">190</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">10</span><span class="cl">    <span class="s1">&#39;class&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;class_10001&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">11</span><span class="cl">    <span class="s1">&#39;score&#39;</span> <span class="o">=&gt;</span> <span class="mf">61.1</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">12</span><span class="cl">    <span class="s1">&#39;province&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;省份_10001&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">13</span><span class="cl">    <span class="s1">&#39;enroll_date&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;2021-09-01&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">14</span><span class="cl">    <span class="s1">&#39;tags&#39;</span> <span class="o">=&gt;</span> 
+</span></span><span class="line"><span class="ln">15</span><span class="cl">    <span class="k">array</span> <span class="p">(</span>
+</span></span><span class="line"><span class="ln">16</span><span class="cl">      <span class="mi">0</span> <span class="o">=&gt;</span> <span class="s1">&#39;tag_10001&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">17</span><span class="cl">      <span class="mi">1</span> <span class="o">=&gt;</span> <span class="s1">&#39;tag_10002&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">18</span><span class="cl">    <span class="p">),</span>
+</span></span><span class="line"><span class="ln">19</span><span class="cl">    <span class="s1">&#39;create_time&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;2026-01-01T10:00:00&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">20</span><span class="cl">  <span class="p">),</span>
+</span></span><span class="line"><span class="ln">21</span><span class="cl">  <span class="s1">&#39;pretty&#39;</span> <span class="o">=&gt;</span> <span class="k">true</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">22</span><span class="cl"><span class="p">));</span>
+</span></span></code></pre></div><hr>
 <h3 id="3-查询单条数据id">3️⃣ 查询单条数据（ID）</h3>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln">1</span><span class="cl"><span class="nv">$response</span> <span class="o">=</span> <span class="nv">$client</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">([</span>
 </span></span><span class="line"><span class="ln">2</span><span class="cl">    <span class="s1">&#39;index&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;student&#39;</span><span class="p">,</span>
@@ -409,25 +433,71 @@
 </span></span><span class="line"><span class="ln">20</span><span class="cl"><span class="nv">$result</span> <span class="o">=</span> <span class="nv">$client</span><span class="o">-&gt;</span><span class="na">search</span><span class="p">(</span><span class="nv">$params</span><span class="p">);</span>
 </span></span></code></pre></div><hr>
 <h3 id="7-更新文档">7️⃣ 更新文档</h3>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln">1</span><span class="cl"><span class="nv">$client</span><span class="o">-&gt;</span><span class="na">update</span><span class="p">([</span>
-</span></span><span class="line"><span class="ln">2</span><span class="cl">    <span class="s1">&#39;index&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;student&#39;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">3</span><span class="cl">    <span class="s1">&#39;id&#39;</span>    <span class="o">=&gt;</span> <span class="mi">100</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">4</span><span class="cl">    <span class="s1">&#39;body&#39;</span>  <span class="o">=&gt;</span> <span class="p">[</span>
-</span></span><span class="line"><span class="ln">5</span><span class="cl">        <span class="s1">&#39;doc&#39;</span> <span class="o">=&gt;</span> <span class="p">[</span>
-</span></span><span class="line"><span class="ln">6</span><span class="cl">            <span class="s1">&#39;score&#39;</span> <span class="o">=&gt;</span> <span class="mf">95.5</span>
-</span></span><span class="line"><span class="ln">7</span><span class="cl">        <span class="p">]</span>
-</span></span><span class="line"><span class="ln">8</span><span class="cl">    <span class="p">]</span>
-</span></span><span class="line"><span class="ln">9</span><span class="cl"><span class="p">]);</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="nv">$client</span><span class="o">-&gt;</span><span class="na">update</span><span class="p">([</span>
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl">    <span class="s1">&#39;index&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;student&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl">    <span class="s1">&#39;id&#39;</span>    <span class="o">=&gt;</span> <span class="mi">100</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl">    <span class="s1">&#39;body&#39;</span>  <span class="o">=&gt;</span> <span class="p">[</span>
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl">        <span class="s1">&#39;doc&#39;</span> <span class="o">=&gt;</span> <span class="p">[</span>
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">            <span class="s1">&#39;score&#39;</span> <span class="o">=&gt;</span> <span class="mf">95.5</span>
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl">        <span class="p">]</span>
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl">    <span class="p">]</span>
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl"><span class="p">]);</span>
+</span></span><span class="line"><span class="ln">10</span><span class="cl">
+</span></span><span class="line"><span class="ln">11</span><span class="cl">
+</span></span><span class="line"><span class="ln">12</span><span class="cl"><span class="c1">//更新文档-用脚本批量更新
+</span></span></span><span class="line"><span class="ln">13</span><span class="cl"><span class="c1"></span><span class="nv">$client</span><span class="o">-&gt;</span><span class="na">updateByQuery</span><span class="p">(</span><span class="k">array</span> <span class="p">(</span>
+</span></span><span class="line"><span class="ln">14</span><span class="cl">  <span class="s1">&#39;index&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;student&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">15</span><span class="cl">  <span class="s1">&#39;body&#39;</span> <span class="o">=&gt;</span> 
+</span></span><span class="line"><span class="ln">16</span><span class="cl">  <span class="k">array</span> <span class="p">(</span>
+</span></span><span class="line"><span class="ln">17</span><span class="cl">    <span class="s1">&#39;query&#39;</span> <span class="o">=&gt;</span> 
+</span></span><span class="line"><span class="ln">18</span><span class="cl">    <span class="k">array</span> <span class="p">(</span>
+</span></span><span class="line"><span class="ln">19</span><span class="cl">      <span class="s1">&#39;term&#39;</span> <span class="o">=&gt;</span> 
+</span></span><span class="line"><span class="ln">20</span><span class="cl">      <span class="k">array</span> <span class="p">(</span>
+</span></span><span class="line"><span class="ln">21</span><span class="cl">        <span class="s1">&#39;id&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;10003&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">22</span><span class="cl">      <span class="p">),</span>
+</span></span><span class="line"><span class="ln">23</span><span class="cl">    <span class="p">),</span>
+</span></span><span class="line"><span class="ln">24</span><span class="cl">    <span class="s1">&#39;script&#39;</span> <span class="o">=&gt;</span> 
+</span></span><span class="line"><span class="ln">25</span><span class="cl">    <span class="k">array</span> <span class="p">(</span>
+</span></span><span class="line"><span class="ln">26</span><span class="cl">      <span class="s1">&#39;source&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;ctx._source.score=params.new_score;ctx._source.id=params.id;ctx._source.age=params.new_age;ctx._source.name=params.new_name&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">27</span><span class="cl">      <span class="s1">&#39;params&#39;</span> <span class="o">=&gt;</span> 
+</span></span><span class="line"><span class="ln">28</span><span class="cl">      <span class="k">array</span> <span class="p">(</span>
+</span></span><span class="line"><span class="ln">29</span><span class="cl">        <span class="s1">&#39;new_score&#39;</span> <span class="o">=&gt;</span> <span class="mi">10003</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">30</span><span class="cl">        <span class="s1">&#39;id&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;10003&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">31</span><span class="cl">        <span class="s1">&#39;new_age&#39;</span> <span class="o">=&gt;</span> <span class="mi">99</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">32</span><span class="cl">        <span class="s1">&#39;new_name&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;学生10003&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">33</span><span class="cl">      <span class="p">),</span>
+</span></span><span class="line"><span class="ln">34</span><span class="cl">    <span class="p">),</span>
+</span></span><span class="line"><span class="ln">35</span><span class="cl">  <span class="p">),</span>
+</span></span><span class="line"><span class="ln">36</span><span class="cl">  <span class="s1">&#39;pretty&#39;</span> <span class="o">=&gt;</span> <span class="k">true</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">37</span><span class="cl"><span class="p">));</span>
 </span></span></code></pre></div><hr>
 <h3 id="8-删除文档--删除索引">8️⃣ 删除文档 / 删除索引</h3>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln">1</span><span class="cl"><span class="c1">// 删除文档
-</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="c1"></span><span class="nv">$client</span><span class="o">-&gt;</span><span class="na">delete</span><span class="p">([</span>
-</span></span><span class="line"><span class="ln">3</span><span class="cl">    <span class="s1">&#39;index&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;student&#39;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">4</span><span class="cl">    <span class="s1">&#39;id&#39;</span>    <span class="o">=&gt;</span> <span class="mi">100</span>
-</span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="p">]);</span>
-</span></span><span class="line"><span class="ln">6</span><span class="cl">
-</span></span><span class="line"><span class="ln">7</span><span class="cl"><span class="c1">// 删除索引
-</span></span></span><span class="line"><span class="ln">8</span><span class="cl"><span class="c1"></span><span class="nv">$client</span><span class="o">-&gt;</span><span class="na">indices</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">delete</span><span class="p">([</span><span class="s1">&#39;index&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;student&#39;</span><span class="p">]);</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="c1">// 删除文档
+</span></span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="c1"></span><span class="nv">$client</span><span class="o">-&gt;</span><span class="na">delete</span><span class="p">([</span>
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl">    <span class="s1">&#39;index&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;student&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl">    <span class="s1">&#39;id&#39;</span>    <span class="o">=&gt;</span> <span class="mi">100</span>
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="p">]);</span>
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="c1">//根据搜索条件删除文档
+</span></span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="c1"></span><span class="nv">$client</span><span class="o">-&gt;</span><span class="na">deleteByQuery</span><span class="p">(</span><span class="k">array</span> <span class="p">(</span>
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">  <span class="s1">&#39;index&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;student&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">10</span><span class="cl">  <span class="s1">&#39;body&#39;</span> <span class="o">=&gt;</span> 
+</span></span><span class="line"><span class="ln">11</span><span class="cl">  <span class="k">array</span> <span class="p">(</span>
+</span></span><span class="line"><span class="ln">12</span><span class="cl">    <span class="s1">&#39;query&#39;</span> <span class="o">=&gt;</span> 
+</span></span><span class="line"><span class="ln">13</span><span class="cl">    <span class="k">array</span> <span class="p">(</span>
+</span></span><span class="line"><span class="ln">14</span><span class="cl">      <span class="s1">&#39;term&#39;</span> <span class="o">=&gt;</span> 
+</span></span><span class="line"><span class="ln">15</span><span class="cl">      <span class="k">array</span> <span class="p">(</span>
+</span></span><span class="line"><span class="ln">16</span><span class="cl">        <span class="s1">&#39;id&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;20000&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">17</span><span class="cl">      <span class="p">),</span>
+</span></span><span class="line"><span class="ln">18</span><span class="cl">    <span class="p">),</span>
+</span></span><span class="line"><span class="ln">19</span><span class="cl">  <span class="p">),</span>
+</span></span><span class="line"><span class="ln">20</span><span class="cl">  <span class="s1">&#39;pretty&#39;</span> <span class="o">=&gt;</span> <span class="k">true</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">21</span><span class="cl"><span class="p">));</span>
+</span></span><span class="line"><span class="ln">22</span><span class="cl">
+</span></span><span class="line"><span class="ln">23</span><span class="cl">
+</span></span><span class="line"><span class="ln">24</span><span class="cl">
+</span></span><span class="line"><span class="ln">25</span><span class="cl"><span class="c1">// 删除索引
+</span></span></span><span class="line"><span class="ln">26</span><span class="cl"><span class="c1"></span><span class="nv">$client</span><span class="o">-&gt;</span><span class="na">indices</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">delete</span><span class="p">([</span><span class="s1">&#39;index&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;student&#39;</span><span class="p">]);</span>
 </span></span></code></pre></div><hr>
 <h2 id="四match--term--range--bool-对比练习核心">四、match / term / range / bool 对比练习（🔥核心）</h2>
 <blockquote>
