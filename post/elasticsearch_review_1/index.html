@@ -168,7 +168,7 @@
     <span class="post_date">
       2026-01-22	  
     </span>
-    <span class="post_time"> · 3 分钟阅读</span><span>&nbsp;· <a href='https://jianlin-li.github.io/tags/elasticsearch/' title="Elasticsearch" class="post_tag button button_translucent">Elasticsearch
+    <span class="post_time"> · 4 分钟阅读</span><span>&nbsp;· <a href='https://jianlin-li.github.io/tags/elasticsearch/' title="Elasticsearch" class="post_tag button button_translucent">Elasticsearch
         </a>
     </span>
     <span class="page_only">&nbsp;·
@@ -513,6 +513,165 @@
 </span></span><span class="line"><span class="ln">10</span><span class="cl">  <span class="p">}</span>
 </span></span><span class="line"><span class="ln">11</span><span class="cl"><span class="p">}</span>
 </span></span></code></pre></div><hr>
+<h1 id="elasticsearch中字段与数组类型的关系">Elasticsearch中字段与数组类型的关系</h1>
+<p>即使 <code>tags</code> 定义为 <code>keyword</code>：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="ln">1</span><span class="cl"><span class="s2">&#34;tags&#34;</span><span class="err">:</span> <span class="p">{</span> <span class="nt">&#34;type&#34;</span><span class="p">:</span> <span class="s2">&#34;keyword&#34;</span> <span class="p">}</span>
+</span></span></code></pre></div><p>👉 你仍然可以直接存数组：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="ln">1</span><span class="cl"><span class="s2">&#34;tags&#34;</span><span class="err">:</span> <span class="p">[</span><span class="s2">&#34;tag1&#34;</span><span class="p">,</span> <span class="s2">&#34;tag2&#34;</span><span class="p">]</span>
+</span></span></code></pre></div><p>因为在 Elasticsearch 中：</p>
+<blockquote>
+<p><strong>keyword 类型本质上支持“多值字段（multi-value field）”</strong></p>
+</blockquote>
+<hr>
+<h1 id="-一es-为什么允许-keyword-存数组">🚀 一、ES 为什么允许 keyword 存数组？</h1>
+<h2 id="-关键点es-字段本质是多值结构">📌 关键点：ES 字段本质是“多值结构”</h2>
+<p>在 ES 中，一个字段不是“单值变量”，而是：</p>
+<blockquote>
+<p>👉 <strong>一个字段 = 一个 value list（值集合）</strong></p>
+</blockquote>
+<hr>
+<h2 id="-举个例子">📦 举个例子</h2>
+<h3 id="你写">你写：</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="ln">1</span><span class="cl"><span class="s2">&#34;tags&#34;</span><span class="err">:</span> <span class="p">[</span><span class="s2">&#34;java&#34;</span><span class="p">,</span> <span class="s2">&#34;elasticsearch&#34;</span><span class="p">,</span> <span class="s2">&#34;backend&#34;</span><span class="p">]</span>
+</span></span></code></pre></div><h3 id="es-实际存储是">ES 实际存储是：</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="ln">1</span><span class="cl">tags = {
+</span></span><span class="line"><span class="ln">2</span><span class="cl">  &#34;java&#34;,
+</span></span><span class="line"><span class="ln">3</span><span class="cl">  &#34;elasticsearch&#34;,
+</span></span><span class="line"><span class="ln">4</span><span class="cl">  &#34;backend&#34;
+</span></span><span class="line"><span class="ln">5</span><span class="cl">}
+</span></span></code></pre></div><p>👉 它不是数组概念，而是 <strong>多值字段</strong></p>
+<hr>
+<h1 id="-二keyword-的真实含义">🔍 二、keyword 的真实含义</h1>
+<p><code>keyword</code> 的定义是：</p>
+<blockquote>
+<p>📌 <strong>不分词 + 精确索引 + 可用于聚合/排序</strong></p>
+</blockquote>
+<p>但它没有规定：</p>
+<p>❌ 必须是单值
+✔ 可以是多值</p>
+<hr>
+<h1 id="-三底层索引机制重点">⚙️ 三、底层索引机制（重点）</h1>
+<p>ES 底层会把数组拆成多个倒排索引项：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="ln">1</span><span class="cl"><span class="s2">&#34;tags&#34;</span><span class="err">:</span> <span class="p">[</span><span class="s2">&#34;A&#34;</span><span class="p">,</span> <span class="s2">&#34;B&#34;</span><span class="p">,</span> <span class="s2">&#34;C&#34;</span><span class="p">]</span>
+</span></span></code></pre></div><p>会被索引成：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="ln">1</span><span class="cl">A → doc1
+</span></span><span class="line"><span class="ln">2</span><span class="cl">B → doc1
+</span></span><span class="line"><span class="ln">3</span><span class="cl">C → doc1
+</span></span></code></pre></div><p>👉 所以查询时：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="ln">1</span><span class="cl"><span class="err">term:</span> <span class="p">{</span> <span class="err">tags:</span> <span class="nt">&#34;A&#34;</span> <span class="p">}</span>
+</span></span></code></pre></div><p>一样能命中</p>
+<hr>
+<h1 id="-四对比理解非常重要">📌 四、对比理解（非常重要）</h1>
+<table>
+  <thead>
+      <tr>
+          <th>类型</th>
+          <th>是否可数组</th>
+          <th>是否分词</th>
+          <th>用途</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>text</td>
+          <td>✔</td>
+          <td>✔</td>
+          <td>模糊搜索</td>
+      </tr>
+      <tr>
+          <td>keyword</td>
+          <td>✔</td>
+          <td>❌</td>
+          <td>精确匹配</td>
+      </tr>
+      <tr>
+          <td>integer</td>
+          <td>✔</td>
+          <td>❌</td>
+          <td>数值</td>
+      </tr>
+      <tr>
+          <td>object</td>
+          <td>✔</td>
+          <td>❌</td>
+          <td>结构</td>
+      </tr>
+  </tbody>
+</table>
+<hr>
+<h1 id="-五容易误解的点重点">⚠️ 五、容易误解的点（重点）</h1>
+<h2 id="-误区1keyword--单值字段">❌ 误区1：keyword = 单值字段</h2>
+<p>错！</p>
+<p>👉 keyword 只是“不可分词字符串”，不是单值限制</p>
+<hr>
+<h2 id="-误区2数组是特殊类型">❌ 误区2：数组是特殊类型</h2>
+<p>错！</p>
+<p>👉 ES 没有 array 类型</p>
+<p>数组 = 普通字段 + 多值</p>
+<hr>
+<h2 id="-误区3mapping-要声明-array">❌ 误区3：mapping 要声明 array</h2>
+<p>错！</p>
+<p>ES 不需要：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="ln">1</span><span class="cl"><span class="s2">&#34;type&#34;</span><span class="err">:</span> <span class="s2">&#34;array&#34;</span> <span class="err">❌（不存在）</span>
+</span></span></code></pre></div><hr>
+<h1 id="-六验证例子你可以直接试">🧪 六、验证例子（你可以直接试）</h1>
+<h2 id="建索引">建索引</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-http" data-lang="http"><span class="line"><span class="ln">1</span><span class="cl"><span class="err">PUT students
+</span></span></span></code></pre></div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="ln">1</span><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl">  <span class="nt">&#34;mappings&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">3</span><span class="cl">    <span class="nt">&#34;properties&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">4</span><span class="cl">      <span class="nt">&#34;tags&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">5</span><span class="cl">        <span class="nt">&#34;type&#34;</span><span class="p">:</span> <span class="s2">&#34;keyword&#34;</span>
+</span></span><span class="line"><span class="ln">6</span><span class="cl">      <span class="p">}</span>
+</span></span><span class="line"><span class="ln">7</span><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="ln">8</span><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="ln">9</span><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><hr>
+<h2 id="写入数组">写入数组</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-http" data-lang="http"><span class="line"><span class="ln">1</span><span class="cl"><span class="err">POST students/_doc/1
+</span></span></span></code></pre></div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="ln">1</span><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl">  <span class="nt">&#34;tags&#34;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&#34;php&#34;</span><span class="p">,</span> <span class="s2">&#34;elasticsearch&#34;</span><span class="p">,</span> <span class="s2">&#34;backend&#34;</span><span class="p">]</span>
+</span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><hr>
+<h2 id="查询单个-tag">查询单个 tag</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="ln">1</span><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl">  <span class="nt">&#34;query&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">3</span><span class="cl">    <span class="nt">&#34;term&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">4</span><span class="cl">      <span class="nt">&#34;tags&#34;</span><span class="p">:</span> <span class="s2">&#34;php&#34;</span>
+</span></span><span class="line"><span class="ln">5</span><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="ln">6</span><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="ln">7</span><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>👉 会命中 ✔</p>
+<hr>
+<h1 id="-七什么时候要特别注意">💡 七、什么时候要特别注意？</h1>
+<p>虽然 keyword 支持数组，但有 2 个坑：</p>
+<hr>
+<h2 id="-1-聚合aggregation">⚠️ 1. 聚合（aggregation）</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="ln">1</span><span class="cl"><span class="s2">&#34;aggs&#34;</span><span class="err">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl">  <span class="nt">&#34;tags&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">3</span><span class="cl">    <span class="nt">&#34;terms&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">4</span><span class="cl">      <span class="nt">&#34;field&#34;</span><span class="p">:</span> <span class="s2">&#34;tags&#34;</span>
+</span></span><span class="line"><span class="ln">5</span><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="ln">6</span><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="ln">7</span><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>👉 会自动展开数组统计 ✔</p>
+<hr>
+<h2 id="-2-nested-才是对象数组的正确方式">⚠️ 2. nested 才是“对象数组的正确方式”</h2>
+<p>如果是这种：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="ln">1</span><span class="cl"><span class="s2">&#34;comments&#34;</span><span class="err">:</span> <span class="p">[</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl">  <span class="p">{</span> <span class="nt">&#34;user&#34;</span><span class="p">:</span> <span class="s2">&#34;A&#34;</span><span class="p">,</span> <span class="nt">&#34;score&#34;</span><span class="p">:</span> <span class="mi">5</span> <span class="p">},</span>
+</span></span><span class="line"><span class="ln">3</span><span class="cl">  <span class="p">{</span> <span class="nt">&#34;user&#34;</span><span class="p">:</span> <span class="s2">&#34;B&#34;</span><span class="p">,</span> <span class="nt">&#34;score&#34;</span><span class="p">:</span> <span class="mi">3</span> <span class="p">}</span>
+</span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="p">]</span>
+</span></span></code></pre></div><p>👉 必须用：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="ln">1</span><span class="cl"><span class="s2">&#34;type&#34;</span><span class="err">:</span> <span class="s2">&#34;nested&#34;</span>
+</span></span></code></pre></div><p>否则查询会错位</p>
+<hr>
+<h1 id="-八一句话总结">🎯 八、一句话总结</h1>
+<p>👉 <code>keyword</code> 能存数组的原因：</p>
+<blockquote>
+<p>Elasticsearch 字段本身就是“多值结构”，数组只是 JSON 表达方式，不是类型限制。</p>
+</blockquote>
+<hr>
 
     </div><div class="post_comments">
   
