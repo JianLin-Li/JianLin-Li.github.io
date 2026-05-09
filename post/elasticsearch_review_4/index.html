@@ -746,260 +746,303 @@
 </span></span><span class="line"><span class="ln">22</span><span class="cl">
 </span></span><span class="line"><span class="ln">23</span><span class="cl"><span class="nv">$result</span> <span class="o">=</span> <span class="nv">$client</span><span class="o">-&gt;</span><span class="na">search</span><span class="p">(</span><span class="nv">$params</span><span class="p">);</span>
 </span></span></code></pre></div><hr>
-<h1 id="下面是一份真正能在生产里用的-不是-demo-拼参数而是">下面是一份<strong>真正能在生产里用的 <code>StudentSearchService</code></strong>，不是 demo 拼参数，而是：</h1>
-<p>✔ 统一入口
-✔ 参数安全（防止乱传）
-✔ 查询可组合
-✔ 好扩展、好维护
-✔ ES DSL 不泄露到 Controller</p>
-<p>你可以直接 copy 进 PHP 项目里用。</p>
+<h1 id="下面是一套企业级-elasticsearch-php-封装版-studentsearchservice结构会尽量接近真实公司项目可维护--可扩展--可测试">下面是一套<strong>企业级 Elasticsearch PHP 封装版 StudentSearchService</strong>，结构会尽量接近真实公司项目（可维护 + 可扩展 + 可测试）。</h1>
 <hr>
-<h2 id="一设计目标你一看就懂为什么这么拆">一、设计目标（你一看就懂为什么这么拆）</h2>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">Controller
-</span></span><span class="line"><span class="ln">2</span><span class="cl">   ↓
-</span></span><span class="line"><span class="ln">3</span><span class="cl">StudentSearchService   ←—— 只关心“业务语义”
-</span></span><span class="line"><span class="ln">4</span><span class="cl">   ↓
-</span></span><span class="line"><span class="ln">5</span><span class="cl">Elasticsearch Client   ←—— 只关心 ES
-</span></span></code></pre></div><p><strong>Controller 只传业务参数</strong>，比如：</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln">1</span><span class="cl"><span class="nv">$service</span><span class="o">-&gt;</span><span class="na">search</span><span class="p">([</span>
-</span></span><span class="line"><span class="ln">2</span><span class="cl">    <span class="s1">&#39;keyword&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;学生&#39;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">3</span><span class="cl">    <span class="s1">&#39;gender&#39;</span>  <span class="o">=&gt;</span> <span class="s1">&#39;female&#39;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">4</span><span class="cl">    <span class="s1">&#39;class&#39;</span>   <span class="o">=&gt;</span> <span class="s1">&#39;class_3&#39;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">5</span><span class="cl">    <span class="s1">&#39;score_min&#39;</span> <span class="o">=&gt;</span> <span class="mi">80</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">6</span><span class="cl">    <span class="s1">&#39;sort&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;score_desc&#39;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">7</span><span class="cl">    <span class="s1">&#39;page&#39;</span> <span class="o">=&gt;</span> <span class="mi">1</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">8</span><span class="cl">    <span class="s1">&#39;page_size&#39;</span> <span class="o">=&gt;</span> <span class="mi">10</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">9</span><span class="cl"><span class="p">]);</span>
+<h1 id="-一整体设计目标">🚀 一、整体设计目标</h1>
+<p>我们这个服务会具备：</p>
+<h3 id="-功能完整">✅ 功能完整</h3>
+<ul>
+<li>单条/批量新增（index / bulk）</li>
+<li>查询（match / term / range / bool）</li>
+<li>分页 + 排序</li>
+<li>更新（update / update_by_query）</li>
+<li>删除（delete / delete_by_query）</li>
+<li>高级查询（组合查询）</li>
+</ul>
+<h3 id="-工程化能力">✅ 工程化能力</h3>
+<ul>
+<li>统一 ES Client 封装</li>
+<li>请求参数结构化</li>
+<li>可扩展 Query Builder</li>
+<li>错误处理</li>
+<li>日志友好结构</li>
+</ul>
+<hr>
+<h1 id="-二项目结构推荐">📦 二、项目结构（推荐）</h1>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="ln">1</span><span class="cl">app/
+</span></span><span class="line"><span class="ln">2</span><span class="cl"> └── Service/
+</span></span><span class="line"><span class="ln">3</span><span class="cl">      └── Elasticsearch/
+</span></span><span class="line"><span class="ln">4</span><span class="cl">            ├── EsClient.php
+</span></span><span class="line"><span class="ln">5</span><span class="cl">            ├── StudentSearchService.php
+</span></span><span class="line"><span class="ln">6</span><span class="cl">            ├── QueryBuilder.php
+</span></span><span class="line"><span class="ln">7</span><span class="cl">            └── EsResponse.php
 </span></span></code></pre></div><hr>
-<h2 id="二studentsearchservice完整版">二、StudentSearchService（完整版）</h2>
-<p>📁 <code>app/Service/StudentSearchService.php</code></p>
+<h1 id="-三es-client-封装核心">⚙️ 三、ES Client 封装（核心）</h1>
+<h2 id="-esclientphp">📌 EsClient.php</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="o">&lt;?</span><span class="nx">php</span>
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="k">namespace</span> <span class="nx">App\Service\Elasticsearch</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="k">use</span> <span class="nx">Elasticsearch\ClientBuilder</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="k">class</span> <span class="nc">EsClient</span>
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">    <span class="k">private</span> <span class="k">static</span> <span class="nv">$client</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln">10</span><span class="cl">
+</span></span><span class="line"><span class="ln">11</span><span class="cl">    <span class="k">public</span> <span class="k">static</span> <span class="k">function</span> <span class="nf">getClient</span><span class="p">()</span>
+</span></span><span class="line"><span class="ln">12</span><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="ln">13</span><span class="cl">        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">self</span><span class="o">::</span><span class="nv">$client</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">14</span><span class="cl">            <span class="nx">self</span><span class="o">::</span><span class="nv">$client</span> <span class="o">=</span> <span class="nx">ClientBuilder</span><span class="o">::</span><span class="na">create</span><span class="p">()</span>
+</span></span><span class="line"><span class="ln">15</span><span class="cl">                <span class="o">-&gt;</span><span class="na">setHosts</span><span class="p">([</span><span class="s1">&#39;http://local.elasticsearch-docker.com:9200&#39;</span><span class="p">])</span>
+</span></span><span class="line"><span class="ln">16</span><span class="cl">                <span class="o">-&gt;</span><span class="na">build</span><span class="p">();</span>
+</span></span><span class="line"><span class="ln">17</span><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="ln">18</span><span class="cl">        <span class="k">return</span> <span class="nx">self</span><span class="o">::</span><span class="nv">$client</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln">19</span><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="ln">20</span><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><hr>
+<h1 id="-四查询构造器企业级关键">🧠 四、查询构造器（企业级关键🔥）</h1>
+<h2 id="-querybuilderphp">📌 QueryBuilder.php</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="o">&lt;?</span><span class="nx">php</span>
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="k">namespace</span> <span class="nx">App\Service\Elasticsearch</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="k">class</span> <span class="nc">QueryBuilder</span>
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl">    <span class="k">private</span> <span class="k">array</span> <span class="nv">$must</span> <span class="o">=</span> <span class="p">[];</span>
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl">    <span class="k">private</span> <span class="k">array</span> <span class="nv">$filter</span> <span class="o">=</span> <span class="p">[];</span>
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">    <span class="k">private</span> <span class="k">array</span> <span class="nv">$should</span> <span class="o">=</span> <span class="p">[];</span>
+</span></span><span class="line"><span class="ln">10</span><span class="cl">
+</span></span><span class="line"><span class="ln">11</span><span class="cl">    <span class="k">public</span> <span class="k">function</span> <span class="nf">match</span><span class="p">(</span><span class="nx">string</span> <span class="nv">$field</span><span class="p">,</span> <span class="nv">$value</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln">12</span><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="ln">13</span><span class="cl">        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">must</span><span class="p">[]</span> <span class="o">=</span> <span class="p">[</span>
+</span></span><span class="line"><span class="ln">14</span><span class="cl">            <span class="s1">&#39;match&#39;</span> <span class="o">=&gt;</span> <span class="p">[</span><span class="nv">$field</span> <span class="o">=&gt;</span> <span class="nv">$value</span><span class="p">]</span>
+</span></span><span class="line"><span class="ln">15</span><span class="cl">        <span class="p">];</span>
+</span></span><span class="line"><span class="ln">16</span><span class="cl">        <span class="k">return</span> <span class="nv">$this</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln">17</span><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="ln">18</span><span class="cl">
+</span></span><span class="line"><span class="ln">19</span><span class="cl">    <span class="k">public</span> <span class="k">function</span> <span class="nf">term</span><span class="p">(</span><span class="nx">string</span> <span class="nv">$field</span><span class="p">,</span> <span class="nv">$value</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln">20</span><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="ln">21</span><span class="cl">        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">filter</span><span class="p">[]</span> <span class="o">=</span> <span class="p">[</span>
+</span></span><span class="line"><span class="ln">22</span><span class="cl">            <span class="s1">&#39;term&#39;</span> <span class="o">=&gt;</span> <span class="p">[</span><span class="nv">$field</span> <span class="o">=&gt;</span> <span class="nv">$value</span><span class="p">]</span>
+</span></span><span class="line"><span class="ln">23</span><span class="cl">        <span class="p">];</span>
+</span></span><span class="line"><span class="ln">24</span><span class="cl">        <span class="k">return</span> <span class="nv">$this</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln">25</span><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="ln">26</span><span class="cl">
+</span></span><span class="line"><span class="ln">27</span><span class="cl">    <span class="k">public</span> <span class="k">function</span> <span class="nf">range</span><span class="p">(</span><span class="nx">string</span> <span class="nv">$field</span><span class="p">,</span> <span class="k">array</span> <span class="nv">$range</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln">28</span><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="ln">29</span><span class="cl">        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">filter</span><span class="p">[]</span> <span class="o">=</span> <span class="p">[</span>
+</span></span><span class="line"><span class="ln">30</span><span class="cl">            <span class="s1">&#39;range&#39;</span> <span class="o">=&gt;</span> <span class="p">[</span>
+</span></span><span class="line"><span class="ln">31</span><span class="cl">                <span class="nv">$field</span> <span class="o">=&gt;</span> <span class="nv">$range</span>
+</span></span><span class="line"><span class="ln">32</span><span class="cl">            <span class="p">]</span>
+</span></span><span class="line"><span class="ln">33</span><span class="cl">        <span class="p">];</span>
+</span></span><span class="line"><span class="ln">34</span><span class="cl">        <span class="k">return</span> <span class="nv">$this</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln">35</span><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="ln">36</span><span class="cl">
+</span></span><span class="line"><span class="ln">37</span><span class="cl">    <span class="k">public</span> <span class="k">function</span> <span class="nf">should</span><span class="p">(</span><span class="k">array</span> <span class="nv">$query</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln">38</span><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="ln">39</span><span class="cl">        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">should</span><span class="p">[]</span> <span class="o">=</span> <span class="nv">$query</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln">40</span><span class="cl">        <span class="k">return</span> <span class="nv">$this</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln">41</span><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="ln">42</span><span class="cl">
+</span></span><span class="line"><span class="ln">43</span><span class="cl">    <span class="k">public</span> <span class="k">function</span> <span class="nf">build</span><span class="p">()</span><span class="o">:</span> <span class="k">array</span>
+</span></span><span class="line"><span class="ln">44</span><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="ln">45</span><span class="cl">        <span class="nv">$bool</span> <span class="o">=</span> <span class="p">[];</span>
+</span></span><span class="line"><span class="ln">46</span><span class="cl">
+</span></span><span class="line"><span class="ln">47</span><span class="cl">        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="k">empty</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">must</span><span class="p">))</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">48</span><span class="cl">            <span class="nv">$bool</span><span class="p">[</span><span class="s1">&#39;must&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">must</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln">49</span><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="ln">50</span><span class="cl">
+</span></span><span class="line"><span class="ln">51</span><span class="cl">        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="k">empty</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">filter</span><span class="p">))</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">52</span><span class="cl">            <span class="nv">$bool</span><span class="p">[</span><span class="s1">&#39;filter&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">filter</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln">53</span><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="ln">54</span><span class="cl">
+</span></span><span class="line"><span class="ln">55</span><span class="cl">        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="k">empty</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">should</span><span class="p">))</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">56</span><span class="cl">            <span class="nv">$bool</span><span class="p">[</span><span class="s1">&#39;should&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">should</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln">57</span><span class="cl">            <span class="nv">$bool</span><span class="p">[</span><span class="s1">&#39;minimum_should_match&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln">58</span><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="ln">59</span><span class="cl">
+</span></span><span class="line"><span class="ln">60</span><span class="cl">        <span class="k">return</span> <span class="p">[</span><span class="s1">&#39;bool&#39;</span> <span class="o">=&gt;</span> <span class="nv">$bool</span><span class="p">];</span>
+</span></span><span class="line"><span class="ln">61</span><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="ln">62</span><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><hr>
+<h1 id="-五核心-servicestudentsearchservice">🎓 五、核心 Service（StudentSearchService）</h1>
+<h2 id="-studentsearchservicephp">📌 StudentSearchService.php</h2>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln">  1</span><span class="cl"><span class="o">&lt;?</span><span class="nx">php</span>
 </span></span><span class="line"><span class="ln">  2</span><span class="cl">
-</span></span><span class="line"><span class="ln">  3</span><span class="cl"><span class="k">namespace</span> <span class="nx">App\Service</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln">  3</span><span class="cl"><span class="k">namespace</span> <span class="nx">App\Service\Elasticsearch</span><span class="p">;</span>
 </span></span><span class="line"><span class="ln">  4</span><span class="cl">
-</span></span><span class="line"><span class="ln">  5</span><span class="cl"><span class="k">use</span> <span class="nx">Elastic\Elasticsearch\Client</span><span class="p">;</span>
-</span></span><span class="line"><span class="ln">  6</span><span class="cl">
-</span></span><span class="line"><span class="ln">  7</span><span class="cl"><span class="k">class</span> <span class="nc">StudentSearchService</span>
-</span></span><span class="line"><span class="ln">  8</span><span class="cl"><span class="p">{</span>
-</span></span><span class="line"><span class="ln">  9</span><span class="cl">    <span class="k">protected</span> <span class="nx">Client</span> <span class="nv">$client</span><span class="p">;</span>
-</span></span><span class="line"><span class="ln"> 10</span><span class="cl">    <span class="k">protected</span> <span class="nx">string</span> <span class="nv">$index</span> <span class="o">=</span> <span class="s1">&#39;student&#39;</span><span class="p">;</span>
-</span></span><span class="line"><span class="ln"> 11</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 12</span><span class="cl">    <span class="k">public</span> <span class="k">function</span> <span class="fm">__construct</span><span class="p">(</span><span class="nx">Client</span> <span class="nv">$client</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln"> 13</span><span class="cl">    <span class="p">{</span>
-</span></span><span class="line"><span class="ln"> 14</span><span class="cl">        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">client</span> <span class="o">=</span> <span class="nv">$client</span><span class="p">;</span>
-</span></span><span class="line"><span class="ln"> 15</span><span class="cl">    <span class="p">}</span>
-</span></span><span class="line"><span class="ln"> 16</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 17</span><span class="cl">    <span class="sd">/**
-</span></span></span><span class="line"><span class="ln"> 18</span><span class="cl"><span class="sd">     * 统一搜索入口（生产主方法）
-</span></span></span><span class="line"><span class="ln"> 19</span><span class="cl"><span class="sd">     */</span>
-</span></span><span class="line"><span class="ln"> 20</span><span class="cl">    <span class="k">public</span> <span class="k">function</span> <span class="nf">search</span><span class="p">(</span><span class="k">array</span> <span class="nv">$params</span><span class="p">)</span><span class="o">:</span> <span class="k">array</span>
-</span></span><span class="line"><span class="ln"> 21</span><span class="cl">    <span class="p">{</span>
-</span></span><span class="line"><span class="ln"> 22</span><span class="cl">        <span class="nv">$query</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">buildQuery</span><span class="p">(</span><span class="nv">$params</span><span class="p">);</span>
-</span></span><span class="line"><span class="ln"> 23</span><span class="cl">        <span class="nv">$sort</span>  <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">buildSort</span><span class="p">(</span><span class="nv">$params</span><span class="p">);</span>
-</span></span><span class="line"><span class="ln"> 24</span><span class="cl">        <span class="nv">$page</span>  <span class="o">=</span> <span class="nx">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="p">(</span><span class="nx">int</span><span class="p">)(</span><span class="nv">$params</span><span class="p">[</span><span class="s1">&#39;page&#39;</span><span class="p">]</span> <span class="o">??</span> <span class="mi">1</span><span class="p">));</span>
-</span></span><span class="line"><span class="ln"> 25</span><span class="cl">        <span class="nv">$size</span>  <span class="o">=</span> <span class="nx">min</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="nx">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="p">(</span><span class="nx">int</span><span class="p">)(</span><span class="nv">$params</span><span class="p">[</span><span class="s1">&#39;page_size&#39;</span><span class="p">]</span> <span class="o">??</span> <span class="mi">10</span><span class="p">)));</span>
-</span></span><span class="line"><span class="ln"> 26</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 27</span><span class="cl">        <span class="nv">$esParams</span> <span class="o">=</span> <span class="p">[</span>
-</span></span><span class="line"><span class="ln"> 28</span><span class="cl">            <span class="s1">&#39;index&#39;</span> <span class="o">=&gt;</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">index</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln"> 29</span><span class="cl">            <span class="s1">&#39;from&#39;</span>  <span class="o">=&gt;</span> <span class="p">(</span><span class="nv">$page</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="nv">$size</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln"> 30</span><span class="cl">            <span class="s1">&#39;size&#39;</span>  <span class="o">=&gt;</span> <span class="nv">$size</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln"> 31</span><span class="cl">            <span class="s1">&#39;body&#39;</span>  <span class="o">=&gt;</span> <span class="p">[</span>
-</span></span><span class="line"><span class="ln"> 32</span><span class="cl">                <span class="s1">&#39;query&#39;</span> <span class="o">=&gt;</span> <span class="nv">$query</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln"> 33</span><span class="cl">                <span class="s1">&#39;sort&#39;</span>  <span class="o">=&gt;</span> <span class="nv">$sort</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln"> 34</span><span class="cl">            <span class="p">]</span>
-</span></span><span class="line"><span class="ln"> 35</span><span class="cl">        <span class="p">];</span>
-</span></span><span class="line"><span class="ln"> 36</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 37</span><span class="cl">        <span class="nv">$response</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">client</span><span class="o">-&gt;</span><span class="na">search</span><span class="p">(</span><span class="nv">$esParams</span><span class="p">);</span>
-</span></span><span class="line"><span class="ln"> 38</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 39</span><span class="cl">        <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">formatResult</span><span class="p">(</span><span class="nv">$response</span><span class="p">);</span>
-</span></span><span class="line"><span class="ln"> 40</span><span class="cl">    <span class="p">}</span>
-</span></span><span class="line"><span class="ln"> 41</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 42</span><span class="cl">    <span class="sd">/**
-</span></span></span><span class="line"><span class="ln"> 43</span><span class="cl"><span class="sd">     * 构建 bool 查询
-</span></span></span><span class="line"><span class="ln"> 44</span><span class="cl"><span class="sd">     */</span>
-</span></span><span class="line"><span class="ln"> 45</span><span class="cl">    <span class="k">protected</span> <span class="k">function</span> <span class="nf">buildQuery</span><span class="p">(</span><span class="k">array</span> <span class="nv">$params</span><span class="p">)</span><span class="o">:</span> <span class="k">array</span>
-</span></span><span class="line"><span class="ln"> 46</span><span class="cl">    <span class="p">{</span>
-</span></span><span class="line"><span class="ln"> 47</span><span class="cl">        <span class="nv">$must</span>   <span class="o">=</span> <span class="p">[];</span>
-</span></span><span class="line"><span class="ln"> 48</span><span class="cl">        <span class="nv">$filter</span> <span class="o">=</span> <span class="p">[];</span>
+</span></span><span class="line"><span class="ln">  5</span><span class="cl"><span class="k">class</span> <span class="nc">StudentSearchService</span>
+</span></span><span class="line"><span class="ln">  6</span><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="ln">  7</span><span class="cl">    <span class="k">private</span> <span class="nx">string</span> <span class="nv">$index</span> <span class="o">=</span> <span class="s1">&#39;students&#39;</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln">  8</span><span class="cl">
+</span></span><span class="line"><span class="ln">  9</span><span class="cl">    <span class="k">private</span> <span class="nv">$client</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln"> 10</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 11</span><span class="cl">    <span class="k">public</span> <span class="k">function</span> <span class="fm">__construct</span><span class="p">()</span>
+</span></span><span class="line"><span class="ln"> 12</span><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 13</span><span class="cl">        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">client</span> <span class="o">=</span> <span class="nx">EsClient</span><span class="o">::</span><span class="na">getClient</span><span class="p">();</span>
+</span></span><span class="line"><span class="ln"> 14</span><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="ln"> 15</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 16</span><span class="cl">    <span class="sd">/**
+</span></span></span><span class="line"><span class="ln"> 17</span><span class="cl"><span class="sd">     * ➕ 单条新增/更新
+</span></span></span><span class="line"><span class="ln"> 18</span><span class="cl"><span class="sd">     */</span>
+</span></span><span class="line"><span class="ln"> 19</span><span class="cl">    <span class="k">public</span> <span class="k">function</span> <span class="nf">index</span><span class="p">(</span><span class="k">array</span> <span class="nv">$data</span><span class="p">,</span> <span class="nv">$id</span> <span class="o">=</span> <span class="k">null</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln"> 20</span><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 21</span><span class="cl">        <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">client</span><span class="o">-&gt;</span><span class="na">index</span><span class="p">([</span>
+</span></span><span class="line"><span class="ln"> 22</span><span class="cl">            <span class="s1">&#39;index&#39;</span> <span class="o">=&gt;</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">index</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln"> 23</span><span class="cl">            <span class="s1">&#39;id&#39;</span>    <span class="o">=&gt;</span> <span class="nv">$id</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln"> 24</span><span class="cl">            <span class="s1">&#39;body&#39;</span>  <span class="o">=&gt;</span> <span class="nv">$data</span>
+</span></span><span class="line"><span class="ln"> 25</span><span class="cl">        <span class="p">]);</span>
+</span></span><span class="line"><span class="ln"> 26</span><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="ln"> 27</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 28</span><span class="cl">    <span class="sd">/**
+</span></span></span><span class="line"><span class="ln"> 29</span><span class="cl"><span class="sd">     * 📦 Bulk 批量插入
+</span></span></span><span class="line"><span class="ln"> 30</span><span class="cl"><span class="sd">     */</span>
+</span></span><span class="line"><span class="ln"> 31</span><span class="cl">    <span class="k">public</span> <span class="k">function</span> <span class="nf">bulkInsert</span><span class="p">(</span><span class="k">array</span> <span class="nv">$rows</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln"> 32</span><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 33</span><span class="cl">        <span class="nv">$params</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;body&#39;</span> <span class="o">=&gt;</span> <span class="p">[]];</span>
+</span></span><span class="line"><span class="ln"> 34</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 35</span><span class="cl">        <span class="k">foreach</span> <span class="p">(</span><span class="nv">$rows</span> <span class="k">as</span> <span class="nv">$row</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 36</span><span class="cl">            <span class="nv">$params</span><span class="p">[</span><span class="s1">&#39;body&#39;</span><span class="p">][]</span> <span class="o">=</span> <span class="p">[</span>
+</span></span><span class="line"><span class="ln"> 37</span><span class="cl">                <span class="s1">&#39;index&#39;</span> <span class="o">=&gt;</span> <span class="p">[</span>
+</span></span><span class="line"><span class="ln"> 38</span><span class="cl">                    <span class="s1">&#39;_index&#39;</span> <span class="o">=&gt;</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">index</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln"> 39</span><span class="cl">                    <span class="s1">&#39;_id&#39;</span>    <span class="o">=&gt;</span> <span class="nv">$row</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span> <span class="o">??</span> <span class="k">null</span>
+</span></span><span class="line"><span class="ln"> 40</span><span class="cl">                <span class="p">]</span>
+</span></span><span class="line"><span class="ln"> 41</span><span class="cl">            <span class="p">];</span>
+</span></span><span class="line"><span class="ln"> 42</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 43</span><span class="cl">            <span class="nx">unset</span><span class="p">(</span><span class="nv">$row</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]);</span>
+</span></span><span class="line"><span class="ln"> 44</span><span class="cl">            <span class="nv">$params</span><span class="p">[</span><span class="s1">&#39;body&#39;</span><span class="p">][]</span> <span class="o">=</span> <span class="nv">$row</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln"> 45</span><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="ln"> 46</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 47</span><span class="cl">        <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">client</span><span class="o">-&gt;</span><span class="na">bulk</span><span class="p">(</span><span class="nv">$params</span><span class="p">);</span>
+</span></span><span class="line"><span class="ln"> 48</span><span class="cl">    <span class="p">}</span>
 </span></span><span class="line"><span class="ln"> 49</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 50</span><span class="cl">        <span class="c1">// 关键词（全文检索）
-</span></span></span><span class="line"><span class="ln"> 51</span><span class="cl"><span class="c1"></span>        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="k">empty</span><span class="p">(</span><span class="nv">$params</span><span class="p">[</span><span class="s1">&#39;keyword&#39;</span><span class="p">]))</span> <span class="p">{</span>
-</span></span><span class="line"><span class="ln"> 52</span><span class="cl">            <span class="nv">$must</span><span class="p">[]</span> <span class="o">=</span> <span class="p">[</span>
-</span></span><span class="line"><span class="ln"> 53</span><span class="cl">                <span class="s1">&#39;match&#39;</span> <span class="o">=&gt;</span> <span class="p">[</span>
-</span></span><span class="line"><span class="ln"> 54</span><span class="cl">                    <span class="s1">&#39;name&#39;</span> <span class="o">=&gt;</span> <span class="nv">$params</span><span class="p">[</span><span class="s1">&#39;keyword&#39;</span><span class="p">]</span>
-</span></span><span class="line"><span class="ln"> 55</span><span class="cl">                <span class="p">]</span>
-</span></span><span class="line"><span class="ln"> 56</span><span class="cl">            <span class="p">];</span>
-</span></span><span class="line"><span class="ln"> 57</span><span class="cl">        <span class="p">}</span>
-</span></span><span class="line"><span class="ln"> 58</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 59</span><span class="cl">        <span class="c1">// 性别（精确）
-</span></span></span><span class="line"><span class="ln"> 60</span><span class="cl"><span class="c1"></span>        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="k">empty</span><span class="p">(</span><span class="nv">$params</span><span class="p">[</span><span class="s1">&#39;gender&#39;</span><span class="p">]))</span> <span class="p">{</span>
-</span></span><span class="line"><span class="ln"> 61</span><span class="cl">            <span class="nv">$filter</span><span class="p">[]</span> <span class="o">=</span> <span class="p">[</span>
-</span></span><span class="line"><span class="ln"> 62</span><span class="cl">                <span class="s1">&#39;term&#39;</span> <span class="o">=&gt;</span> <span class="p">[</span>
-</span></span><span class="line"><span class="ln"> 63</span><span class="cl">                    <span class="s1">&#39;gender&#39;</span> <span class="o">=&gt;</span> <span class="nv">$params</span><span class="p">[</span><span class="s1">&#39;gender&#39;</span><span class="p">]</span>
-</span></span><span class="line"><span class="ln"> 64</span><span class="cl">                <span class="p">]</span>
-</span></span><span class="line"><span class="ln"> 65</span><span class="cl">            <span class="p">];</span>
-</span></span><span class="line"><span class="ln"> 66</span><span class="cl">        <span class="p">}</span>
-</span></span><span class="line"><span class="ln"> 67</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 68</span><span class="cl">        <span class="c1">// 班级
-</span></span></span><span class="line"><span class="ln"> 69</span><span class="cl"><span class="c1"></span>        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="k">empty</span><span class="p">(</span><span class="nv">$params</span><span class="p">[</span><span class="s1">&#39;class&#39;</span><span class="p">]))</span> <span class="p">{</span>
-</span></span><span class="line"><span class="ln"> 70</span><span class="cl">            <span class="nv">$filter</span><span class="p">[]</span> <span class="o">=</span> <span class="p">[</span>
-</span></span><span class="line"><span class="ln"> 71</span><span class="cl">                <span class="s1">&#39;term&#39;</span> <span class="o">=&gt;</span> <span class="p">[</span>
-</span></span><span class="line"><span class="ln"> 72</span><span class="cl">                    <span class="s1">&#39;class&#39;</span> <span class="o">=&gt;</span> <span class="nv">$params</span><span class="p">[</span><span class="s1">&#39;class&#39;</span><span class="p">]</span>
-</span></span><span class="line"><span class="ln"> 73</span><span class="cl">                <span class="p">]</span>
-</span></span><span class="line"><span class="ln"> 74</span><span class="cl">            <span class="p">];</span>
-</span></span><span class="line"><span class="ln"> 75</span><span class="cl">        <span class="p">}</span>
-</span></span><span class="line"><span class="ln"> 76</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 77</span><span class="cl">        <span class="c1">// 成绩范围
-</span></span></span><span class="line"><span class="ln"> 78</span><span class="cl"><span class="c1"></span>        <span class="k">if</span> <span class="p">(</span><span class="nx">isset</span><span class="p">(</span><span class="nv">$params</span><span class="p">[</span><span class="s1">&#39;score_min&#39;</span><span class="p">])</span> <span class="o">||</span> <span class="nx">isset</span><span class="p">(</span><span class="nv">$params</span><span class="p">[</span><span class="s1">&#39;score_max&#39;</span><span class="p">]))</span> <span class="p">{</span>
-</span></span><span class="line"><span class="ln"> 79</span><span class="cl">            <span class="nv">$range</span> <span class="o">=</span> <span class="p">[];</span>
-</span></span><span class="line"><span class="ln"> 80</span><span class="cl">            <span class="k">if</span> <span class="p">(</span><span class="nx">isset</span><span class="p">(</span><span class="nv">$params</span><span class="p">[</span><span class="s1">&#39;score_min&#39;</span><span class="p">]))</span> <span class="p">{</span>
-</span></span><span class="line"><span class="ln"> 81</span><span class="cl">                <span class="nv">$range</span><span class="p">[</span><span class="s1">&#39;gte&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="nx">float</span><span class="p">)</span><span class="nv">$params</span><span class="p">[</span><span class="s1">&#39;score_min&#39;</span><span class="p">];</span>
-</span></span><span class="line"><span class="ln"> 82</span><span class="cl">            <span class="p">}</span>
-</span></span><span class="line"><span class="ln"> 83</span><span class="cl">            <span class="k">if</span> <span class="p">(</span><span class="nx">isset</span><span class="p">(</span><span class="nv">$params</span><span class="p">[</span><span class="s1">&#39;score_max&#39;</span><span class="p">]))</span> <span class="p">{</span>
-</span></span><span class="line"><span class="ln"> 84</span><span class="cl">                <span class="nv">$range</span><span class="p">[</span><span class="s1">&#39;lte&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="nx">float</span><span class="p">)</span><span class="nv">$params</span><span class="p">[</span><span class="s1">&#39;score_max&#39;</span><span class="p">];</span>
-</span></span><span class="line"><span class="ln"> 85</span><span class="cl">            <span class="p">}</span>
+</span></span><span class="line"><span class="ln"> 50</span><span class="cl">    <span class="sd">/**
+</span></span></span><span class="line"><span class="ln"> 51</span><span class="cl"><span class="sd">     * 🔍 通用搜索
+</span></span></span><span class="line"><span class="ln"> 52</span><span class="cl"><span class="sd">     */</span>
+</span></span><span class="line"><span class="ln"> 53</span><span class="cl">    <span class="k">public</span> <span class="k">function</span> <span class="nf">search</span><span class="p">(</span><span class="k">array</span> <span class="nv">$query</span><span class="p">,</span> <span class="nx">int</span> <span class="nv">$page</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="nx">int</span> <span class="nv">$size</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span> <span class="k">array</span> <span class="nv">$sort</span> <span class="o">=</span> <span class="p">[])</span>
+</span></span><span class="line"><span class="ln"> 54</span><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 55</span><span class="cl">        <span class="nv">$from</span> <span class="o">=</span> <span class="p">(</span><span class="nv">$page</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="nv">$size</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln"> 56</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 57</span><span class="cl">        <span class="nv">$params</span> <span class="o">=</span> <span class="p">[</span>
+</span></span><span class="line"><span class="ln"> 58</span><span class="cl">            <span class="s1">&#39;index&#39;</span> <span class="o">=&gt;</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">index</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln"> 59</span><span class="cl">            <span class="s1">&#39;body&#39;</span>  <span class="o">=&gt;</span> <span class="p">[</span>
+</span></span><span class="line"><span class="ln"> 60</span><span class="cl">                <span class="s1">&#39;query&#39;</span> <span class="o">=&gt;</span> <span class="nv">$query</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln"> 61</span><span class="cl">                <span class="s1">&#39;from&#39;</span>  <span class="o">=&gt;</span> <span class="nv">$from</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln"> 62</span><span class="cl">                <span class="s1">&#39;size&#39;</span>  <span class="o">=&gt;</span> <span class="nv">$size</span>
+</span></span><span class="line"><span class="ln"> 63</span><span class="cl">            <span class="p">]</span>
+</span></span><span class="line"><span class="ln"> 64</span><span class="cl">        <span class="p">];</span>
+</span></span><span class="line"><span class="ln"> 65</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 66</span><span class="cl">        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="k">empty</span><span class="p">(</span><span class="nv">$sort</span><span class="p">))</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 67</span><span class="cl">            <span class="nv">$params</span><span class="p">[</span><span class="s1">&#39;body&#39;</span><span class="p">][</span><span class="s1">&#39;sort&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nv">$sort</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln"> 68</span><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="ln"> 69</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 70</span><span class="cl">        <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">client</span><span class="o">-&gt;</span><span class="na">search</span><span class="p">(</span><span class="nv">$params</span><span class="p">);</span>
+</span></span><span class="line"><span class="ln"> 71</span><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="ln"> 72</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 73</span><span class="cl">    <span class="sd">/**
+</span></span></span><span class="line"><span class="ln"> 74</span><span class="cl"><span class="sd">     * ✏️ 更新
+</span></span></span><span class="line"><span class="ln"> 75</span><span class="cl"><span class="sd">     */</span>
+</span></span><span class="line"><span class="ln"> 76</span><span class="cl">    <span class="k">public</span> <span class="k">function</span> <span class="nf">update</span><span class="p">(</span><span class="nx">string</span> <span class="nv">$id</span><span class="p">,</span> <span class="k">array</span> <span class="nv">$data</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln"> 77</span><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 78</span><span class="cl">        <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">client</span><span class="o">-&gt;</span><span class="na">update</span><span class="p">([</span>
+</span></span><span class="line"><span class="ln"> 79</span><span class="cl">            <span class="s1">&#39;index&#39;</span> <span class="o">=&gt;</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">index</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln"> 80</span><span class="cl">            <span class="s1">&#39;id&#39;</span>    <span class="o">=&gt;</span> <span class="nv">$id</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln"> 81</span><span class="cl">            <span class="s1">&#39;body&#39;</span>  <span class="o">=&gt;</span> <span class="p">[</span>
+</span></span><span class="line"><span class="ln"> 82</span><span class="cl">                <span class="s1">&#39;doc&#39;</span> <span class="o">=&gt;</span> <span class="nv">$data</span>
+</span></span><span class="line"><span class="ln"> 83</span><span class="cl">            <span class="p">]</span>
+</span></span><span class="line"><span class="ln"> 84</span><span class="cl">        <span class="p">]);</span>
+</span></span><span class="line"><span class="ln"> 85</span><span class="cl">    <span class="p">}</span>
 </span></span><span class="line"><span class="ln"> 86</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 87</span><span class="cl">            <span class="nv">$filter</span><span class="p">[]</span> <span class="o">=</span> <span class="p">[</span>
-</span></span><span class="line"><span class="ln"> 88</span><span class="cl">                <span class="s1">&#39;range&#39;</span> <span class="o">=&gt;</span> <span class="p">[</span>
-</span></span><span class="line"><span class="ln"> 89</span><span class="cl">                    <span class="s1">&#39;score&#39;</span> <span class="o">=&gt;</span> <span class="nv">$range</span>
-</span></span><span class="line"><span class="ln"> 90</span><span class="cl">                <span class="p">]</span>
-</span></span><span class="line"><span class="ln"> 91</span><span class="cl">            <span class="p">];</span>
-</span></span><span class="line"><span class="ln"> 92</span><span class="cl">        <span class="p">}</span>
-</span></span><span class="line"><span class="ln"> 93</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 94</span><span class="cl">        <span class="c1">// 年龄范围
-</span></span></span><span class="line"><span class="ln"> 95</span><span class="cl"><span class="c1"></span>        <span class="k">if</span> <span class="p">(</span><span class="nx">isset</span><span class="p">(</span><span class="nv">$params</span><span class="p">[</span><span class="s1">&#39;age_min&#39;</span><span class="p">])</span> <span class="o">||</span> <span class="nx">isset</span><span class="p">(</span><span class="nv">$params</span><span class="p">[</span><span class="s1">&#39;age_max&#39;</span><span class="p">]))</span> <span class="p">{</span>
-</span></span><span class="line"><span class="ln"> 96</span><span class="cl">            <span class="nv">$range</span> <span class="o">=</span> <span class="p">[];</span>
-</span></span><span class="line"><span class="ln"> 97</span><span class="cl">            <span class="k">if</span> <span class="p">(</span><span class="nx">isset</span><span class="p">(</span><span class="nv">$params</span><span class="p">[</span><span class="s1">&#39;age_min&#39;</span><span class="p">]))</span> <span class="p">{</span>
-</span></span><span class="line"><span class="ln"> 98</span><span class="cl">                <span class="nv">$range</span><span class="p">[</span><span class="s1">&#39;gte&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="nx">int</span><span class="p">)</span><span class="nv">$params</span><span class="p">[</span><span class="s1">&#39;age_min&#39;</span><span class="p">];</span>
-</span></span><span class="line"><span class="ln"> 99</span><span class="cl">            <span class="p">}</span>
-</span></span><span class="line"><span class="ln">100</span><span class="cl">            <span class="k">if</span> <span class="p">(</span><span class="nx">isset</span><span class="p">(</span><span class="nv">$params</span><span class="p">[</span><span class="s1">&#39;age_max&#39;</span><span class="p">]))</span> <span class="p">{</span>
-</span></span><span class="line"><span class="ln">101</span><span class="cl">                <span class="nv">$range</span><span class="p">[</span><span class="s1">&#39;lte&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="nx">int</span><span class="p">)</span><span class="nv">$params</span><span class="p">[</span><span class="s1">&#39;age_max&#39;</span><span class="p">];</span>
-</span></span><span class="line"><span class="ln">102</span><span class="cl">            <span class="p">}</span>
-</span></span><span class="line"><span class="ln">103</span><span class="cl">
-</span></span><span class="line"><span class="ln">104</span><span class="cl">            <span class="nv">$filter</span><span class="p">[]</span> <span class="o">=</span> <span class="p">[</span>
-</span></span><span class="line"><span class="ln">105</span><span class="cl">                <span class="s1">&#39;range&#39;</span> <span class="o">=&gt;</span> <span class="p">[</span>
-</span></span><span class="line"><span class="ln">106</span><span class="cl">                    <span class="s1">&#39;age&#39;</span> <span class="o">=&gt;</span> <span class="nv">$range</span>
-</span></span><span class="line"><span class="ln">107</span><span class="cl">                <span class="p">]</span>
-</span></span><span class="line"><span class="ln">108</span><span class="cl">            <span class="p">];</span>
-</span></span><span class="line"><span class="ln">109</span><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="ln"> 87</span><span class="cl">    <span class="sd">/**
+</span></span></span><span class="line"><span class="ln"> 88</span><span class="cl"><span class="sd">     * ❌ 删除
+</span></span></span><span class="line"><span class="ln"> 89</span><span class="cl"><span class="sd">     */</span>
+</span></span><span class="line"><span class="ln"> 90</span><span class="cl">    <span class="k">public</span> <span class="k">function</span> <span class="nf">delete</span><span class="p">(</span><span class="nx">string</span> <span class="nv">$id</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln"> 91</span><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 92</span><span class="cl">        <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">client</span><span class="o">-&gt;</span><span class="na">delete</span><span class="p">([</span>
+</span></span><span class="line"><span class="ln"> 93</span><span class="cl">            <span class="s1">&#39;index&#39;</span> <span class="o">=&gt;</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">index</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln"> 94</span><span class="cl">            <span class="s1">&#39;id&#39;</span>    <span class="o">=&gt;</span> <span class="nv">$id</span>
+</span></span><span class="line"><span class="ln"> 95</span><span class="cl">        <span class="p">]);</span>
+</span></span><span class="line"><span class="ln"> 96</span><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="ln"> 97</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 98</span><span class="cl">    <span class="sd">/**
+</span></span></span><span class="line"><span class="ln"> 99</span><span class="cl"><span class="sd">     * 🧨 条件删除
+</span></span></span><span class="line"><span class="ln">100</span><span class="cl"><span class="sd">     */</span>
+</span></span><span class="line"><span class="ln">101</span><span class="cl">    <span class="k">public</span> <span class="k">function</span> <span class="nf">deleteByQuery</span><span class="p">(</span><span class="k">array</span> <span class="nv">$query</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln">102</span><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="ln">103</span><span class="cl">        <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">client</span><span class="o">-&gt;</span><span class="na">deleteByQuery</span><span class="p">([</span>
+</span></span><span class="line"><span class="ln">104</span><span class="cl">            <span class="s1">&#39;index&#39;</span> <span class="o">=&gt;</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">index</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">105</span><span class="cl">            <span class="s1">&#39;body&#39;</span>  <span class="o">=&gt;</span> <span class="p">[</span>
+</span></span><span class="line"><span class="ln">106</span><span class="cl">                <span class="s1">&#39;query&#39;</span> <span class="o">=&gt;</span> <span class="nv">$query</span>
+</span></span><span class="line"><span class="ln">107</span><span class="cl">            <span class="p">]</span>
+</span></span><span class="line"><span class="ln">108</span><span class="cl">        <span class="p">]);</span>
+</span></span><span class="line"><span class="ln">109</span><span class="cl">    <span class="p">}</span>
 </span></span><span class="line"><span class="ln">110</span><span class="cl">
-</span></span><span class="line"><span class="ln">111</span><span class="cl">        <span class="k">return</span> <span class="p">[</span>
-</span></span><span class="line"><span class="ln">112</span><span class="cl">            <span class="s1">&#39;bool&#39;</span> <span class="o">=&gt;</span> <span class="nx">array_filter</span><span class="p">([</span>
-</span></span><span class="line"><span class="ln">113</span><span class="cl">                <span class="s1">&#39;must&#39;</span>   <span class="o">=&gt;</span> <span class="nv">$must</span> <span class="o">?:</span> <span class="k">null</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">114</span><span class="cl">                <span class="s1">&#39;filter&#39;</span> <span class="o">=&gt;</span> <span class="nv">$filter</span> <span class="o">?:</span> <span class="k">null</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">115</span><span class="cl">            <span class="p">])</span>
-</span></span><span class="line"><span class="ln">116</span><span class="cl">        <span class="p">];</span>
-</span></span><span class="line"><span class="ln">117</span><span class="cl">    <span class="p">}</span>
-</span></span><span class="line"><span class="ln">118</span><span class="cl">
-</span></span><span class="line"><span class="ln">119</span><span class="cl">    <span class="sd">/**
-</span></span></span><span class="line"><span class="ln">120</span><span class="cl"><span class="sd">     * 排序规则白名单
-</span></span></span><span class="line"><span class="ln">121</span><span class="cl"><span class="sd">     */</span>
-</span></span><span class="line"><span class="ln">122</span><span class="cl">    <span class="k">protected</span> <span class="k">function</span> <span class="nf">buildSort</span><span class="p">(</span><span class="k">array</span> <span class="nv">$params</span><span class="p">)</span><span class="o">:</span> <span class="k">array</span>
-</span></span><span class="line"><span class="ln">123</span><span class="cl">    <span class="p">{</span>
-</span></span><span class="line"><span class="ln">124</span><span class="cl">        <span class="nv">$sortMap</span> <span class="o">=</span> <span class="p">[</span>
-</span></span><span class="line"><span class="ln">125</span><span class="cl">            <span class="s1">&#39;score_desc&#39;</span> <span class="o">=&gt;</span> <span class="p">[</span><span class="s1">&#39;score&#39;</span> <span class="o">=&gt;</span> <span class="p">[</span><span class="s1">&#39;order&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;desc&#39;</span><span class="p">]],</span>
-</span></span><span class="line"><span class="ln">126</span><span class="cl">            <span class="s1">&#39;score_asc&#39;</span>  <span class="o">=&gt;</span> <span class="p">[</span><span class="s1">&#39;score&#39;</span> <span class="o">=&gt;</span> <span class="p">[</span><span class="s1">&#39;order&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;asc&#39;</span><span class="p">]],</span>
-</span></span><span class="line"><span class="ln">127</span><span class="cl">            <span class="s1">&#39;age_desc&#39;</span>   <span class="o">=&gt;</span> <span class="p">[</span><span class="s1">&#39;age&#39;</span> <span class="o">=&gt;</span> <span class="p">[</span><span class="s1">&#39;order&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;desc&#39;</span><span class="p">]],</span>
-</span></span><span class="line"><span class="ln">128</span><span class="cl">            <span class="s1">&#39;age_asc&#39;</span>    <span class="o">=&gt;</span> <span class="p">[</span><span class="s1">&#39;age&#39;</span> <span class="o">=&gt;</span> <span class="p">[</span><span class="s1">&#39;order&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;asc&#39;</span><span class="p">]],</span>
-</span></span><span class="line"><span class="ln">129</span><span class="cl">            <span class="s1">&#39;time_desc&#39;</span>  <span class="o">=&gt;</span> <span class="p">[</span><span class="s1">&#39;create_time&#39;</span> <span class="o">=&gt;</span> <span class="p">[</span><span class="s1">&#39;order&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;desc&#39;</span><span class="p">]],</span>
-</span></span><span class="line"><span class="ln">130</span><span class="cl">        <span class="p">];</span>
-</span></span><span class="line"><span class="ln">131</span><span class="cl">
-</span></span><span class="line"><span class="ln">132</span><span class="cl">        <span class="k">return</span> <span class="nx">isset</span><span class="p">(</span><span class="nv">$sortMap</span><span class="p">[</span><span class="nv">$params</span><span class="p">[</span><span class="s1">&#39;sort&#39;</span><span class="p">]</span> <span class="o">??</span> <span class="s1">&#39;&#39;</span><span class="p">])</span>
-</span></span><span class="line"><span class="ln">133</span><span class="cl">            <span class="o">?</span> <span class="p">[</span><span class="nv">$sortMap</span><span class="p">[</span><span class="nv">$params</span><span class="p">[</span><span class="s1">&#39;sort&#39;</span><span class="p">]]]</span>
-</span></span><span class="line"><span class="ln">134</span><span class="cl">            <span class="o">:</span> <span class="p">[];</span>
-</span></span><span class="line"><span class="ln">135</span><span class="cl">    <span class="p">}</span>
-</span></span><span class="line"><span class="ln">136</span><span class="cl">
-</span></span><span class="line"><span class="ln">137</span><span class="cl">    <span class="sd">/**
-</span></span></span><span class="line"><span class="ln">138</span><span class="cl"><span class="sd">     * 结果统一格式化（生产非常重要）
-</span></span></span><span class="line"><span class="ln">139</span><span class="cl"><span class="sd">     */</span>
-</span></span><span class="line"><span class="ln">140</span><span class="cl">    <span class="k">protected</span> <span class="k">function</span> <span class="nf">formatResult</span><span class="p">(</span><span class="k">array</span> <span class="nv">$response</span><span class="p">)</span><span class="o">:</span> <span class="k">array</span>
-</span></span><span class="line"><span class="ln">141</span><span class="cl">    <span class="p">{</span>
-</span></span><span class="line"><span class="ln">142</span><span class="cl">        <span class="nv">$hits</span> <span class="o">=</span> <span class="nv">$response</span><span class="p">[</span><span class="s1">&#39;hits&#39;</span><span class="p">];</span>
-</span></span><span class="line"><span class="ln">143</span><span class="cl">
-</span></span><span class="line"><span class="ln">144</span><span class="cl">        <span class="k">return</span> <span class="p">[</span>
-</span></span><span class="line"><span class="ln">145</span><span class="cl">            <span class="s1">&#39;total&#39;</span> <span class="o">=&gt;</span> <span class="nv">$hits</span><span class="p">[</span><span class="s1">&#39;total&#39;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span> <span class="o">??</span> <span class="mi">0</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">146</span><span class="cl">            <span class="s1">&#39;list&#39;</span>  <span class="o">=&gt;</span> <span class="nx">array_map</span><span class="p">(</span><span class="k">function</span> <span class="p">(</span><span class="nv">$hit</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="ln">147</span><span class="cl">                <span class="k">return</span> <span class="nx">array_merge</span><span class="p">(</span>
-</span></span><span class="line"><span class="ln">148</span><span class="cl">                    <span class="p">[</span><span class="s1">&#39;_id&#39;</span> <span class="o">=&gt;</span> <span class="nv">$hit</span><span class="p">[</span><span class="s1">&#39;_id&#39;</span><span class="p">],</span> <span class="s1">&#39;_score&#39;</span> <span class="o">=&gt;</span> <span class="nv">$hit</span><span class="p">[</span><span class="s1">&#39;_score&#39;</span><span class="p">]</span> <span class="o">??</span> <span class="k">null</span><span class="p">],</span>
-</span></span><span class="line"><span class="ln">149</span><span class="cl">                    <span class="nv">$hit</span><span class="p">[</span><span class="s1">&#39;_source&#39;</span><span class="p">]</span>
-</span></span><span class="line"><span class="ln">150</span><span class="cl">                <span class="p">);</span>
-</span></span><span class="line"><span class="ln">151</span><span class="cl">            <span class="p">},</span> <span class="nv">$hits</span><span class="p">[</span><span class="s1">&#39;hits&#39;</span><span class="p">])</span>
-</span></span><span class="line"><span class="ln">152</span><span class="cl">        <span class="p">];</span>
-</span></span><span class="line"><span class="ln">153</span><span class="cl">    <span class="p">}</span>
-</span></span><span class="line"><span class="ln">154</span><span class="cl">
-</span></span><span class="line"><span class="ln">155</span><span class="cl">    <span class="sd">/**
-</span></span></span><span class="line"><span class="ln">156</span><span class="cl"><span class="sd">     * 单条查询（ID）
-</span></span></span><span class="line"><span class="ln">157</span><span class="cl"><span class="sd">     */</span>
-</span></span><span class="line"><span class="ln">158</span><span class="cl">    <span class="k">public</span> <span class="k">function</span> <span class="nf">find</span><span class="p">(</span><span class="nx">string</span><span class="o">|</span><span class="nx">int</span> <span class="nv">$id</span><span class="p">)</span><span class="o">:</span> <span class="k">array</span>
-</span></span><span class="line"><span class="ln">159</span><span class="cl">    <span class="p">{</span>
-</span></span><span class="line"><span class="ln">160</span><span class="cl">        <span class="nv">$response</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">client</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">([</span>
-</span></span><span class="line"><span class="ln">161</span><span class="cl">            <span class="s1">&#39;index&#39;</span> <span class="o">=&gt;</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">index</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">162</span><span class="cl">            <span class="s1">&#39;id&#39;</span>    <span class="o">=&gt;</span> <span class="nv">$id</span>
-</span></span><span class="line"><span class="ln">163</span><span class="cl">        <span class="p">]);</span>
-</span></span><span class="line"><span class="ln">164</span><span class="cl">
-</span></span><span class="line"><span class="ln">165</span><span class="cl">        <span class="k">return</span> <span class="nv">$response</span><span class="p">[</span><span class="s1">&#39;_source&#39;</span><span class="p">];</span>
-</span></span><span class="line"><span class="ln">166</span><span class="cl">    <span class="p">}</span>
-</span></span><span class="line"><span class="ln">167</span><span class="cl">
-</span></span><span class="line"><span class="ln">168</span><span class="cl">    <span class="sd">/**
-</span></span></span><span class="line"><span class="ln">169</span><span class="cl"><span class="sd">     * 聚合：按班级统计人数 &amp; 平均分
-</span></span></span><span class="line"><span class="ln">170</span><span class="cl"><span class="sd">     */</span>
-</span></span><span class="line"><span class="ln">171</span><span class="cl">    <span class="k">public</span> <span class="k">function</span> <span class="nf">aggByClass</span><span class="p">()</span><span class="o">:</span> <span class="k">array</span>
-</span></span><span class="line"><span class="ln">172</span><span class="cl">    <span class="p">{</span>
-</span></span><span class="line"><span class="ln">173</span><span class="cl">        <span class="nv">$params</span> <span class="o">=</span> <span class="p">[</span>
-</span></span><span class="line"><span class="ln">174</span><span class="cl">            <span class="s1">&#39;index&#39;</span> <span class="o">=&gt;</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">index</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">175</span><span class="cl">            <span class="s1">&#39;size&#39;</span>  <span class="o">=&gt;</span> <span class="mi">0</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">176</span><span class="cl">            <span class="s1">&#39;body&#39;</span>  <span class="o">=&gt;</span> <span class="p">[</span>
-</span></span><span class="line"><span class="ln">177</span><span class="cl">                <span class="s1">&#39;aggs&#39;</span> <span class="o">=&gt;</span> <span class="p">[</span>
-</span></span><span class="line"><span class="ln">178</span><span class="cl">                    <span class="s1">&#39;by_class&#39;</span> <span class="o">=&gt;</span> <span class="p">[</span>
-</span></span><span class="line"><span class="ln">179</span><span class="cl">                        <span class="s1">&#39;terms&#39;</span> <span class="o">=&gt;</span> <span class="p">[</span>
-</span></span><span class="line"><span class="ln">180</span><span class="cl">                            <span class="s1">&#39;field&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;class&#39;</span>
-</span></span><span class="line"><span class="ln">181</span><span class="cl">                        <span class="p">],</span>
-</span></span><span class="line"><span class="ln">182</span><span class="cl">                        <span class="s1">&#39;aggs&#39;</span> <span class="o">=&gt;</span> <span class="p">[</span>
-</span></span><span class="line"><span class="ln">183</span><span class="cl">                            <span class="s1">&#39;avg_score&#39;</span> <span class="o">=&gt;</span> <span class="p">[</span>
-</span></span><span class="line"><span class="ln">184</span><span class="cl">                                <span class="s1">&#39;avg&#39;</span> <span class="o">=&gt;</span> <span class="p">[</span>
-</span></span><span class="line"><span class="ln">185</span><span class="cl">                                    <span class="s1">&#39;field&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;score&#39;</span>
-</span></span><span class="line"><span class="ln">186</span><span class="cl">                                <span class="p">]</span>
-</span></span><span class="line"><span class="ln">187</span><span class="cl">                            <span class="p">]</span>
-</span></span><span class="line"><span class="ln">188</span><span class="cl">                        <span class="p">]</span>
-</span></span><span class="line"><span class="ln">189</span><span class="cl">                    <span class="p">]</span>
-</span></span><span class="line"><span class="ln">190</span><span class="cl">                <span class="p">]</span>
-</span></span><span class="line"><span class="ln">191</span><span class="cl">            <span class="p">]</span>
-</span></span><span class="line"><span class="ln">192</span><span class="cl">        <span class="p">];</span>
-</span></span><span class="line"><span class="ln">193</span><span class="cl">
-</span></span><span class="line"><span class="ln">194</span><span class="cl">        <span class="nv">$response</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">client</span><span class="o">-&gt;</span><span class="na">search</span><span class="p">(</span><span class="nv">$params</span><span class="p">);</span>
-</span></span><span class="line"><span class="ln">195</span><span class="cl">
-</span></span><span class="line"><span class="ln">196</span><span class="cl">        <span class="k">return</span> <span class="nv">$response</span><span class="p">[</span><span class="s1">&#39;aggregations&#39;</span><span class="p">][</span><span class="s1">&#39;by_class&#39;</span><span class="p">][</span><span class="s1">&#39;buckets&#39;</span><span class="p">]</span> <span class="o">??</span> <span class="p">[];</span>
-</span></span><span class="line"><span class="ln">197</span><span class="cl">    <span class="p">}</span>
-</span></span><span class="line"><span class="ln">198</span><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="ln">111</span><span class="cl">    <span class="sd">/**
+</span></span></span><span class="line"><span class="ln">112</span><span class="cl"><span class="sd">     * ⚡ update_by_query
+</span></span></span><span class="line"><span class="ln">113</span><span class="cl"><span class="sd">     */</span>
+</span></span><span class="line"><span class="ln">114</span><span class="cl">    <span class="k">public</span> <span class="k">function</span> <span class="nf">updateByQuery</span><span class="p">(</span><span class="k">array</span> <span class="nv">$query</span><span class="p">,</span> <span class="k">array</span> <span class="nv">$script</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln">115</span><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="ln">116</span><span class="cl">        <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">client</span><span class="o">-&gt;</span><span class="na">updateByQuery</span><span class="p">([</span>
+</span></span><span class="line"><span class="ln">117</span><span class="cl">            <span class="s1">&#39;index&#39;</span> <span class="o">=&gt;</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">index</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">118</span><span class="cl">            <span class="s1">&#39;body&#39;</span>  <span class="o">=&gt;</span> <span class="p">[</span>
+</span></span><span class="line"><span class="ln">119</span><span class="cl">                <span class="s1">&#39;query&#39;</span>  <span class="o">=&gt;</span> <span class="nv">$query</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">120</span><span class="cl">                <span class="s1">&#39;script&#39;</span> <span class="o">=&gt;</span> <span class="nv">$script</span>
+</span></span><span class="line"><span class="ln">121</span><span class="cl">            <span class="p">]</span>
+</span></span><span class="line"><span class="ln">122</span><span class="cl">        <span class="p">]);</span>
+</span></span><span class="line"><span class="ln">123</span><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="ln">124</span><span class="cl"><span class="p">}</span>
 </span></span></code></pre></div><hr>
-<h2 id="三controller--使用示例">三、Controller / 使用示例</h2>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="nv">$service</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">StudentSearchService</span><span class="p">(</span><span class="nv">$client</span><span class="p">);</span>
-</span></span><span class="line"><span class="ln"> 2</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="c1">// 搜索
-</span></span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="c1"></span><span class="nv">$result</span> <span class="o">=</span> <span class="nv">$service</span><span class="o">-&gt;</span><span class="na">search</span><span class="p">([</span>
-</span></span><span class="line"><span class="ln"> 5</span><span class="cl">    <span class="s1">&#39;keyword&#39;</span>   <span class="o">=&gt;</span> <span class="s1">&#39;学生&#39;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln"> 6</span><span class="cl">    <span class="s1">&#39;gender&#39;</span>    <span class="o">=&gt;</span> <span class="s1">&#39;female&#39;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln"> 7</span><span class="cl">    <span class="s1">&#39;class&#39;</span>     <span class="o">=&gt;</span> <span class="s1">&#39;class_3&#39;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln"> 8</span><span class="cl">    <span class="s1">&#39;score_min&#39;</span> <span class="o">=&gt;</span> <span class="mi">80</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln"> 9</span><span class="cl">    <span class="s1">&#39;sort&#39;</span>      <span class="o">=&gt;</span> <span class="s1">&#39;score_desc&#39;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">10</span><span class="cl">    <span class="s1">&#39;page&#39;</span>      <span class="o">=&gt;</span> <span class="mi">1</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">11</span><span class="cl">    <span class="s1">&#39;page_size&#39;</span> <span class="o">=&gt;</span> <span class="mi">10</span>
-</span></span><span class="line"><span class="ln">12</span><span class="cl"><span class="p">]);</span>
-</span></span><span class="line"><span class="ln">13</span><span class="cl">
-</span></span><span class="line"><span class="ln">14</span><span class="cl"><span class="c1">// 单条
-</span></span></span><span class="line"><span class="ln">15</span><span class="cl"><span class="c1"></span><span class="nv">$student</span> <span class="o">=</span> <span class="nv">$service</span><span class="o">-&gt;</span><span class="na">find</span><span class="p">(</span><span class="mi">100</span><span class="p">);</span>
-</span></span><span class="line"><span class="ln">16</span><span class="cl">
-</span></span><span class="line"><span class="ln">17</span><span class="cl"><span class="c1">// 聚合
-</span></span></span><span class="line"><span class="ln">18</span><span class="cl"><span class="c1"></span><span class="nv">$agg</span> <span class="o">=</span> <span class="nv">$service</span><span class="o">-&gt;</span><span class="na">aggByClass</span><span class="p">();</span>
-</span></span></code></pre></div><hr>
-<h2 id="四这份-service-为什么是生产级">四、这份 Service 为什么是“生产级”</h2>
-<p>✅ <strong>Controller 不碰 ES DSL</strong>
-✅ <strong>查询条件天然防注入</strong>
-✅ <strong>filter / must 使用正确</strong>
-✅ <strong>排序白名单（防止 field 注入）</strong>
-✅ <strong>分页限制 size ≤ 100（防事故）</strong>
-✅ <strong>后期加条件只改 Service</strong></p>
+<h1 id="-六使用示例非常关键">🔥 六、使用示例（非常关键）</h1>
 <hr>
+<h2 id="-1-插入数据">📌 1. 插入数据</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln">1</span><span class="cl"><span class="nv">$service</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">StudentSearchService</span><span class="p">();</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl">
+</span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="nv">$service</span><span class="o">-&gt;</span><span class="na">index</span><span class="p">([</span>
+</span></span><span class="line"><span class="ln">4</span><span class="cl">    <span class="s1">&#39;name&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;学生1&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">5</span><span class="cl">    <span class="s1">&#39;age&#39;</span>  <span class="o">=&gt;</span> <span class="mi">18</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">6</span><span class="cl">    <span class="s1">&#39;gender&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;female&#39;</span>
+</span></span><span class="line"><span class="ln">7</span><span class="cl"><span class="p">],</span> <span class="mi">1</span><span class="p">);</span>
+</span></span></code></pre></div><hr>
+<h2 id="-2-批量插入bulk">📌 2. 批量插入（Bulk）</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln">1</span><span class="cl"><span class="nv">$service</span><span class="o">-&gt;</span><span class="na">bulkInsert</span><span class="p">([</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl">    <span class="p">[</span><span class="s1">&#39;id&#39;</span> <span class="o">=&gt;</span> <span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;name&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;学生2&#39;</span><span class="p">,</span> <span class="s1">&#39;age&#39;</span> <span class="o">=&gt;</span> <span class="mi">20</span><span class="p">],</span>
+</span></span><span class="line"><span class="ln">3</span><span class="cl">    <span class="p">[</span><span class="s1">&#39;id&#39;</span> <span class="o">=&gt;</span> <span class="mi">3</span><span class="p">,</span> <span class="s1">&#39;name&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;学生3&#39;</span><span class="p">,</span> <span class="s1">&#39;age&#39;</span> <span class="o">=&gt;</span> <span class="mi">19</span><span class="p">],</span>
+</span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="p">]);</span>
+</span></span></code></pre></div><hr>
+<h2 id="-3-match-查询">📌 3. match 查询</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln">1</span><span class="cl"><span class="nv">$query</span> <span class="o">=</span> <span class="p">(</span><span class="k">new</span> <span class="nx">QueryBuilder</span><span class="p">())</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl">    <span class="o">-&gt;</span><span class="na">match</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;学生&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln">3</span><span class="cl">    <span class="o">-&gt;</span><span class="na">build</span><span class="p">();</span>
+</span></span><span class="line"><span class="ln">4</span><span class="cl">
+</span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="nv">$result</span> <span class="o">=</span> <span class="nv">$service</span><span class="o">-&gt;</span><span class="na">search</span><span class="p">(</span><span class="nv">$query</span><span class="p">);</span>
+</span></span></code></pre></div><hr>
+<h2 id="-4-term--range-组合查询">📌 4. term + range 组合查询</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln">1</span><span class="cl"><span class="nv">$query</span> <span class="o">=</span> <span class="p">(</span><span class="k">new</span> <span class="nx">QueryBuilder</span><span class="p">())</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl">    <span class="o">-&gt;</span><span class="na">term</span><span class="p">(</span><span class="s1">&#39;gender&#39;</span><span class="p">,</span> <span class="s1">&#39;female&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln">3</span><span class="cl">    <span class="o">-&gt;</span><span class="na">range</span><span class="p">(</span><span class="s1">&#39;age&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;gte&#39;</span> <span class="o">=&gt;</span> <span class="mi">18</span><span class="p">,</span> <span class="s1">&#39;lte&#39;</span> <span class="o">=&gt;</span> <span class="mi">25</span><span class="p">])</span>
+</span></span><span class="line"><span class="ln">4</span><span class="cl">    <span class="o">-&gt;</span><span class="na">build</span><span class="p">();</span>
+</span></span><span class="line"><span class="ln">5</span><span class="cl">
+</span></span><span class="line"><span class="ln">6</span><span class="cl"><span class="nv">$result</span> <span class="o">=</span> <span class="nv">$service</span><span class="o">-&gt;</span><span class="na">search</span><span class="p">(</span><span class="nv">$query</span><span class="p">);</span>
+</span></span></code></pre></div><hr>
+<h2 id="-5-update_by_query">📌 5. update_by_query</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln">1</span><span class="cl"><span class="nv">$service</span><span class="o">-&gt;</span><span class="na">updateByQuery</span><span class="p">(</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl">    <span class="p">[</span><span class="s1">&#39;term&#39;</span> <span class="o">=&gt;</span> <span class="p">[</span><span class="s1">&#39;name&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;学生5&#39;</span><span class="p">]],</span>
+</span></span><span class="line"><span class="ln">3</span><span class="cl">    <span class="p">[</span>
+</span></span><span class="line"><span class="ln">4</span><span class="cl">        <span class="s1">&#39;source&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;ctx._source.gender = params.gender&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">5</span><span class="cl">        <span class="s1">&#39;params&#39;</span> <span class="o">=&gt;</span> <span class="p">[</span><span class="s1">&#39;gender&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;male&#39;</span><span class="p">]</span>
+</span></span><span class="line"><span class="ln">6</span><span class="cl">    <span class="p">]</span>
+</span></span><span class="line"><span class="ln">7</span><span class="cl"><span class="p">);</span>
+</span></span></code></pre></div><hr>
+<h2 id="-6-删除数据">📌 6. 删除数据</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln">1</span><span class="cl"><span class="nv">$service</span><span class="o">-&gt;</span><span class="na">delete</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+</span></span></code></pre></div><hr>
+<h2 id="-7-条件删除">📌 7. 条件删除</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln">1</span><span class="cl"><span class="nv">$service</span><span class="o">-&gt;</span><span class="na">deleteByQuery</span><span class="p">([</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl">    <span class="s1">&#39;range&#39;</span> <span class="o">=&gt;</span> <span class="p">[</span>
+</span></span><span class="line"><span class="ln">3</span><span class="cl">        <span class="s1">&#39;age&#39;</span> <span class="o">=&gt;</span> <span class="p">[</span><span class="s1">&#39;lt&#39;</span> <span class="o">=&gt;</span> <span class="mi">18</span><span class="p">]</span>
+</span></span><span class="line"><span class="ln">4</span><span class="cl">    <span class="p">]</span>
+</span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="p">]);</span>
+</span></span></code></pre></div><hr>
 <h1 id="附加一个用-elasticsearch-的-bulk-api-批量插入数据">附加一个用 <strong>Elasticsearch 的 Bulk API</strong> 批量插入数据。</h1>
 <hr>
 <h2 id="-一bulk-请求格式核心">🚀 一、Bulk 请求格式（核心）</h2>
