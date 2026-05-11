@@ -168,7 +168,7 @@
     <span class="post_date">
       2026-01-22	  
     </span>
-    <span class="post_time"> · 4 分钟阅读</span><span>&nbsp;· <a href='https://jianlin-li.github.io/tags/elasticsearch/' title="Elasticsearch" class="post_tag button button_translucent">Elasticsearch
+    <span class="post_time"> · 7 分钟阅读</span><span>&nbsp;· <a href='https://jianlin-li.github.io/tags/elasticsearch/' title="Elasticsearch" class="post_tag button button_translucent">Elasticsearch
         </a>
     </span>
     <span class="page_only">&nbsp;·
@@ -671,6 +671,362 @@
 <blockquote>
 <p>Elasticsearch 字段本身就是“多值结构”，数组只是 JSON 表达方式，不是类型限制。</p>
 </blockquote>
+<hr>
+<hr>
+<hr>
+<h1 id="在-elasticsearch-里date-类型其实是非常灵活但也容易踩坑的一类字段现在把它讲透支持哪些日期格式--底层机制--推荐写法--常见坑">在 Elasticsearch 里，<code>date</code> 类型其实是<strong>非常灵活但也容易踩坑</strong>的一类字段。现在把它讲透：<strong>支持哪些日期格式 + 底层机制 + 推荐写法 + 常见坑</strong></h1>
+<hr>
+<h2 id="-一结论先说清楚">🧠 一、结论先说清楚</h2>
+<p><code>date</code> 类型支持三大类格式：</p>
+<h3 id="-1-标准日期格式推荐">✅ 1. 标准日期格式（推荐）</h3>
+<ul>
+<li>ISO 8601（最常用）</li>
+</ul>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">2026-01-25
+</span></span><span class="line"><span class="ln">2</span><span class="cl">2026-01-25T10:30:00
+</span></span><span class="line"><span class="ln">3</span><span class="cl">2026-01-25T10:30:00Z
+</span></span><span class="line"><span class="ln">4</span><span class="cl">2026-01-25T10:30:00+08:00
+</span></span></code></pre></div><hr>
+<h3 id="-2-时间戳毫秒秒">✅ 2. 时间戳（毫秒/秒）</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">1706188200000   （毫秒）
+</span></span><span class="line"><span class="ln">2</span><span class="cl">1706188200      （秒，需配置）
+</span></span></code></pre></div><hr>
+<h3 id="-3-自定义格式mapping-定义">✅ 3. 自定义格式（mapping 定义）</h3>
+<p>比如：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">25/01/2026
+</span></span><span class="line"><span class="ln">2</span><span class="cl">2026-01-25 10:30:00
+</span></span></code></pre></div><p>👉 需要在 mapping 中声明 format</p>
+<hr>
+<h2 id="-二默认支持的日期格式重点">⚙️ 二、默认支持的日期格式（重点🔥）</h2>
+<p>如果你<strong>不写 format</strong>，默认是：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">strict_date_optional_time||epoch_millis
+</span></span></code></pre></div><p>等价于：</p>
+<h3 id="-1-iso-8601最推荐">📌 1. ISO 8601（最推荐）</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">2026-01-25T10:30:00Z
+</span></span><span class="line"><span class="ln">2</span><span class="cl">2026-01-25T10:30:00+08:00
+</span></span></code></pre></div><hr>
+<h3 id="-2-日期--时间可选时间">📌 2. 日期 + 时间（可选时间）</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">2026-01-25
+</span></span><span class="line"><span class="ln">2</span><span class="cl">2026-01-25T10:30:00
+</span></span></code></pre></div><hr>
+<h3 id="-3-时间戳毫秒">📌 3. 时间戳（毫秒）</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">1706188200000
+</span></span></code></pre></div><hr>
+<h2 id="-三mapping-示例">🧱 三、mapping 示例</h2>
+<h3 id="-1-默认-date-类型">📌 1. 默认 date 类型</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="ln">1</span><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl">  <span class="nt">&#34;mappings&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">3</span><span class="cl">    <span class="nt">&#34;properties&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">4</span><span class="cl">      <span class="nt">&#34;birthday&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">5</span><span class="cl">        <span class="nt">&#34;type&#34;</span><span class="p">:</span> <span class="s2">&#34;date&#34;</span>
+</span></span><span class="line"><span class="ln">6</span><span class="cl">      <span class="p">}</span>
+</span></span><span class="line"><span class="ln">7</span><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="ln">8</span><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="ln">9</span><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><hr>
+<h3 id="-2-自定义格式重点">📌 2. 自定义格式（重点🔥）</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl">  <span class="nt">&#34;mappings&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl">    <span class="nt">&#34;properties&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl">      <span class="nt">&#34;birthday&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl">        <span class="nt">&#34;type&#34;</span><span class="p">:</span> <span class="s2">&#34;date&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">        <span class="nt">&#34;format&#34;</span><span class="p">:</span> <span class="s2">&#34;yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||epoch_millis&#34;</span>
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl">      <span class="p">}</span>
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><hr>
+<h2 id="-四支持的日期格式语法核心">📅 四、支持的日期格式语法（核心）</h2>
+<p>ES 使用的是类似 Java DateTimeFormatter 的规则：</p>
+<hr>
+<h3 id="-常用格式符">📌 常用格式符</h3>
+<table>
+  <thead>
+      <tr>
+          <th>符号</th>
+          <th>含义</th>
+          <th>示例</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>yyyy</td>
+          <td>年</td>
+          <td>2026</td>
+      </tr>
+      <tr>
+          <td>MM</td>
+          <td>月</td>
+          <td>01</td>
+      </tr>
+      <tr>
+          <td>dd</td>
+          <td>日</td>
+          <td>25</td>
+      </tr>
+      <tr>
+          <td>HH</td>
+          <td>小时（24h）</td>
+          <td>10</td>
+      </tr>
+      <tr>
+          <td>mm</td>
+          <td>分钟</td>
+          <td>30</td>
+      </tr>
+      <tr>
+          <td>ss</td>
+          <td>秒</td>
+          <td>59</td>
+      </tr>
+  </tbody>
+</table>
+<hr>
+<h3 id="-组合示例">📌 组合示例</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">yyyy-MM-dd
+</span></span><span class="line"><span class="ln">2</span><span class="cl">yyyy/MM/dd
+</span></span><span class="line"><span class="ln">3</span><span class="cl">yyyy-MM-dd HH:mm:ss
+</span></span><span class="line"><span class="ln">4</span><span class="cl">yyyy-MM-dd&#39;T&#39;HH:mm:ss
+</span></span></code></pre></div><hr>
+<h2 id="-五时间戳支持重点">🕒 五、时间戳支持（重点）</h2>
+<h3 id="-默认支持毫秒">📌 默认支持毫秒</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">1706188200000
+</span></span></code></pre></div><hr>
+<h3 id="-如果你想支持秒">📌 如果你想支持“秒”</h3>
+<p>需要这样：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="ln">1</span><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl">  <span class="nt">&#34;format&#34;</span><span class="p">:</span> <span class="s2">&#34;epoch_second||epoch_millis&#34;</span>
+</span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><hr>
+<h2 id="-六查询时的日期写法非常重要">🔥 六、查询时的日期写法（非常重要）</h2>
+<h3 id="-1-精确日期">📌 1. 精确日期</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="ln">1</span><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl">  <span class="nt">&#34;query&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">3</span><span class="cl">    <span class="nt">&#34;term&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">4</span><span class="cl">      <span class="nt">&#34;birthday&#34;</span><span class="p">:</span> <span class="s2">&#34;2026-01-25&#34;</span>
+</span></span><span class="line"><span class="ln">5</span><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="ln">6</span><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="ln">7</span><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><hr>
+<h3 id="-2-范围查询最常用">📌 2. 范围查询（最常用🔥）</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl">  <span class="nt">&#34;query&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl">    <span class="nt">&#34;range&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl">      <span class="nt">&#34;birthday&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl">        <span class="nt">&#34;gte&#34;</span><span class="p">:</span> <span class="s2">&#34;2026-01-01&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">        <span class="nt">&#34;lte&#34;</span><span class="p">:</span> <span class="s2">&#34;2026-12-31&#34;</span>
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl">      <span class="p">}</span>
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><hr>
+<h3 id="-3-带时间">📌 3. 带时间</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="ln">1</span><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl">  <span class="nt">&#34;range&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">3</span><span class="cl">    <span class="nt">&#34;birthday&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">4</span><span class="cl">      <span class="nt">&#34;gte&#34;</span><span class="p">:</span> <span class="s2">&#34;2026-01-25T00:00:00&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">5</span><span class="cl">      <span class="nt">&#34;lte&#34;</span><span class="p">:</span> <span class="s2">&#34;2026-01-25T23:59:59&#34;</span>
+</span></span><span class="line"><span class="ln">6</span><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="ln">7</span><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="ln">8</span><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><hr>
+<h3 id="-4-相对时间超级好用">📌 4. 相对时间（超级好用🔥）</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="ln">1</span><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl">  <span class="nt">&#34;range&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">3</span><span class="cl">    <span class="nt">&#34;birthday&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">4</span><span class="cl">      <span class="nt">&#34;gte&#34;</span><span class="p">:</span> <span class="s2">&#34;now-7d/d&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">5</span><span class="cl">      <span class="nt">&#34;lte&#34;</span><span class="p">:</span> <span class="s2">&#34;now&#34;</span>
+</span></span><span class="line"><span class="ln">6</span><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="ln">7</span><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="ln">8</span><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><hr>
+<h2 id="-七常见坑非常重要">⚠️ 七、常见坑（非常重要）</h2>
+<hr>
+<h3 id="-1-时间格式不匹配">❌ 1. 时间格式不匹配</h3>
+<p>比如 mapping：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="ln">1</span><span class="cl"><span class="s2">&#34;format&#34;</span><span class="err">:</span> <span class="s2">&#34;yyyy-MM-dd&#34;</span>
+</span></span></code></pre></div><p>但你传：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">2026-01-25T10:00:00 ❌
+</span></span></code></pre></div><p>👉 会报错</p>
+<hr>
+<h3 id="-2-时区问题">❌ 2. 时区问题</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">2026-01-25T10:00:00Z
+</span></span></code></pre></div><p>vs</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">2026-01-25T10:00:00+08:00
+</span></span></code></pre></div><p>👉 ES 会自动转换为 UTC 存储</p>
+<hr>
+<h3 id="-3-用-string-当-date">❌ 3. 用 string 当 date</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="ln">1</span><span class="cl"><span class="s2">&#34;type&#34;</span><span class="err">:</span> <span class="s2">&#34;text&#34;</span>
+</span></span></code></pre></div><p>👉 无法 range 查询</p>
+<hr>
+<h2 id="-八最佳实践建议">🧠 八、最佳实践（建议🔥）</h2>
+<h3 id="-推荐-mapping">🚀 推荐 mapping</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="ln">1</span><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl">  <span class="nt">&#34;type&#34;</span><span class="p">:</span> <span class="s2">&#34;date&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">3</span><span class="cl">  <span class="nt">&#34;format&#34;</span><span class="p">:</span> <span class="s2">&#34;strict_date_optional_time||epoch_millis&#34;</span>
+</span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>👉 这是工业标准配置</p>
+<hr>
+<h3 id="-推荐写入格式">🚀 推荐写入格式</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">2026-01-25T10:30:00Z
+</span></span></code></pre></div><hr>
+<h2 id="-九一句话总结">🎯 九、一句话总结</h2>
+<p>👉 Elasticsearch 的 date 类型支持：</p>
+<ul>
+<li>ISO 8601（标准）</li>
+<li>时间戳（毫秒/秒）</li>
+<li>自定义格式（format 定义）</li>
+<li>相对时间（now-7d）</li>
+</ul>
+<hr>
+<h1 id="要分清一个关键点es-接收的是解析后的时间不是你输入的字符串长什么样-查询的时候可以使用其他时间格式">要分清一个关键点：<strong>ES 接收的是“解析后的时间”，不是你输入的“字符串长什么样”</strong> 👍，查询的时候可以使用其他时间格式</h1>
+<p>在 Elasticsearch 中，<code>date</code> 类型本质上是：</p>
+<blockquote>
+<p>👉 <strong>内部统一转成 long（毫秒时间戳）存储</strong></p>
+</blockquote>
+<p>所以结论是：</p>
+<hr>
+<h2 id="-一答案先说清楚">🧠 一、答案先说清楚</h2>
+<h3 id="-可以用时间戳查询-iso-8601--日期时间字段">✅ 可以用时间戳查询 ISO 8601 / 日期时间字段</h3>
+<p>但必须满足：</p>
+<h4 id="-1-时间戳是合法-epoch-millis--seconds">✔ 1. 时间戳是“合法 epoch millis / seconds”</h4>
+<h4 id="-2-mapping-支持-epoch-格式">✔ 2. mapping 支持 epoch 格式</h4>
+<h4 id="-3-查询时-es-会自动转换">✔ 3. 查询时 ES 会自动转换</h4>
+<hr>
+<h2 id="-二底层原理非常重要">⚙️ 二、底层原理（非常重要🔥）</h2>
+<p>无论你写的是：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">2026-01-25T10:00:00Z
+</span></span></code></pre></div><p>或：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">2026-01-25 10:00:00
+</span></span></code></pre></div><p>ES 内部都会转成：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">→ 1706176800000 (毫秒时间戳)
+</span></span></code></pre></div><p>👉 所以查询时：</p>
+<blockquote>
+<p>ES 做的是 <strong>数值范围比较</strong>，不是字符串比较</p>
+</blockquote>
+<hr>
+<h2 id="-三可以这样查支持">🔍 三、可以这样查（支持）</h2>
+<h3 id="-1-用时间戳范围查询毫秒">📌 1. 用时间戳范围查询（毫秒）</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl">  <span class="nt">&#34;query&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl">    <span class="nt">&#34;range&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl">      <span class="nt">&#34;birthday&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl">        <span class="nt">&#34;gte&#34;</span><span class="p">:</span> <span class="mi">1706176800000</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">        <span class="nt">&#34;lte&#34;</span><span class="p">:</span> <span class="mi">1706263200000</span>
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl">      <span class="p">}</span>
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>👉 ✔ 完全可以匹配 ISO 8601 数据</p>
+<hr>
+<h3 id="-2-用时间戳秒">📌 2. 用时间戳（秒）</h3>
+<p>如果 mapping 支持：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="ln">1</span><span class="cl"><span class="s2">&#34;format&#34;</span><span class="err">:</span> <span class="s2">&#34;epoch_second||epoch_millis&#34;</span>
+</span></span></code></pre></div><p>可以：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="ln">1</span><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl">  <span class="nt">&#34;range&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">3</span><span class="cl">    <span class="nt">&#34;birthday&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">4</span><span class="cl">      <span class="nt">&#34;gte&#34;</span><span class="p">:</span> <span class="mi">1706176800</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">5</span><span class="cl">      <span class="nt">&#34;lte&#34;</span><span class="p">:</span> <span class="mi">1706263200</span>
+</span></span><span class="line"><span class="ln">6</span><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="ln">7</span><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="ln">8</span><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><hr>
+<h2 id="-四关键前提很多人踩坑">⚠️ 四、关键前提（很多人踩坑）</h2>
+<h3 id="-前提1mapping-必须支持-epoch">❗ 前提1：mapping 必须支持 epoch</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="ln">1</span><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl">  <span class="nt">&#34;type&#34;</span><span class="p">:</span> <span class="s2">&#34;date&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">3</span><span class="cl">  <span class="nt">&#34;format&#34;</span><span class="p">:</span> <span class="s2">&#34;strict_date_optional_time||epoch_millis&#34;</span>
+</span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>👉 否则：</p>
+<ul>
+<li>ISO ✔</li>
+<li>时间戳 ❌（会报错）</li>
+</ul>
+<hr>
+<h3 id="-前提2时间单位必须正确">❗ 前提2：时间单位必须正确</h3>
+<table>
+  <thead>
+      <tr>
+          <th>类型</th>
+          <th>单位</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>epoch_millis</td>
+          <td>毫秒</td>
+      </tr>
+      <tr>
+          <td>epoch_second</td>
+          <td>秒</td>
+      </tr>
+  </tbody>
+</table>
+<hr>
+<h3 id="-错误示例">❗ 错误示例</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">1706176800 ❌（如果只支持 millis）
+</span></span></code></pre></div><hr>
+<h2 id="-五混合查询能力重点">🔥 五、混合查询能力（重点）</h2>
+<p>ES 的 <code>range</code> 查询支持<strong>多格式混用</strong></p>
+<h3 id="-可以这样写">✔ 可以这样写</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="ln">1</span><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl">  <span class="nt">&#34;range&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">3</span><span class="cl">    <span class="nt">&#34;birthday&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">4</span><span class="cl">      <span class="nt">&#34;gte&#34;</span><span class="p">:</span> <span class="s2">&#34;2026-01-01T00:00:00Z&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">5</span><span class="cl">      <span class="nt">&#34;lte&#34;</span><span class="p">:</span> <span class="mi">1706263200000</span>
+</span></span><span class="line"><span class="ln">6</span><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="ln">7</span><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="ln">8</span><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>👉 ES 会自动统一转换</p>
+<hr>
+<h2 id="-六最佳实践企业级建议">🧠 六、最佳实践（企业级建议）</h2>
+<h3 id="-推荐方式统一标准">🚀 推荐方式（统一标准）</h3>
+<h4 id="-存储">✔ 存储</h4>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">ISO 8601（带时区）
+</span></span></code></pre></div><h4 id="-查询">✔ 查询</h4>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">统一用：
+</span></span><span class="line"><span class="ln">2</span><span class="cl">- ISO 8601（推荐）
+</span></span><span class="line"><span class="ln">3</span><span class="cl">- 或 now-7d 这种 DSL
+</span></span></code></pre></div><hr>
+<h3 id="-如果系统是后端服务phpjava">🚀 如果系统是后端服务（PHP/Java）</h3>
+<p>👉 建议：</p>
+<table>
+  <thead>
+      <tr>
+          <th>场景</th>
+          <th>推荐</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>前端传参</td>
+          <td>时间戳</td>
+      </tr>
+      <tr>
+          <td>ES 查询</td>
+          <td>转 ISO 8601</td>
+      </tr>
+      <tr>
+          <td>ES 存储</td>
+          <td>ISO 8601</td>
+      </tr>
+  </tbody>
+</table>
+<hr>
+<h2 id="-七为什么不建议直接用时间戳查">⚠️ 七、为什么不建议直接用时间戳查？</h2>
+<p>虽然可以，但有 3 个问题：</p>
+<h4 id="-1-可读性差">❌ 1. 可读性差</h4>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">1706176800000 ❌
+</span></span></code></pre></div><hr>
+<h4 id="-2-时区风险">❌ 2. 时区风险</h4>
+<p>ISO 自动带时区，timestamp 不会</p>
+<hr>
+<h4 id="-3-调试困难">❌ 3. 调试困难</h4>
+<p>Kibana 里不直观</p>
+<hr>
+<h2 id="-八一句话总结-1">🎯 八、一句话总结</h2>
+<p>👉 <strong>可以用时间戳查询 ISO 8601 日期字段，因为 ES 内部最终都会转换成毫秒时间戳进行比较</strong></p>
 <hr>
 
     </div><div class="post_comments">
