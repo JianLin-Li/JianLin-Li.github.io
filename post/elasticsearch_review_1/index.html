@@ -168,7 +168,7 @@
     <span class="post_date">
       2026-01-22	  
     </span>
-    <span class="post_time"> · 7 分钟阅读</span><span>&nbsp;· <a href='https://jianlin-li.github.io/tags/elasticsearch/' title="Elasticsearch" class="post_tag button button_translucent">Elasticsearch
+    <span class="post_time"> · 11 分钟阅读</span><span>&nbsp;· <a href='https://jianlin-li.github.io/tags/elasticsearch/' title="Elasticsearch" class="post_tag button button_translucent">Elasticsearch
         </a>
     </span>
     <span class="page_only">&nbsp;·
@@ -1028,6 +1028,634 @@
 <h2 id="-八一句话总结-1">🎯 八、一句话总结</h2>
 <p>👉 <strong>可以用时间戳查询 ISO 8601 日期字段，因为 ES 内部最终都会转换成毫秒时间戳进行比较</strong></p>
 <hr>
+<hr>
+<h1 id="在-elasticsearch-中乐观锁并发控制">在 Elasticsearch 中乐观锁并发控制</h1>
+<h1 id="elasticsearch-的乐观锁本质">Elasticsearch 的乐观锁本质</h1>
+<p>就是：</p>
+<blockquote>
+<p>更新时附带“我认为当前文档应该是什么版本”的条件。</p>
+</blockquote>
+<p>如果条件成立：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">允许更新
+</span></span></code></pre></div><p>否则：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">version_conflict_engine_exception
+</span></span></code></pre></div><hr>
+<h3 id="早期版本6x7x-初期使用">早期版本（6.x、7.x 初期）使用</h3>
+<ul>
+<li><code>version</code></li>
+<li><code>version_type</code></li>
+</ul>
+<p>因为version 本身也是乐观锁版本号，逻辑版本号</p>
+<p>例如：</p>
+<table>
+  <thead>
+      <tr>
+          <th>操作</th>
+          <th>version</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>初始</td>
+          <td>1</td>
+      </tr>
+      <tr>
+          <td>修改一次</td>
+          <td>2</td>
+      </tr>
+      <tr>
+          <td>修改一次</td>
+          <td>3</td>
+      </tr>
+  </tbody>
+</table>
+<p>所以：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-http" data-lang="http"><span class="line"><span class="ln">1</span><span class="cl"><span class="err">?version=3
+</span></span></span></code></pre></div><p>就表示：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">我认为当前版本应该是3
+</span></span></code></pre></div><hr>
+<h3 id="但是从-7x-后期到-8x官方已经不推荐甚至限制直接使用-version-做并发控制而改为">但是从 7.x 后期到 8.x，官方已经<strong>不推荐甚至限制直接使用 version 做并发控制</strong>，而改为：</h3>
+<ul>
+<li>
+<p><code>if_seq_no</code></p>
+</li>
+<li>
+<p><code>if_primary_term</code></p>
+</li>
+</ul>
+<p>这也是 Elasticsearch 8.x 官方推荐的 OCC（Optimistic Concurrency Control）机制。</p>
+<hr>
+<h1 id="一为什么旧版早期版本6x7x-初期-version-被淘汰">一、为什么旧版(早期版本（6.x、7.x 初期）) version 被淘汰</h1>
+<p>旧版本的并发控制：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="ln">1</span><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl">  <span class="nt">&#34;version&#34;</span><span class="p">:</span> <span class="mi">3</span>
+</span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>的问题：</p>
+<ul>
+<li>version 是逻辑版本号</li>
+<li>主从复制情况下可能不够严谨</li>
+<li>failover 后 version 可能不准确</li>
+<li>无法精确识别主分片切换</li>
+</ul>
+<p>因此 Elasticsearch 后来引入：</p>
+<h1 id="新版-occ-机制">新版 OCC 机制</h1>
+<p>基于：</p>
+<table>
+  <thead>
+      <tr>
+          <th>字段</th>
+          <th>作用</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>_seq_no</code></td>
+          <td>文档操作序列号</td>
+      </tr>
+      <tr>
+          <td><code>_primary_term</code></td>
+          <td>主分片任期编号</td>
+      </tr>
+  </tbody>
+</table>
+<p>两者一起才能唯一确定：</p>
+<blockquote>
+<p>“这个文档是不是我刚刚读取的那个版本”</p>
+</blockquote>
+<p>这是 Elasticsearch 现在真正底层的并发控制机制。</p>
+<hr>
+<h1 id="二旧版-version-并发控制老方式">二、旧版 version 并发控制（老方式）</h1>
+<hr>
+<h1 id="1老版本流程">1、老版本流程</h1>
+<h2 id="第一步查询文档">第一步：查询文档</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-http" data-lang="http"><span class="line"><span class="ln">1</span><span class="cl"><span class="err">GET student/_doc/1
+</span></span></span></code></pre></div><p>返回：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="ln">1</span><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl">  <span class="nt">&#34;_index&#34;</span><span class="p">:</span> <span class="s2">&#34;student&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">3</span><span class="cl">  <span class="nt">&#34;_id&#34;</span><span class="p">:</span> <span class="s2">&#34;1&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">4</span><span class="cl">  <span class="nt">&#34;_version&#34;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">5</span><span class="cl">  <span class="nt">&#34;_source&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">6</span><span class="cl">    <span class="nt">&#34;name&#34;</span><span class="p">:</span> <span class="s2">&#34;张三&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">7</span><span class="cl">    <span class="nt">&#34;age&#34;</span><span class="p">:</span> <span class="mi">18</span>
+</span></span><span class="line"><span class="ln">8</span><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="ln">9</span><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>这里：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="ln">1</span><span class="cl"><span class="s2">&#34;_version&#34;</span><span class="err">:</span> <span class="mi">3</span>
+</span></span></code></pre></div><p>代表当前版本。</p>
+<hr>
+<h1 id="2更新时携带-version">2、更新时携带 version</h1>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-http" data-lang="http"><span class="line"><span class="ln">1</span><span class="cl"><span class="err">PUT student/_doc/1?version=3
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="err">{
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="err">  &#34;name&#34;: &#34;张三&#34;,
+</span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="err">  &#34;age&#34;: 20
+</span></span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="err">}
+</span></span></span></code></pre></div><hr>
+<h1 id="3成功">3、成功</h1>
+<p>因为当前版本确实是 3。</p>
+<p>更新后：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="ln">1</span><span class="cl"><span class="s2">&#34;_version&#34;</span><span class="err">:</span> <span class="mi">4</span>
+</span></span></code></pre></div><hr>
+<h1 id="4并发冲突">4、并发冲突</h1>
+<p>如果别人已经更新过：</p>
+<p>当前版本已经变成：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="ln">1</span><span class="cl"><span class="s2">&#34;_version&#34;</span><span class="err">:</span> <span class="mi">4</span>
+</span></span></code></pre></div><p>你再提交：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-http" data-lang="http"><span class="line"><span class="ln">1</span><span class="cl"><span class="err">PUT student/_doc/1?version=3
+</span></span></span></code></pre></div><p>就会报错：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="ln">1</span><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl">  <span class="nt">&#34;error&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">3</span><span class="cl">    <span class="nt">&#34;type&#34;</span><span class="p">:</span> <span class="s2">&#34;version_conflict_engine_exception&#34;</span>
+</span></span><span class="line"><span class="ln">4</span><span class="cl">  <span class="p">},</span>
+</span></span><span class="line"><span class="ln">5</span><span class="cl">  <span class="nt">&#34;status&#34;</span><span class="p">:</span> <span class="mi">409</span>
+</span></span><span class="line"><span class="ln">6</span><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><hr>
+<h1 id="三新版本-occ推荐方式">三、新版本 OCC（推荐方式）</h1>
+<p>Elasticsearch 8.x 推荐：</p>
+<h1 id="if_seq_no--if_primary_term">if_seq_no + if_primary_term</h1>
+<hr>
+<h1 id="核心思想">核心思想</h1>
+<p>更新时必须满足：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">seq_no 相同
+</span></span><span class="line"><span class="ln">2</span><span class="cl">并且
+</span></span><span class="line"><span class="ln">3</span><span class="cl">primary_term 相同
+</span></span></code></pre></div><p>否则认为：</p>
+<blockquote>
+<p>文档已经被别人修改过。</p>
+</blockquote>
+<hr>
+<h1 id="四_seq_no-和-_primary_term-在哪里">四、_seq_no 和 _primary_term 在哪里？</h1>
+<ol>
+<li>
+<h4 id="其实默认-get-是有的">其实默认 GET 是有的。</h4>
+</li>
+</ol>
+<p>例如：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-http" data-lang="http"><span class="line"><span class="ln">1</span><span class="cl"><span class="err">GET student/_doc/1
+</span></span></span></code></pre></div><p>返回：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl">  <span class="nt">&#34;_index&#34;</span><span class="p">:</span> <span class="s2">&#34;student&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl">  <span class="nt">&#34;_id&#34;</span><span class="p">:</span> <span class="s2">&#34;1&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl">  <span class="nt">&#34;_version&#34;</span><span class="p">:</span> <span class="mi">7</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl">  <span class="nt">&#34;_seq_no&#34;</span><span class="p">:</span> <span class="mi">15</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">  <span class="nt">&#34;_primary_term&#34;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl">  <span class="nt">&#34;found&#34;</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl">  <span class="nt">&#34;_source&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">    <span class="nt">&#34;name&#34;</span><span class="p">:</span> <span class="s2">&#34;张三&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">10</span><span class="cl">    <span class="nt">&#34;age&#34;</span><span class="p">:</span> <span class="mi">18</span>
+</span></span><span class="line"><span class="ln">11</span><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="ln">12</span><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>重点：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="ln">1</span><span class="cl"><span class="s2">&#34;_seq_no&#34;</span><span class="err">:</span> <span class="mi">15</span><span class="err">,</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="s2">&#34;_primary_term&#34;</span><span class="err">:</span> <span class="mi">1</span>
+</span></span></code></pre></div><p>这两个字段就是 OCC 的核心。</p>
+<ol start="2">
+<li>
+<h4 id="search-api-要显式开启">Search API 要显式开启</h4>
+<p>如果你是：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-http" data-lang="http"><span class="line"><span class="ln">1</span><span class="cl"><span class="err">GET student/_search
+</span></span></span></code></pre></div><p>你必须加：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="ln">1</span><span class="cl"><span class="err">seq_no_primary_term=</span><span class="kc">true</span>
+</span></span></code></pre></div><p>例如：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-http" data-lang="http"><span class="line"><span class="ln">1</span><span class="cl"><span class="err">GET student/_search?seq_no_primary_term=true
+</span></span></span></code></pre></div><p>这时才会返回：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl">  <span class="nt">&#34;hits&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl">    <span class="nt">&#34;hits&#34;</span><span class="p">:</span> <span class="p">[</span>
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl">      <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl">        <span class="nt">&#34;_id&#34;</span><span class="p">:</span> <span class="s2">&#34;1&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">        <span class="nt">&#34;_seq_no&#34;</span><span class="p">:</span> <span class="mi">15</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl">        <span class="nt">&#34;_primary_term&#34;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl">        <span class="nt">&#34;_source&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">          <span class="nt">&#34;name&#34;</span><span class="p">:</span> <span class="s2">&#34;张三&#34;</span>
+</span></span><span class="line"><span class="ln">10</span><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="ln">11</span><span class="cl">      <span class="p">}</span>
+</span></span><span class="line"><span class="ln">12</span><span class="cl">    <span class="p">]</span>
+</span></span><span class="line"><span class="ln">13</span><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="ln">14</span><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><hr>
+<h5 id="为什么-search-默认不返回-seq_no">为什么 search 默认不返回 seq_no</h5>
+<p>因为： seq_no 是内部并发元数据，大量搜索时返回会增加开销。</p>
+<p>所以默认关闭。</p>
+<p>只有：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-http" data-lang="http"><span class="line"><span class="ln">1</span><span class="cl"><span class="err">?seq_no_primary_term=true
+</span></span></span></code></pre></div><p>才会返回。</p>
+</li>
+</ol>
+<hr>
+<h1 id="五新版完整并发控制流程">五、新版完整并发控制流程</h1>
+<hr>
+<h4 id="1读取文档">1、读取文档</h4>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-http" data-lang="http"><span class="line"><span class="ln">1</span><span class="cl"><span class="err">GET student/_doc/1
+</span></span></span></code></pre></div><p>得到：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="ln">1</span><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl">  <span class="nt">&#34;_seq_no&#34;</span><span class="p">:</span> <span class="mi">15</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">3</span><span class="cl">  <span class="nt">&#34;_primary_term&#34;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">4</span><span class="cl">  <span class="nt">&#34;_source&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">5</span><span class="cl">    <span class="nt">&#34;name&#34;</span><span class="p">:</span> <span class="s2">&#34;张三&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">6</span><span class="cl">    <span class="nt">&#34;age&#34;</span><span class="p">:</span> <span class="mi">18</span>
+</span></span><span class="line"><span class="ln">7</span><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="ln">8</span><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>记住：</p>
+<table>
+  <thead>
+      <tr>
+          <th>字段</th>
+          <th>值</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>seq_no</td>
+          <td>15</td>
+      </tr>
+      <tr>
+          <td>primary_term</td>
+          <td>1</td>
+      </tr>
+  </tbody>
+</table>
+<hr>
+<h4 id="2更新时带上-occ-条件">2、更新时带上 OCC 条件</h4>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-http" data-lang="http"><span class="line"><span class="ln">1</span><span class="cl"><span class="err">PUT student/_doc/1?if_seq_no=15&amp;if_primary_term=1
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="err">{
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="err">  &#34;name&#34;: &#34;张三&#34;,
+</span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="err">  &#34;age&#34;: 20
+</span></span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="err">}
+</span></span></span></code></pre></div><hr>
+<h4 id="3更新成功">3、更新成功</h4>
+<p>返回：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="ln">1</span><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl">  <span class="nt">&#34;_seq_no&#34;</span><span class="p">:</span> <span class="mi">16</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">3</span><span class="cl">  <span class="nt">&#34;_primary_term&#34;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">4</span><span class="cl">  <span class="nt">&#34;result&#34;</span><span class="p">:</span> <span class="s2">&#34;updated&#34;</span>
+</span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>注意：</p>
+<p>seq_no 自动增加。</p>
+<h4 id="4update-api-也是一样">4、Update API 也是一样</h4>
+<p>例如：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-http" data-lang="http"><span class="line"><span class="ln">1</span><span class="cl"><span class="err">POST /student/_update/1?if_seq_no=15&amp;if_primary_term=1
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="err">{
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="err">  &#34;doc&#34;: {
+</span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="err">    &#34;age&#34;: 20
+</span></span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="err">  }
+</span></span></span><span class="line"><span class="ln">6</span><span class="cl"><span class="err">}
+</span></span></span></code></pre></div><p>同样会启用 OCC。</p>
+<h4 id="5bulk-api-也支持-occ">5、Bulk API 也支持 OCC</h4>
+<p>例如：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="p">{</span> 
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl">  <span class="nt">&#34;update&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl">    <span class="nt">&#34;_id&#34;</span><span class="p">:</span> <span class="s2">&#34;1&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl">    <span class="nt">&#34;_index&#34;</span><span class="p">:</span> <span class="s2">&#34;student&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl">    <span class="nt">&#34;if_seq_no&#34;</span><span class="p">:</span> <span class="mi">15</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">    <span class="nt">&#34;if_primary_term&#34;</span><span class="p">:</span> <span class="mi">1</span>
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl"><span class="p">{</span> 
+</span></span><span class="line"><span class="ln">10</span><span class="cl">  <span class="nt">&#34;doc&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">11</span><span class="cl">    <span class="nt">&#34;age&#34;</span><span class="p">:</span> <span class="mi">20</span>
+</span></span><span class="line"><span class="ln">12</span><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="ln">13</span><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>Bulk 内部也是一样。</p>
+<hr>
+<h4 id="6并发冲突">6、并发冲突</h4>
+<p>如果别人已经修改：</p>
+<p>当前：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="ln">1</span><span class="cl"><span class="s2">&#34;_seq_no&#34;</span><span class="err">:</span> <span class="mi">16</span>
+</span></span></code></pre></div><p>你仍提交：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-http" data-lang="http"><span class="line"><span class="ln">1</span><span class="cl"><span class="err">PUT student/_doc/1?if_seq_no=15&amp;if_primary_term=1
+</span></span></span></code></pre></div><p>就会报：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="ln">1</span><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl">  <span class="nt">&#34;error&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">3</span><span class="cl">    <span class="nt">&#34;type&#34;</span><span class="p">:</span> <span class="s2">&#34;version_conflict_engine_exception&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">4</span><span class="cl">    <span class="nt">&#34;reason&#34;</span><span class="p">:</span> <span class="s2">&#34;[1]: version conflict, required seqNo [15], primary term [1]. current document has seqNo [16] and primary term [1]&#34;</span>
+</span></span><span class="line"><span class="ln">5</span><span class="cl">  <span class="p">},</span>
+</span></span><span class="line"><span class="ln">6</span><span class="cl">  <span class="nt">&#34;status&#34;</span><span class="p">:</span> <span class="mi">409</span>
+</span></span><span class="line"><span class="ln">7</span><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>这就是：</p>
+<h1 id="乐观锁失败">乐观锁失败</h1>
+<hr>
+<h1 id="六为什么-primary_term-也必须参与">六、为什么 primary_term 也必须参与</h1>
+<p>这是很多人忽略的重点。</p>
+<hr>
+<h1 id="场景">场景</h1>
+<p>假设：</p>
+<ul>
+<li>节点A 是 primary</li>
+<li>节点A 挂了</li>
+<li>节点B 晋升为新的 primary</li>
+</ul>
+<p>这时候：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">primary_term 会 +1
+</span></span></code></pre></div><p>例如：</p>
+<table>
+  <thead>
+      <tr>
+          <th>时间</th>
+          <th>primary_term</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>原主分片</td>
+          <td>1</td>
+      </tr>
+      <tr>
+          <td>切换后</td>
+          <td>2</td>
+      </tr>
+  </tbody>
+</table>
+<p>这样 Elasticsearch 可以避免：</p>
+<blockquote>
+<p>老 primary 的脏数据覆盖新 primary。</p>
+</blockquote>
+<p>这是 version 做不到的。所以必须：seq_no + primary_term</p>
+<hr>
+<h1 id="七官方推荐的正确姿势">七、官方推荐的正确姿势</h1>
+<p>现在 Elasticsearch 官方建议：</p>
+<h1 id="读取--携带-seq_no--primary_term-更新">读取 → 携带 seq_no + primary_term 更新</h1>
+<p>标准流程：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">GET doc
+</span></span><span class="line"><span class="ln">2</span><span class="cl">↓
+</span></span><span class="line"><span class="ln">3</span><span class="cl">获取 seq_no/primary_term
+</span></span><span class="line"><span class="ln">4</span><span class="cl">↓
+</span></span><span class="line"><span class="ln">5</span><span class="cl">PUT/UPDATE 时携带
+</span></span><span class="line"><span class="ln">6</span><span class="cl">↓
+</span></span><span class="line"><span class="ln">7</span><span class="cl">成功 or 冲突
+</span></span></code></pre></div><p>这里非常关键 🔥</p>
+<hr>
+<h1 id="只要携带">只要携带：</h1>
+<table>
+  <thead>
+      <tr>
+          <th>参数</th>
+          <th>是否启用 OCC</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>if_seq_no</td>
+          <td>✅</td>
+      </tr>
+      <tr>
+          <td>if_primary_term</td>
+          <td>✅</td>
+      </tr>
+  </tbody>
+</table>
+<p>就会启用乐观锁。</p>
+<hr>
+<h1 id="如果不带呢">如果不带呢？</h1>
+<p>例如：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-http" data-lang="http"><span class="line"><span class="ln">1</span><span class="cl"><span class="err">PUT /student/_doc/1
+</span></span></span></code></pre></div><p>没有：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">if_seq_no
+</span></span><span class="line"><span class="ln">2</span><span class="cl">if_primary_term
+</span></span></code></pre></div><p>那么：</p>
+<h1 id="最后一次写入覆盖前一次">最后一次写入覆盖前一次</h1>
+<p>也就是：</p>
+<h1 id="last-write-wins">Last Write Wins</h1>
+<p>没有并发保护。</p>
+<hr>
+<h1 id="八php-完整范例8x-推荐">八、PHP 完整范例（8.x 推荐）</h1>
+<p>下面给你一个企业里真正常见的写法。</p>
+<hr>
+<h1 id="查询文档">查询文档</h1>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln">1</span><span class="cl"><span class="nv">$response</span> <span class="o">=</span> <span class="nv">$client</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">([</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl">    <span class="s1">&#39;index&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;student&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">3</span><span class="cl">    <span class="s1">&#39;id&#39;</span>    <span class="o">=&gt;</span> <span class="s1">&#39;1&#39;</span>
+</span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="p">]);</span>
+</span></span><span class="line"><span class="ln">5</span><span class="cl">
+</span></span><span class="line"><span class="ln">6</span><span class="cl"><span class="nx">print_r</span><span class="p">(</span><span class="nv">$response</span><span class="p">);</span>
+</span></span></code></pre></div><p>返回：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln">1</span><span class="cl"><span class="k">Array</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="p">(</span>
+</span></span><span class="line"><span class="ln">3</span><span class="cl">    <span class="p">[</span><span class="nx">_seq_no</span><span class="p">]</span> <span class="o">=&gt;</span> <span class="mi">15</span>
+</span></span><span class="line"><span class="ln">4</span><span class="cl">    <span class="p">[</span><span class="nx">_primary_term</span><span class="p">]</span> <span class="o">=&gt;</span> <span class="mi">1</span>
+</span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="p">)</span>
+</span></span></code></pre></div><hr>
+<h1 id="带-occ-更新">带 OCC 更新</h1>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="nv">$response</span> <span class="o">=</span> <span class="nv">$client</span><span class="o">-&gt;</span><span class="na">update</span><span class="p">([</span>
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl">    <span class="s1">&#39;index&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;student&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl">    <span class="s1">&#39;id&#39;</span>    <span class="o">=&gt;</span> <span class="s1">&#39;1&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl">    <span class="s1">&#39;if_seq_no&#39;</span> <span class="o">=&gt;</span> <span class="mi">15</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">    <span class="s1">&#39;if_primary_term&#39;</span> <span class="o">=&gt;</span> <span class="mi">1</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl">    <span class="s1">&#39;body&#39;</span> <span class="o">=&gt;</span> <span class="p">[</span>
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">        <span class="s1">&#39;doc&#39;</span> <span class="o">=&gt;</span> <span class="p">[</span>
+</span></span><span class="line"><span class="ln">10</span><span class="cl">            <span class="s1">&#39;age&#39;</span> <span class="o">=&gt;</span> <span class="mi">20</span>
+</span></span><span class="line"><span class="ln">11</span><span class="cl">        <span class="p">]</span>
+</span></span><span class="line"><span class="ln">12</span><span class="cl">    <span class="p">]</span>
+</span></span><span class="line"><span class="ln">13</span><span class="cl"><span class="p">]);</span>
+</span></span></code></pre></div><hr>
+<h1 id="九企业级推荐封装方式">九、企业级推荐封装方式</h1>
+<p>实际开发里通常这样封装：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="k">public</span> <span class="k">function</span> <span class="nf">safeUpdate</span><span class="p">(</span>
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl">    <span class="nx">string</span> <span class="nv">$index</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl">    <span class="nx">string</span> <span class="nv">$id</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl">    <span class="k">array</span> <span class="nv">$doc</span>
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="p">)</span>
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl">    <span class="c1">// 1. 查询
+</span></span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="c1"></span>    <span class="nv">$old</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">client</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">([</span>
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">        <span class="s1">&#39;index&#39;</span> <span class="o">=&gt;</span> <span class="nv">$index</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">10</span><span class="cl">        <span class="s1">&#39;id&#39;</span>    <span class="o">=&gt;</span> <span class="nv">$id</span>
+</span></span><span class="line"><span class="ln">11</span><span class="cl">    <span class="p">]);</span>
+</span></span><span class="line"><span class="ln">12</span><span class="cl">
+</span></span><span class="line"><span class="ln">13</span><span class="cl">    <span class="c1">// 2. 获取 OCC 信息
+</span></span></span><span class="line"><span class="ln">14</span><span class="cl"><span class="c1"></span>    <span class="nv">$seqNo</span> <span class="o">=</span> <span class="nv">$old</span><span class="p">[</span><span class="s1">&#39;_seq_no&#39;</span><span class="p">];</span>
+</span></span><span class="line"><span class="ln">15</span><span class="cl">    <span class="nv">$primaryTerm</span> <span class="o">=</span> <span class="nv">$old</span><span class="p">[</span><span class="s1">&#39;_primary_term&#39;</span><span class="p">];</span>
+</span></span><span class="line"><span class="ln">16</span><span class="cl">
+</span></span><span class="line"><span class="ln">17</span><span class="cl">    <span class="c1">// 3. 更新
+</span></span></span><span class="line"><span class="ln">18</span><span class="cl"><span class="c1"></span>    <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">client</span><span class="o">-&gt;</span><span class="na">update</span><span class="p">([</span>
+</span></span><span class="line"><span class="ln">19</span><span class="cl">        <span class="s1">&#39;index&#39;</span> <span class="o">=&gt;</span> <span class="nv">$index</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">20</span><span class="cl">        <span class="s1">&#39;id&#39;</span>    <span class="o">=&gt;</span> <span class="nv">$id</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">21</span><span class="cl">
+</span></span><span class="line"><span class="ln">22</span><span class="cl">        <span class="s1">&#39;if_seq_no&#39;</span> <span class="o">=&gt;</span> <span class="nv">$seqNo</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">23</span><span class="cl">        <span class="s1">&#39;if_primary_term&#39;</span> <span class="o">=&gt;</span> <span class="nv">$primaryTerm</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">24</span><span class="cl">
+</span></span><span class="line"><span class="ln">25</span><span class="cl">        <span class="s1">&#39;body&#39;</span> <span class="o">=&gt;</span> <span class="p">[</span>
+</span></span><span class="line"><span class="ln">26</span><span class="cl">            <span class="s1">&#39;doc&#39;</span> <span class="o">=&gt;</span> <span class="nv">$doc</span>
+</span></span><span class="line"><span class="ln">27</span><span class="cl">        <span class="p">]</span>
+</span></span><span class="line"><span class="ln">28</span><span class="cl">    <span class="p">]);</span>
+</span></span><span class="line"><span class="ln">29</span><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><hr>
+<h1 id="十retry_on_conflict-是什么">十、retry_on_conflict 是什么？</h1>
+<p>很多人会看到：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln">1</span><span class="cl"><span class="s1">&#39;retry_on_conflict&#39;</span> <span class="o">=&gt;</span> <span class="mi">3</span>
+</span></span></code></pre></div><p>例如：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="nv">$client</span><span class="o">-&gt;</span><span class="na">update</span><span class="p">([</span>
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl">    <span class="s1">&#39;index&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;student&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl">    <span class="s1">&#39;id&#39;</span>    <span class="o">=&gt;</span> <span class="s1">&#39;1&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl">    <span class="s1">&#39;retry_on_conflict&#39;</span> <span class="o">=&gt;</span> <span class="mi">3</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl">    <span class="s1">&#39;body&#39;</span> <span class="o">=&gt;</span> <span class="p">[</span>
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl">        <span class="s1">&#39;doc&#39;</span> <span class="o">=&gt;</span> <span class="p">[</span>
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">            <span class="s1">&#39;score&#39;</span> <span class="o">=&gt;</span> <span class="mi">99</span>
+</span></span><span class="line"><span class="ln">10</span><span class="cl">        <span class="p">]</span>
+</span></span><span class="line"><span class="ln">11</span><span class="cl">    <span class="p">]</span>
+</span></span><span class="line"><span class="ln">12</span><span class="cl"><span class="p">]);</span>
+</span></span></code></pre></div><p>它表示：</p>
+<blockquote>
+<p>如果 OCC 冲突，自动重试 3 次。</p>
+</blockquote>
+<p>适合：</p>
+<ul>
+<li>计数器</li>
+<li>点赞</li>
+<li>浏览量</li>
+</ul>
+<p>不适合：</p>
+<ul>
+<li>财务</li>
+<li>库存</li>
+<li>关键业务</li>
+</ul>
+<p>因为可能覆盖别人数据。</p>
+<hr>
+<h1 id="十一两种方式对比">十一、两种方式对比</h1>
+<table>
+  <thead>
+      <tr>
+          <th>对比项</th>
+          <th>version（旧）</th>
+          <th>seq_no + primary_term（新）</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>ES8 是否推荐</td>
+          <td>❌</td>
+          <td>✅</td>
+      </tr>
+      <tr>
+          <td>是否准确</td>
+          <td>一般</td>
+          <td>很高</td>
+      </tr>
+      <tr>
+          <td>是否支持主分片切换</td>
+          <td>❌</td>
+          <td>✅</td>
+      </tr>
+      <tr>
+          <td>是否适合分布式</td>
+          <td>一般</td>
+          <td>非常适合</td>
+      </tr>
+      <tr>
+          <td>是否官方推荐</td>
+          <td>❌</td>
+          <td>✅</td>
+      </tr>
+      <tr>
+          <td>企业是否使用</td>
+          <td>很少</td>
+          <td>标准方案</td>
+      </tr>
+  </tbody>
+</table>
+<hr>
+<h3 id="_version-还存在"><code>_version</code> 还存在</h3>
+<p>注意：</p>
+<p>ES8 并没有删除：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="ln">1</span><span class="cl"><span class="s2">&#34;_version&#34;</span>
+</span></span></code></pre></div><p>你仍然能看到。</p>
+<p>但是：</p>
+<h3 id="不再推荐用于-occ-并发控制">不再推荐用于 OCC 并发控制</h3>
+<p>现在：</p>
+<table>
+  <thead>
+      <tr>
+          <th>字段</th>
+          <th>用途</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>_version</code></td>
+          <td>内部版本信息</td>
+      </tr>
+      <tr>
+          <td><code>_seq_no</code></td>
+          <td>真正并发控制</td>
+      </tr>
+      <tr>
+          <td><code>_primary_term</code></td>
+          <td>主分片任期控制</td>
+      </tr>
+  </tbody>
+</table>
+<hr>
+<h1 id="十二重点结论非常重要">十二、重点结论（非常重要）🔥</h1>
+<hr>
+<h2 id="1es8-以后不要再使用-version-做-occ">1、ES8 以后不要再使用 version 做 OCC</h2>
+<p>应改为：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">if_seq_no
+</span></span><span class="line"><span class="ln">2</span><span class="cl">if_primary_term
+</span></span></code></pre></div><hr>
+<h2 id="2_seq_no-和-_primary_term-是系统字段">2、_seq_no 和 _primary_term 是系统字段</h2>
+<p>查询文档时自动返回：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="ln">1</span><span class="cl"><span class="s2">&#34;_seq_no&#34;</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="s2">&#34;_primary_term&#34;</span>
+</span></span></code></pre></div><hr>
+<h2 id="3真正企业级流程">3、真正企业级流程</h2>
+<p>标准做法：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">先 GET
+</span></span><span class="line"><span class="ln">2</span><span class="cl">↓
+</span></span><span class="line"><span class="ln">3</span><span class="cl">获取 seq_no/primary_term
+</span></span><span class="line"><span class="ln">4</span><span class="cl">↓
+</span></span><span class="line"><span class="ln">5</span><span class="cl">再 UPDATE
+</span></span></code></pre></div><hr>
+<h2 id="4retry_on_conflict-不等于真正安全">4、retry_on_conflict 不等于真正安全</h2>
+<p>它只是：</p>
+<blockquote>
+<p>自动重试。</p>
+</blockquote>
+<p>不是严格乐观锁。</p>
+<hr>
+<h2 id="5update-api-本质也是-occ">5、Update API 本质也是 OCC</h2>
+<p>实际上：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">update
+</span></span><span class="line"><span class="ln">2</span><span class="cl">=
+</span></span><span class="line"><span class="ln">3</span><span class="cl">get + reindex
+</span></span></code></pre></div><p>底层仍然使用 seq_no 机制。</p>
+<hr>
+<h1 id="十三你现在已经可以理解-es-官方为什么弃用-version-了">十三、你现在已经可以理解 ES 官方为什么弃用 version 了</h1>
+<p>一句话总结：</p>
+<hr>
+<h1 id="老版本">老版本</h1>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">version
+</span></span><span class="line"><span class="ln">2</span><span class="cl">=
+</span></span><span class="line"><span class="ln">3</span><span class="cl">逻辑版本乐观锁
+</span></span></code></pre></div><hr>
+<h1 id="新版本">新版本</h1>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">if_seq_no + if_primary_term
+</span></span><span class="line"><span class="ln">2</span><span class="cl">=
+</span></span><span class="line"><span class="ln">3</span><span class="cl">分布式安全乐观锁
+</span></span></code></pre></div><hr>
+<h1 id="两者共同本质">两者共同本质</h1>
+<p>都是：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">只有“当前版本”符合预期
+</span></span><span class="line"><span class="ln">2</span><span class="cl">才允许更新
+</span></span></code></pre></div><p>否则：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">409 conflict
+</span></span></code></pre></div><hr>
+<p>因为：</p>
+<h1 id="version-不够分布式">version 不够“分布式”</h1>
+<p>而：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">seq_no + primary_term
+</span></span></code></pre></div><p>才真正适合：</p>
+<ul>
+<li>分片</li>
+<li>主从</li>
+<li>failover</li>
+<li>replication</li>
+<li>cluster recovery</li>
+</ul>
+<p>这些 ES 核心场景。</p>
 
     </div><div class="post_comments">
   
