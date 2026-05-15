@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Centos7 on 浩瀚天空</title>
+    <link>https://jianlin-li.github.io/categories/centos7/</link>
+    <description>Recent content in Centos7 on 浩瀚天空</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <copyright>Copyright © 1989–2025, 李建林 </copyright>
+    <lastBuildDate>Fri, 31 Jan 2025 23:04:49 +0800</lastBuildDate><atom:link href="https://jianlin-li.github.io/categories/centos7/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>centos7相关问题</title>
+      <link>https://jianlin-li.github.io/post/centos_review_1/</link>
+      <pubDate>Fri, 31 Jan 2025 23:04:49 +0800</pubDate>
+      
+      <guid>https://jianlin-li.github.io/post/centos_review_1/</guid>
+      <description>
+        
+          
+            &lt;h1 id=&#34;-centos-7-官方镜像源已经停止维护后的解决方案&#34;&gt;✅ CentOS 7 官方镜像源已经停止维护后的解决方案&lt;/h1&gt;
+&lt;p&gt;CentOS 7 在进入 EOL（生命周期结束）后：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-text&#34; data-lang=&#34;text&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;mirrorlist.centos.org
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;很多镜像已经失效。&lt;/p&gt;
+&lt;p&gt;所以 yum 无法解析：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-text&#34; data-lang=&#34;text&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;Could not resolve host: mirrorlist.centos.org
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;hr&gt;
+&lt;h1 id=&#34;-解决方案最有效&#34;&gt;🚀 解决方案（最有效）&lt;/h1&gt;
+&lt;p&gt;你需要：&lt;/p&gt;
+&lt;h1 id=&#34;-替换为-vaultcentosorg-源&#34;&gt;✅ 替换为 vault.centos.org 源&lt;/h1&gt;
+&lt;p&gt;这是 CentOS 官方归档源。&lt;/p&gt;
+&lt;hr&gt;
+&lt;h1 id=&#34;-一键修复推荐&#34;&gt;✅ 一键修复（推荐）&lt;/h1&gt;
+&lt;p&gt;执行：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;sed -i.bak &lt;span class=&#34;se&#34;&gt;\
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt;2&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;se&#34;&gt;&lt;/span&gt;-e &lt;span class=&#34;s1&#34;&gt;&amp;#39;s|^mirrorlist=|#mirrorlist=|g&amp;#39;&lt;/span&gt; &lt;span class=&#34;se&#34;&gt;\
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt;3&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;se&#34;&gt;&lt;/span&gt;-e &lt;span class=&#34;s1&#34;&gt;&amp;#39;s|^#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g&amp;#39;&lt;/span&gt; &lt;span class=&#34;se&#34;&gt;\
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt;4&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;se&#34;&gt;&lt;/span&gt;/etc/yum.repos.d/CentOS-*.repo
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;然后：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;yum clean all
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt;2&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;yum makecache
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;hr&gt;
+&lt;h1 id=&#34;-再测试&#34;&gt;✅ 再测试&lt;/h1&gt;
+&lt;p&gt;执行：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;yum install -y net-tools
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;应该就正常了 👍&lt;/p&gt;
+&lt;hr&gt;
+&lt;h1 id=&#34;-为什么会这样&#34;&gt;🧠 为什么会这样？&lt;/h1&gt;
+&lt;p&gt;以前：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-text&#34; data-lang=&#34;text&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;mirrorlist.centos.org
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;会动态分配最近镜像站。&lt;/p&gt;
+&lt;p&gt;但：&lt;/p&gt;
+&lt;p&gt;CentOS 7 EOL 后：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;动态镜像关闭&lt;/li&gt;
+&lt;li&gt;官方只保留归档&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;所以必须改：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-text&#34; data-lang=&#34;text&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;vault.centos.org
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;hr&gt;
+&lt;h1 id=&#34;-如果上面的脚本不生效&#34;&gt;✅ 如果上面的脚本不生效&lt;/h1&gt;
+&lt;p&gt;你可以直接手动修改：&lt;/p&gt;
+          
+          
+        
+      </description>
+    </item>
+    
+  </channel>
+</rss>

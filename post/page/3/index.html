@@ -773,7 +773,7 @@ Broker:它提供一种传输服务,它的角色就是维护一条从生产者到
   <div class="excerpt">
     <div class="excerpt_header">
       <h3 class="post_link">
-        <a href="https://jianlin-li.github.io/post/local_hosts_bak/" title="本地hosts的开发环境备份">本地hosts的开发环境备份</a>
+        <a href="https://jianlin-li.github.io/post/centos_review_1/" title="centos7相关问题">centos7相关问题</a>
       </h3>
       
   <div class="post_meta">
@@ -785,20 +785,20 @@ Broker:它提供一种传输服务,它的角色就是维护一条从生产者到
     <span class="post_date">
       2025-01-31	  
     </span>
-    <span class="post_time"> · 1 分钟阅读</span><span>&nbsp;· <a href='https://jianlin-li.github.io/tags/hosts/' title="hosts" class="post_tag button button_translucent">hosts
+    <span class="post_time"> · 2 分钟阅读</span><span>&nbsp;· <a href='https://jianlin-li.github.io/tags/centos7/' title="centos7" class="post_tag button button_translucent">centos7
         </a>
     </span>
     <span class="page_only">&nbsp;·
   <div class="post_share">
     分享到:
-    <a href="https://twitter.com/intent/tweet?text=%e6%9c%ac%e5%9c%b0hosts%e7%9a%84%e5%bc%80%e5%8f%91%e7%8e%af%e5%a2%83%e5%a4%87%e4%bb%bd&url=https%3a%2f%2fjianlin-li.github.io%2fpost%2flocal_hosts_bak%2f&tw_p=tweetbutton" class="twitter" title="分享到 Twitter" target="_blank" rel="nofollow">
+    <a href="https://twitter.com/intent/tweet?text=centos7%e7%9b%b8%e5%85%b3%e9%97%ae%e9%a2%98&url=https%3a%2f%2fjianlin-li.github.io%2fpost%2fcentos_review_1%2f&tw_p=tweetbutton" class="twitter" title="分享到 Twitter" target="_blank" rel="nofollow">
       <svg class="icon">
   <title>twitter</title>
   <use xlink:href="#twitter"></use>
 </svg>
 
     </a>
-    <a href="https://www.facebook.com/sharer.php?u=https%3a%2f%2fjianlin-li.github.io%2fpost%2flocal_hosts_bak%2f&t=%e6%9c%ac%e5%9c%b0hosts%e7%9a%84%e5%bc%80%e5%8f%91%e7%8e%af%e5%a2%83%e5%a4%87%e4%bb%bd" class="facebook" title="分享到 Facebook" target="_blank" rel="nofollow">
+    <a href="https://www.facebook.com/sharer.php?u=https%3a%2f%2fjianlin-li.github.io%2fpost%2fcentos_review_1%2f&t=centos7%e7%9b%b8%e5%85%b3%e9%97%ae%e9%a2%98" class="facebook" title="分享到 Facebook" target="_blank" rel="nofollow">
       <svg class="icon">
   <title>facebook</title>
   <use xlink:href="#facebook"></use>
@@ -812,7 +812,7 @@ Broker:它提供一种传输服务,它的角色就是维护一条从生产者到
 </svg>
 
     </a>
-    <a href="https://jianlin-li.github.io/post/local_hosts_bak/" title="Copy Link" class="link link_yank">
+    <a href="https://jianlin-li.github.io/post/centos_review_1/" title="Copy Link" class="link link_yank">
       <svg class="icon">
   <title>copy</title>
   <use xlink:href="#copy"></use>
@@ -827,11 +827,16 @@ Broker:它提供一种传输服务,它的角色就是维护一条从生产者到
       <div class="excerpt_footer">
         <div class="pale">
           
-            <p>提示 本地hosts的开发环境备份
-1#postman forbidden update 20.0.0.0 dl.pstmn.io 3 4#sublimetext 5127.0.0.1 <a href="https://www.sublimetext.com">www.sublimetext.com</a> 6127.0.0.1 license.sublimehq.com 7 8#github.com no proxy 9#20.205.243.166 github.com 10 11 12 13192.168.31.250 ljl-maci5 14192.168.31.150 ljl-maci9 15 16 17192.168.31.71 vm7-1 vm7-1.com vm7-1-phpmyadmin.com …</p>
+            <p>✅ CentOS 7 官方镜像源已经停止维护后的解决方案 CentOS 7 在进入 EOL（生命周期结束）后：
+1mirrorlist.centos.org 很多镜像已经失效。
+所以 yum 无法解析：
+1Could not resolve host: mirrorlist.centos.org 🚀 解决方案（最有效） 你需要：
+✅ 替换为 vault.centos.org 源 这是 CentOS 官方归档源。
+✅ 一键修复（推荐） 执行：
+1sed -i.bak \ 2-e 's|^mirrorlist=|#mirrorlist=|g' \ 3-e …</p>
           
           <br>
-          <a href="https://jianlin-li.github.io/post/local_hosts_bak/" title="阅读更多" class="excerpt_more button">阅读更多</a>
+          <a href="https://jianlin-li.github.io/post/centos_review_1/" title="阅读更多" class="excerpt_more button">阅读更多</a>
         </div>
       </div>
     </div>
@@ -981,6 +986,11 @@ Broker:它提供一种传输服务,它的角色就是维护一条从生产者到
           <span class="button_tally">2</span>
         </a>
         
+        <a href='https://jianlin-li.github.io/categories/centos7/' class="post_tag button button_translucent" title="centos7">
+          CENTOS7
+          <span class="button_tally">1</span>
+        </a>
+        
         <a href='https://jianlin-li.github.io/categories/docker/' class="post_tag button button_translucent" title="docker">
           DOCKER
           <span class="button_tally">1</span>
@@ -996,16 +1006,15 @@ Broker:它提供一种传输服务,它的角色就是维护一条从生产者到
           <span class="button_tally">1</span>
         </a>
         
-        <a href='https://jianlin-li.github.io/categories/mysql/' class="post_tag button button_translucent" title="mysql">
-          MYSQL
-          <span class="button_tally">1</span>
-        </a>
-        
         
         <br>
         <div class="post_tags_toggle button">所有分类</div>
         <div class="post_tags">
           <div class="tags_list">
+            
+            <a href='https://jianlin-li.github.io/categories/centos7/' class=" post_tag button button_translucent" data-position=1 title="centos7">CENTOS7<span class="button_tally">1</span>
+            </a>
+            
             
             <a href='https://jianlin-li.github.io/categories/docker/' class=" post_tag button button_translucent" data-position=1 title="docker">DOCKER<span class="button_tally">1</span>
             </a>
@@ -1111,6 +1120,11 @@ Broker:它提供一种传输服务,它的角色就是维护一条从生产者到
           <span class="button_tally">3</span>
         </a>
         
+        <a href='https://jianlin-li.github.io/tags/centos7/' class="post_tag button button_translucent" title="centos7">
+          CENTOS7
+          <span class="button_tally">1</span>
+        </a>
+        
         <a href='https://jianlin-li.github.io/tags/docker/' class="post_tag button button_translucent" title="docker">
           DOCKER
           <span class="button_tally">1</span>
@@ -1131,16 +1145,15 @@ Broker:它提供一种传输服务,它的角色就是维护一条从生产者到
           <span class="button_tally">1</span>
         </a>
         
-        <a href='https://jianlin-li.github.io/tags/hugo/' class="post_tag button button_translucent" title="hugo">
-          HUGO
-          <span class="button_tally">1</span>
-        </a>
-        
         
         <br>
         <div class="post_tags_toggle button">所有标签</div>
         <div class="post_tags">
           <div class="tags_list">
+            
+            <a href='https://jianlin-li.github.io/tags/centos7/' class=" post_tag button button_translucent" data-position=1 title="centos7">CENTOS7<span class="button_tally">1</span>
+            </a>
+            
             
             <a href='https://jianlin-li.github.io/tags/docker/' class=" post_tag button button_translucent" data-position=1 title="docker">DOCKER<span class="button_tally">1</span>
             </a>
