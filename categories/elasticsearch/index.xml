@@ -248,16 +248,65 @@
       <description>
         
           
-            &lt;h1 id=&#34;elasticsearch-常用知识点&#34;&gt;Elasticsearch 常用知识点&lt;/h1&gt;
-&lt;!-- 
-![](images/Elasticsearch/1-尚硅谷项目课程系列之Elasticsearch_00.png)
-![](images/Elasticsearch/1-尚硅谷项目课程系列之Elasticsearch_01.png)
-![](images/Elasticsearch/1-尚硅谷项目课程系列之Elasticsearch_02.png)
-![](images/Elasticsearch/1-尚硅谷项目课程系列之Elasticsearch_03.png)
-![](images/Elasticsearch/1-尚硅谷项目课程系列之Elasticsearch_04.png)
-![](images/Elasticsearch/1-尚硅谷项目课程系列之Elasticsearch_05.png)
-![](images/Elasticsearch/1-尚硅谷项目课程系列之Elasticsearch_06.png) 
---&gt;
+            &lt;h1 id=&#34;elasticsearch7x文档&#34;&gt;&lt;strong&gt;Elasticsearch7.x文档&lt;/strong&gt;&lt;/h1&gt;
+&lt;div class=&#34;pdf-toolbar&#34;&gt;
+
+    &lt;a class=&#34;pdf-btn&#34;
+       href=&#34;https://jianlin-li.github.io/pdfs/elasticsearch-7x.pdf&#34;
+       target=&#34;_blank&#34;&gt;
+        📄 下载PDF
+    &lt;/a&gt;
+
+    &lt;a class=&#34;pdf-btn&#34;
+       href=&#34;https://jianlin-li.github.io/pdfjs/web/viewer.html?file=%2fpdfs%2felasticsearch-7x.pdf&#34;
+       target=&#34;_blank&#34;&gt;
+        🔍 全屏阅读
+    &lt;/a&gt;
+
+&lt;/div&gt;
+
+&lt;div class=&#34;pdf-container&#34;&gt;
+    &lt;iframe
+            src=&#34;https://jianlin-li.github.io/pdfjs/web/viewer.html?file=%2fpdfs%2felasticsearch-7x.pdf&#34;
+            width=&#34;100%&#34;
+            height=&#34;1000px&#34;
+            loading=&#34;lazy&#34;&gt;
+    &lt;/iframe&gt;
+&lt;/div&gt;
+
+&lt;style&gt;
+    .pdf-toolbar{
+        margin:15px 0;
+        display:flex;
+        gap:12px;
+    }
+
+    .pdf-btn{
+        padding:10px 16px;
+        border-radius:8px;
+        text-decoration:none;
+         
+        color:white;
+        font-weight:600;
+    }
+
+    .pdf-btn:hover{
+        opacity:0.9;
+    }
+
+    .pdf-container{
+        border-radius:14px;
+        overflow:hidden;
+        border:1px solid #ddd;
+        box-shadow:0 4px 20px rgba(0,0,0,0.08);
+    }
+
+    .pdf-container iframe{
+        border:none;
+    }
+&lt;/style&gt;
+&lt;hr&gt;
+&lt;h1 id=&#34;elasticsearch-常用知识点&#34;&gt;&lt;strong&gt;Elasticsearch 常用知识点&lt;/strong&gt;&lt;/h1&gt;
 &lt;hr&gt;
 &lt;h1 id=&#34;-一elasticsearch-常见数据类型总览&#34;&gt;🚀 一、Elasticsearch 常见数据类型总览&lt;/h1&gt;
 &lt;p&gt;在 Elasticsearch 中，字段类型（mapping type）决定了数据如何被索引和查询。&lt;/p&gt;

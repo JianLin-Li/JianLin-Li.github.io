@@ -54,7 +54,7 @@
         padding:10px 16px;
         border-radius:8px;
         text-decoration:none;
-        background:#2563eb;
+         
         color:white;
         font-weight:600;
     }
