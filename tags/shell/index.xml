@@ -135,5 +135,77 @@
       </description>
     </item>
     
+    <item>
+      <title>Shell电子书</title>
+      <link>https://jianlin-li.github.io/post/shell_book/</link>
+      <pubDate>Mon, 23 Mar 2026 09:29:12 +0800</pubDate>
+      
+      <guid>https://jianlin-li.github.io/post/shell_book/</guid>
+      <description>
+        
+          
+            &lt;h1 id=&#34;跟老男孩学linux运维-shell编程实战&#34;&gt;&lt;strong&gt;跟老男孩学Linux运维-Shell编程实战&lt;/strong&gt;&lt;/h1&gt;
+&lt;div class=&#34;pdf-toolbar&#34;&gt;
+
+    &lt;a class=&#34;pdf-btn&#34;
+       href=&#34;https://jianlin-li.github.io/pdfs/%e8%b7%9f%e8%80%81%e7%94%b7%e5%ad%a9%e5%ad%a6Linux%e8%bf%90%e7%bb%b4-Shell%e7%bc%96%e7%a8%8b%e5%ae%9e%e6%88%98.pdf&#34;
+       target=&#34;_blank&#34;&gt;
+        📄 下载PDF
+    &lt;/a&gt;
+
+    &lt;a class=&#34;pdf-btn&#34;
+       href=&#34;https://jianlin-li.github.io/pdfjs/web/viewer.html?file=%2fpdfs%2f%e8%b7%9f%e8%80%81%e7%94%b7%e5%ad%a9%e5%ad%a6Linux%e8%bf%90%e7%bb%b4-Shell%e7%bc%96%e7%a8%8b%e5%ae%9e%e6%88%98.pdf&#34;
+       target=&#34;_blank&#34;&gt;
+        🔍 全屏阅读
+    &lt;/a&gt;
+
+&lt;/div&gt;
+
+&lt;div class=&#34;pdf-container&#34;&gt;
+    &lt;iframe
+            src=&#34;https://jianlin-li.github.io/pdfjs/web/viewer.html?file=%2fpdfs%2f%e8%b7%9f%e8%80%81%e7%94%b7%e5%ad%a9%e5%ad%a6Linux%e8%bf%90%e7%bb%b4-Shell%e7%bc%96%e7%a8%8b%e5%ae%9e%e6%88%98.pdf&#34;
+            width=&#34;100%&#34;
+            height=&#34;1000px&#34;
+            loading=&#34;lazy&#34;&gt;
+    &lt;/iframe&gt;
+&lt;/div&gt;
+
+&lt;style&gt;
+    .pdf-toolbar{
+        margin:15px 0;
+        display:flex;
+        gap:12px;
+    }
+
+    .pdf-btn{
+        padding:10px 16px;
+        border-radius:8px;
+        text-decoration:none;
+         
+        color:white;
+        font-weight:600;
+    }
+
+    .pdf-btn:hover{
+        opacity:0.9;
+    }
+
+    .pdf-container{
+        border-radius:14px;
+        overflow:hidden;
+        border:1px solid #ddd;
+        box-shadow:0 4px 20px rgba(0,0,0,0.08);
+    }
+
+    .pdf-container iframe{
+        border:none;
+    }
+&lt;/style&gt;
+          
+          
+        
+      </description>
+    </item>
+    
   </channel>
 </rss>

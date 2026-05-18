@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Web服务器 on 李建林--个人知识库</title>
+    <link>https://jianlin-li.github.io/tags/web%E6%9C%8D%E5%8A%A1%E5%99%A8/</link>
+    <description>Recent content in Web服务器 on 李建林--个人知识库</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <copyright>Copyright © 1989–2025, 李建林 </copyright>
+    <lastBuildDate>Thu, 10 Apr 2025 10:33:29 +0800</lastBuildDate><atom:link href="https://jianlin-li.github.io/tags/web%E6%9C%8D%E5%8A%A1%E5%99%A8/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>架构-web服务器部署</title>
+      <link>https://jianlin-li.github.io/post/jiagou-fuwuqibushu/</link>
+      <pubDate>Thu, 10 Apr 2025 10:33:29 +0800</pubDate>
+      
+      <guid>https://jianlin-li.github.io/post/jiagou-fuwuqibushu/</guid>
+      <description>
+        
+          
+            &lt;h1 id=&#34;跟老男孩学linux运维-web集群实战&#34;&gt;&lt;strong&gt;跟老男孩学Linux运维-Web集群实战&lt;/strong&gt;&lt;/h1&gt;
+&lt;div class=&#34;pdf-toolbar&#34;&gt;
+
+    &lt;a class=&#34;pdf-btn&#34;
+       href=&#34;https://jianlin-li.github.io/pdfs/%e8%b7%9f%e8%80%81%e7%94%b7%e5%ad%a9%e5%ad%a6Linux%e8%bf%90%e7%bb%b4-Web%e9%9b%86%e7%be%a4%e5%ae%9e%e6%88%98.pdf&#34;
+       target=&#34;_blank&#34;&gt;
+        📄 下载PDF
+    &lt;/a&gt;
+
+    &lt;a class=&#34;pdf-btn&#34;
+       href=&#34;https://jianlin-li.github.io/pdfjs/web/viewer.html?file=%2fpdfs%2f%e8%b7%9f%e8%80%81%e7%94%b7%e5%ad%a9%e5%ad%a6Linux%e8%bf%90%e7%bb%b4-Web%e9%9b%86%e7%be%a4%e5%ae%9e%e6%88%98.pdf&#34;
+       target=&#34;_blank&#34;&gt;
+        🔍 全屏阅读
+    &lt;/a&gt;
+
+&lt;/div&gt;
+
+&lt;div class=&#34;pdf-container&#34;&gt;
+    &lt;iframe
+            src=&#34;https://jianlin-li.github.io/pdfjs/web/viewer.html?file=%2fpdfs%2f%e8%b7%9f%e8%80%81%e7%94%b7%e5%ad%a9%e5%ad%a6Linux%e8%bf%90%e7%bb%b4-Web%e9%9b%86%e7%be%a4%e5%ae%9e%e6%88%98.pdf&#34;
+            width=&#34;100%&#34;
+            height=&#34;1000px&#34;
+            loading=&#34;lazy&#34;&gt;
+    &lt;/iframe&gt;
+&lt;/div&gt;
+
+&lt;style&gt;
+    .pdf-toolbar{
+        margin:15px 0;
+        display:flex;
+        gap:12px;
+    }
+
+    .pdf-btn{
+        padding:10px 16px;
+        border-radius:8px;
+        text-decoration:none;
+         
+        color:white;
+        font-weight:600;
+    }
+
+    .pdf-btn:hover{
+        opacity:0.9;
+    }
+
+    .pdf-container{
+        border-radius:14px;
+        overflow:hidden;
+        border:1px solid #ddd;
+        box-shadow:0 4px 20px rgba(0,0,0,0.08);
+    }
+
+    .pdf-container iframe{
+        border:none;
+    }
+&lt;/style&gt;
+          
+          
+        
+      </description>
+    </item>
+    
+  </channel>
+</rss>

@@ -41,6 +41,9 @@
     <loc>https://jianlin-li.github.io/post/redis_review_1/</loc>
     <lastmod>2026-04-22T00:54:16+08:00</lastmod>
   </url><url>
+    <loc>https://jianlin-li.github.io/post/redis_book/</loc>
+    <lastmod>2026-04-22T00:53:16+08:00</lastmod>
+  </url><url>
     <loc>https://jianlin-li.github.io/categories/rabbitmq/</loc>
     <lastmod>2026-04-22T00:10:37+08:00</lastmod>
   </url><url>
@@ -53,16 +56,22 @@
     <loc>https://jianlin-li.github.io/post/rabbitmq_review_2/</loc>
     <lastmod>2026-04-22T00:09:37+08:00</lastmod>
   </url><url>
-    <loc>https://jianlin-li.github.io/categories/git/</loc>
-    <lastmod>2026-03-31T23:32:44+08:00</lastmod>
+    <loc>https://jianlin-li.github.io/post/rabbitmq_review_1/</loc>
+    <lastmod>2026-04-22T00:08:37+08:00</lastmod>
   </url><url>
-    <loc>https://jianlin-li.github.io/post/git_book/</loc>
+    <loc>https://jianlin-li.github.io/post/rabbitmq_book/</loc>
+    <lastmod>2026-04-22T00:07:37+08:00</lastmod>
+  </url><url>
+    <loc>https://jianlin-li.github.io/categories/git/</loc>
     <lastmod>2026-03-31T23:32:44+08:00</lastmod>
   </url><url>
     <loc>https://jianlin-li.github.io/tags/git/</loc>
     <lastmod>2026-03-31T23:32:44+08:00</lastmod>
   </url><url>
     <loc>https://jianlin-li.github.io/post/git_review_1/</loc>
+    <lastmod>2026-03-31T23:32:44+08:00</lastmod>
+  </url><url>
+    <loc>https://jianlin-li.github.io/post/git_book/</loc>
     <lastmod>2026-03-31T23:32:44+08:00</lastmod>
   </url><url>
     <loc>https://jianlin-li.github.io/tags/php/</loc>
@@ -92,6 +101,9 @@
     <loc>https://jianlin-li.github.io/post/shell_review_1/</loc>
     <lastmod>2026-03-23T10:29:12+08:00</lastmod>
   </url><url>
+    <loc>https://jianlin-li.github.io/post/shell_book/</loc>
+    <lastmod>2026-03-23T09:29:12+08:00</lastmod>
+  </url><url>
     <loc>https://jianlin-li.github.io/categories/mysql/</loc>
     <lastmod>2026-02-27T10:29:12+08:00</lastmod>
   </url><url>
@@ -100,6 +112,9 @@
   </url><url>
     <loc>https://jianlin-li.github.io/post/mysql_review_1/</loc>
     <lastmod>2026-02-27T10:29:12+08:00</lastmod>
+  </url><url>
+    <loc>https://jianlin-li.github.io/post/mysql_book/</loc>
+    <lastmod>2026-02-27T10:28:12+08:00</lastmod>
   </url><url>
     <loc>https://jianlin-li.github.io/categories/elasticsearch/</loc>
     <lastmod>2026-02-03T17:43:49+08:00</lastmod>
@@ -154,9 +169,6 @@
   </url><url>
     <loc>https://jianlin-li.github.io/post/go_book/</loc>
     <lastmod>2025-06-30T10:04:49+08:00</lastmod>
-  </url><url>
-    <loc>https://jianlin-li.github.io/post/rabbitmq_review_1/</loc>
-    <lastmod>2025-06-10T15:04:49+08:00</lastmod>
   </url><url>
     <loc>https://jianlin-li.github.io/post/php_review_4/</loc>
     <lastmod>2025-06-04T10:04:49+08:00</lastmod>
@@ -223,6 +235,24 @@
   </url><url>
     <loc>https://jianlin-li.github.io/tags/%E7%AE%97%E6%B3%95/</loc>
     <lastmod>2025-04-10T10:36:29+08:00</lastmod>
+  </url><url>
+    <loc>https://jianlin-li.github.io/categories/web%E6%9C%8D%E5%8A%A1%E5%99%A8/</loc>
+    <lastmod>2025-04-10T10:33:29+08:00</lastmod>
+  </url><url>
+    <loc>https://jianlin-li.github.io/tags/web%E6%9C%8D%E5%8A%A1%E5%99%A8/</loc>
+    <lastmod>2025-04-10T10:33:29+08:00</lastmod>
+  </url><url>
+    <loc>https://jianlin-li.github.io/post/jiagou-fuwuqibushu/</loc>
+    <lastmod>2025-04-10T10:33:29+08:00</lastmod>
+  </url><url>
+    <loc>https://jianlin-li.github.io/categories/devops/</loc>
+    <lastmod>2025-04-10T10:32:29+08:00</lastmod>
+  </url><url>
+    <loc>https://jianlin-li.github.io/tags/devops/</loc>
+    <lastmod>2025-04-10T10:32:29+08:00</lastmod>
+  </url><url>
+    <loc>https://jianlin-li.github.io/post/jiagou-devops/</loc>
+    <lastmod>2025-04-10T10:32:29+08:00</lastmod>
   </url><url>
     <loc>https://jianlin-li.github.io/categories/centos7/</loc>
     <lastmod>2025-01-31T23:04:49+08:00</lastmod>

@@ -717,6 +717,194 @@
     </item>
     
     <item>
+      <title>Redis电子书</title>
+      <link>https://jianlin-li.github.io/post/redis_book/</link>
+      <pubDate>Wed, 22 Apr 2026 00:53:16 +0800</pubDate>
+      
+      <guid>https://jianlin-li.github.io/post/redis_book/</guid>
+      <description>
+        
+          
+            &lt;h1 id=&#34;从零开始学redis-高洪涛刘河飞-编著&#34;&gt;&lt;strong&gt;从零开始学Redis (高洪涛，刘河飞 编著)&lt;/strong&gt;&lt;/h1&gt;
+&lt;div class=&#34;pdf-toolbar&#34;&gt;
+
+    &lt;a class=&#34;pdf-btn&#34;
+       href=&#34;https://jianlin-li.github.io/pdfs/%e4%bb%8e%e9%9b%b6%e5%bc%80%e5%a7%8b%e5%ad%a6Redis-%e9%ab%98%e6%b4%aa%e6%b6%9b-%e5%88%98%e6%b2%b3%e9%a3%9e-%e8%91%97.pdf&#34;
+       target=&#34;_blank&#34;&gt;
+        📄 下载PDF
+    &lt;/a&gt;
+
+    &lt;a class=&#34;pdf-btn&#34;
+       href=&#34;https://jianlin-li.github.io/pdfjs/web/viewer.html?file=%2fpdfs%2f%e4%bb%8e%e9%9b%b6%e5%bc%80%e5%a7%8b%e5%ad%a6Redis-%e9%ab%98%e6%b4%aa%e6%b6%9b-%e5%88%98%e6%b2%b3%e9%a3%9e-%e8%91%97.pdf&#34;
+       target=&#34;_blank&#34;&gt;
+        🔍 全屏阅读
+    &lt;/a&gt;
+
+&lt;/div&gt;
+
+&lt;div class=&#34;pdf-container&#34;&gt;
+    &lt;iframe
+            src=&#34;https://jianlin-li.github.io/pdfjs/web/viewer.html?file=%2fpdfs%2f%e4%bb%8e%e9%9b%b6%e5%bc%80%e5%a7%8b%e5%ad%a6Redis-%e9%ab%98%e6%b4%aa%e6%b6%9b-%e5%88%98%e6%b2%b3%e9%a3%9e-%e8%91%97.pdf&#34;
+            width=&#34;100%&#34;
+            height=&#34;1000px&#34;
+            loading=&#34;lazy&#34;&gt;
+    &lt;/iframe&gt;
+&lt;/div&gt;
+
+&lt;style&gt;
+    .pdf-toolbar{
+        margin:15px 0;
+        display:flex;
+        gap:12px;
+    }
+
+    .pdf-btn{
+        padding:10px 16px;
+        border-radius:8px;
+        text-decoration:none;
+         
+        color:white;
+        font-weight:600;
+    }
+
+    .pdf-btn:hover{
+        opacity:0.9;
+    }
+
+    .pdf-container{
+        border-radius:14px;
+        overflow:hidden;
+        border:1px solid #ddd;
+        box-shadow:0 4px 20px rgba(0,0,0,0.08);
+    }
+
+    .pdf-container iframe{
+        border:none;
+    }
+&lt;/style&gt;
+&lt;hr&gt;
+&lt;h1 id=&#34;redis高手心法-码哥字节原创&#34;&gt;&lt;strong&gt;Redis高手心法-码哥字节原创&lt;/strong&gt;&lt;/h1&gt;
+&lt;div class=&#34;pdf-toolbar&#34;&gt;
+
+    &lt;a class=&#34;pdf-btn&#34;
+       href=&#34;https://jianlin-li.github.io/pdfs/Redis%e9%ab%98%e6%89%8b%e5%bf%83%e6%b3%95-%e7%a0%81%e5%93%a5%e5%ad%97%e8%8a%82%e5%8e%9f%e5%88%9b.pdf&#34;
+       target=&#34;_blank&#34;&gt;
+        📄 下载PDF
+    &lt;/a&gt;
+
+    &lt;a class=&#34;pdf-btn&#34;
+       href=&#34;https://jianlin-li.github.io/pdfjs/web/viewer.html?file=%2fpdfs%2fRedis%e9%ab%98%e6%89%8b%e5%bf%83%e6%b3%95-%e7%a0%81%e5%93%a5%e5%ad%97%e8%8a%82%e5%8e%9f%e5%88%9b.pdf&#34;
+       target=&#34;_blank&#34;&gt;
+        🔍 全屏阅读
+    &lt;/a&gt;
+
+&lt;/div&gt;
+
+&lt;div class=&#34;pdf-container&#34;&gt;
+    &lt;iframe
+            src=&#34;https://jianlin-li.github.io/pdfjs/web/viewer.html?file=%2fpdfs%2fRedis%e9%ab%98%e6%89%8b%e5%bf%83%e6%b3%95-%e7%a0%81%e5%93%a5%e5%ad%97%e8%8a%82%e5%8e%9f%e5%88%9b.pdf&#34;
+            width=&#34;100%&#34;
+            height=&#34;1000px&#34;
+            loading=&#34;lazy&#34;&gt;
+    &lt;/iframe&gt;
+&lt;/div&gt;
+
+&lt;style&gt;
+    .pdf-toolbar{
+        margin:15px 0;
+        display:flex;
+        gap:12px;
+    }
+
+    .pdf-btn{
+        padding:10px 16px;
+        border-radius:8px;
+        text-decoration:none;
+         
+        color:white;
+        font-weight:600;
+    }
+
+    .pdf-btn:hover{
+        opacity:0.9;
+    }
+
+    .pdf-container{
+        border-radius:14px;
+        overflow:hidden;
+        border:1px solid #ddd;
+        box-shadow:0 4px 20px rgba(0,0,0,0.08);
+    }
+
+    .pdf-container iframe{
+        border:none;
+    }
+&lt;/style&gt;
+&lt;hr&gt;
+&lt;h1 id=&#34;redis全套学习笔记pdf&#34;&gt;&lt;strong&gt;Redis全套学习笔记.pdf&lt;/strong&gt;&lt;/h1&gt;
+&lt;div class=&#34;pdf-toolbar&#34;&gt;
+
+    &lt;a class=&#34;pdf-btn&#34;
+       href=&#34;https://jianlin-li.github.io/pdfs/Redis%e5%85%a8%e5%a5%97%e5%ad%a6%e4%b9%a0%e7%ac%94%e8%ae%b0.pdf&#34;
+       target=&#34;_blank&#34;&gt;
+        📄 下载PDF
+    &lt;/a&gt;
+
+    &lt;a class=&#34;pdf-btn&#34;
+       href=&#34;https://jianlin-li.github.io/pdfjs/web/viewer.html?file=%2fpdfs%2fRedis%e5%85%a8%e5%a5%97%e5%ad%a6%e4%b9%a0%e7%ac%94%e8%ae%b0.pdf&#34;
+       target=&#34;_blank&#34;&gt;
+        🔍 全屏阅读
+    &lt;/a&gt;
+
+&lt;/div&gt;
+
+&lt;div class=&#34;pdf-container&#34;&gt;
+    &lt;iframe
+            src=&#34;https://jianlin-li.github.io/pdfjs/web/viewer.html?file=%2fpdfs%2fRedis%e5%85%a8%e5%a5%97%e5%ad%a6%e4%b9%a0%e7%ac%94%e8%ae%b0.pdf&#34;
+            width=&#34;100%&#34;
+            height=&#34;1000px&#34;
+            loading=&#34;lazy&#34;&gt;
+    &lt;/iframe&gt;
+&lt;/div&gt;
+
+&lt;style&gt;
+    .pdf-toolbar{
+        margin:15px 0;
+        display:flex;
+        gap:12px;
+    }
+
+    .pdf-btn{
+        padding:10px 16px;
+        border-radius:8px;
+        text-decoration:none;
+         
+        color:white;
+        font-weight:600;
+    }
+
+    .pdf-btn:hover{
+        opacity:0.9;
+    }
+
+    .pdf-container{
+        border-radius:14px;
+        overflow:hidden;
+        border:1px solid #ddd;
+        box-shadow:0 4px 20px rgba(0,0,0,0.08);
+    }
+
+    .pdf-container iframe{
+        border:none;
+    }
+&lt;/style&gt;
+          
+          
+        
+      </description>
+    </item>
+    
+    <item>
       <title>RabbitMQ消息中间件详解-3</title>
       <link>https://jianlin-li.github.io/post/rabbitmq_review_3/</link>
       <pubDate>Wed, 22 Apr 2026 00:10:37 +0800</pubDate>
@@ -943,25 +1131,241 @@
     </item>
     
     <item>
-      <title>Git</title>
-      <link>https://jianlin-li.github.io/post/git_book/</link>
-      <pubDate>Tue, 31 Mar 2026 23:32:44 +0800</pubDate>
+      <title>RabbitMQ消息中间件详解-1</title>
+      <link>https://jianlin-li.github.io/post/rabbitmq_review_1/</link>
+      <pubDate>Wed, 22 Apr 2026 00:08:37 +0800</pubDate>
       
-      <guid>https://jianlin-li.github.io/post/git_book/</guid>
+      <guid>https://jianlin-li.github.io/post/rabbitmq_review_1/</guid>
       <description>
         
           
-            &lt;h1 id=&#34;pro-git第二版&#34;&gt;&lt;strong&gt;Pro Git（第二版）&lt;/strong&gt;&lt;/h1&gt;
+            &lt;h1 id=&#34;rabbitmq-消息中间件详解&#34;&gt;RabbitMQ 消息中间件详解&lt;/h1&gt;
+&lt;p&gt;&lt;figure&gt;
+  &lt;picture&gt;
+
+    
+      
+        
+        
+        
+        
+        
+        
+    &lt;img
+      loading=&#34;lazy&#34;
+      decoding=&#34;async&#34;
+      alt=&#34;RabbitMQ的基本结构&#34;
+      
+        class=&#34;image_figure image_internal image_unprocessed&#34;
+        src=&#34;https://jianlin-li.github.io/images/rabbitmq_1.png&#34;
+      
+      
+    /&gt;
+
+    &lt;/picture&gt;
+&lt;/figure&gt;
+&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;组件介绍&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;ol&gt;
+&lt;li&gt;Broker:它提供一种传输服务,它的角色就是维护一条从生产者到消费者的路线，保证数据能按照指定的方式进行传输,&lt;/li&gt;
+&lt;li&gt;Exchange：消息交换机,它指定消息按什么规则,路由到哪个队列。&lt;/li&gt;
+&lt;li&gt;Queue:消息的载体,每个消息都会被投到一个或多个队列。&lt;/li&gt;
+&lt;li&gt;Binding:绑定，它的作用就是把exchange和queue按照路由规则绑定起来.&lt;/li&gt;
+&lt;li&gt;Routing Key:路由关键字,exchange根据这个关键字进行消息投递。&lt;/li&gt;
+&lt;li&gt;vhost:虚拟主机,一个broker里可以有多个vhost，用作不同用户的权限分离。&lt;/li&gt;
+&lt;li&gt;Producer:消息生产者,就是投递消息的程序.&lt;/li&gt;
+&lt;li&gt;Consumer:消息消费者,就是接受消息的程序.&lt;/li&gt;
+&lt;li&gt;Channel:消息通道,在客户端的每个连接里,可建立多个channel.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;figure&gt;
+  &lt;picture&gt;
+
+    
+      
+        
+        
+        
+        
+        
+        
+    &lt;img
+      loading=&#34;lazy&#34;
+      decoding=&#34;async&#34;
+      alt=&#34;RabbitMQ的消息发布和接收流程&#34;
+      
+        class=&#34;image_figure image_internal image_unprocessed&#34;
+        src=&#34;https://jianlin-li.github.io/images/rabbitmq_2.png&#34;
+      
+      
+    /&gt;
+
+    &lt;/picture&gt;
+&lt;/figure&gt;
+
+&lt;strong&gt;一. 如何发送消息&lt;/strong&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;生产者和Broker建立TCP连接&lt;/li&gt;
+&lt;li&gt;生产者和Broker建立通道&lt;/li&gt;
+&lt;li&gt;生产者通过通道消息发送给Broker，由Exchange将消息进行转发&lt;/li&gt;
+&lt;li&gt;Exchange将消息转发到对应那个的Queue（队列）&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;strong&gt;二.如何接收消息&lt;/strong&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;消费者和Broker建立TCP连接&lt;/li&gt;
+&lt;li&gt;消费者和Broker建立通道&lt;/li&gt;
+&lt;li&gt;消费者监听制定的Queue（队列）&lt;/li&gt;
+&lt;li&gt;当有消息到达Queue时Broker默认将消息推送给消费者&lt;/li&gt;
+&lt;li&gt;消费者接受到消息&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;消息中间件的作用&#34;&gt;消息中间件的作用&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;削峰&lt;/strong&gt;：缓冲瞬时高峰流量，避免系统被冲垮&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;解耦&lt;/strong&gt;：降低系统间耦合度，提高可维护性&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;异步通信&lt;/strong&gt;：提高系统响应速度，减少等待时间&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;顺序保证&lt;/strong&gt;：确保消息按特定顺序处理&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;数据冗余&lt;/strong&gt;：提供消息持久化，防止数据丢失&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;系统扩展&lt;/strong&gt;：便于系统水平扩展&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;amqp-高级消息队列协议&#34;&gt;AMQP 高级消息队列协议&lt;/h2&gt;
+&lt;p&gt;AMQP（Advanced Message Queuing Protocol）是一个提供统一消息服务的应用层标准协议。&lt;/p&gt;
+&lt;h2 id=&#34;交换器-exchange&#34;&gt;交换器 (Exchange)&lt;/h2&gt;
+&lt;h3 id=&#34;交换器特性&#34;&gt;交换器特性&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;交换器与交换器可以相互绑定&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;交换器类型&#34;&gt;交换器类型&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;direct&lt;/code&gt;
+&lt;figure&gt;
+  &lt;picture&gt;
+
+    
+      
+        
+        
+        
+        
+        
+        
+    &lt;img
+      loading=&#34;lazy&#34;
+      decoding=&#34;async&#34;
+      alt=&#34;Direct 模式&#34;
+      
+        class=&#34;image_figure image_internal image_unprocessed&#34;
+        src=&#34;https://jianlin-li.github.io/images/rabbitmq_direct.png&#34;
+      
+      
+    /&gt;
+
+    &lt;/picture&gt;
+&lt;/figure&gt;
+
+是最简单的模式.即创建消息队列的时候,指定一个路由键（RoutingKey）.当发送者发送消息的时候,指定对应的Key.当Key和消息队列的RoutingKey一致的时候,消息将会被发送到该消息队列中.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;topic&lt;/code&gt;
+&lt;figure&gt;
+  &lt;picture&gt;
+
+    
+      
+        
+        
+        
+        
+        
+        
+    &lt;img
+      loading=&#34;lazy&#34;
+      decoding=&#34;async&#34;
+      alt=&#34;Topic 主题模式&#34;
+      
+        class=&#34;image_figure image_internal image_unprocessed&#34;
+        src=&#34;https://jianlin-li.github.io/images/rabbitmq_topic.png&#34;
+      
+      
+    /&gt;
+
+    &lt;/picture&gt;
+&lt;/figure&gt;
+
+topic转发信息主要是依据通配符,队列和交换机的绑定主要是依据一种模式(通配符+字符串),而当发送消息的时候,只有指定的Key和该模式相匹配的时候,消息才会被发送到该消息队列中.通配符：* 表示一个词，# 表示零个或多个词&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;fanout&lt;/code&gt;
+&lt;figure&gt;
+  &lt;picture&gt;
+
+    
+      
+        
+        
+        
+        
+        
+        
+    &lt;img
+      loading=&#34;lazy&#34;
+      decoding=&#34;async&#34;
+      alt=&#34;Fanout模式&#34;
+      
+        class=&#34;image_figure image_internal image_unprocessed&#34;
+        src=&#34;https://jianlin-li.github.io/images/rabbitmq_fanout.png&#34;
+      
+      
+    /&gt;
+
+    &lt;/picture&gt;
+&lt;/figure&gt;
+
+fanout是路由广播的形式,将会把消息发给绑定它的全部队列,即便设置了key,也会被忽略.因此我们发送到交换机的消息会使得绑定到该交换机的每一个Queue接收到消息,这个时候就算指定了路由键（routingKey）,或者规则(即上文中convertAndSend方法的参数2),也会被忽略!&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;header&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;system&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;自定义&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;交换器属性&#34;&gt;交换器属性&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;持久化&lt;/strong&gt;：&lt;code&gt;durable&lt;/code&gt; 参数让交换器存盘&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;自动删除&lt;/strong&gt;：当所有绑定的队列或交换器都解绑后自动删除(自动删除的前提是至少有一个队列或者交换器与这个交换器绑定，之后所有与这个交换器绑定的队列或者交换器都与此解绑。)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;队列-queue&#34;&gt;队列 (Queue)&lt;/h2&gt;
+&lt;h3 id=&#34;队列特性&#34;&gt;队列特性&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;队列与交换器进行绑定&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;队列属性&#34;&gt;队列属性&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;持久化&lt;/strong&gt;：&lt;code&gt;durable&lt;/code&gt; 参数让队列存盘&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;排他性&lt;/strong&gt;：&lt;code&gt;exclusive&lt;/code&gt; 参数使队列仅对首次声明它的连接可见，连接断开时自动删除&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;自动删除&lt;/strong&gt;：当所有消费者都断开连接时自动删除(至少有一个消费者连接到这个队列，之后所有与这个队列连接的消费者都断开时，才会自动删除)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;声明机制&#34;&gt;声明机制&lt;/h2&gt;
+&lt;p&gt;生产者和消费者都可以声明交换器或队列：&lt;/p&gt;
+          
+          
+        
+      </description>
+    </item>
+    
+    <item>
+      <title>RabbitMQ电子书</title>
+      <link>https://jianlin-li.github.io/post/rabbitmq_book/</link>
+      <pubDate>Wed, 22 Apr 2026 00:07:37 +0800</pubDate>
+      
+      <guid>https://jianlin-li.github.io/post/rabbitmq_book/</guid>
+      <description>
+        
+          
+            &lt;h1 id=&#34;rabbitmq实战指南&#34;&gt;&lt;strong&gt;RabbitMQ实战指南&lt;/strong&gt;&lt;/h1&gt;
 &lt;div class=&#34;pdf-toolbar&#34;&gt;
 
     &lt;a class=&#34;pdf-btn&#34;
-       href=&#34;https://jianlin-li.github.io/pdfs/Pro-Gitv2-1-55.pdf&#34;
+       href=&#34;https://jianlin-li.github.io/pdfs/RabbitMQ%e5%ae%9e%e6%88%98%e6%8c%87%e5%8d%97.pdf&#34;
        target=&#34;_blank&#34;&gt;
         📄 下载PDF
     &lt;/a&gt;
 
     &lt;a class=&#34;pdf-btn&#34;
-       href=&#34;https://jianlin-li.github.io/pdfjs/web/viewer.html?file=%2fpdfs%2fPro-Gitv2-1-55.pdf&#34;
+       href=&#34;https://jianlin-li.github.io/pdfjs/web/viewer.html?file=%2fpdfs%2fRabbitMQ%e5%ae%9e%e6%88%98%e6%8c%87%e5%8d%97.pdf&#34;
        target=&#34;_blank&#34;&gt;
         🔍 全屏阅读
     &lt;/a&gt;
@@ -970,7 +1374,7 @@
 
 &lt;div class=&#34;pdf-container&#34;&gt;
     &lt;iframe
-            src=&#34;https://jianlin-li.github.io/pdfjs/web/viewer.html?file=%2fpdfs%2fPro-Gitv2-1-55.pdf&#34;
+            src=&#34;https://jianlin-li.github.io/pdfjs/web/viewer.html?file=%2fpdfs%2fRabbitMQ%e5%ae%9e%e6%88%98%e6%8c%87%e5%8d%97.pdf&#34;
             width=&#34;100%&#34;
             height=&#34;1000px&#34;
             loading=&#34;lazy&#34;&gt;
@@ -1092,6 +1496,78 @@
 &lt;/li&gt;
 &lt;li&gt;
 &lt;p&gt;&lt;strong&gt;&lt;code&gt;git reset --hard &amp;lt;commit_id&amp;gt;&lt;/code&gt;&lt;/strong&gt;&lt;/p&gt;
+          
+          
+        
+      </description>
+    </item>
+    
+    <item>
+      <title>Git电子书</title>
+      <link>https://jianlin-li.github.io/post/git_book/</link>
+      <pubDate>Tue, 31 Mar 2026 23:32:44 +0800</pubDate>
+      
+      <guid>https://jianlin-li.github.io/post/git_book/</guid>
+      <description>
+        
+          
+            &lt;h1 id=&#34;pro-git第二版&#34;&gt;&lt;strong&gt;Pro Git（第二版）&lt;/strong&gt;&lt;/h1&gt;
+&lt;div class=&#34;pdf-toolbar&#34;&gt;
+
+    &lt;a class=&#34;pdf-btn&#34;
+       href=&#34;https://jianlin-li.github.io/pdfs/Pro-Gitv2-1-55.pdf&#34;
+       target=&#34;_blank&#34;&gt;
+        📄 下载PDF
+    &lt;/a&gt;
+
+    &lt;a class=&#34;pdf-btn&#34;
+       href=&#34;https://jianlin-li.github.io/pdfjs/web/viewer.html?file=%2fpdfs%2fPro-Gitv2-1-55.pdf&#34;
+       target=&#34;_blank&#34;&gt;
+        🔍 全屏阅读
+    &lt;/a&gt;
+
+&lt;/div&gt;
+
+&lt;div class=&#34;pdf-container&#34;&gt;
+    &lt;iframe
+            src=&#34;https://jianlin-li.github.io/pdfjs/web/viewer.html?file=%2fpdfs%2fPro-Gitv2-1-55.pdf&#34;
+            width=&#34;100%&#34;
+            height=&#34;1000px&#34;
+            loading=&#34;lazy&#34;&gt;
+    &lt;/iframe&gt;
+&lt;/div&gt;
+
+&lt;style&gt;
+    .pdf-toolbar{
+        margin:15px 0;
+        display:flex;
+        gap:12px;
+    }
+
+    .pdf-btn{
+        padding:10px 16px;
+        border-radius:8px;
+        text-decoration:none;
+         
+        color:white;
+        font-weight:600;
+    }
+
+    .pdf-btn:hover{
+        opacity:0.9;
+    }
+
+    .pdf-container{
+        border-radius:14px;
+        overflow:hidden;
+        border:1px solid #ddd;
+        box-shadow:0 4px 20px rgba(0,0,0,0.08);
+    }
+
+    .pdf-container iframe{
+        border:none;
+    }
+&lt;/style&gt;
           
           
         
@@ -1431,6 +1907,78 @@
     </item>
     
     <item>
+      <title>Shell电子书</title>
+      <link>https://jianlin-li.github.io/post/shell_book/</link>
+      <pubDate>Mon, 23 Mar 2026 09:29:12 +0800</pubDate>
+      
+      <guid>https://jianlin-li.github.io/post/shell_book/</guid>
+      <description>
+        
+          
+            &lt;h1 id=&#34;跟老男孩学linux运维-shell编程实战&#34;&gt;&lt;strong&gt;跟老男孩学Linux运维-Shell编程实战&lt;/strong&gt;&lt;/h1&gt;
+&lt;div class=&#34;pdf-toolbar&#34;&gt;
+
+    &lt;a class=&#34;pdf-btn&#34;
+       href=&#34;https://jianlin-li.github.io/pdfs/%e8%b7%9f%e8%80%81%e7%94%b7%e5%ad%a9%e5%ad%a6Linux%e8%bf%90%e7%bb%b4-Shell%e7%bc%96%e7%a8%8b%e5%ae%9e%e6%88%98.pdf&#34;
+       target=&#34;_blank&#34;&gt;
+        📄 下载PDF
+    &lt;/a&gt;
+
+    &lt;a class=&#34;pdf-btn&#34;
+       href=&#34;https://jianlin-li.github.io/pdfjs/web/viewer.html?file=%2fpdfs%2f%e8%b7%9f%e8%80%81%e7%94%b7%e5%ad%a9%e5%ad%a6Linux%e8%bf%90%e7%bb%b4-Shell%e7%bc%96%e7%a8%8b%e5%ae%9e%e6%88%98.pdf&#34;
+       target=&#34;_blank&#34;&gt;
+        🔍 全屏阅读
+    &lt;/a&gt;
+
+&lt;/div&gt;
+
+&lt;div class=&#34;pdf-container&#34;&gt;
+    &lt;iframe
+            src=&#34;https://jianlin-li.github.io/pdfjs/web/viewer.html?file=%2fpdfs%2f%e8%b7%9f%e8%80%81%e7%94%b7%e5%ad%a9%e5%ad%a6Linux%e8%bf%90%e7%bb%b4-Shell%e7%bc%96%e7%a8%8b%e5%ae%9e%e6%88%98.pdf&#34;
+            width=&#34;100%&#34;
+            height=&#34;1000px&#34;
+            loading=&#34;lazy&#34;&gt;
+    &lt;/iframe&gt;
+&lt;/div&gt;
+
+&lt;style&gt;
+    .pdf-toolbar{
+        margin:15px 0;
+        display:flex;
+        gap:12px;
+    }
+
+    .pdf-btn{
+        padding:10px 16px;
+        border-radius:8px;
+        text-decoration:none;
+         
+        color:white;
+        font-weight:600;
+    }
+
+    .pdf-btn:hover{
+        opacity:0.9;
+    }
+
+    .pdf-container{
+        border-radius:14px;
+        overflow:hidden;
+        border:1px solid #ddd;
+        box-shadow:0 4px 20px rgba(0,0,0,0.08);
+    }
+
+    .pdf-container iframe{
+        border:none;
+    }
+&lt;/style&gt;
+          
+          
+        
+      </description>
+    </item>
+    
+    <item>
       <title>MySQL的知识点-1</title>
       <link>https://jianlin-li.github.io/post/mysql_review_1/</link>
       <pubDate>Fri, 27 Feb 2026 10:29:12 +0800</pubDate>
@@ -1511,6 +2059,135 @@
 &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;hr&gt;
 &lt;h2 id=&#34;2-带参数的存储过程&#34;&gt;2️⃣ 带参数的存储过程&lt;/h2&gt;
 &lt;p&gt;参数类型：&lt;/p&gt;
+          
+          
+        
+      </description>
+    </item>
+    
+    <item>
+      <title>MySQL电子书</title>
+      <link>https://jianlin-li.github.io/post/mysql_book/</link>
+      <pubDate>Fri, 27 Feb 2026 10:28:12 +0800</pubDate>
+      
+      <guid>https://jianlin-li.github.io/post/mysql_book/</guid>
+      <description>
+        
+          
+            &lt;h1 id=&#34;mysql是怎样运行的&#34;&gt;&lt;strong&gt;mysql是怎样运行的&lt;/strong&gt;&lt;/h1&gt;
+&lt;div class=&#34;pdf-toolbar&#34;&gt;
+
+    &lt;a class=&#34;pdf-btn&#34;
+       href=&#34;https://jianlin-li.github.io/pdfs/mysql%e6%98%af%e6%80%8e%e6%a0%b7%e8%bf%90%e8%a1%8c%e7%9a%84.pdf&#34;
+       target=&#34;_blank&#34;&gt;
+        📄 下载PDF
+    &lt;/a&gt;
+
+    &lt;a class=&#34;pdf-btn&#34;
+       href=&#34;https://jianlin-li.github.io/pdfjs/web/viewer.html?file=%2fpdfs%2fmysql%e6%98%af%e6%80%8e%e6%a0%b7%e8%bf%90%e8%a1%8c%e7%9a%84.pdf&#34;
+       target=&#34;_blank&#34;&gt;
+        🔍 全屏阅读
+    &lt;/a&gt;
+
+&lt;/div&gt;
+
+&lt;div class=&#34;pdf-container&#34;&gt;
+    &lt;iframe
+            src=&#34;https://jianlin-li.github.io/pdfjs/web/viewer.html?file=%2fpdfs%2fmysql%e6%98%af%e6%80%8e%e6%a0%b7%e8%bf%90%e8%a1%8c%e7%9a%84.pdf&#34;
+            width=&#34;100%&#34;
+            height=&#34;1000px&#34;
+            loading=&#34;lazy&#34;&gt;
+    &lt;/iframe&gt;
+&lt;/div&gt;
+
+&lt;style&gt;
+    .pdf-toolbar{
+        margin:15px 0;
+        display:flex;
+        gap:12px;
+    }
+
+    .pdf-btn{
+        padding:10px 16px;
+        border-radius:8px;
+        text-decoration:none;
+         
+        color:white;
+        font-weight:600;
+    }
+
+    .pdf-btn:hover{
+        opacity:0.9;
+    }
+
+    .pdf-container{
+        border-radius:14px;
+        overflow:hidden;
+        border:1px solid #ddd;
+        box-shadow:0 4px 20px rgba(0,0,0,0.08);
+    }
+
+    .pdf-container iframe{
+        border:none;
+    }
+&lt;/style&gt;
+&lt;h1 id=&#34;我们都是小青蛙mysql系列文章&#34;&gt;&lt;strong&gt;我们都是小青蛙MySQL系列文章&lt;/strong&gt;&lt;/h1&gt;
+&lt;div class=&#34;pdf-toolbar&#34;&gt;
+
+    &lt;a class=&#34;pdf-btn&#34;
+       href=&#34;https://jianlin-li.github.io/pdfs/%e6%88%91%e4%bb%ac%e9%83%bd%e6%98%af%e5%b0%8f%e9%9d%92%e8%9b%99MySQL%e7%b3%bb%e5%88%97%e6%96%87%e7%ab%a0.pdf&#34;
+       target=&#34;_blank&#34;&gt;
+        📄 下载PDF
+    &lt;/a&gt;
+
+    &lt;a class=&#34;pdf-btn&#34;
+       href=&#34;https://jianlin-li.github.io/pdfjs/web/viewer.html?file=%2fpdfs%2f%e6%88%91%e4%bb%ac%e9%83%bd%e6%98%af%e5%b0%8f%e9%9d%92%e8%9b%99MySQL%e7%b3%bb%e5%88%97%e6%96%87%e7%ab%a0.pdf&#34;
+       target=&#34;_blank&#34;&gt;
+        🔍 全屏阅读
+    &lt;/a&gt;
+
+&lt;/div&gt;
+
+&lt;div class=&#34;pdf-container&#34;&gt;
+    &lt;iframe
+            src=&#34;https://jianlin-li.github.io/pdfjs/web/viewer.html?file=%2fpdfs%2f%e6%88%91%e4%bb%ac%e9%83%bd%e6%98%af%e5%b0%8f%e9%9d%92%e8%9b%99MySQL%e7%b3%bb%e5%88%97%e6%96%87%e7%ab%a0.pdf&#34;
+            width=&#34;100%&#34;
+            height=&#34;1000px&#34;
+            loading=&#34;lazy&#34;&gt;
+    &lt;/iframe&gt;
+&lt;/div&gt;
+
+&lt;style&gt;
+    .pdf-toolbar{
+        margin:15px 0;
+        display:flex;
+        gap:12px;
+    }
+
+    .pdf-btn{
+        padding:10px 16px;
+        border-radius:8px;
+        text-decoration:none;
+         
+        color:white;
+        font-weight:600;
+    }
+
+    .pdf-btn:hover{
+        opacity:0.9;
+    }
+
+    .pdf-container{
+        border-radius:14px;
+        overflow:hidden;
+        border:1px solid #ddd;
+        box-shadow:0 4px 20px rgba(0,0,0,0.08);
+    }
+
+    .pdf-container iframe{
+        border:none;
+    }
+&lt;/style&gt;
           
           
         
@@ -2716,222 +3393,6 @@
         border:none;
     }
 &lt;/style&gt;
-          
-          
-        
-      </description>
-    </item>
-    
-    <item>
-      <title>RabbitMQ消息中间件详解-1</title>
-      <link>https://jianlin-li.github.io/post/rabbitmq_review_1/</link>
-      <pubDate>Tue, 10 Jun 2025 15:04:49 +0800</pubDate>
-      
-      <guid>https://jianlin-li.github.io/post/rabbitmq_review_1/</guid>
-      <description>
-        
-          
-            &lt;h1 id=&#34;rabbitmq-消息中间件详解&#34;&gt;RabbitMQ 消息中间件详解&lt;/h1&gt;
-&lt;p&gt;&lt;figure&gt;
-  &lt;picture&gt;
-
-    
-      
-        
-        
-        
-        
-        
-        
-    &lt;img
-      loading=&#34;lazy&#34;
-      decoding=&#34;async&#34;
-      alt=&#34;RabbitMQ的基本结构&#34;
-      
-        class=&#34;image_figure image_internal image_unprocessed&#34;
-        src=&#34;https://jianlin-li.github.io/images/rabbitmq_1.png&#34;
-      
-      
-    /&gt;
-
-    &lt;/picture&gt;
-&lt;/figure&gt;
-&lt;/p&gt;
-&lt;blockquote&gt;
-&lt;p&gt;组件介绍&lt;/p&gt;
-&lt;/blockquote&gt;
-&lt;ol&gt;
-&lt;li&gt;Broker:它提供一种传输服务,它的角色就是维护一条从生产者到消费者的路线，保证数据能按照指定的方式进行传输,&lt;/li&gt;
-&lt;li&gt;Exchange：消息交换机,它指定消息按什么规则,路由到哪个队列。&lt;/li&gt;
-&lt;li&gt;Queue:消息的载体,每个消息都会被投到一个或多个队列。&lt;/li&gt;
-&lt;li&gt;Binding:绑定，它的作用就是把exchange和queue按照路由规则绑定起来.&lt;/li&gt;
-&lt;li&gt;Routing Key:路由关键字,exchange根据这个关键字进行消息投递。&lt;/li&gt;
-&lt;li&gt;vhost:虚拟主机,一个broker里可以有多个vhost，用作不同用户的权限分离。&lt;/li&gt;
-&lt;li&gt;Producer:消息生产者,就是投递消息的程序.&lt;/li&gt;
-&lt;li&gt;Consumer:消息消费者,就是接受消息的程序.&lt;/li&gt;
-&lt;li&gt;Channel:消息通道,在客户端的每个连接里,可建立多个channel.&lt;/li&gt;
-&lt;/ol&gt;
-&lt;p&gt;&lt;figure&gt;
-  &lt;picture&gt;
-
-    
-      
-        
-        
-        
-        
-        
-        
-    &lt;img
-      loading=&#34;lazy&#34;
-      decoding=&#34;async&#34;
-      alt=&#34;RabbitMQ的消息发布和接收流程&#34;
-      
-        class=&#34;image_figure image_internal image_unprocessed&#34;
-        src=&#34;https://jianlin-li.github.io/images/rabbitmq_2.png&#34;
-      
-      
-    /&gt;
-
-    &lt;/picture&gt;
-&lt;/figure&gt;
-
-&lt;strong&gt;一. 如何发送消息&lt;/strong&gt;&lt;/p&gt;
-&lt;ol&gt;
-&lt;li&gt;生产者和Broker建立TCP连接&lt;/li&gt;
-&lt;li&gt;生产者和Broker建立通道&lt;/li&gt;
-&lt;li&gt;生产者通过通道消息发送给Broker，由Exchange将消息进行转发&lt;/li&gt;
-&lt;li&gt;Exchange将消息转发到对应那个的Queue（队列）&lt;/li&gt;
-&lt;/ol&gt;
-&lt;p&gt;&lt;strong&gt;二.如何接收消息&lt;/strong&gt;&lt;/p&gt;
-&lt;ol&gt;
-&lt;li&gt;消费者和Broker建立TCP连接&lt;/li&gt;
-&lt;li&gt;消费者和Broker建立通道&lt;/li&gt;
-&lt;li&gt;消费者监听制定的Queue（队列）&lt;/li&gt;
-&lt;li&gt;当有消息到达Queue时Broker默认将消息推送给消费者&lt;/li&gt;
-&lt;li&gt;消费者接受到消息&lt;/li&gt;
-&lt;/ol&gt;
-&lt;h2 id=&#34;消息中间件的作用&#34;&gt;消息中间件的作用&lt;/h2&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;strong&gt;削峰&lt;/strong&gt;：缓冲瞬时高峰流量，避免系统被冲垮&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;解耦&lt;/strong&gt;：降低系统间耦合度，提高可维护性&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;异步通信&lt;/strong&gt;：提高系统响应速度，减少等待时间&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;顺序保证&lt;/strong&gt;：确保消息按特定顺序处理&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;数据冗余&lt;/strong&gt;：提供消息持久化，防止数据丢失&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;系统扩展&lt;/strong&gt;：便于系统水平扩展&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h2 id=&#34;amqp-高级消息队列协议&#34;&gt;AMQP 高级消息队列协议&lt;/h2&gt;
-&lt;p&gt;AMQP（Advanced Message Queuing Protocol）是一个提供统一消息服务的应用层标准协议。&lt;/p&gt;
-&lt;h2 id=&#34;交换器-exchange&#34;&gt;交换器 (Exchange)&lt;/h2&gt;
-&lt;h3 id=&#34;交换器特性&#34;&gt;交换器特性&lt;/h3&gt;
-&lt;ul&gt;
-&lt;li&gt;交换器与交换器可以相互绑定&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h3 id=&#34;交换器类型&#34;&gt;交换器类型&lt;/h3&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;code&gt;direct&lt;/code&gt;
-&lt;figure&gt;
-  &lt;picture&gt;
-
-    
-      
-        
-        
-        
-        
-        
-        
-    &lt;img
-      loading=&#34;lazy&#34;
-      decoding=&#34;async&#34;
-      alt=&#34;Direct 模式&#34;
-      
-        class=&#34;image_figure image_internal image_unprocessed&#34;
-        src=&#34;https://jianlin-li.github.io/images/rabbitmq_direct.png&#34;
-      
-      
-    /&gt;
-
-    &lt;/picture&gt;
-&lt;/figure&gt;
-
-是最简单的模式.即创建消息队列的时候,指定一个路由键（RoutingKey）.当发送者发送消息的时候,指定对应的Key.当Key和消息队列的RoutingKey一致的时候,消息将会被发送到该消息队列中.&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;topic&lt;/code&gt;
-&lt;figure&gt;
-  &lt;picture&gt;
-
-    
-      
-        
-        
-        
-        
-        
-        
-    &lt;img
-      loading=&#34;lazy&#34;
-      decoding=&#34;async&#34;
-      alt=&#34;Topic 主题模式&#34;
-      
-        class=&#34;image_figure image_internal image_unprocessed&#34;
-        src=&#34;https://jianlin-li.github.io/images/rabbitmq_topic.png&#34;
-      
-      
-    /&gt;
-
-    &lt;/picture&gt;
-&lt;/figure&gt;
-
-topic转发信息主要是依据通配符,队列和交换机的绑定主要是依据一种模式(通配符+字符串),而当发送消息的时候,只有指定的Key和该模式相匹配的时候,消息才会被发送到该消息队列中.通配符：* 表示一个词，# 表示零个或多个词&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;fanout&lt;/code&gt;
-&lt;figure&gt;
-  &lt;picture&gt;
-
-    
-      
-        
-        
-        
-        
-        
-        
-    &lt;img
-      loading=&#34;lazy&#34;
-      decoding=&#34;async&#34;
-      alt=&#34;Fanout模式&#34;
-      
-        class=&#34;image_figure image_internal image_unprocessed&#34;
-        src=&#34;https://jianlin-li.github.io/images/rabbitmq_fanout.png&#34;
-      
-      
-    /&gt;
-
-    &lt;/picture&gt;
-&lt;/figure&gt;
-
-fanout是路由广播的形式,将会把消息发给绑定它的全部队列,即便设置了key,也会被忽略.因此我们发送到交换机的消息会使得绑定到该交换机的每一个Queue接收到消息,这个时候就算指定了路由键（routingKey）,或者规则(即上文中convertAndSend方法的参数2),也会被忽略!&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;header&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;system&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;自定义&lt;/code&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h3 id=&#34;交换器属性&#34;&gt;交换器属性&lt;/h3&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;strong&gt;持久化&lt;/strong&gt;：&lt;code&gt;durable&lt;/code&gt; 参数让交换器存盘&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;自动删除&lt;/strong&gt;：当所有绑定的队列或交换器都解绑后自动删除(自动删除的前提是至少有一个队列或者交换器与这个交换器绑定，之后所有与这个交换器绑定的队列或者交换器都与此解绑。)&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h2 id=&#34;队列-queue&#34;&gt;队列 (Queue)&lt;/h2&gt;
-&lt;h3 id=&#34;队列特性&#34;&gt;队列特性&lt;/h3&gt;
-&lt;ul&gt;
-&lt;li&gt;队列与交换器进行绑定&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h3 id=&#34;队列属性&#34;&gt;队列属性&lt;/h3&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;strong&gt;持久化&lt;/strong&gt;：&lt;code&gt;durable&lt;/code&gt; 参数让队列存盘&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;排他性&lt;/strong&gt;：&lt;code&gt;exclusive&lt;/code&gt; 参数使队列仅对首次声明它的连接可见，连接断开时自动删除&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;自动删除&lt;/strong&gt;：当所有消费者都断开连接时自动删除(至少有一个消费者连接到这个队列，之后所有与这个队列连接的消费者都断开时，才会自动删除)&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h2 id=&#34;声明机制&#34;&gt;声明机制&lt;/h2&gt;
-&lt;p&gt;生产者和消费者都可以声明交换器或队列：&lt;/p&gt;
           
           
         
@@ -4424,6 +4885,150 @@ fanout是路由广播的形式,将会把消息发给绑定它的全部队列,即
 &lt;div class=&#34;pdf-container&#34;&gt;
     &lt;iframe
             src=&#34;https://jianlin-li.github.io/pdfjs/web/viewer.html?file=%2fpdfs%2f%e6%95%b0%e6%8d%ae%e7%bb%93%e6%9e%84%e4%b8%8e%e7%ae%97%e6%b3%95%e5%88%86%e6%9e%90C%e8%af%ad%e8%a8%80%e6%8f%8f%e8%bf%b0_%e5%8e%9f%e4%b9%a6%e7%ac%ac2%e7%89%88_%e9%ab%98%e6%b8%85%e7%89%88.pdf&#34;
+            width=&#34;100%&#34;
+            height=&#34;1000px&#34;
+            loading=&#34;lazy&#34;&gt;
+    &lt;/iframe&gt;
+&lt;/div&gt;
+
+&lt;style&gt;
+    .pdf-toolbar{
+        margin:15px 0;
+        display:flex;
+        gap:12px;
+    }
+
+    .pdf-btn{
+        padding:10px 16px;
+        border-radius:8px;
+        text-decoration:none;
+         
+        color:white;
+        font-weight:600;
+    }
+
+    .pdf-btn:hover{
+        opacity:0.9;
+    }
+
+    .pdf-container{
+        border-radius:14px;
+        overflow:hidden;
+        border:1px solid #ddd;
+        box-shadow:0 4px 20px rgba(0,0,0,0.08);
+    }
+
+    .pdf-container iframe{
+        border:none;
+    }
+&lt;/style&gt;
+          
+          
+        
+      </description>
+    </item>
+    
+    <item>
+      <title>架构-web服务器部署</title>
+      <link>https://jianlin-li.github.io/post/jiagou-fuwuqibushu/</link>
+      <pubDate>Thu, 10 Apr 2025 10:33:29 +0800</pubDate>
+      
+      <guid>https://jianlin-li.github.io/post/jiagou-fuwuqibushu/</guid>
+      <description>
+        
+          
+            &lt;h1 id=&#34;跟老男孩学linux运维-web集群实战&#34;&gt;&lt;strong&gt;跟老男孩学Linux运维-Web集群实战&lt;/strong&gt;&lt;/h1&gt;
+&lt;div class=&#34;pdf-toolbar&#34;&gt;
+
+    &lt;a class=&#34;pdf-btn&#34;
+       href=&#34;https://jianlin-li.github.io/pdfs/%e8%b7%9f%e8%80%81%e7%94%b7%e5%ad%a9%e5%ad%a6Linux%e8%bf%90%e7%bb%b4-Web%e9%9b%86%e7%be%a4%e5%ae%9e%e6%88%98.pdf&#34;
+       target=&#34;_blank&#34;&gt;
+        📄 下载PDF
+    &lt;/a&gt;
+
+    &lt;a class=&#34;pdf-btn&#34;
+       href=&#34;https://jianlin-li.github.io/pdfjs/web/viewer.html?file=%2fpdfs%2f%e8%b7%9f%e8%80%81%e7%94%b7%e5%ad%a9%e5%ad%a6Linux%e8%bf%90%e7%bb%b4-Web%e9%9b%86%e7%be%a4%e5%ae%9e%e6%88%98.pdf&#34;
+       target=&#34;_blank&#34;&gt;
+        🔍 全屏阅读
+    &lt;/a&gt;
+
+&lt;/div&gt;
+
+&lt;div class=&#34;pdf-container&#34;&gt;
+    &lt;iframe
+            src=&#34;https://jianlin-li.github.io/pdfjs/web/viewer.html?file=%2fpdfs%2f%e8%b7%9f%e8%80%81%e7%94%b7%e5%ad%a9%e5%ad%a6Linux%e8%bf%90%e7%bb%b4-Web%e9%9b%86%e7%be%a4%e5%ae%9e%e6%88%98.pdf&#34;
+            width=&#34;100%&#34;
+            height=&#34;1000px&#34;
+            loading=&#34;lazy&#34;&gt;
+    &lt;/iframe&gt;
+&lt;/div&gt;
+
+&lt;style&gt;
+    .pdf-toolbar{
+        margin:15px 0;
+        display:flex;
+        gap:12px;
+    }
+
+    .pdf-btn{
+        padding:10px 16px;
+        border-radius:8px;
+        text-decoration:none;
+         
+        color:white;
+        font-weight:600;
+    }
+
+    .pdf-btn:hover{
+        opacity:0.9;
+    }
+
+    .pdf-container{
+        border-radius:14px;
+        overflow:hidden;
+        border:1px solid #ddd;
+        box-shadow:0 4px 20px rgba(0,0,0,0.08);
+    }
+
+    .pdf-container iframe{
+        border:none;
+    }
+&lt;/style&gt;
+          
+          
+        
+      </description>
+    </item>
+    
+    <item>
+      <title>架构-DevOps权威指南</title>
+      <link>https://jianlin-li.github.io/post/jiagou-devops/</link>
+      <pubDate>Thu, 10 Apr 2025 10:32:29 +0800</pubDate>
+      
+      <guid>https://jianlin-li.github.io/post/jiagou-devops/</guid>
+      <description>
+        
+          
+            &lt;h1 id=&#34;devops权威指南it效能新基建&#34;&gt;&lt;strong&gt;DevOps权威指南：IT效能“新基建”&lt;/strong&gt;&lt;/h1&gt;
+&lt;div class=&#34;pdf-toolbar&#34;&gt;
+
+    &lt;a class=&#34;pdf-btn&#34;
+       href=&#34;https://jianlin-li.github.io/pdfs/DevOps%e6%9d%83%e5%a8%81%e6%8c%87%e5%8d%97-IT%e6%95%88%e8%83%bd%e6%96%b0%e5%9f%ba%e5%bb%ba.pdf&#34;
+       target=&#34;_blank&#34;&gt;
+        📄 下载PDF
+    &lt;/a&gt;
+
+    &lt;a class=&#34;pdf-btn&#34;
+       href=&#34;https://jianlin-li.github.io/pdfjs/web/viewer.html?file=%2fpdfs%2fDevOps%e6%9d%83%e5%a8%81%e6%8c%87%e5%8d%97-IT%e6%95%88%e8%83%bd%e6%96%b0%e5%9f%ba%e5%bb%ba.pdf&#34;
+       target=&#34;_blank&#34;&gt;
+        🔍 全屏阅读
+    &lt;/a&gt;
+
+&lt;/div&gt;
+
+&lt;div class=&#34;pdf-container&#34;&gt;
+    &lt;iframe
+            src=&#34;https://jianlin-li.github.io/pdfjs/web/viewer.html?file=%2fpdfs%2fDevOps%e6%9d%83%e5%a8%81%e6%8c%87%e5%8d%97-IT%e6%95%88%e8%83%bd%e6%96%b0%e5%9f%ba%e5%bb%ba.pdf&#34;
             width=&#34;100%&#34;
             height=&#34;1000px&#34;
             loading=&#34;lazy&#34;&gt;
