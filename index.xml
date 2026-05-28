@@ -201,7 +201,7 @@
         class=&#34;image_figure image_external image_processed&#34;
         width=&#34;518&#34;
         height=&#34;595&#34;
-        src=&#34;https://jianlin-li.github.io/images/640_10501578189088005366.webp&#34;
+        src=&#34;https://jianlin-li.github.io/images/640_10501578189088005366.png&#34;
       
       
     /&gt;
@@ -329,7 +329,7 @@
         class=&#34;image_figure image_external image_processed&#34;
         width=&#34;820&#34;
         height=&#34;617&#34;
-        src=&#34;https://jianlin-li.github.io/images/640_5000515777212889652.webp&#34;
+        src=&#34;https://jianlin-li.github.io/images/640_5000515777212889652.png&#34;
       
       
     /&gt;
@@ -411,7 +411,7 @@
         class=&#34;image_figure image_external image_processed&#34;
         width=&#34;833&#34;
         height=&#34;590&#34;
-        src=&#34;https://jianlin-li.github.io/images/640_3928304774531292164.webp&#34;
+        src=&#34;https://jianlin-li.github.io/images/640_3928304774531292164.png&#34;
       
       
     /&gt;
@@ -3930,6 +3930,84 @@ fanout是路由广播的形式,将会把消息发给绑定它的全部队列,即
 &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt;32&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;// echo $arr{0}; // ❌ Fatal error in 7.4+
 &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;blockquote&gt;
 &lt;p&gt;⚠️ 注意：构造器属性提升是 &lt;strong&gt;PHP 8.0&lt;/strong&gt; 特性，7.4 不支持。&lt;/p&gt;
+          
+          
+        
+      </description>
+    </item>
+    
+    <item>
+      <title>Mac 本地使用 mkcert 制作 HTTPS 自签名证书教程</title>
+      <link>https://jianlin-li.github.io/post/mkcert_review/</link>
+      <pubDate>Fri, 30 May 2025 23:59:12 +0800</pubDate>
+      
+      <guid>https://jianlin-li.github.io/post/mkcert_review/</guid>
+      <description>
+        
+          
+            &lt;h1 id=&#34;mac-本地使用-mkcert-制作-https-自签名证书教程&#34;&gt;Mac 本地使用 mkcert 制作 HTTPS 自签名证书教程&lt;/h1&gt;
+&lt;h2 id=&#34;一mkcert-简介&#34;&gt;一、mkcert 简介&lt;/h2&gt;
+&lt;p&gt;mkcert&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;mkcert&lt;/code&gt; 是一个用于本地开发环境生成可信 HTTPS 证书的工具。&lt;/p&gt;
+&lt;p&gt;相比传统 OpenSSL 自签名证书：&lt;/p&gt;
+&lt;table&gt;
+  &lt;thead&gt;
+      &lt;tr&gt;
+          &lt;th&gt;对比项&lt;/th&gt;
+          &lt;th&gt;mkcert&lt;/th&gt;
+          &lt;th&gt;OpenSSL&lt;/th&gt;
+      &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+      &lt;tr&gt;
+          &lt;td&gt;浏览器信任&lt;/td&gt;
+          &lt;td&gt;✅&lt;/td&gt;
+          &lt;td&gt;❌&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;自动加入系统信任&lt;/td&gt;
+          &lt;td&gt;✅&lt;/td&gt;
+          &lt;td&gt;❌&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;使用难度&lt;/td&gt;
+          &lt;td&gt;简单&lt;/td&gt;
+          &lt;td&gt;较复杂&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;支持本地域名&lt;/td&gt;
+          &lt;td&gt;✅&lt;/td&gt;
+          &lt;td&gt;✅&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;支持 IP&lt;/td&gt;
+          &lt;td&gt;✅&lt;/td&gt;
+          &lt;td&gt;需额外配置&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;适合本地开发&lt;/td&gt;
+          &lt;td&gt;非常适合&lt;/td&gt;
+          &lt;td&gt;一般&lt;/td&gt;
+      &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;hr&gt;
+&lt;h1 id=&#34;二适用场景&#34;&gt;二、适用场景&lt;/h1&gt;
+&lt;p&gt;mkcert 非常适用于：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;本地 HTTPS 开发&lt;/li&gt;
+&lt;li&gt;本地 Kubernetes Ingress&lt;/li&gt;
+&lt;li&gt;Vue / React / Node 开发&lt;/li&gt;
+&lt;li&gt;Java SpringBoot HTTPS&lt;/li&gt;
+&lt;li&gt;微信 OAuth 回调&lt;/li&gt;
+&lt;li&gt;SSO 单点登录&lt;/li&gt;
+&lt;li&gt;API HTTPS 联调&lt;/li&gt;
+&lt;li&gt;本地模拟生产 HTTPS 环境&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;h1 id=&#34;三安装-mkcert&#34;&gt;三、安装 mkcert&lt;/h1&gt;
+&lt;h2 id=&#34;1安装-homebrew如未安装&#34;&gt;1、安装 Homebrew（如未安装）&lt;/h2&gt;
+&lt;p&gt;&lt;a href=&#34;https://brew.sh?utm_source=chatgpt.com&#34;&gt;Homebrew 官网&lt;/a&gt;&lt;/p&gt;
           
           
         

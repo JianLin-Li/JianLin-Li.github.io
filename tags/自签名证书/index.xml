@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>自签名证书 on 李建林--个人知识库</title>
+    <link>https://jianlin-li.github.io/tags/%E8%87%AA%E7%AD%BE%E5%90%8D%E8%AF%81%E4%B9%A6/</link>
+    <description>Recent content in 自签名证书 on 李建林--个人知识库</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <copyright>Copyright © 1989–2025, 李建林 </copyright>
+    <lastBuildDate>Fri, 30 May 2025 23:59:12 +0800</lastBuildDate><atom:link href="https://jianlin-li.github.io/tags/%E8%87%AA%E7%AD%BE%E5%90%8D%E8%AF%81%E4%B9%A6/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Mac 本地使用 mkcert 制作 HTTPS 自签名证书教程</title>
+      <link>https://jianlin-li.github.io/post/mkcert_review/</link>
+      <pubDate>Fri, 30 May 2025 23:59:12 +0800</pubDate>
+      
+      <guid>https://jianlin-li.github.io/post/mkcert_review/</guid>
+      <description>
+        
+          
+            &lt;h1 id=&#34;mac-本地使用-mkcert-制作-https-自签名证书教程&#34;&gt;Mac 本地使用 mkcert 制作 HTTPS 自签名证书教程&lt;/h1&gt;
+&lt;h2 id=&#34;一mkcert-简介&#34;&gt;一、mkcert 简介&lt;/h2&gt;
+&lt;p&gt;mkcert&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;mkcert&lt;/code&gt; 是一个用于本地开发环境生成可信 HTTPS 证书的工具。&lt;/p&gt;
+&lt;p&gt;相比传统 OpenSSL 自签名证书：&lt;/p&gt;
+&lt;table&gt;
+  &lt;thead&gt;
+      &lt;tr&gt;
+          &lt;th&gt;对比项&lt;/th&gt;
+          &lt;th&gt;mkcert&lt;/th&gt;
+          &lt;th&gt;OpenSSL&lt;/th&gt;
+      &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+      &lt;tr&gt;
+          &lt;td&gt;浏览器信任&lt;/td&gt;
+          &lt;td&gt;✅&lt;/td&gt;
+          &lt;td&gt;❌&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;自动加入系统信任&lt;/td&gt;
+          &lt;td&gt;✅&lt;/td&gt;
+          &lt;td&gt;❌&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;使用难度&lt;/td&gt;
+          &lt;td&gt;简单&lt;/td&gt;
+          &lt;td&gt;较复杂&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;支持本地域名&lt;/td&gt;
+          &lt;td&gt;✅&lt;/td&gt;
+          &lt;td&gt;✅&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;支持 IP&lt;/td&gt;
+          &lt;td&gt;✅&lt;/td&gt;
+          &lt;td&gt;需额外配置&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;适合本地开发&lt;/td&gt;
+          &lt;td&gt;非常适合&lt;/td&gt;
+          &lt;td&gt;一般&lt;/td&gt;
+      &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;hr&gt;
+&lt;h1 id=&#34;二适用场景&#34;&gt;二、适用场景&lt;/h1&gt;
+&lt;p&gt;mkcert 非常适用于：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;本地 HTTPS 开发&lt;/li&gt;
+&lt;li&gt;本地 Kubernetes Ingress&lt;/li&gt;
+&lt;li&gt;Vue / React / Node 开发&lt;/li&gt;
+&lt;li&gt;Java SpringBoot HTTPS&lt;/li&gt;
+&lt;li&gt;微信 OAuth 回调&lt;/li&gt;
+&lt;li&gt;SSO 单点登录&lt;/li&gt;
+&lt;li&gt;API HTTPS 联调&lt;/li&gt;
+&lt;li&gt;本地模拟生产 HTTPS 环境&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;h1 id=&#34;三安装-mkcert&#34;&gt;三、安装 mkcert&lt;/h1&gt;
+&lt;h2 id=&#34;1安装-homebrew如未安装&#34;&gt;1、安装 Homebrew（如未安装）&lt;/h2&gt;
+&lt;p&gt;&lt;a href=&#34;https://brew.sh?utm_source=chatgpt.com&#34;&gt;Homebrew 官网&lt;/a&gt;&lt;/p&gt;
+          
+          
+        
+      </description>
+    </item>
+    
+  </channel>
+</rss>
