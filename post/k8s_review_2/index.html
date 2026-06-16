@@ -168,7 +168,7 @@
     <span class="post_date">
       2026-04-26	  
     </span>
-    <span class="post_time"> · 9 分钟阅读</span><span>&nbsp;· <a href='https://jianlin-li.github.io/tags/kubernetes/' title="Kubernetes" class="post_tag button button_translucent">Kubernetes
+    <span class="post_time"> · 10 分钟阅读</span><span>&nbsp;· <a href='https://jianlin-li.github.io/tags/kubernetes/' title="Kubernetes" class="post_tag button button_translucent">Kubernetes
         </a>
     </span>
     <span class="page_only">&nbsp;·
@@ -1561,6 +1561,307 @@
 </span></span><span class="line"><span class="ln">19</span><span class="cl">config
 </span></span><span class="line"><span class="ln">20</span><span class="cl">auth
 </span></span></code></pre></div><p>这 20 个命令基本覆盖了日常 Kubernetes 运维、CKA 考试以及生产环境管理的绝大部分场景。</p>
+<h1 id="kubectl"><strong>kubectl <code>-o</code> 输出格式汇总</strong></h1>
+<p>在使用 <code>kubectl get</code>、<code>kubectl describe</code> 等命令查看资源时，可以通过 <code>-o</code>（<code>--output</code>）参数指定输出格式。</p>
+<p>例如：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">kubectl get pod nginx -o yaml
+</span></span><span class="line"><span class="ln">2</span><span class="cl">kubectl get svc -o json
+</span></span></code></pre></div><p>下面是 <code>kubectl</code> 常见支持的输出格式汇总：</p>
+<table>
+  <thead>
+      <tr>
+          <th>输出格式</th>
+          <th>描述</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>wide</code></td>
+          <td>在默认表格基础上显示更多信息，例如 Pod IP、节点名称、镜像等</td>
+      </tr>
+      <tr>
+          <td><code>yaml</code></td>
+          <td>以 YAML 格式输出资源完整定义</td>
+      </tr>
+      <tr>
+          <td><code>json</code></td>
+          <td>以 JSON 格式输出资源完整定义</td>
+      </tr>
+      <tr>
+          <td><code>name</code></td>
+          <td>仅输出资源名称，格式为 <code>&lt;资源类型&gt;/&lt;资源名称&gt;</code></td>
+      </tr>
+      <tr>
+          <td><code>jsonpath</code></td>
+          <td>使用 JSONPath 表达式提取指定字段</td>
+      </tr>
+      <tr>
+          <td><code>jsonpath-file</code></td>
+          <td>从文件中读取 JSONPath 表达式进行字段提取</td>
+      </tr>
+      <tr>
+          <td><code>go-template</code></td>
+          <td>使用 Go Template 模板输出指定内容</td>
+      </tr>
+      <tr>
+          <td><code>go-template-file</code></td>
+          <td>从文件中读取 Go Template 模板</td>
+      </tr>
+      <tr>
+          <td><code>custom-columns</code></td>
+          <td>自定义列输出</td>
+      </tr>
+      <tr>
+          <td><code>custom-columns-file</code></td>
+          <td>从文件读取自定义列定义</td>
+      </tr>
+      <tr>
+          <td><code>template</code></td>
+          <td>Go Template 的简写方式（较少使用）</td>
+      </tr>
+      <tr>
+          <td><code>templatefile</code></td>
+          <td>从模板文件生成输出（较少使用）</td>
+      </tr>
+  </tbody>
+</table>
+<hr>
+<h1 id="常见输出格式示例">常见输出格式示例</h1>
+<h2 id="1-wide">1. wide</h2>
+<p>默认表格扩展输出</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">kubectl get pods -o wide
+</span></span></code></pre></div><p>输出：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">NAME     READY STATUS  IP            NODE
+</span></span><span class="line"><span class="ln">2</span><span class="cl">nginx    1/1   Running 10.244.1.2    node1
+</span></span></code></pre></div><p>适用于：</p>
+<ul>
+<li>查看 Pod IP</li>
+<li>查看节点位置</li>
+<li>查看镜像等附加信息</li>
+</ul>
+<hr>
+<h2 id="2-yaml-">2. yaml ⭐⭐⭐⭐⭐</h2>
+<p>输出资源完整 YAML</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">kubectl get pod nginx -o yaml
+</span></span></code></pre></div><p>适用于：</p>
+<ul>
+<li>导出资源</li>
+<li>查看全部配置</li>
+<li>编写 YAML 文件</li>
+</ul>
+<hr>
+<h2 id="3-json-">3. json ⭐⭐⭐⭐⭐</h2>
+<p>输出 JSON 格式</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">kubectl get pod nginx -o json
+</span></span></code></pre></div><p>适用于：</p>
+<ul>
+<li>程序调用</li>
+<li>jq 工具处理</li>
+<li>API 调试</li>
+</ul>
+<hr>
+<h2 id="4-name">4. name</h2>
+<p>仅输出资源名称</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">kubectl get pods -o name
+</span></span></code></pre></div><p>输出：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">pod/nginx
+</span></span><span class="line"><span class="ln">2</span><span class="cl">pod/mysql
+</span></span></code></pre></div><p>常用于：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">kubectl delete <span class="k">$(</span>kubectl get pods -o name<span class="k">)</span>
+</span></span></code></pre></div><hr>
+<h2 id="5-jsonpath-">5. jsonpath ⭐⭐⭐⭐⭐</h2>
+<p>提取指定字段</p>
+<h3 id="获取-pod-ip">获取 Pod IP</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">kubectl get pod nginx <span class="se">\
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="se"></span>-o <span class="nv">jsonpath</span><span class="o">=</span><span class="s1">&#39;{.status.podIP}&#39;</span>
+</span></span></code></pre></div><p>输出：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">10.244.1.2
+</span></span></code></pre></div><h3 id="获取所有-pod-名称">获取所有 Pod 名称</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">kubectl get pods <span class="se">\
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="se"></span>-o <span class="nv">jsonpath</span><span class="o">=</span><span class="s1">&#39;{.items[*].metadata.name}&#39;</span>
+</span></span></code></pre></div><p>输出：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">nginx mysql redis
+</span></span></code></pre></div><h3 id="获取-node-名称">获取 Node 名称</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">kubectl get nodes <span class="se">\
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="se"></span>-o <span class="nv">jsonpath</span><span class="o">=</span><span class="s1">&#39;{.items[*].metadata.name}&#39;</span>
+</span></span></code></pre></div><hr>
+<h2 id="6-jsonpath-file">6. jsonpath-file</h2>
+<p>从文件读取 JSONPath</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">kubectl get pod nginx <span class="se">\
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="se"></span>-o jsonpath-file<span class="o">=</span>path.txt
+</span></span></code></pre></div><p>path.txt：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">{.status.podIP}
+</span></span></code></pre></div><p>适用于：</p>
+<ul>
+<li>长 JSONPath 表达式</li>
+<li>自动化脚本</li>
+</ul>
+<hr>
+<h2 id="7-custom-columns-">7. custom-columns ⭐⭐⭐⭐</h2>
+<p>自定义列输出</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">kubectl get pods <span class="se">\
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="se"></span>-o custom-columns<span class="o">=</span><span class="se">\
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="se"></span>NAME:.metadata.name,<span class="se">\
+</span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="se"></span>IP:.status.podIP,<span class="se">\
+</span></span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="se"></span>NODE:.spec.nodeName
+</span></span></code></pre></div><p>输出：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">NAME    IP           NODE
+</span></span><span class="line"><span class="ln">2</span><span class="cl">nginx   10.244.1.2   node1
+</span></span><span class="line"><span class="ln">3</span><span class="cl">mysql   10.244.2.3   node2
+</span></span></code></pre></div><p>适用于：</p>
+<ul>
+<li>运维统计</li>
+<li>报表输出</li>
+</ul>
+<hr>
+<h2 id="8-custom-columns-file">8. custom-columns-file</h2>
+<p>从文件读取列定义</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">kubectl get pods <span class="se">\
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="se"></span>-o custom-columns-file<span class="o">=</span>columns.txt
+</span></span></code></pre></div><p>columns.txt：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">NAME:.metadata.name
+</span></span><span class="line"><span class="ln">2</span><span class="cl">NODE:.spec.nodeName
+</span></span><span class="line"><span class="ln">3</span><span class="cl">IP:.status.podIP
+</span></span></code></pre></div><hr>
+<h2 id="9-go-template-">9. go-template ⭐⭐⭐</h2>
+<p>使用 Go 模板</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">kubectl get pods <span class="se">\
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="se"></span>-o go-template<span class="o">=</span><span class="s1">&#39;{{range .items}}{{.metadata.name}}{{&#34;\n&#34;}}{{end}}&#39;</span>
+</span></span></code></pre></div><p>输出：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">nginx
+</span></span><span class="line"><span class="ln">2</span><span class="cl">mysql
+</span></span><span class="line"><span class="ln">3</span><span class="cl">redis
+</span></span></code></pre></div><p>适用于：</p>
+<ul>
+<li>复杂格式化输出</li>
+<li>自动化脚本</li>
+</ul>
+<hr>
+<h2 id="10-go-template-file">10. go-template-file</h2>
+<p>从模板文件读取</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">kubectl get pods <span class="se">\
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="se"></span>-o go-template-file<span class="o">=</span>template.tpl
+</span></span></code></pre></div><p>template.tpl：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="ln">1</span><span class="cl">{{range .items}}
+</span></span><span class="line"><span class="ln">2</span><span class="cl">{{.metadata.name}}
+</span></span><span class="line"><span class="ln">3</span><span class="cl">{{end}}
+</span></span></code></pre></div><hr>
+<h1 id="支持情况汇总">支持情况汇总</h1>
+<table>
+  <thead>
+      <tr>
+          <th>输出格式</th>
+          <th>人类阅读</th>
+          <th>自动化脚本</th>
+          <th>推荐程度</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>wide</td>
+          <td>⭐⭐⭐⭐⭐</td>
+          <td>⭐⭐</td>
+          <td>⭐⭐⭐⭐⭐</td>
+      </tr>
+      <tr>
+          <td>yaml</td>
+          <td>⭐⭐⭐⭐⭐</td>
+          <td>⭐⭐⭐⭐</td>
+          <td>⭐⭐⭐⭐⭐</td>
+      </tr>
+      <tr>
+          <td>json</td>
+          <td>⭐⭐⭐</td>
+          <td>⭐⭐⭐⭐⭐</td>
+          <td>⭐⭐⭐⭐⭐</td>
+      </tr>
+      <tr>
+          <td>name</td>
+          <td>⭐⭐⭐⭐</td>
+          <td>⭐⭐⭐⭐⭐</td>
+          <td>⭐⭐⭐⭐</td>
+      </tr>
+      <tr>
+          <td>jsonpath</td>
+          <td>⭐⭐</td>
+          <td>⭐⭐⭐⭐⭐</td>
+          <td>⭐⭐⭐⭐⭐</td>
+      </tr>
+      <tr>
+          <td>custom-columns</td>
+          <td>⭐⭐⭐⭐⭐</td>
+          <td>⭐⭐⭐⭐</td>
+          <td>⭐⭐⭐⭐⭐</td>
+      </tr>
+      <tr>
+          <td>go-template</td>
+          <td>⭐⭐</td>
+          <td>⭐⭐⭐⭐</td>
+          <td>⭐⭐⭐</td>
+      </tr>
+      <tr>
+          <td>jsonpath-file</td>
+          <td>⭐⭐</td>
+          <td>⭐⭐⭐⭐</td>
+          <td>⭐⭐⭐</td>
+      </tr>
+      <tr>
+          <td>custom-columns-file</td>
+          <td>⭐⭐⭐⭐</td>
+          <td>⭐⭐⭐⭐</td>
+          <td>⭐⭐⭐</td>
+      </tr>
+      <tr>
+          <td>go-template-file</td>
+          <td>⭐⭐</td>
+          <td>⭐⭐⭐⭐</td>
+          <td>⭐⭐⭐</td>
+      </tr>
+  </tbody>
+</table>
+<hr>
+<h1 id="日常最常用的几种格式-">日常最常用的几种格式 ⭐⭐⭐⭐⭐</h1>
+<table>
+  <thead>
+      <tr>
+          <th>输出格式</th>
+          <th>典型用途</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>-o wide</code></td>
+          <td>查看更多资源信息</td>
+      </tr>
+      <tr>
+          <td><code>-o yaml</code></td>
+          <td>导出资源定义</td>
+      </tr>
+      <tr>
+          <td><code>-o json</code></td>
+          <td>API 调试、脚本处理</td>
+      </tr>
+      <tr>
+          <td><code>-o name</code></td>
+          <td>获取资源名称列表</td>
+      </tr>
+      <tr>
+          <td><code>-o jsonpath</code></td>
+          <td>提取单个字段</td>
+      </tr>
+      <tr>
+          <td><code>-o custom-columns</code></td>
+          <td>自定义表格输出</td>
+      </tr>
+  </tbody>
+</table>
+<p>其中：</p>
+<ul>
+<li><strong>运维人员最常用：</strong> <code>wide</code>、<code>yaml</code></li>
+<li><strong>脚本自动化最常用：</strong> <code>json</code>、<code>jsonpath</code></li>
+<li><strong>CKA/CKAD 考试最常用：</strong> <code>yaml</code>、<code>jsonpath</code>、<code>custom-columns</code></li>
+<li><strong>复杂格式化输出：</strong> <code>go-template</code></li>
+</ul>
 
     </div><div class="post_comments">
   
