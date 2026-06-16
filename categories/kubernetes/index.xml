@@ -7,7 +7,85 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
     <copyright>Copyright © 1989–2025, 李建林 </copyright>
-    <lastBuildDate>Sat, 25 Apr 2026 10:54:16 +0800</lastBuildDate><atom:link href="https://jianlin-li.github.io/categories/kubernetes/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sun, 26 Apr 2026 10:54:16 +0800</lastBuildDate><atom:link href="https://jianlin-li.github.io/categories/kubernetes/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Kubernetes的知识点-2</title>
+      <link>https://jianlin-li.github.io/post/k8s_review_2/</link>
+      <pubDate>Sun, 26 Apr 2026 10:54:16 +0800</pubDate>
+      
+      <guid>https://jianlin-li.github.io/post/k8s_review_2/</guid>
+      <description>
+        
+          
+            &lt;h1 id=&#34;kubernetes-集群的部署方式很多但从实际应用和学习角度来看主要可以归纳为&#34;&gt;&lt;strong&gt;Kubernetes 集群的部署方式很多，但从实际应用和学习角度来看，主要可以归纳为 &lt;strong&gt;三种部署方式&lt;/strong&gt;：&lt;/strong&gt;&lt;/h1&gt;
+&lt;h2 id=&#34;1-二进制部署binary-installation&#34;&gt;1. 二进制部署（Binary Installation）&lt;/h2&gt;
+&lt;h3 id=&#34;部署方式&#34;&gt;部署方式&lt;/h3&gt;
+&lt;p&gt;手动安装 Kubernetes 各组件的二进制文件：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;kube-apiserver&lt;/li&gt;
+&lt;li&gt;kube-controller-manager&lt;/li&gt;
+&lt;li&gt;kube-scheduler&lt;/li&gt;
+&lt;li&gt;kubelet&lt;/li&gt;
+&lt;li&gt;kube-proxy&lt;/li&gt;
+&lt;li&gt;etcd&lt;/li&gt;
+&lt;li&gt;Container Runtime（Docker、containerd）&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;特点&#34;&gt;特点&lt;/h3&gt;
+&lt;table&gt;
+  &lt;thead&gt;
+      &lt;tr&gt;
+          &lt;th&gt;优点&lt;/th&gt;
+          &lt;th&gt;缺点&lt;/th&gt;
+      &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+      &lt;tr&gt;
+          &lt;td&gt;灵活性最高&lt;/td&gt;
+          &lt;td&gt;安装复杂&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;可深度定制&lt;/td&gt;
+          &lt;td&gt;运维成本高&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;适合生产环境&lt;/td&gt;
+          &lt;td&gt;升级和维护较麻烦&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;对组件版本控制精确&lt;/td&gt;
+          &lt;td&gt;学习门槛较高&lt;/td&gt;
+      &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h3 id=&#34;适用场景&#34;&gt;适用场景&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;企业生产环境&lt;/li&gt;
+&lt;li&gt;对集群有特殊定制需求&lt;/li&gt;
+&lt;li&gt;国产化、离线环境部署&lt;/li&gt;
+&lt;li&gt;大规模集群&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;架构示意&#34;&gt;架构示意&lt;/h3&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-text&#34; data-lang=&#34;text&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt; 1&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;Master
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt; 2&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;├── etcd
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt; 3&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;├── kube-apiserver
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt; 4&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;├── kube-controller-manager
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt; 5&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;└── kube-scheduler
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt; 6&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt; 7&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;Node
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt; 8&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;├── kubelet
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt; 9&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;├── kube-proxy
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt;10&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;└── containerd(Docker)
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;hr&gt;
+&lt;h2 id=&#34;2-kubeadm-部署官方推荐&#34;&gt;2. kubeadm 部署（官方推荐）&lt;/h2&gt;
+&lt;h3 id=&#34;部署方式-1&#34;&gt;部署方式&lt;/h3&gt;
+&lt;p&gt;利用官方工具 &lt;code&gt;kubeadm&lt;/code&gt; 自动完成集群初始化。&lt;/p&gt;
+&lt;p&gt;常用命令：&lt;/p&gt;
+          
+          
+        
+      </description>
+    </item>
+    
     <item>
       <title>Kubernetes的知识点-1</title>
       <link>https://jianlin-li.github.io/post/k8s_review_1/</link>
