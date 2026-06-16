@@ -168,7 +168,7 @@
     <span class="post_date">
       2026-04-25	  
     </span>
-    <span class="post_time"> · 1 分钟阅读</span><span>&nbsp;· <a href='https://jianlin-li.github.io/tags/kubernetes/' title="Kubernetes" class="post_tag button button_translucent">Kubernetes
+    <span class="post_time"> · 8 分钟阅读</span><span>&nbsp;· <a href='https://jianlin-li.github.io/tags/kubernetes/' title="Kubernetes" class="post_tag button button_translucent">Kubernetes
         </a>
     </span>
     <span class="page_only">&nbsp;·
@@ -227,6 +227,2162 @@
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">systemctl restart docker
 </span></span></code></pre></div></li>
 </ol>
+<h1 id="-主流容器编排系统汇总"><strong>📦 主流容器编排系统汇总</strong></h1>
+<p>容器编排（Container Orchestration）用于管理大量容器的部署、调度、扩缩容、服务发现、故障恢复等，是云原生架构的核心组成部分。</p>
+<p>目前主流的容器编排系统如下：</p>
+<table>
+  <thead>
+      <tr>
+          <th>编排系统</th>
+          <th>开发组织</th>
+          <th>当前状态</th>
+          <th>应用场景</th>
+          <th>流行程度</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Kubernetes（K8s）</td>
+          <td>Google → <a href="https://cloud.google.com?utm_source=chatgpt.com">Google Cloud</a></td>
+          <td>主流标准</td>
+          <td>企业级、云原生平台</td>
+          <td>⭐⭐⭐⭐⭐</td>
+      </tr>
+      <tr>
+          <td>Docker Swarm</td>
+          <td><a href="https://www.docker.com?utm_source=chatgpt.com">Docker</a></td>
+          <td>维护状态</td>
+          <td>中小规模集群</td>
+          <td>⭐⭐⭐</td>
+      </tr>
+      <tr>
+          <td>Apache Mesos + Marathon</td>
+          <td>Apache Software Foundation</td>
+          <td>较少使用</td>
+          <td>大规模资源调度</td>
+          <td>⭐⭐</td>
+      </tr>
+      <tr>
+          <td>Nomad</td>
+          <td><a href="https://www.hashicorp.com?utm_source=chatgpt.com">HashiCorp</a></td>
+          <td>活跃发展</td>
+          <td>混合工作负载</td>
+          <td>⭐⭐⭐⭐</td>
+      </tr>
+      <tr>
+          <td>OpenShift</td>
+          <td><a href="https://www.redhat.com?utm_source=chatgpt.com">Red Hat</a></td>
+          <td>企业级平台</td>
+          <td>私有云、金融、电信</td>
+          <td>⭐⭐⭐⭐</td>
+      </tr>
+      <tr>
+          <td>Rancher</td>
+          <td><a href="https://www.rancher.com?utm_source=chatgpt.com">SUSE Rancher Manager</a></td>
+          <td>活跃</td>
+          <td>多集群管理</td>
+          <td>⭐⭐⭐⭐</td>
+      </tr>
+      <tr>
+          <td>DC/OS</td>
+          <td>Mesosphere</td>
+          <td>基本退出主流</td>
+          <td>超大规模集群</td>
+          <td>⭐</td>
+      </tr>
+      <tr>
+          <td>Amazon ECS</td>
+          <td><a href="https://aws.amazon.com?utm_source=chatgpt.com">Amazon Web Services</a></td>
+          <td>活跃</td>
+          <td>AWS 云平台</td>
+          <td>⭐⭐⭐⭐</td>
+      </tr>
+      <tr>
+          <td>Azure AKS</td>
+          <td><a href="https://azure.microsoft.com?utm_source=chatgpt.com">Microsoft Azure</a></td>
+          <td>活跃</td>
+          <td>Azure 云平台</td>
+          <td>⭐⭐⭐⭐</td>
+      </tr>
+      <tr>
+          <td>Google GKE</td>
+          <td><a href="https://cloud.google.com/kubernetes-engine?utm_source=chatgpt.com">Google Kubernetes Engine</a></td>
+          <td>活跃</td>
+          <td>Google Cloud</td>
+          <td>⭐⭐⭐⭐⭐</td>
+      </tr>
+  </tbody>
+</table>
+<hr>
+<h1 id="1-kubernetes事实上的行业标准">1. Kubernetes（事实上的行业标准）</h1>
+<p><figure>
+  <picture>
+
+    
+      
+        
+        
+        
+        
+        
+        
+    <img
+      loading="lazy"
+      decoding="async"
+      alt="Image"
+      
+        class="image_figure image_external image_processed"
+        width="1101"
+        height="751"
+        src="https://jianlin-li.github.io/images/fnI3-sEg80Z98BQAdLR1rhehXQvxKe-Fhgfzn7HTsijvjVaGrnl1_H06bhfhvXhDrvP9MWbXuz00u4sPX5T8DoREiwHIupx6fYc1Ajb3mIo8BJIk_fKRCbolBnyI6yd9hg6v3v_SICVhGkA0TMOUICFiRFFwa4vShgPOPOUHrhUGX5a9CNqN9N9UwP2-P5Ud_16197581885327981600.jpg"
+      
+      
+    />
+
+    </picture>
+</figure>
+</p>
+<p><figure>
+  <picture>
+
+    
+      
+        
+        
+        
+        
+        
+        
+    <img
+      loading="lazy"
+      decoding="async"
+      alt="Image"
+      
+        class="image_figure image_external image_processed"
+        width="933"
+        height="394"
+        src="https://jianlin-li.github.io/images/CWO8FN58UWkcNexhFW5Wb2yvrM-FaxILHjc9FEPNpyHE6utFIwACh2DPJJ5SRHiln4q7fQXAhX_z9_zjxjHab1eYBAx6KrmwjEzgGCterXfucHJYO3C7kVks69OkLvhHQmsoBBvWLXJYdUl6d7Wnr-z_qqLjEjgwiaQGTSmvRvUSY3pNSTEGY20oO-fipb28_7503749520263746410.jpg"
+      
+      
+    />
+
+    </picture>
+</figure>
+</p>
+<p><figure>
+  <picture>
+
+    
+      
+        
+        
+        
+        
+        
+        
+    <img
+      loading="lazy"
+      decoding="async"
+      alt="Image"
+      
+        class="image_figure image_external image_processed"
+        width="1920"
+        height="1080"
+        src="https://jianlin-li.github.io/images/2ThkTlLL8O0IyqD_uZ-uvHpvnUGmKLXnBRJyC1HYn4IgILTKYnKjL8mPycd_v6TdlJIwGB6HVfQWiixJbz68Vh4JrWZTy2XszwGZf67YrGP03s2xaVUQX8wCSnlsgCvFGdOFOfSdYMG6a74uTw3uGTMpfRcVR4ZBAVYZSVd3rlo6xmI7RbIniX0WMfyitPHz_13411638409616811054.jpg"
+      
+      
+    />
+
+    </picture>
+</figure>
+</p>
+<p><figure>
+  <picture>
+
+    
+      
+        
+        
+        
+        
+        
+        
+    <img
+      loading="lazy"
+      decoding="async"
+      alt="Image"
+      
+        class="image_figure image_external image_processed"
+        width="770"
+        height="717"
+        src="https://jianlin-li.github.io/images/2ZWffAHp4ocFFYlFdKfQxaJunFngEHNKD56ug_ON_6N37_wnGtEryXBXgGp1lfgdEe9aWnscjrUpAeMHEPqQssbnPTxjeW0ojzy-wsungzY4F6ptTE3dMzSy0Hy8eQBSaoXPCqMfjzpF_Bd9qSCGr4-QR0JkNPBsv7rlEDnH7y_wWNvWItE_x-KQx6bZpyvF_16575869478360994987.jpg"
+      
+      
+    />
+
+    </picture>
+</figure>
+</p>
+<p><figure>
+  <picture>
+
+    
+      
+        
+        
+        
+        
+        
+        
+    <img
+      loading="lazy"
+      decoding="async"
+      alt="Image"
+      
+        class="image_figure image_external image_processed"
+        width="1234"
+        height="1008"
+        src="https://jianlin-li.github.io/images/ZGHgyYKM_SUNKvg_VJk7eKypM1bF18H9AvtiRJHMGCtNeuB4Y2zsviPWaI4-KVJvas2CDrf7b08e0l_zipOcd4D7i-h9il1UXvLNyPghiVk68n15nfb8DjvNlHdjyY9HadBft0voVC58_StZbDBmMaOt8Qiwc7Kwn-SJeq0bgQ8D_nRBu1o6trtOIRVEJ-U__9527287625477667050.jpg"
+      
+      
+    />
+
+    </picture>
+</figure>
+</p>
+<h3 id="特点">特点</h3>
+<ul>
+<li>自动调度</li>
+<li>自愈能力</li>
+<li>服务发现</li>
+<li>滚动升级</li>
+<li>水平扩容</li>
+<li>丰富生态（Helm、Istio、Prometheus、ArgoCD 等）</li>
+</ul>
+<h3 id="优点">优点</h3>
+<ul>
+<li>社区最活跃</li>
+<li>云厂商全面支持</li>
+<li>扩展能力强</li>
+<li>已成为云原生标准</li>
+</ul>
+<h3 id="缺点">缺点</h3>
+<ul>
+<li>学习曲线较陡</li>
+<li>运维复杂</li>
+</ul>
+<h3 id="适用场景">适用场景</h3>
+<ul>
+<li>企业私有云</li>
+<li>微服务平台</li>
+<li>DevOps 平台</li>
+<li>AI 平台</li>
+<li>大规模生产环境</li>
+</ul>
+<hr>
+<h1 id="2-docker-swarm">2. Docker Swarm</h1>
+<p><figure>
+  <picture>
+
+    
+      
+        
+        
+        
+        
+        
+        
+    <img
+      loading="lazy"
+      decoding="async"
+      alt="Image"
+      
+        class="image_figure image_external image_processed"
+        width="1306"
+        height="967"
+        src="https://jianlin-li.github.io/images/qHWYOvyTh8wlStG13rPRgmLGyDCRZak1FULRcHYaEdLRwy3soOQHWCmsH5LFLQG1PQtUtzsjeIFj_49oUd3tM2DmKFvButLCXduCPVxhXK-EB0Hilq6BldL8-4y20RgeLLaA3j0uc5u-bVVoXiYY8S5yomtfweQ1MHdQx7j4IxtoeXdGzRGUizxad6sgaPsL_6568209977706680952.jpg"
+      
+      
+    />
+
+    </picture>
+</figure>
+</p>
+<p><figure>
+  <picture>
+
+    
+      
+        
+        
+        
+        
+        
+        
+    <img
+      loading="lazy"
+      decoding="async"
+      alt="Image"
+      
+        class="image_figure image_external image_processed"
+        width="578"
+        height="422"
+        src="https://jianlin-li.github.io/images/bcYMOne-BBlCU2A39fRmX2Bbu5gkOroLwjfQOnpRV-ENks9q8OXnD7yGVnxfmcLAxtFSi9MnwXXdj0ViiKWU_EVqJJYzF2Fw0ZiQH4qqXfgg98uYlfxfwWuP_BwLOLt9UEo6-w5TX-8jMPawPms_qa5GrUHrnUvGUysOpxbxWqE5ZqTr3kZV99qo2XHw1y54_10511568379021634596.jpg"
+      
+      
+    />
+
+    </picture>
+</figure>
+</p>
+<p><figure>
+  <picture>
+
+    
+      
+        
+        
+        
+        
+        
+        
+    <img
+      loading="lazy"
+      decoding="async"
+      alt="Image"
+      
+        class="image_figure image_external image_processed"
+        width="1121"
+        height="478"
+        src="https://jianlin-li.github.io/images/puCbZzrGfMVogY5R348U_Vb7aYuKCBqstI3kd35tgLe1BweiK2gLKWVoZVmqP7XAzh2Fu4X6GVZ-IFqBDWWDbqcd7vkAaEXHUUxSFzIOwrrV7YCI4jrzJzMjSxZu8rNn-KbxOhz_VvIIbxbPvYKV1k7BzH_bS8VMLR_v6zTMfkqYR2pySKV8Gqqb2zGJdr5F_7006504178038455164.jpg"
+      
+      
+    />
+
+    </picture>
+</figure>
+</p>
+<p><figure>
+  <picture>
+
+    
+      
+        
+        
+        
+        
+        
+        
+    <img
+      loading="lazy"
+      decoding="async"
+      alt="Image"
+      
+        class="image_figure image_external image_processed"
+        width="905"
+        height="750"
+        src="https://jianlin-li.github.io/images/3bitXREo0ceTV-I4eWQsw7kqgPW9VKTrNpfyVfF6qZoOm81gCo-Oe2gunsRXbnNK7YFy3vEC9fn9hbb1hQkCGN6i552IuUcGYQBAQhgbll1CBZ-9dDU6oDmlcnOWMlZliECqRk1oFvAc_eKiOoUVVf2y0vyyR_rXi5I4yzwYvhe1HRykL7laEhkxk4TUhqzk_5917478535656297196.jpg"
+      
+      
+    />
+
+    </picture>
+</figure>
+</p>
+<p><figure>
+  <picture>
+
+    
+      
+        
+        
+        
+        
+        
+        
+    <img
+      loading="lazy"
+      decoding="async"
+      alt="Image"
+      
+        class="image_figure image_external image_processed"
+        width="1024"
+        height="894"
+        src="https://jianlin-li.github.io/images/_xjwUYnbrcHkuORhiYfFGZYrZMh54exB86QQoTa3AuAodGq4VHdEA1gg97t3PlkRgwSCqdWxfAeF1WvScmmaSnhFI_egs7OopyQ-pU32no-szC3gmlTyoFFSqawtgOES6oHSxtVDs54BEdHCCLcNRz6Vhh-Ve6ScQd5QfJEZObt-m4C0EoMxSS2TX0u8ljJt_2130089766400470043.jpg"
+      
+      
+    />
+
+    </picture>
+</figure>
+</p>
+<p>Docker 官方推出的编排系统。</p>
+<h3 id="优点-1">优点</h3>
+<ul>
+<li>上手简单</li>
+<li>与 Docker 集成紧密</li>
+<li>学习成本低</li>
+</ul>
+<h3 id="缺点-1">缺点</h3>
+<ul>
+<li>功能不如 Kubernetes 丰富</li>
+<li>社区活跃度下降</li>
+</ul>
+<h3 id="适用场景-1">适用场景</h3>
+<ul>
+<li>小型项目</li>
+<li>测试环境</li>
+<li>学习容器编排</li>
+</ul>
+<hr>
+<h1 id="3-nomad">3. Nomad</h1>
+<p><figure>
+  <picture>
+
+    
+      
+        
+        
+        
+        
+        
+        
+    <img
+      loading="lazy"
+      decoding="async"
+      alt="Image"
+      
+        class="image_figure image_external image_processed"
+        width="1319"
+        height="1090"
+        src="https://jianlin-li.github.io/images/-rYxXPfzO5W1llUxR6vlKP6YfepwQiad9ZdnUVp0HQKDxfAkAYpPzawzJt5awLIcZCvfwprUY6sZvsRDB5_pyXRPcmND8eYBZ3xniRSfN9D4LWEkeUe_BfhM3L2Hn0ZlCGyBZyN3LAEr05AKaSTwEoAuKlyf2BTeohdSGnLVeJAKC8I-r5IsdUCWo8flOqZy_11105387925273870236.jpg"
+      
+      
+    />
+
+    </picture>
+</figure>
+</p>
+<p><figure>
+  <picture>
+
+    
+      
+        
+        
+        
+        
+        
+        
+    <img
+      loading="lazy"
+      decoding="async"
+      alt="Image"
+      
+        class="image_figure image_external image_processed"
+        width="768"
+        height="604"
+        src="https://jianlin-li.github.io/images/rYEJ9Qpt_PWQHzZ-57cvh80LJADS2LV7zIy1MdCpxfRr-GH_iy3V8Bi7UGNf8oFOo5Xysv0_zXWpUWOLhSZh1Co0smsdOjUCCIIeIcZxZDAfX0aWKfDS109bpQQkSRIj0Fqm1rWXF2Own-tO-gi0fdqeGNzDsPbuxI-r3CLOY2fi4L7GMO3T9tW_n4l4Yr4A_11874123271648769397.jpg"
+      
+      
+    />
+
+    </picture>
+</figure>
+</p>
+<p><figure>
+  <picture>
+
+    
+      
+        
+        
+        
+        
+        
+        
+    <img
+      loading="lazy"
+      decoding="async"
+      alt="Image"
+      
+        class="image_figure image_external image_processed"
+        width="960"
+        height="540"
+        src="https://jianlin-li.github.io/images/6YcreaBnO2Rc8w7OBEUjodHfxAbhQ5NWXzhksazqSMMj19soGLJz2KOAsMPhnXxPNvzTiruN1Q1XQySt5icZ9w0ioysx9ds0ZFP_pAB7uTc9FX4zam_paOED8akIUqgPz-0U3j-rRi-rkidTLuMGq6J-oI2fRfqFQTlf7zcsxzXDTTd5Xk_Y3x4hYHngV1SW_10156517173834748187.jpg"
+      
+      
+    />
+
+    </picture>
+</figure>
+</p>
+<p><figure>
+  <picture>
+
+    
+      
+        
+        
+        
+        
+        
+        
+    <img
+      loading="lazy"
+      decoding="async"
+      alt="Image"
+      
+        class="image_figure image_external image_processed"
+        width="874"
+        height="617"
+        src="https://jianlin-li.github.io/images/4BgjSULcUmv5wjAwepnVQyvAiyHIZvTlnt_SJCgqmmgLC05kq8kfwmiyNmIPQ5Qa8hO22k5LD1yd1jzcGWF0qj2gp4ySJeER6QVDM5M8_c1at_xZXJGGrsBas3945ujXSENAfNZ_j_hLRRdwPq0m4OY8rwAGZ6rKQB9tWaqb2LITh3nVEJqIgNA3Mm3igNQG_6275202222687031577.jpg"
+      
+      
+    />
+
+    </picture>
+</figure>
+</p>
+<p><figure>
+  <picture>
+
+    
+      
+        
+        
+        
+        
+        
+        
+    <img
+      loading="lazy"
+      decoding="async"
+      alt="Image"
+      
+        class="image_figure image_external image_processed"
+        width="1825"
+        height="1068"
+        src="https://jianlin-li.github.io/images/2pjc0WTnU-DzI36iC1akOPXAYWiU9W_iLl8psEnaYc4MISB6piGOwDiWtALjJaTOVUJvSSN7ybedA9LjMrEO5MRBf0SwanFcacv-ekuwkYDWrTPhtpSqVecNltYVnXQLnCzX1wIYDeEvtm8Qh_4k3EtGfpCyaJv2qVs4SvSI-zZ5ZrvE2BLxRInwzmP5Au4R_13440163940562774625.jpg"
+      
+      
+    />
+
+    </picture>
+</figure>
+</p>
+<p>由 HashiCorp 开发。</p>
+<h3 id="特点-1">特点</h3>
+<p>除了容器，还能调度：</p>
+<ul>
+<li>Docker</li>
+<li>Podman</li>
+<li>Java 应用</li>
+<li>虚拟机</li>
+<li>Batch 作业</li>
+</ul>
+<h3 id="优点-2">优点</h3>
+<ul>
+<li>部署简单</li>
+<li>资源占用低</li>
+<li>支持混合工作负载</li>
+</ul>
+<h3 id="缺点-2">缺点</h3>
+<ul>
+<li>生态规模不及 Kubernetes</li>
+</ul>
+<h3 id="适用场景-2">适用场景</h3>
+<ul>
+<li>边缘计算</li>
+<li>HPC</li>
+<li>CI/CD 平台</li>
+</ul>
+<hr>
+<h1 id="4-apache-mesos">4. Apache Mesos</h1>
+<p>Mesos 曾与 Kubernetes 齐名。</p>
+<p>典型架构：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="ln">1</span><span class="cl">Mesos
+</span></span><span class="line"><span class="ln">2</span><span class="cl"> ├── Marathon（容器编排）
+</span></span><span class="line"><span class="ln">3</span><span class="cl"> ├── Hadoop
+</span></span><span class="line"><span class="ln">4</span><span class="cl"> ├── Spark
+</span></span><span class="line"><span class="ln">5</span><span class="cl"> └── Kafka
+</span></span></code></pre></div><h3 id="优点-3">优点</h3>
+<ul>
+<li>大规模资源调度能力强</li>
+</ul>
+<h3 id="缺点-3">缺点</h3>
+<ul>
+<li>社区热度下降</li>
+<li>被 Kubernetes 逐渐替代</li>
+</ul>
+<hr>
+<h1 id="5-openshift">5. OpenShift</h1>
+<p><figure>
+  <picture>
+
+    
+      
+        
+        
+        
+        
+        
+        
+    <img
+      loading="lazy"
+      decoding="async"
+      alt="Image"
+      
+        class="image_figure image_external image_processed"
+        width="2617"
+        height="2007"
+        src="https://jianlin-li.github.io/images/n0nzDSbw6p_IDDNLtdqwzekSDYpLzYSnvYnDjHwvO_G5iwIJ4vyaOYxfuy2nDTnCNNOau-NE5IaVxC3fcurk7mdBXfXTz3naN6te88i8lr1jGsTETNb04OUd8WexqaPRhvoCUg-7TIF1IEwr6pQmfE1k3_FjdLD_Gd8fCSnWsF-fEfQ3QVcbC_cxJeDgNF46_11010656804645412208.jpg"
+      
+      
+    />
+
+    </picture>
+</figure>
+</p>
+<p><figure>
+  <picture>
+
+    
+      
+        
+        
+        
+        
+        
+        
+    <img
+      loading="lazy"
+      decoding="async"
+      alt="Image"
+      
+        class="image_figure image_external image_processed"
+        width="929"
+        height="590"
+        src="https://jianlin-li.github.io/images/wHP5KzllUQaFhDUGmBXForhbE3ZnwLWhBLm7UiLomd4RJGBMhhLC9Kv6Z0z-Zth_pwF9QLXRbEHtwIDwa4UDLSf83eIJbCrqr4Razi4zY-O5LgRtVZ3BLlLFNJPD5jz-Z83A4Jeks9rNs8HMqz2E_gUVoOw8aRUCgi0LwmTpxWQ3WbB2yyK74ZrD28LAN4-D_7382229970891233302.jpg"
+      
+      
+    />
+
+    </picture>
+</figure>
+</p>
+<p><figure>
+  <picture>
+
+    
+      
+        
+        
+        
+        
+        
+        
+    <img
+      loading="lazy"
+      decoding="async"
+      alt="Image"
+      
+        class="image_figure image_external image_processed"
+        width="1296"
+        height="867"
+        src="https://jianlin-li.github.io/images/xQ_F4aklF9Zz23BLtSUBlMYFPiGrKtH-QCWFDoQ7qajUBKsyYzYYrzW5M32qR9sJrc0iYiuieqY_2JrrzWBVgJ3eWN8_hYEXP_152Szja5yrGP-VX7X2X_BB1jmnttCJc8NQc1bzL7fGHmG7FuoPPNRh4qXbr0RbJ5p2plKYrWVXEbzuph0o5SdRft4qM6W__3719848069155458247.jpg"
+      
+      
+    />
+
+    </picture>
+</figure>
+</p>
+<p><figure>
+  <picture>
+
+    
+      
+        
+        
+        
+        
+        
+        
+    <img
+      loading="lazy"
+      decoding="async"
+      alt="Image"
+      
+        class="image_figure image_external image_processed"
+        width="1464"
+        height="929"
+        src="https://jianlin-li.github.io/images/wZ5PZJsYXz3vgXtsL2EQaz6DyW0RQ-sGgkbJ-xxElFVocWtOd-2Q5dksYRtd4hOMZB2Zh5Z2eqO3-VpBT_Sz68ui6AtonfiRdrVTK0hqeae6mtYcsAfq88kuV5BpZ2AFGXDUbIKw2Hlv_axIF5kXyha8c1v8ZPTXaZDVRqcodAE_f1DSa_xmx52BUksH0rKQ_11157908695316976075.jpg"
+      
+      
+    />
+
+    </picture>
+</figure>
+</p>
+<p><figure>
+  <picture>
+
+    
+      
+        
+        
+        
+        
+        
+        
+    <img
+      loading="lazy"
+      decoding="async"
+      alt="Image"
+      
+        class="image_figure image_external image_processed"
+        width="1097"
+        height="682"
+        src="https://jianlin-li.github.io/images/Xa3qGV1h9am8TxK04mqb_Xm4C-5cGqlw48U6E39RaN4JNXIneM5jCJ4kcGhMKeIsEC0JIllx46kJIGDrOXEKmXbrwzcvjT9qlTj3eOKOBKFA9UeIqbolDFOyyruB4aLqmpTRlITDgsx_ra4jlvFZI4E1TLbzVi3ghLD6s-cUeXwgnWMBo0HwgbvhE5qBrmyx_12206810883027895727.jpg"
+      
+      
+    />
+
+    </picture>
+</figure>
+</p>
+<p>本质上是：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="ln">1</span><span class="cl">OpenShift = Kubernetes + 企业能力
+</span></span></code></pre></div><p>增加了：</p>
+<ul>
+<li>CI/CD</li>
+<li>镜像仓库</li>
+<li>用户权限管理</li>
+<li>Web Console</li>
+<li>DevOps 工具链</li>
+</ul>
+<h3 id="适用行业">适用行业</h3>
+<ul>
+<li>金融</li>
+<li>电信</li>
+<li>政府</li>
+<li>国企</li>
+</ul>
+<hr>
+<h1 id="6-云厂商托管版-kubernetes">6. 云厂商托管版 Kubernetes</h1>
+<p>实际上这些都属于 Kubernetes 的发行版：</p>
+<table>
+  <thead>
+      <tr>
+          <th>产品</th>
+          <th>云厂商</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>GKE</td>
+          <td>Google</td>
+      </tr>
+      <tr>
+          <td>EKS</td>
+          <td>AWS</td>
+      </tr>
+      <tr>
+          <td>AKS</td>
+          <td>Microsoft</td>
+      </tr>
+      <tr>
+          <td>ACK</td>
+          <td>阿里云</td>
+      </tr>
+      <tr>
+          <td>TKE</td>
+          <td>腾讯云</td>
+      </tr>
+      <tr>
+          <td>CCE</td>
+          <td>华为云</td>
+      </tr>
+  </tbody>
+</table>
+<p>特点：</p>
+<ul>
+<li>不需要自己维护 Master 节点；</li>
+<li>自动升级；</li>
+<li>高可用；</li>
+<li>与云资源深度整合。</li>
+</ul>
+<hr>
+<h1 id="7-rancher">7. Rancher</h1>
+<p>严格来说，<strong>Rancher 并不是容器编排系统，而是 Kubernetes 多集群管理平台</strong>。</p>
+<p>它可以统一管理：</p>
+<ul>
+<li>K8s</li>
+<li>RKE2</li>
+<li>K3s</li>
+<li>EKS</li>
+<li>AKS</li>
+<li>GKE</li>
+</ul>
+<p>适合：</p>
+<ul>
+<li>企业多集群管理；</li>
+<li>混合云；</li>
+<li>私有云。</li>
+</ul>
+<hr>
+<h1 id="历史演进">历史演进</h1>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln"> 1</span><span class="cl">2013
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl">Docker
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl">  ↓
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl">2014
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">Mesos
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl">Docker Swarm
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">2015
+</span></span><span class="line"><span class="ln">10</span><span class="cl">Kubernetes
+</span></span><span class="line"><span class="ln">11</span><span class="cl">  ↓
+</span></span><span class="line"><span class="ln">12</span><span class="cl">
+</span></span><span class="line"><span class="ln">13</span><span class="cl">2017~
+</span></span><span class="line"><span class="ln">14</span><span class="cl">OpenShift
+</span></span><span class="line"><span class="ln">15</span><span class="cl">Rancher
+</span></span><span class="line"><span class="ln">16</span><span class="cl">
+</span></span><span class="line"><span class="ln">17</span><span class="cl">2018~
+</span></span><span class="line"><span class="ln">18</span><span class="cl">EKS、AKS、GKE
+</span></span><span class="line"><span class="ln">19</span><span class="cl">
+</span></span><span class="line"><span class="ln">20</span><span class="cl">2019~
+</span></span><span class="line"><span class="ln">21</span><span class="cl">K3s、RKE2
+</span></span><span class="line"><span class="ln">22</span><span class="cl">
+</span></span><span class="line"><span class="ln">23</span><span class="cl">2022~
+</span></span><span class="line"><span class="ln">24</span><span class="cl">边缘计算、Serverless Kubernetes
+</span></span></code></pre></div><h1 id="当前市场格局">当前市场格局</h1>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln"> 1</span><span class="cl">Kubernetes
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl">★★★★★ 80%+
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl">OpenShift
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl">★★★★
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl">Nomad
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl">★★★
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">
+</span></span><span class="line"><span class="ln">10</span><span class="cl">Docker Swarm
+</span></span><span class="line"><span class="ln">11</span><span class="cl">★★
+</span></span><span class="line"><span class="ln">12</span><span class="cl">
+</span></span><span class="line"><span class="ln">13</span><span class="cl">Mesos
+</span></span><span class="line"><span class="ln">14</span><span class="cl">★
+</span></span><span class="line"><span class="ln">15</span><span class="cl">
+</span></span><span class="line"><span class="ln">16</span><span class="cl">其它
+</span></span><span class="line"><span class="ln">17</span><span class="cl">★
+</span></span></code></pre></div><h1 id="企业选型建议">企业选型建议</h1>
+<table>
+  <thead>
+      <tr>
+          <th>场景</th>
+          <th>推荐</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>学习容器编排</td>
+          <td>Docker Swarm、K3s</td>
+      </tr>
+      <tr>
+          <td>中小企业生产环境</td>
+          <td>Kubernetes</td>
+      </tr>
+      <tr>
+          <td>大型企业私有云</td>
+          <td>Kubernetes + Rancher</td>
+      </tr>
+      <tr>
+          <td>金融、电信、国企</td>
+          <td>OpenShift</td>
+      </tr>
+      <tr>
+          <td>多集群管理</td>
+          <td>Rancher</td>
+      </tr>
+      <tr>
+          <td>AWS 云环境</td>
+          <td>EKS</td>
+      </tr>
+      <tr>
+          <td>阿里云环境</td>
+          <td>ACK</td>
+      </tr>
+      <tr>
+          <td>腾讯云环境</td>
+          <td>TKE</td>
+      </tr>
+      <tr>
+          <td>华为云环境</td>
+          <td>CCE</td>
+      </tr>
+      <tr>
+          <td>轻量级边缘计算</td>
+          <td>K3s</td>
+      </tr>
+      <tr>
+          <td>混合工作负载（容器+VM）</td>
+          <td>Nomad</td>
+      </tr>
+  </tbody>
+</table>
+<hr>
+<p>截至 2026 年，<strong>Kubernetes 已经成为事实上的容器编排标准</strong>。很多产品（OpenShift、Rancher、各大云厂商托管服务）本质上都是围绕 Kubernetes 构建，其它早期方案如 Docker Swarm、Mesos 已逐渐退出主流。对于新项目，优先学习和使用 Kubernetes 生态通常是最具长期价值的选择。 🚀</p>
+<h1 id="kubernetes-master-节点和-node-节点组件详解"><strong>Kubernetes Master 节点和 Node 节点组件详解</strong></h1>
+<p><figure>
+  <picture>
+
+    
+      
+        
+        
+        
+        
+        
+        
+    <img
+      loading="lazy"
+      decoding="async"
+      alt="Kubernetes集群架构"
+      
+        class="image_figure image_internal image_unprocessed"
+        src="https://jianlin-li.github.io/images/k8s/1.png"
+      
+      
+    />
+
+    </picture>
+</figure>
+</p>
+<p>在 Kubernetes 集群中，节点大致分为：</p>
+<ul>
+<li><strong>Control Plane（Master 节点）</strong></li>
+<li><strong>Worker Node（Node 工作节点）</strong></li>
+</ul>
+<p>其中：</p>
+<blockquote>
+<p>Master 节点负责「管理和调度」，Node 节点负责「运行容器」。</p>
+</blockquote>
+<p>可以理解成：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln"> 1</span><span class="cl">                 Control Plane（Master）
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl">          ┌───────────────────────────┐
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl">          │ kube-apiserver            │
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl">          │ etcd                      │
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl">          │ kube-scheduler            │
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">          │ kube-controller-manager   │
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl">          └─────────────┬─────────────┘
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl">                        │
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">         ───────────────┼────────────────
+</span></span><span class="line"><span class="ln">10</span><span class="cl">                        │
+</span></span><span class="line"><span class="ln">11</span><span class="cl">           Worker Node 1       Worker Node 2
+</span></span><span class="line"><span class="ln">12</span><span class="cl">      ┌─────────────────┐ ┌─────────────────┐
+</span></span><span class="line"><span class="ln">13</span><span class="cl">      │ kubelet         │ │ kubelet         │
+</span></span><span class="line"><span class="ln">14</span><span class="cl">      │ kube-proxy      │ │ kube-proxy      │
+</span></span><span class="line"><span class="ln">15</span><span class="cl">      │ Container Runtime│ │ Container Runtime│
+</span></span><span class="line"><span class="ln">16</span><span class="cl">      │ Pod             │ │ Pod             │
+</span></span><span class="line"><span class="ln">17</span><span class="cl">      └─────────────────┘ └─────────────────┘
+</span></span></code></pre></div><hr>
+<h1 id="一master-节点组件">一、Master 节点组件</h1>
+<p>Master 节点上的核心组件如下：</p>
+<table>
+  <thead>
+      <tr>
+          <th>组件</th>
+          <th>功能定位</th>
+          <th>是否必须</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>kube-apiserver</td>
+          <td>集群入口</td>
+          <td>√</td>
+      </tr>
+      <tr>
+          <td>etcd</td>
+          <td>数据存储中心</td>
+          <td>√</td>
+      </tr>
+      <tr>
+          <td>kube-scheduler</td>
+          <td>Pod调度器</td>
+          <td>√</td>
+      </tr>
+      <tr>
+          <td>kube-controller-manager</td>
+          <td>控制器管理器</td>
+          <td>√</td>
+      </tr>
+      <tr>
+          <td>cloud-controller-manager</td>
+          <td>云控制器</td>
+          <td>可选</td>
+      </tr>
+  </tbody>
+</table>
+<hr>
+<h2 id="1-kube-apiserver">1. kube-apiserver</h2>
+<h3 id="功能">功能</h3>
+<p>整个 Kubernetes 的统一入口。</p>
+<p>所有组件之间都不直接通信，而是通过 API Server。</p>
+<p>例如：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln"> 1</span><span class="cl">kubectl
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl">Ingress Controller
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl">Scheduler
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl">Controller Manager
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl">Kubelet
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">Dashboard
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl">        ↓
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">
+</span></span><span class="line"><span class="ln">10</span><span class="cl">kube-apiserver
+</span></span><span class="line"><span class="ln">11</span><span class="cl">
+</span></span><span class="line"><span class="ln">12</span><span class="cl">        ↓
+</span></span><span class="line"><span class="ln">13</span><span class="cl">
+</span></span><span class="line"><span class="ln">14</span><span class="cl">etcd
+</span></span></code></pre></div><h3 id="作用">作用</h3>
+<p>负责：</p>
+<ul>
+<li>接收 REST 请求</li>
+<li>身份认证</li>
+<li>RBAC 授权</li>
+<li>Admission 准入控制</li>
+<li>数据校验</li>
+<li>与 etcd 交互</li>
+</ul>
+<p>例如：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">kubectl get pods
+</span></span></code></pre></div><p>实际上：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">kubectl
+</span></span><span class="line"><span class="ln">2</span><span class="cl"> ↓
+</span></span><span class="line"><span class="ln">3</span><span class="cl">HTTPS
+</span></span><span class="line"><span class="ln">4</span><span class="cl"> ↓
+</span></span><span class="line"><span class="ln">5</span><span class="cl">kube-apiserver
+</span></span><span class="line"><span class="ln">6</span><span class="cl"> ↓
+</span></span><span class="line"><span class="ln">7</span><span class="cl">etcd
+</span></span></code></pre></div><h3 id="默认端口">默认端口</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">6443
+</span></span></code></pre></div><p>查看：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">netstat -lntp <span class="p">|</span> grep <span class="m">6443</span>
+</span></span></code></pre></div><hr>
+<h2 id="2-etcd">2. etcd</h2>
+<h3 id="功能-1">功能</h3>
+<p>Kubernetes 的数据库。</p>
+<p>保存：</p>
+<ul>
+<li>Pod</li>
+<li>Deployment</li>
+<li>Service</li>
+<li>Secret</li>
+<li>ConfigMap</li>
+<li>Node</li>
+<li>Endpoint</li>
+</ul>
+<p>等所有资源对象。</p>
+<h3 id="特点-2">特点</h3>
+<p>采用：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">Raft一致性算法
+</span></span></code></pre></div><p>保证：</p>
+<ul>
+<li>强一致性</li>
+<li>高可用</li>
+</ul>
+<h3 id="工作流程">工作流程</h3>
+<p>例如：</p>
+<p>创建 Pod：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln"> 1</span><span class="cl">kubectl apply
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl">↓
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl">API Server
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">↓
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl">写入 etcd
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">↓
+</span></span><span class="line"><span class="ln">10</span><span class="cl">Scheduler
+</span></span><span class="line"><span class="ln">11</span><span class="cl">
+</span></span><span class="line"><span class="ln">12</span><span class="cl">↓
+</span></span><span class="line"><span class="ln">13</span><span class="cl">Node运行
+</span></span></code></pre></div><h3 id="默认端口-1">默认端口</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">2379
+</span></span><span class="line"><span class="ln">2</span><span class="cl">2380
+</span></span></code></pre></div><hr>
+<h2 id="3-kube-scheduler">3. kube-scheduler</h2>
+<h3 id="功能-2">功能</h3>
+<p>Pod 调度器。</p>
+<p>负责决定：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">Pod 应该运行在哪个 Node 上。
+</span></span></code></pre></div><p>例如：</p>
+<p>有：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">node1
+</span></span><span class="line"><span class="ln">2</span><span class="cl">node2
+</span></span><span class="line"><span class="ln">3</span><span class="cl">node3
+</span></span></code></pre></div><p>Scheduler 根据：</p>
+<ul>
+<li>CPU</li>
+<li>Memory</li>
+<li>污点容忍</li>
+<li>Affinity</li>
+<li>NodeSelector</li>
+<li>PodTopologySpread</li>
+</ul>
+<p>选择：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">node2
+</span></span></code></pre></div><p>然后：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">把绑定结果写回 API Server
+</span></span></code></pre></div><h3 id="默认端口-2">默认端口</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">10259
+</span></span></code></pre></div><hr>
+<h2 id="4-kube-controller-manager">4. kube-controller-manager</h2>
+<h3 id="功能-3">功能</h3>
+<p>维持集群状态。</p>
+<p>遵循：</p>
+<blockquote>
+<p>期望状态（Desired State） = 实际状态（Current State）</p>
+</blockquote>
+<p>不断执行同步。</p>
+<p>内部包含几十个 Controller。</p>
+<hr>
+<h3 id="node-controller">Node Controller</h3>
+<p>检测节点：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">Ready
+</span></span><span class="line"><span class="ln">2</span><span class="cl">NotReady
+</span></span></code></pre></div><hr>
+<h3 id="replicaset-controller">ReplicaSet Controller</h3>
+<p>保证：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="ln">1</span><span class="cl"><span class="nt">replicas</span><span class="p">:</span><span class="w"> </span><span class="m">3</span><span class="w">
+</span></span></span></code></pre></div><p>始终有：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">3 个 Pod
+</span></span></code></pre></div><p>少一个：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">自动创建
+</span></span></code></pre></div><hr>
+<h3 id="deployment-controller">Deployment Controller</h3>
+<p>实现：</p>
+<ul>
+<li>Rolling Update</li>
+<li>Rollback</li>
+</ul>
+<hr>
+<h3 id="endpoint-controller">Endpoint Controller</h3>
+<p>维护：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">Service → Pod
+</span></span></code></pre></div><p>对应关系。</p>
+<hr>
+<h3 id="job-controller">Job Controller</h3>
+<p>负责：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">Job
+</span></span><span class="line"><span class="ln">2</span><span class="cl">CronJob
+</span></span></code></pre></div><hr>
+<h3 id="serviceaccount-controller">ServiceAccount Controller</h3>
+<p>自动创建：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">default ServiceAccount
+</span></span></code></pre></div><h3 id="默认端口-3">默认端口</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">10257
+</span></span></code></pre></div><hr>
+<h2 id="5-cloud-controller-manager可选">5. cloud-controller-manager（可选）</h2>
+<p>云平台相关。</p>
+<p>负责：</p>
+<ul>
+<li>LoadBalancer</li>
+<li>Node</li>
+<li>Route</li>
+<li>Volume</li>
+</ul>
+<p>例如：</p>
+<p>阿里云 ACK：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">创建 Service(type=LoadBalancer)
+</span></span><span class="line"><span class="ln">2</span><span class="cl">
+</span></span><span class="line"><span class="ln">3</span><span class="cl">↓
+</span></span><span class="line"><span class="ln">4</span><span class="cl">
+</span></span><span class="line"><span class="ln">5</span><span class="cl">自动创建 SLB
+</span></span></code></pre></div><p>本地裸机环境通常没有该组件。</p>
+<hr>
+<h1 id="二node-节点组件">二、Node 节点组件</h1>
+<table>
+  <thead>
+      <tr>
+          <th>组件</th>
+          <th>功能</th>
+          <th>必须</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>kubelet</td>
+          <td>节点代理</td>
+          <td>√</td>
+      </tr>
+      <tr>
+          <td>kube-proxy</td>
+          <td>Service网络</td>
+          <td>√</td>
+      </tr>
+      <tr>
+          <td>Container Runtime</td>
+          <td>容器运行时</td>
+          <td>√</td>
+      </tr>
+      <tr>
+          <td>CNI插件</td>
+          <td>Pod网络</td>
+          <td>√</td>
+      </tr>
+  </tbody>
+</table>
+<hr>
+<h2 id="1-kubelet">1. kubelet</h2>
+<h3 id="功能-4">功能</h3>
+<p>Node 节点的大管家。</p>
+<p>负责：</p>
+<ul>
+<li>与 API Server 通信；</li>
+<li>创建 Pod；</li>
+<li>监控容器；</li>
+<li>上报节点状态。</li>
+</ul>
+<p>工作流程：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">API Server
+</span></span><span class="line"><span class="ln">2</span><span class="cl">      ↓
+</span></span><span class="line"><span class="ln">3</span><span class="cl">kubelet
+</span></span><span class="line"><span class="ln">4</span><span class="cl">      ↓
+</span></span><span class="line"><span class="ln">5</span><span class="cl">Container Runtime
+</span></span><span class="line"><span class="ln">6</span><span class="cl">      ↓
+</span></span><span class="line"><span class="ln">7</span><span class="cl">Pod
+</span></span></code></pre></div><hr>
+<h3 id="周期性汇报">周期性汇报</h3>
+<p>包括：</p>
+<ul>
+<li>CPU</li>
+<li>Memory</li>
+<li>Pod状态</li>
+</ul>
+<p>发送：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">NodeStatus
+</span></span></code></pre></div><p>给 API Server。</p>
+<hr>
+<h3 id="默认端口-4">默认端口</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">10250
+</span></span></code></pre></div><hr>
+<h2 id="2-kube-proxy">2. kube-proxy</h2>
+<h3 id="功能-5">功能</h3>
+<p>实现 Service 的负载均衡。</p>
+<p>例如：</p>
+<p>Service：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="ln">1</span><span class="cl"><span class="m">10.96.0.10</span><span class="w">
+</span></span></span></code></pre></div><p>后端：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">Pod1
+</span></span><span class="line"><span class="ln">2</span><span class="cl">Pod2
+</span></span><span class="line"><span class="ln">3</span><span class="cl">Pod3
+</span></span></code></pre></div><p>kube-proxy 创建：</p>
+<h4 id="iptables模式">iptables模式</h4>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">ClusterIP
+</span></span><span class="line"><span class="ln">2</span><span class="cl">↓
+</span></span><span class="line"><span class="ln">3</span><span class="cl">iptables
+</span></span><span class="line"><span class="ln">4</span><span class="cl">↓
+</span></span><span class="line"><span class="ln">5</span><span class="cl">Pod
+</span></span></code></pre></div><h4 id="ipvs模式">IPVS模式</h4>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">ClusterIP
+</span></span><span class="line"><span class="ln">2</span><span class="cl">↓
+</span></span><span class="line"><span class="ln">3</span><span class="cl">IPVS
+</span></span><span class="line"><span class="ln">4</span><span class="cl">↓
+</span></span><span class="line"><span class="ln">5</span><span class="cl">Pod
+</span></span></code></pre></div><p>实现：</p>
+<ul>
+<li>ClusterIP</li>
+<li>NodePort</li>
+<li>LoadBalancer</li>
+</ul>
+<p>访问。</p>
+<hr>
+<h3 id="默认端口-5">默认端口</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">10256
+</span></span></code></pre></div><hr>
+<h2 id="3-container-runtime">3. Container Runtime</h2>
+<p>负责真正运行容器。</p>
+<p>支持：</p>
+<h3 id="containerd">containerd</h3>
+<p>当前默认方案：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">Kubernetes → CRI → containerd → runc
+</span></span></code></pre></div><h3 id="docker已移除-dockershim">Docker（已移除 Dockershim）</h3>
+<p>通过：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">cri-dockerd
+</span></span></code></pre></div><p>连接：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln"> 1</span><span class="cl">Kubernetes
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl">↓
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl">CRI
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl">↓
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl">cri-dockerd
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">↓
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl">Docker Engine
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl">↓
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">containerd
+</span></span><span class="line"><span class="ln">10</span><span class="cl">↓
+</span></span><span class="line"><span class="ln">11</span><span class="cl">runc
+</span></span></code></pre></div><h3 id="cri-o">CRI-O</h3>
+<p>RedHat/OpenShift 常用。</p>
+<hr>
+<p>作用：</p>
+<ul>
+<li>拉取镜像；</li>
+<li>创建容器；</li>
+<li>删除容器；</li>
+<li>日志管理。</li>
+</ul>
+<hr>
+<h2 id="4-cni-网络插件">4. CNI 网络插件</h2>
+<p>负责：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">Pod 与 Pod 通信
+</span></span></code></pre></div><p>常见：</p>
+<h3 id="calico">Calico</h3>
+<p>最主流。</p>
+<p>支持：</p>
+<ul>
+<li>BGP</li>
+<li>VXLAN</li>
+<li>NetworkPolicy</li>
+</ul>
+<hr>
+<h3 id="flannel">Flannel</h3>
+<p>简单易用。</p>
+<hr>
+<h3 id="cilium">Cilium</h3>
+<p>基于：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">eBPF
+</span></span></code></pre></div><p>性能最高。</p>
+<hr>
+<h3 id="weave">Weave</h3>
+<p>老牌网络方案。</p>
+<hr>
+<h1 id="三master-和-node-组件汇总">三、Master 和 Node 组件汇总</h1>
+<h2 id="master-节点">Master 节点</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">                 kube-apiserver
+</span></span><span class="line"><span class="ln">2</span><span class="cl">                       │
+</span></span><span class="line"><span class="ln">3</span><span class="cl">                       ▼
+</span></span><span class="line"><span class="ln">4</span><span class="cl">                    etcd
+</span></span><span class="line"><span class="ln">5</span><span class="cl">                       ▲
+</span></span><span class="line"><span class="ln">6</span><span class="cl">                       │
+</span></span><span class="line"><span class="ln">7</span><span class="cl">         ┌─────────────┴─────────────┐
+</span></span><span class="line"><span class="ln">8</span><span class="cl">         │                           │
+</span></span><span class="line"><span class="ln">9</span><span class="cl">kube-controller-manager      kube-scheduler
+</span></span></code></pre></div><h3 id="负责">负责</h3>
+<ul>
+<li>API入口</li>
+<li>数据存储</li>
+<li>调度</li>
+<li>状态维护</li>
+</ul>
+<hr>
+<h2 id="node-节点">Node 节点</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln"> 1</span><span class="cl">               kubelet
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl">                  │
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl">                  ▼
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl">          Container Runtime
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl">                  │
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">                  ▼
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl">                 Pod
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">kube-proxy → iptables/IPVS
+</span></span><span class="line"><span class="ln">10</span><span class="cl">
+</span></span><span class="line"><span class="ln">11</span><span class="cl">CNI Plugin → Pod网络
+</span></span></code></pre></div><h3 id="负责-1">负责</h3>
+<ul>
+<li>创建 Pod</li>
+<li>运行容器</li>
+<li>Service 转发</li>
+<li>网络通信</li>
+</ul>
+<hr>
+<h1 id="四组件之间的完整调用链">四、组件之间的完整调用链</h1>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln"> 1</span><span class="cl">kubectl apply deployment.yaml
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl">          │
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl">          ▼
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl">kube-apiserver
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl">          │
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">          ▼
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl">etcd 保存 Deployment
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl">          │
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">          ▼
+</span></span><span class="line"><span class="ln">10</span><span class="cl">Controller Manager 创建 Pod
+</span></span><span class="line"><span class="ln">11</span><span class="cl">          │
+</span></span><span class="line"><span class="ln">12</span><span class="cl">          ▼
+</span></span><span class="line"><span class="ln">13</span><span class="cl">Scheduler 为 Pod 选择 Node
+</span></span><span class="line"><span class="ln">14</span><span class="cl">          │
+</span></span><span class="line"><span class="ln">15</span><span class="cl">          ▼
+</span></span><span class="line"><span class="ln">16</span><span class="cl">kubelet 监听到 Pod
+</span></span><span class="line"><span class="ln">17</span><span class="cl">          │
+</span></span><span class="line"><span class="ln">18</span><span class="cl">          ▼
+</span></span><span class="line"><span class="ln">19</span><span class="cl">Container Runtime 拉镜像
+</span></span><span class="line"><span class="ln">20</span><span class="cl">          │
+</span></span><span class="line"><span class="ln">21</span><span class="cl">          ▼
+</span></span><span class="line"><span class="ln">22</span><span class="cl">创建 Container
+</span></span><span class="line"><span class="ln">23</span><span class="cl">          │
+</span></span><span class="line"><span class="ln">24</span><span class="cl">          ▼
+</span></span><span class="line"><span class="ln">25</span><span class="cl">CNI 分配 IP
+</span></span><span class="line"><span class="ln">26</span><span class="cl">          │
+</span></span><span class="line"><span class="ln">27</span><span class="cl">          ▼
+</span></span><span class="line"><span class="ln">28</span><span class="cl">Pod Running
+</span></span><span class="line"><span class="ln">29</span><span class="cl">          │
+</span></span><span class="line"><span class="ln">30</span><span class="cl">          ▼
+</span></span><span class="line"><span class="ln">31</span><span class="cl">kube-proxy 更新 Service 转发表
+</span></span></code></pre></div><hr>
+<h1 id="五按职责分类总结">五、按职责分类总结</h1>
+<table>
+  <thead>
+      <tr>
+          <th>节点类型</th>
+          <th>核心组件</th>
+          <th>主要职责</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Master</td>
+          <td>kube-apiserver</td>
+          <td>集群统一入口</td>
+      </tr>
+      <tr>
+          <td>Master</td>
+          <td>etcd</td>
+          <td>保存集群状态</td>
+      </tr>
+      <tr>
+          <td>Master</td>
+          <td>kube-scheduler</td>
+          <td>Pod 调度</td>
+      </tr>
+      <tr>
+          <td>Master</td>
+          <td>kube-controller-manager</td>
+          <td>保持期望状态</td>
+      </tr>
+      <tr>
+          <td>Master</td>
+          <td>cloud-controller-manager</td>
+          <td>云资源管理</td>
+      </tr>
+      <tr>
+          <td>Node</td>
+          <td>kubelet</td>
+          <td>节点代理、创建 Pod</td>
+      </tr>
+      <tr>
+          <td>Node</td>
+          <td>kube-proxy</td>
+          <td>Service 网络转发</td>
+      </tr>
+      <tr>
+          <td>Node</td>
+          <td>Container Runtime</td>
+          <td>运行容器</td>
+      </tr>
+      <tr>
+          <td>Node</td>
+          <td>CNI Plugin</td>
+          <td>Pod 网络</td>
+      </tr>
+  </tbody>
+</table>
+<hr>
+<p>如果从 <strong>kubeadm 部署的 Kubernetes（例如 v1.28+）</strong> 的角度来看，还可以进一步整理出 <strong>Master 节点和 Node 节点上实际运行的 Pod、systemd 服务以及静态 Pod 文件位置</strong>，这样会更贴近实际生产环境。</p>
+<h1 id="-kubernetes-核心资源汇总"><strong>☸️ Kubernetes 核心资源汇总</strong></h1>
+<p><figure>
+  <picture>
+
+    
+      
+        
+        
+        
+        
+        
+        
+    <img
+      loading="lazy"
+      decoding="async"
+      alt="Kubernetes 核心资源关系"
+      
+        class="image_figure image_internal image_unprocessed"
+        src="https://jianlin-li.github.io/images/k8s/2.png"
+      
+      
+    />
+
+    </picture>
+</figure>
+</p>
+<p>Kubernetes 中的资源（Resource）是通过 API 对象来描述集群状态的。可以把它们理解成：</p>
+<blockquote>
+<p><strong>Kubernetes = 一组资源对象 + Controller 持续维护期望状态</strong></p>
+</blockquote>
+<p>按照功能，可以分为 <strong>工作负载资源、服务发现资源、配置资源、存储资源、调度资源、安全资源、元数据资源</strong> 等几大类。</p>
+<hr>
+<h1 id="一工作负载资源workload">一、工作负载资源（Workload）</h1>
+<p>这一类资源负责运行应用。</p>
+<table>
+  <thead>
+      <tr>
+          <th>资源</th>
+          <th>Kind</th>
+          <th>作用</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Pod</td>
+          <td>Pod</td>
+          <td>最小调度单位</td>
+      </tr>
+      <tr>
+          <td>ReplicaSet</td>
+          <td>ReplicaSet</td>
+          <td>保证 Pod 副本数</td>
+      </tr>
+      <tr>
+          <td>Deployment</td>
+          <td>Deployment</td>
+          <td>无状态应用部署</td>
+      </tr>
+      <tr>
+          <td>StatefulSet</td>
+          <td>StatefulSet</td>
+          <td>有状态应用部署</td>
+      </tr>
+      <tr>
+          <td>DaemonSet</td>
+          <td>DaemonSet</td>
+          <td>每个节点运行一个 Pod</td>
+      </tr>
+      <tr>
+          <td>Job</td>
+          <td>Job</td>
+          <td>一次性任务</td>
+      </tr>
+      <tr>
+          <td>CronJob</td>
+          <td>CronJob</td>
+          <td>定时任务</td>
+      </tr>
+      <tr>
+          <td>ReplicationController</td>
+          <td>ReplicationController</td>
+          <td>老版本副本控制器（已很少使用）</td>
+      </tr>
+  </tbody>
+</table>
+<hr>
+<h2 id="1-pod">1. Pod</h2>
+<p>最小运行单元。</p>
+<p>例如：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="ln">1</span><span class="cl"><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l">v1</span><span class="w">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="w"></span><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l">Pod</span><span class="w">
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="w"></span><span class="nt">metadata</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">nginx</span><span class="w">
+</span></span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="w"></span><span class="nt">spec</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln">6</span><span class="cl"><span class="w">  </span><span class="nt">containers</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln">7</span><span class="cl"><span class="w">  </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">nginx</span><span class="w">
+</span></span></span><span class="line"><span class="ln">8</span><span class="cl"><span class="w">    </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l">nginx</span><span class="w">
+</span></span></span></code></pre></div><p>特点：</p>
+<ul>
+<li>
+<p>一个或多个容器</p>
+</li>
+<li>
+<p>共享：</p>
+<ul>
+<li>Network</li>
+<li>Volume</li>
+<li>Namespace</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="2-deployment">2. Deployment</h2>
+<p>最常用资源。</p>
+<p>负责：</p>
+<ul>
+<li>创建 ReplicaSet</li>
+<li>滚动更新</li>
+<li>回滚</li>
+<li>扩缩容</li>
+</ul>
+<p>例如：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="ln">1</span><span class="cl"><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l">Deployment</span><span class="w">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="w"></span><span class="nt">spec</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="w">  </span><span class="nt">replicas</span><span class="p">:</span><span class="w"> </span><span class="m">3</span><span class="w">
+</span></span></span></code></pre></div><p>关系：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">Deployment
+</span></span><span class="line"><span class="ln">2</span><span class="cl">     ↓
+</span></span><span class="line"><span class="ln">3</span><span class="cl">ReplicaSet
+</span></span><span class="line"><span class="ln">4</span><span class="cl">     ↓
+</span></span><span class="line"><span class="ln">5</span><span class="cl">Pod
+</span></span></code></pre></div><hr>
+<h2 id="3-statefulset">3. StatefulSet</h2>
+<p>适用于：</p>
+<ul>
+<li>MySQL</li>
+<li>Redis</li>
+<li>Elasticsearch</li>
+<li>Kafka</li>
+</ul>
+<p>特点：</p>
+<ul>
+<li>固定 Pod 名称</li>
+</ul>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">mysql-0
+</span></span><span class="line"><span class="ln">2</span><span class="cl">mysql-1
+</span></span><span class="line"><span class="ln">3</span><span class="cl">mysql-2
+</span></span></code></pre></div><ul>
+<li>稳定网络身份</li>
+<li>独立存储</li>
+</ul>
+<hr>
+<h2 id="4-daemonset">4. DaemonSet</h2>
+<p>保证：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">每个 Node 至少运行一个 Pod
+</span></span></code></pre></div><p>常用于：</p>
+<ul>
+<li>Calico</li>
+<li>Fluentd</li>
+<li>Filebeat</li>
+<li>Node Exporter</li>
+</ul>
+<p>结构：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">Node1 → Pod
+</span></span><span class="line"><span class="ln">2</span><span class="cl">Node2 → Pod
+</span></span><span class="line"><span class="ln">3</span><span class="cl">Node3 → Pod
+</span></span></code></pre></div><hr>
+<h2 id="5-job">5. Job</h2>
+<p>执行一次后结束：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="ln">1</span><span class="cl"><span class="nt">completions</span><span class="p">:</span><span class="w"> </span><span class="m">1</span><span class="w">
+</span></span></span></code></pre></div><p>例如：</p>
+<ul>
+<li>数据导入</li>
+<li>数据迁移</li>
+<li>备份</li>
+</ul>
+<hr>
+<h2 id="6-cronjob">6. CronJob</h2>
+<p>类似 Linux：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">crontab
+</span></span></code></pre></div><p>例如：</p>
+<p>每天凌晨：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="ln">1</span><span class="cl"><span class="nt">schedule</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;0 0 * * *&#34;</span><span class="w">
+</span></span></span></code></pre></div><p>用于：</p>
+<ul>
+<li>自动备份</li>
+<li>定时报表</li>
+</ul>
+<hr>
+<h1 id="二服务发现和流量访问资源">二、服务发现和流量访问资源</h1>
+<table>
+  <thead>
+      <tr>
+          <th>资源</th>
+          <th>Kind</th>
+          <th>作用</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Service</td>
+          <td>Service</td>
+          <td>服务暴露</td>
+      </tr>
+      <tr>
+          <td>Endpoints</td>
+          <td>Endpoints</td>
+          <td>Service 后端地址</td>
+      </tr>
+      <tr>
+          <td>EndpointSlice</td>
+          <td>EndpointSlice</td>
+          <td>新版 Endpoint</td>
+      </tr>
+      <tr>
+          <td>Ingress</td>
+          <td>Ingress</td>
+          <td>七层负载均衡</td>
+      </tr>
+      <tr>
+          <td>IngressClass</td>
+          <td>IngressClass</td>
+          <td>Ingress 控制器</td>
+      </tr>
+      <tr>
+          <td>Gateway</td>
+          <td>Gateway</td>
+          <td>Gateway API</td>
+      </tr>
+      <tr>
+          <td>HTTPRoute</td>
+          <td>HTTPRoute</td>
+          <td>Gateway 路由</td>
+      </tr>
+  </tbody>
+</table>
+<hr>
+<h2 id="service">Service</h2>
+<p>提供固定访问地址：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">ClusterIP
+</span></span><span class="line"><span class="ln">2</span><span class="cl">NodePort
+</span></span><span class="line"><span class="ln">3</span><span class="cl">LoadBalancer
+</span></span><span class="line"><span class="ln">4</span><span class="cl">ExternalName
+</span></span></code></pre></div><p>例如：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="ln">1</span><span class="cl"><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l">Service</span><span class="w">
+</span></span></span></code></pre></div><p>实现：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">Service
+</span></span><span class="line"><span class="ln">2</span><span class="cl">      ↓
+</span></span><span class="line"><span class="ln">3</span><span class="cl">Endpoints
+</span></span><span class="line"><span class="ln">4</span><span class="cl">      ↓
+</span></span><span class="line"><span class="ln">5</span><span class="cl">Pod
+</span></span></code></pre></div><hr>
+<h2 id="ingress">Ingress</h2>
+<p>七层代理。</p>
+<p>支持：</p>
+<ul>
+<li>Host</li>
+<li>Path</li>
+<li>HTTPS</li>
+</ul>
+<p>例如：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">www.example.com
+</span></span><span class="line"><span class="ln">2</span><span class="cl">          ↓
+</span></span><span class="line"><span class="ln">3</span><span class="cl">Ingress
+</span></span><span class="line"><span class="ln">4</span><span class="cl">          ↓
+</span></span><span class="line"><span class="ln">5</span><span class="cl">Service
+</span></span><span class="line"><span class="ln">6</span><span class="cl">          ↓
+</span></span><span class="line"><span class="ln">7</span><span class="cl">Pod
+</span></span></code></pre></div><p>常见控制器：</p>
+<ul>
+<li>ingress-nginx</li>
+<li>Traefik</li>
+<li>HAProxy</li>
+</ul>
+<hr>
+<h1 id="三配置资源">三、配置资源</h1>
+<table>
+  <thead>
+      <tr>
+          <th>资源</th>
+          <th>Kind</th>
+          <th>用途</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>ConfigMap</td>
+          <td>ConfigMap</td>
+          <td>普通配置</td>
+      </tr>
+      <tr>
+          <td>Secret</td>
+          <td>Secret</td>
+          <td>敏感信息</td>
+      </tr>
+      <tr>
+          <td>DownwardAPI</td>
+          <td>Downward API</td>
+          <td>注入 Pod 元数据</td>
+      </tr>
+  </tbody>
+</table>
+<hr>
+<h2 id="configmap">ConfigMap</h2>
+<p>保存：</p>
+<ul>
+<li>配置文件</li>
+<li>环境变量</li>
+</ul>
+<p>例如：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="ln">1</span><span class="cl"><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l">ConfigMap</span><span class="w">
+</span></span></span></code></pre></div><hr>
+<h2 id="secret">Secret</h2>
+<p>保存：</p>
+<ul>
+<li>用户密码</li>
+<li>Token</li>
+<li>TLS证书</li>
+</ul>
+<p>类型：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">Opaque
+</span></span><span class="line"><span class="ln">2</span><span class="cl">kubernetes.io/tls
+</span></span><span class="line"><span class="ln">3</span><span class="cl">docker-registry
+</span></span><span class="line"><span class="ln">4</span><span class="cl">service-account-token
+</span></span></code></pre></div><hr>
+<h1 id="四存储资源">四、存储资源</h1>
+<table>
+  <thead>
+      <tr>
+          <th>资源</th>
+          <th>Kind</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Volume</td>
+          <td>Volume</td>
+      </tr>
+      <tr>
+          <td>PersistentVolume</td>
+          <td>PV</td>
+      </tr>
+      <tr>
+          <td>PersistentVolumeClaim</td>
+          <td>PVC</td>
+      </tr>
+      <tr>
+          <td>StorageClass</td>
+          <td>StorageClass</td>
+      </tr>
+      <tr>
+          <td>CSI Driver</td>
+          <td>CSIDriver</td>
+      </tr>
+  </tbody>
+</table>
+<p>关系：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">PVC
+</span></span><span class="line"><span class="ln">2</span><span class="cl"> ↓
+</span></span><span class="line"><span class="ln">3</span><span class="cl">PV
+</span></span><span class="line"><span class="ln">4</span><span class="cl"> ↓
+</span></span><span class="line"><span class="ln">5</span><span class="cl">StorageClass
+</span></span><span class="line"><span class="ln">6</span><span class="cl"> ↓
+</span></span><span class="line"><span class="ln">7</span><span class="cl">后端存储
+</span></span></code></pre></div><p>后端：</p>
+<ul>
+<li>NFS</li>
+<li>Ceph</li>
+<li>GlusterFS</li>
+<li>LocalPV</li>
+</ul>
+<hr>
+<h2 id="pv">PV</h2>
+<p>集群存储资源。</p>
+<p>例如：</p>
+<p>100G：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="ln">1</span><span class="cl"><span class="nt">capacity</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="w">  </span><span class="nt">storage</span><span class="p">:</span><span class="w"> </span><span class="l">100Gi</span><span class="w">
+</span></span></span></code></pre></div><hr>
+<h2 id="pvc">PVC</h2>
+<p>用户申请：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="ln">1</span><span class="cl"><span class="nt">requests</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="w">  </span><span class="nt">storage</span><span class="p">:</span><span class="w"> </span><span class="l">20Gi</span><span class="w">
+</span></span></span></code></pre></div><p>自动绑定：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">PVC
+</span></span><span class="line"><span class="ln">2</span><span class="cl">↓
+</span></span><span class="line"><span class="ln">3</span><span class="cl">PV
+</span></span></code></pre></div><hr>
+<h2 id="storageclass">StorageClass</h2>
+<p>动态供给存储。</p>
+<p>例如：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="ln">1</span><span class="cl"><span class="nt">provisioner</span><span class="p">:</span><span class="w">
+</span></span></span></code></pre></div><p>支持：</p>
+<ul>
+<li>NFS</li>
+<li>Ceph</li>
+<li>云盘</li>
+</ul>
+<hr>
+<h1 id="五调度资源">五、调度资源</h1>
+<table>
+  <thead>
+      <tr>
+          <th>资源</th>
+          <th>Kind</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Node</td>
+          <td>Node</td>
+      </tr>
+      <tr>
+          <td>Namespace</td>
+          <td>Namespace</td>
+      </tr>
+      <tr>
+          <td>ResourceQuota</td>
+          <td>ResourceQuota</td>
+      </tr>
+      <tr>
+          <td>LimitRange</td>
+          <td>LimitRange</td>
+      </tr>
+      <tr>
+          <td>PriorityClass</td>
+          <td>PriorityClass</td>
+      </tr>
+  </tbody>
+</table>
+<hr>
+<h2 id="namespace">Namespace</h2>
+<p>资源隔离。</p>
+<p>例如：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">default
+</span></span><span class="line"><span class="ln">2</span><span class="cl">kube-system
+</span></span><span class="line"><span class="ln">3</span><span class="cl">argocd
+</span></span><span class="line"><span class="ln">4</span><span class="cl">monitoring
+</span></span></code></pre></div><hr>
+<h2 id="resourcequota">ResourceQuota</h2>
+<p>限制：</p>
+<ul>
+<li>CPU</li>
+<li>Memory</li>
+<li>Pod数量</li>
+</ul>
+<hr>
+<h2 id="limitrange">LimitRange</h2>
+<p>限制：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">request
+</span></span><span class="line"><span class="ln">2</span><span class="cl">limit
+</span></span></code></pre></div><hr>
+<h2 id="priorityclass">PriorityClass</h2>
+<p>定义优先级：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">high
+</span></span><span class="line"><span class="ln">2</span><span class="cl">medium
+</span></span><span class="line"><span class="ln">3</span><span class="cl">low
+</span></span></code></pre></div><p>高优先级 Pod 可以抢占资源。</p>
+<hr>
+<h1 id="六安全资源">六、安全资源</h1>
+<table>
+  <thead>
+      <tr>
+          <th>资源</th>
+          <th>Kind</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>ServiceAccount</td>
+          <td>ServiceAccount</td>
+      </tr>
+      <tr>
+          <td>Role</td>
+          <td>Role</td>
+      </tr>
+      <tr>
+          <td>ClusterRole</td>
+          <td>ClusterRole</td>
+      </tr>
+      <tr>
+          <td>RoleBinding</td>
+          <td>RoleBinding</td>
+      </tr>
+      <tr>
+          <td>ClusterRoleBinding</td>
+          <td>ClusterRoleBinding</td>
+      </tr>
+      <tr>
+          <td>NetworkPolicy</td>
+          <td>NetworkPolicy</td>
+      </tr>
+  </tbody>
+</table>
+<hr>
+<h2 id="rbac">RBAC</h2>
+<p>权限模型：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">Role
+</span></span><span class="line"><span class="ln">2</span><span class="cl">    ↓
+</span></span><span class="line"><span class="ln">3</span><span class="cl">RoleBinding
+</span></span><span class="line"><span class="ln">4</span><span class="cl">    ↓
+</span></span><span class="line"><span class="ln">5</span><span class="cl">ServiceAccount
+</span></span></code></pre></div><p>跨集群：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">ClusterRole
+</span></span><span class="line"><span class="ln">2</span><span class="cl">       ↓
+</span></span><span class="line"><span class="ln">3</span><span class="cl">ClusterRoleBinding
+</span></span></code></pre></div><hr>
+<h2 id="networkpolicy">NetworkPolicy</h2>
+<p>控制：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">Pod ↔ Pod
+</span></span></code></pre></div><p>通信。</p>
+<p>类似：</p>
+<p>防火墙。</p>
+<hr>
+<h1 id="七自动扩缩容资源">七、自动扩缩容资源</h1>
+<table>
+  <thead>
+      <tr>
+          <th>资源</th>
+          <th>Kind</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>HPA</td>
+          <td>HorizontalPodAutoscaler</td>
+      </tr>
+      <tr>
+          <td>VPA</td>
+          <td>VerticalPodAutoscaler</td>
+      </tr>
+      <tr>
+          <td>ClusterAutoscaler</td>
+          <td>ClusterAutoscaler</td>
+      </tr>
+  </tbody>
+</table>
+<hr>
+<h2 id="hpa">HPA</h2>
+<p>水平扩容：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">CPU &gt; 80%
+</span></span><span class="line"><span class="ln">2</span><span class="cl">
+</span></span><span class="line"><span class="ln">3</span><span class="cl">3 Pod
+</span></span><span class="line"><span class="ln">4</span><span class="cl">↓
+</span></span><span class="line"><span class="ln">5</span><span class="cl">5 Pod
+</span></span></code></pre></div><hr>
+<h2 id="vpa">VPA</h2>
+<p>自动调整：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">CPU Request
+</span></span><span class="line"><span class="ln">2</span><span class="cl">Memory Request
+</span></span></code></pre></div><hr>
+<h1 id="八元数据资源">八、元数据资源</h1>
+<table>
+  <thead>
+      <tr>
+          <th>资源</th>
+          <th>Kind</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Labels</td>
+          <td>Label</td>
+      </tr>
+      <tr>
+          <td>Selector</td>
+          <td>Selector</td>
+      </tr>
+      <tr>
+          <td>Annotation</td>
+          <td>Annotation</td>
+      </tr>
+  </tbody>
+</table>
+<hr>
+<h3 id="label">Label</h3>
+<p>例如：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="ln">1</span><span class="cl"><span class="nt">labels</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="w">  </span><span class="nt">app</span><span class="p">:</span><span class="w"> </span><span class="l">nginx</span><span class="w">
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="w">  </span><span class="nt">env</span><span class="p">:</span><span class="w"> </span><span class="l">prod</span><span class="w">
+</span></span></span></code></pre></div><p>用于：</p>
+<ul>
+<li>Service 选择 Pod</li>
+<li>Deployment 管理 Pod</li>
+</ul>
+<hr>
+<h3 id="annotation">Annotation</h3>
+<p>保存：</p>
+<ul>
+<li>描述信息</li>
+<li>Ingress 配置</li>
+</ul>
+<p>例如：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="ln">1</span><span class="cl"><span class="nt">annotations</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="w">  </span><span class="nt">nginx.ingress.kubernetes.io/rewrite-target</span><span class="p">:</span><span class="w"> </span><span class="l">/</span><span class="w">
+</span></span></span></code></pre></div><hr>
+<h1 id="九crd-扩展资源">九、CRD 扩展资源</h1>
+<table>
+  <thead>
+      <tr>
+          <th>资源</th>
+          <th>Kind</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>CustomResourceDefinition</td>
+          <td>CRD</td>
+      </tr>
+      <tr>
+          <td>CustomResource</td>
+          <td>CR</td>
+      </tr>
+  </tbody>
+</table>
+<p>用于扩展 Kubernetes API。</p>
+<p>例如：</p>
+<p>安装：</p>
+<ul>
+<li>ArgoCD</li>
+<li>Prometheus Operator</li>
+<li>Istio</li>
+</ul>
+<p>会产生：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">Application
+</span></span><span class="line"><span class="ln">2</span><span class="cl">ServiceMonitor
+</span></span><span class="line"><span class="ln">3</span><span class="cl">VirtualService
+</span></span><span class="line"><span class="ln">4</span><span class="cl">DestinationRule
+</span></span></code></pre></div><p>这些都是自定义资源。</p>
+<hr>
+<h1 id="十资源关系总图">十、资源关系总图</h1>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln"> 1</span><span class="cl">                Deployment
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl">                     │
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl">                     ▼
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl">               ReplicaSet
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl">                     │
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">                     ▼
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl">                    Pod
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl">                     │
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">          ┌──────────┴──────────┐
+</span></span><span class="line"><span class="ln">10</span><span class="cl">          ▼                     ▼
+</span></span><span class="line"><span class="ln">11</span><span class="cl">      ConfigMap             Secret
+</span></span><span class="line"><span class="ln">12</span><span class="cl">          │                     │
+</span></span><span class="line"><span class="ln">13</span><span class="cl">          └──────────┬──────────┘
+</span></span><span class="line"><span class="ln">14</span><span class="cl">                     ▼
+</span></span><span class="line"><span class="ln">15</span><span class="cl">                    PVC
+</span></span><span class="line"><span class="ln">16</span><span class="cl">                     ▼
+</span></span><span class="line"><span class="ln">17</span><span class="cl">                     PV
+</span></span><span class="line"><span class="ln">18</span><span class="cl">
+</span></span><span class="line"><span class="ln">19</span><span class="cl">Pod
+</span></span><span class="line"><span class="ln">20</span><span class="cl"> │
+</span></span><span class="line"><span class="ln">21</span><span class="cl"> ▼
+</span></span><span class="line"><span class="ln">22</span><span class="cl">Service
+</span></span><span class="line"><span class="ln">23</span><span class="cl"> │
+</span></span><span class="line"><span class="ln">24</span><span class="cl"> ▼
+</span></span><span class="line"><span class="ln">25</span><span class="cl">EndpointSlice
+</span></span><span class="line"><span class="ln">26</span><span class="cl"> │
+</span></span><span class="line"><span class="ln">27</span><span class="cl"> ▼
+</span></span><span class="line"><span class="ln">28</span><span class="cl">Ingress
+</span></span><span class="line"><span class="ln">29</span><span class="cl"> │
+</span></span><span class="line"><span class="ln">30</span><span class="cl"> ▼
+</span></span><span class="line"><span class="ln">31</span><span class="cl">外部用户
+</span></span><span class="line"><span class="ln">32</span><span class="cl">
+</span></span><span class="line"><span class="ln">33</span><span class="cl">RBAC
+</span></span><span class="line"><span class="ln">34</span><span class="cl">Role → RoleBinding → ServiceAccount
+</span></span><span class="line"><span class="ln">35</span><span class="cl">
+</span></span><span class="line"><span class="ln">36</span><span class="cl">Storage
+</span></span><span class="line"><span class="ln">37</span><span class="cl">PVC → PV → StorageClass
+</span></span><span class="line"><span class="ln">38</span><span class="cl">
+</span></span><span class="line"><span class="ln">39</span><span class="cl">Autoscaling
+</span></span><span class="line"><span class="ln">40</span><span class="cl">HPA → Deployment
+</span></span><span class="line"><span class="ln">41</span><span class="cl">
+</span></span><span class="line"><span class="ln">42</span><span class="cl">CRD
+</span></span><span class="line"><span class="ln">43</span><span class="cl">↓
+</span></span><span class="line"><span class="ln">44</span><span class="cl">Application、ServiceMonitor、VirtualService...
+</span></span></code></pre></div><hr>
+<h1 id="kubernetes-最核心最常用的资源建议优先掌握">Kubernetes 最核心、最常用的资源（建议优先掌握）</h1>
+<p>⭐⭐⭐⭐⭐ 必须掌握：</p>
+<ol>
+<li><strong>Pod</strong></li>
+<li><strong>Deployment</strong></li>
+<li><strong>Service</strong></li>
+<li><strong>Ingress</strong></li>
+<li><strong>ConfigMap</strong></li>
+<li><strong>Secret</strong></li>
+<li><strong>Namespace</strong></li>
+<li><strong>PV</strong></li>
+<li><strong>PVC</strong></li>
+<li><strong>StorageClass</strong></li>
+<li><strong>ServiceAccount</strong></li>
+<li><strong>Role / ClusterRole</strong></li>
+<li><strong>RoleBinding / ClusterRoleBinding</strong></li>
+<li><strong>HPA</strong></li>
+</ol>
+<p>这 14 类资源基本覆盖了 80%～90% 的 Kubernetes 日常运维和生产环境使用场景。🚀</p>
 
     </div><div class="post_comments">
   

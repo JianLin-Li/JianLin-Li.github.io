@@ -38,6 +38,121 @@
 &lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;systemctl restart docker
 &lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/li&gt;
 &lt;/ol&gt;
+&lt;h1 id=&#34;-主流容器编排系统汇总&#34;&gt;&lt;strong&gt;📦 主流容器编排系统汇总&lt;/strong&gt;&lt;/h1&gt;
+&lt;p&gt;容器编排（Container Orchestration）用于管理大量容器的部署、调度、扩缩容、服务发现、故障恢复等，是云原生架构的核心组成部分。&lt;/p&gt;
+&lt;p&gt;目前主流的容器编排系统如下：&lt;/p&gt;
+&lt;table&gt;
+  &lt;thead&gt;
+      &lt;tr&gt;
+          &lt;th&gt;编排系统&lt;/th&gt;
+          &lt;th&gt;开发组织&lt;/th&gt;
+          &lt;th&gt;当前状态&lt;/th&gt;
+          &lt;th&gt;应用场景&lt;/th&gt;
+          &lt;th&gt;流行程度&lt;/th&gt;
+      &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+      &lt;tr&gt;
+          &lt;td&gt;Kubernetes（K8s）&lt;/td&gt;
+          &lt;td&gt;Google → &lt;a href=&#34;https://cloud.google.com?utm_source=chatgpt.com&#34;&gt;Google Cloud&lt;/a&gt;&lt;/td&gt;
+          &lt;td&gt;主流标准&lt;/td&gt;
+          &lt;td&gt;企业级、云原生平台&lt;/td&gt;
+          &lt;td&gt;⭐⭐⭐⭐⭐&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;Docker Swarm&lt;/td&gt;
+          &lt;td&gt;&lt;a href=&#34;https://www.docker.com?utm_source=chatgpt.com&#34;&gt;Docker&lt;/a&gt;&lt;/td&gt;
+          &lt;td&gt;维护状态&lt;/td&gt;
+          &lt;td&gt;中小规模集群&lt;/td&gt;
+          &lt;td&gt;⭐⭐⭐&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;Apache Mesos + Marathon&lt;/td&gt;
+          &lt;td&gt;Apache Software Foundation&lt;/td&gt;
+          &lt;td&gt;较少使用&lt;/td&gt;
+          &lt;td&gt;大规模资源调度&lt;/td&gt;
+          &lt;td&gt;⭐⭐&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;Nomad&lt;/td&gt;
+          &lt;td&gt;&lt;a href=&#34;https://www.hashicorp.com?utm_source=chatgpt.com&#34;&gt;HashiCorp&lt;/a&gt;&lt;/td&gt;
+          &lt;td&gt;活跃发展&lt;/td&gt;
+          &lt;td&gt;混合工作负载&lt;/td&gt;
+          &lt;td&gt;⭐⭐⭐⭐&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;OpenShift&lt;/td&gt;
+          &lt;td&gt;&lt;a href=&#34;https://www.redhat.com?utm_source=chatgpt.com&#34;&gt;Red Hat&lt;/a&gt;&lt;/td&gt;
+          &lt;td&gt;企业级平台&lt;/td&gt;
+          &lt;td&gt;私有云、金融、电信&lt;/td&gt;
+          &lt;td&gt;⭐⭐⭐⭐&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;Rancher&lt;/td&gt;
+          &lt;td&gt;&lt;a href=&#34;https://www.rancher.com?utm_source=chatgpt.com&#34;&gt;SUSE Rancher Manager&lt;/a&gt;&lt;/td&gt;
+          &lt;td&gt;活跃&lt;/td&gt;
+          &lt;td&gt;多集群管理&lt;/td&gt;
+          &lt;td&gt;⭐⭐⭐⭐&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;DC/OS&lt;/td&gt;
+          &lt;td&gt;Mesosphere&lt;/td&gt;
+          &lt;td&gt;基本退出主流&lt;/td&gt;
+          &lt;td&gt;超大规模集群&lt;/td&gt;
+          &lt;td&gt;⭐&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;Amazon ECS&lt;/td&gt;
+          &lt;td&gt;&lt;a href=&#34;https://aws.amazon.com?utm_source=chatgpt.com&#34;&gt;Amazon Web Services&lt;/a&gt;&lt;/td&gt;
+          &lt;td&gt;活跃&lt;/td&gt;
+          &lt;td&gt;AWS 云平台&lt;/td&gt;
+          &lt;td&gt;⭐⭐⭐⭐&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;Azure AKS&lt;/td&gt;
+          &lt;td&gt;&lt;a href=&#34;https://azure.microsoft.com?utm_source=chatgpt.com&#34;&gt;Microsoft Azure&lt;/a&gt;&lt;/td&gt;
+          &lt;td&gt;活跃&lt;/td&gt;
+          &lt;td&gt;Azure 云平台&lt;/td&gt;
+          &lt;td&gt;⭐⭐⭐⭐&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;Google GKE&lt;/td&gt;
+          &lt;td&gt;&lt;a href=&#34;https://cloud.google.com/kubernetes-engine?utm_source=chatgpt.com&#34;&gt;Google Kubernetes Engine&lt;/a&gt;&lt;/td&gt;
+          &lt;td&gt;活跃&lt;/td&gt;
+          &lt;td&gt;Google Cloud&lt;/td&gt;
+          &lt;td&gt;⭐⭐⭐⭐⭐&lt;/td&gt;
+      &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;hr&gt;
+&lt;h1 id=&#34;1-kubernetes事实上的行业标准&#34;&gt;1. Kubernetes（事实上的行业标准）&lt;/h1&gt;
+&lt;p&gt;&lt;figure&gt;
+  &lt;picture&gt;
+
+    
+      
+        
+        
+        
+        
+        
+        
+    &lt;img
+      loading=&#34;lazy&#34;
+      decoding=&#34;async&#34;
+      alt=&#34;Image&#34;
+      
+        class=&#34;image_figure image_external image_processed&#34;
+        width=&#34;1101&#34;
+        height=&#34;751&#34;
+        src=&#34;https://jianlin-li.github.io/images/fnI3-sEg80Z98BQAdLR1rhehXQvxKe-Fhgfzn7HTsijvjVaGrnl1_H06bhfhvXhDrvP9MWbXuz00u4sPX5T8DoREiwHIupx6fYc1Ajb3mIo8BJIk_fKRCbolBnyI6yd9hg6v3v_SICVhGkA0TMOUICFiRFFwa4vShgPOPOUHrhUGX5a9CNqN9N9UwP2-P5Ud_16197581885327981600.jpg&#34;
+      
+      
+    /&gt;
+
+    &lt;/picture&gt;
+&lt;/figure&gt;
+&lt;/p&gt;
           
           
         
