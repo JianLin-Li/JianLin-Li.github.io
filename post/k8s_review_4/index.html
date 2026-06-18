@@ -168,7 +168,7 @@
     <span class="post_date">
       2026-04-26	  
     </span>
-    <span class="post_time"> · 4 分钟阅读</span><span>&nbsp;· <a href='https://jianlin-li.github.io/tags/kubernetes/' title="Kubernetes" class="post_tag button button_translucent">Kubernetes
+    <span class="post_time"> · 12 分钟阅读</span><span>&nbsp;· <a href='https://jianlin-li.github.io/tags/kubernetes/' title="Kubernetes" class="post_tag button button_translucent">Kubernetes
         </a>
     </span>
     <span class="page_only">&nbsp;·
@@ -914,11 +914,1104 @@
 <blockquote>
 <p>管理节点级别的守护进程，确保在集群中的每个节点上都运行一个Pod副本</p>
 </blockquote>
+<p><figure>
+  <picture>
+
+    
+      
+        
+        
+        
+        
+        
+        
+    <img
+      loading="lazy"
+      decoding="async"
+      alt="DaemonSet的特点"
+      
+        class="image_figure image_internal image_unprocessed"
+        src="https://jianlin-li.github.io/images/k8s/17.png"
+      
+      
+    />
+
+    </picture>
+</figure>
+</p>
+<h1 id="daemonset-资源详解"><strong>DaemonSet 资源详解</strong></h1>
+<p><code>DaemonSet</code>（守护进程集）是 Kubernetes 中的一种工作负载控制器，用于保证 <strong>集群中的每个节点（或指定节点）上都运行一个 Pod 副本</strong>。</p>
+<p>它非常适合部署节点级别的服务，例如：</p>
+<ul>
+<li>日志收集器（Fluentd、Filebeat）</li>
+<li>网络插件（Calico、Flannel）</li>
+<li>监控 Agent（Node Exporter）</li>
+<li>存储插件（Ceph、Longhorn）</li>
+<li>安全 Agent</li>
+<li>节点运维工具</li>
+</ul>
+<hr>
+<h1 id="一daemonset-工作原理">一、DaemonSet 工作原理</h1>
+<p>普通 Deployment：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">Node1
+</span></span><span class="line"><span class="ln">2</span><span class="cl"> ├── Pod1
+</span></span><span class="line"><span class="ln">3</span><span class="cl">Node2
+</span></span><span class="line"><span class="ln">4</span><span class="cl"> └── Pod2
+</span></span><span class="line"><span class="ln">5</span><span class="cl">
+</span></span><span class="line"><span class="ln">6</span><span class="cl">副本数量由 replicas 决定
+</span></span></code></pre></div><p>DaemonSet：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">Node1
+</span></span><span class="line"><span class="ln">2</span><span class="cl"> ├── daemon-pod
+</span></span><span class="line"><span class="ln">3</span><span class="cl">
+</span></span><span class="line"><span class="ln">4</span><span class="cl">Node2
+</span></span><span class="line"><span class="ln">5</span><span class="cl"> ├── daemon-pod
+</span></span><span class="line"><span class="ln">6</span><span class="cl">
+</span></span><span class="line"><span class="ln">7</span><span class="cl">Node3
+</span></span><span class="line"><span class="ln">8</span><span class="cl"> ├── daemon-pod
+</span></span></code></pre></div><p>特点：</p>
+<ul>
+<li>新节点加入集群时自动创建 Pod；</li>
+<li>节点删除时对应 Pod 自动删除；</li>
+<li>不需要指定 replicas；</li>
+<li>默认一个节点只运行一个 Pod。</li>
+</ul>
+<hr>
+<h1 id="二daemonset-完整-yaml-结构">二、DaemonSet 完整 YAML 结构</h1>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="ln">1</span><span class="cl"><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l">apps/v1</span><span class="w">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="w"></span><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l">DaemonSet</span><span class="w">
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="w"></span><span class="nt">metadata</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="w"></span><span class="nt">spec</span><span class="p">:</span><span class="w">
+</span></span></span></code></pre></div><p>结构：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="ln">1</span><span class="cl"><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l">apps/v1</span><span class="w">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="w"></span><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l">DaemonSet</span><span class="w">
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="w"></span><span class="nt">metadata</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="w">  </span><span class="l">...</span><span class="w">
+</span></span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="w"></span><span class="nt">spec</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln">6</span><span class="cl"><span class="w">  </span><span class="l">...</span><span class="w">
+</span></span></span></code></pre></div><hr>
+<h1 id="三daemonset-特有的常见配置">三、DaemonSet 特有的常见配置</h1>
+<h2 id="hostnetwork">hostNetwork</h2>
+<p>使用宿主机网络。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="ln">1</span><span class="cl"><span class="nt">hostNetwork</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
+</span></span></span></code></pre></div><p>此时：</p>
+<p>容器与宿主机共享网络。</p>
+<p>例如：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">宿主机IP：
+</span></span><span class="line"><span class="ln">2</span><span class="cl">192.168.1.101
+</span></span><span class="line"><span class="ln">3</span><span class="cl">
+</span></span><span class="line"><span class="ln">4</span><span class="cl">Node Exporter监听：
+</span></span><span class="line"><span class="ln">5</span><span class="cl">9100
+</span></span><span class="line"><span class="ln">6</span><span class="cl">
+</span></span><span class="line"><span class="ln">7</span><span class="cl">访问：
+</span></span><span class="line"><span class="ln">8</span><span class="cl">
+</span></span><span class="line"><span class="ln">9</span><span class="cl">192.168.1.101:9100
+</span></span></code></pre></div><hr>
+<h2 id="hostpid">hostPID</h2>
+<p>共享宿主机 PID。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="ln">1</span><span class="cl"><span class="nt">hostPID</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
+</span></span></span></code></pre></div><p>可查看节点上的进程。</p>
+<hr>
+<h2 id="hostipc">hostIPC</h2>
+<p>共享宿主机 IPC。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="ln">1</span><span class="cl"><span class="nt">hostIPC</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
+</span></span></span></code></pre></div><hr>
+<h1 id="四hostpath-挂载">四、hostPath 挂载</h1>
+<p>DaemonSet 经常需要访问宿主机文件系统。</p>
+<p>例如：</p>
+<h3 id="挂载-proc">挂载 /proc</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="ln">1</span><span class="cl"><span class="nt">volumes</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="w"></span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">proc</span><span class="w">
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="w">  </span><span class="nt">hostPath</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="w">    </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l">/proc</span><span class="w">
+</span></span></span></code></pre></div><p>对应：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="ln">1</span><span class="cl"><span class="nt">volumeMounts</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="w"></span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">proc</span><span class="w">
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="w">  </span><span class="nt">mountPath</span><span class="p">:</span><span class="w"> </span><span class="l">/host/proc</span><span class="w">
+</span></span></span></code></pre></div><hr>
+<h3 id="挂载-dockersock">挂载 docker.sock</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="ln">1</span><span class="cl"><span class="nt">hostPath</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="w">  </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l">/var/run/docker.sock</span><span class="w">
+</span></span></span></code></pre></div><hr>
+<h3 id="挂载日志目录">挂载日志目录</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="ln">1</span><span class="cl"><span class="nt">hostPath</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="w">  </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l">/var/log</span><span class="w">
+</span></span></span></code></pre></div><hr>
+<h3 id="挂载根目录">挂载根目录</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="ln">1</span><span class="cl"><span class="nt">hostPath</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="w">  </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l">/</span><span class="w">
+</span></span></span></code></pre></div><p>例如：</p>
+<p>Node Exporter：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="ln">1</span><span class="cl"><span class="nt">mountPath</span><span class="p">:</span><span class="w"> </span><span class="l">/host/root</span><span class="w">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="w"></span><span class="nt">readOnly</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
+</span></span></span></code></pre></div><hr>
+<h1 id="五tolerations">五、tolerations</h1>
+<p>允许调度到 master/control-plane 节点。</p>
+<p>默认情况下：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">control-plane 节点存在污点
+</span></span><span class="line"><span class="ln">2</span><span class="cl">
+</span></span><span class="line"><span class="ln">3</span><span class="cl">NoSchedule
+</span></span></code></pre></div><p>加入：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="ln">1</span><span class="cl"><span class="nt">tolerations</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="w"></span>- <span class="nt">operator</span><span class="p">:</span><span class="w"> </span><span class="l">Exists</span><span class="w">
+</span></span></span></code></pre></div><p>即可在所有节点运行。</p>
+<p>例如：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="ln">1</span><span class="cl"><span class="nt">tolerations</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="w"></span>- <span class="nt">key</span><span class="p">:</span><span class="w"> </span><span class="l">node-role.kubernetes.io/control-plane</span><span class="w">
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="w">  </span><span class="nt">operator</span><span class="p">:</span><span class="w"> </span><span class="l">Exists</span><span class="w">
+</span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="w">  </span><span class="nt">effect</span><span class="p">:</span><span class="w"> </span><span class="l">NoSchedule</span><span class="w">
+</span></span></span></code></pre></div><hr>
+<h1 id="六nodeselector">六、nodeSelector</h1>
+<p>限制运行节点。</p>
+<p>例如：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="ln">1</span><span class="cl"><span class="nt">nodeSelector</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="w">  </span><span class="nt">disk</span><span class="p">:</span><span class="w"> </span><span class="l">ssd</span><span class="w">
+</span></span></span></code></pre></div><p>只有：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">disk=ssd
+</span></span></code></pre></div><p>节点才会运行。</p>
+<hr>
+<h1 id="七典型示例node-exporter">七、典型示例——Node Exporter</h1>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l">apps/v1</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="w"></span><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l">DaemonSet</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="w"></span><span class="nt">metadata</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">node-exporter</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="w">  </span><span class="nt">namespace</span><span class="p">:</span><span class="w"> </span><span class="l">monitoring</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 6</span><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="w"></span><span class="nt">spec</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="w">  </span><span class="nt">selector</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 9</span><span class="cl"><span class="w">    </span><span class="nt">matchLabels</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="w">      </span><span class="nt">app</span><span class="p">:</span><span class="w"> </span><span class="l">node-exporter</span><span class="w">
+</span></span></span><span class="line"><span class="ln">11</span><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="ln">12</span><span class="cl"><span class="w">  </span><span class="nt">updateStrategy</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln">13</span><span class="cl"><span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l">RollingUpdate</span><span class="w">
+</span></span></span><span class="line"><span class="ln">14</span><span class="cl"><span class="w">    </span><span class="nt">rollingUpdate</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln">15</span><span class="cl"><span class="w">      </span><span class="nt">maxUnavailable</span><span class="p">:</span><span class="w"> </span><span class="m">1</span><span class="w">
+</span></span></span><span class="line"><span class="ln">16</span><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="ln">17</span><span class="cl"><span class="w">  </span><span class="nt">template</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln">18</span><span class="cl"><span class="w">    </span><span class="nt">metadata</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln">19</span><span class="cl"><span class="w">      </span><span class="nt">labels</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln">20</span><span class="cl"><span class="w">        </span><span class="nt">app</span><span class="p">:</span><span class="w"> </span><span class="l">node-exporter</span><span class="w">
+</span></span></span><span class="line"><span class="ln">21</span><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="ln">22</span><span class="cl"><span class="w">    </span><span class="nt">spec</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln">23</span><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="ln">24</span><span class="cl"><span class="w">      </span><span class="nt">hostNetwork</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
+</span></span></span><span class="line"><span class="ln">25</span><span class="cl"><span class="w">      </span><span class="nt">hostPID</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
+</span></span></span><span class="line"><span class="ln">26</span><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="ln">27</span><span class="cl"><span class="w">      </span><span class="nt">tolerations</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln">28</span><span class="cl"><span class="w">      </span>- <span class="nt">operator</span><span class="p">:</span><span class="w"> </span><span class="l">Exists</span><span class="w">
+</span></span></span><span class="line"><span class="ln">29</span><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="ln">30</span><span class="cl"><span class="w">      </span><span class="nt">containers</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln">31</span><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="ln">32</span><span class="cl"><span class="w">      </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">node-exporter</span><span class="w">
+</span></span></span><span class="line"><span class="ln">33</span><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="ln">34</span><span class="cl"><span class="w">        </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l">prom/node-exporter:v1.8.1</span><span class="w">
+</span></span></span><span class="line"><span class="ln">35</span><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="ln">36</span><span class="cl"><span class="w">        </span><span class="nt">ports</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln">37</span><span class="cl"><span class="w">        </span>- <span class="nt">containerPort</span><span class="p">:</span><span class="w"> </span><span class="m">9100</span><span class="w">
+</span></span></span><span class="line"><span class="ln">38</span><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="ln">39</span><span class="cl"><span class="w">        </span><span class="nt">resources</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln">40</span><span class="cl"><span class="w">          </span><span class="nt">requests</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln">41</span><span class="cl"><span class="w">            </span><span class="nt">cpu</span><span class="p">:</span><span class="w"> </span><span class="l">100m</span><span class="w">
+</span></span></span><span class="line"><span class="ln">42</span><span class="cl"><span class="w">            </span><span class="nt">memory</span><span class="p">:</span><span class="w"> </span><span class="l">100Mi</span><span class="w">
+</span></span></span><span class="line"><span class="ln">43</span><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="ln">44</span><span class="cl"><span class="w">        </span><span class="nt">volumeMounts</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln">45</span><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="ln">46</span><span class="cl"><span class="w">        </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">proc</span><span class="w">
+</span></span></span><span class="line"><span class="ln">47</span><span class="cl"><span class="w">          </span><span class="nt">mountPath</span><span class="p">:</span><span class="w"> </span><span class="l">/host/proc</span><span class="w">
+</span></span></span><span class="line"><span class="ln">48</span><span class="cl"><span class="w">          </span><span class="nt">readOnly</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
+</span></span></span><span class="line"><span class="ln">49</span><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="ln">50</span><span class="cl"><span class="w">        </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">sys</span><span class="w">
+</span></span></span><span class="line"><span class="ln">51</span><span class="cl"><span class="w">          </span><span class="nt">mountPath</span><span class="p">:</span><span class="w"> </span><span class="l">/host/sys</span><span class="w">
+</span></span></span><span class="line"><span class="ln">52</span><span class="cl"><span class="w">          </span><span class="nt">readOnly</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
+</span></span></span><span class="line"><span class="ln">53</span><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="ln">54</span><span class="cl"><span class="w">        </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">root</span><span class="w">
+</span></span></span><span class="line"><span class="ln">55</span><span class="cl"><span class="w">          </span><span class="nt">mountPath</span><span class="p">:</span><span class="w"> </span><span class="l">/host/root</span><span class="w">
+</span></span></span><span class="line"><span class="ln">56</span><span class="cl"><span class="w">          </span><span class="nt">readOnly</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
+</span></span></span><span class="line"><span class="ln">57</span><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="ln">58</span><span class="cl"><span class="w">      </span><span class="nt">volumes</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln">59</span><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="ln">60</span><span class="cl"><span class="w">      </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">proc</span><span class="w">
+</span></span></span><span class="line"><span class="ln">61</span><span class="cl"><span class="w">        </span><span class="nt">hostPath</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln">62</span><span class="cl"><span class="w">          </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l">/proc</span><span class="w">
+</span></span></span><span class="line"><span class="ln">63</span><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="ln">64</span><span class="cl"><span class="w">      </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">sys</span><span class="w">
+</span></span></span><span class="line"><span class="ln">65</span><span class="cl"><span class="w">        </span><span class="nt">hostPath</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln">66</span><span class="cl"><span class="w">          </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l">/sys</span><span class="w">
+</span></span></span><span class="line"><span class="ln">67</span><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="ln">68</span><span class="cl"><span class="w">      </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">root</span><span class="w">
+</span></span></span><span class="line"><span class="ln">69</span><span class="cl"><span class="w">        </span><span class="nt">hostPath</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln">70</span><span class="cl"><span class="w">          </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l">/</span><span class="w">
+</span></span></span></code></pre></div><hr>
+<h1 id="八fluentd-日志采集-daemonset">八、Fluentd 日志采集 DaemonSet</h1>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l">apps/v1</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="w"></span><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l">DaemonSet</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="w"></span><span class="nt">metadata</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">fluentd</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="ln"> 6</span><span class="cl"><span class="w"></span><span class="nt">spec</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="w">  </span><span class="nt">selector</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="w">    </span><span class="nt">matchLabels</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 9</span><span class="cl"><span class="w">      </span><span class="nt">app</span><span class="p">:</span><span class="w"> </span><span class="l">fluentd</span><span class="w">
+</span></span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="ln">11</span><span class="cl"><span class="w">  </span><span class="nt">template</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln">12</span><span class="cl"><span class="w">    </span><span class="nt">metadata</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln">13</span><span class="cl"><span class="w">      </span><span class="nt">labels</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln">14</span><span class="cl"><span class="w">        </span><span class="nt">app</span><span class="p">:</span><span class="w"> </span><span class="l">fluentd</span><span class="w">
+</span></span></span><span class="line"><span class="ln">15</span><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="ln">16</span><span class="cl"><span class="w">    </span><span class="nt">spec</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln">17</span><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="ln">18</span><span class="cl"><span class="w">      </span><span class="nt">tolerations</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln">19</span><span class="cl"><span class="w">      </span>- <span class="nt">operator</span><span class="p">:</span><span class="w"> </span><span class="l">Exists</span><span class="w">
+</span></span></span><span class="line"><span class="ln">20</span><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="ln">21</span><span class="cl"><span class="w">      </span><span class="nt">containers</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln">22</span><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="ln">23</span><span class="cl"><span class="w">      </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">fluentd</span><span class="w">
+</span></span></span><span class="line"><span class="ln">24</span><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="ln">25</span><span class="cl"><span class="w">        </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l">fluent/fluentd:v1.17</span><span class="w">
+</span></span></span><span class="line"><span class="ln">26</span><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="ln">27</span><span class="cl"><span class="w">        </span><span class="nt">volumeMounts</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln">28</span><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="ln">29</span><span class="cl"><span class="w">        </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">varlog</span><span class="w">
+</span></span></span><span class="line"><span class="ln">30</span><span class="cl"><span class="w">          </span><span class="nt">mountPath</span><span class="p">:</span><span class="w"> </span><span class="l">/var/log</span><span class="w">
+</span></span></span><span class="line"><span class="ln">31</span><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="ln">32</span><span class="cl"><span class="w">      </span><span class="nt">volumes</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln">33</span><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="ln">34</span><span class="cl"><span class="w">      </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">varlog</span><span class="w">
+</span></span></span><span class="line"><span class="ln">35</span><span class="cl"><span class="w">        </span><span class="nt">hostPath</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln">36</span><span class="cl"><span class="w">          </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l">/var/log</span><span class="w">
+</span></span></span></code></pre></div><hr>
+<h1 id="九calico-node-实际-daemonset">九、Calico-node 实际 DaemonSet</h1>
+<p>Calico 的核心组件就是一个 DaemonSet：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">calico-system
+</span></span><span class="line"><span class="ln">2</span><span class="cl">└── calico-node
+</span></span></code></pre></div><p>查看：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">kubectl get ds -A
+</span></span></code></pre></div><p>输出：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">NAMESPACE      NAME
+</span></span><span class="line"><span class="ln">2</span><span class="cl">calico-system  calico-node
+</span></span></code></pre></div><p>每个节点都会运行：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">kubectl get pods -n calico-system -o wide
+</span></span></code></pre></div><p>结果：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">calico-node-abcde
+</span></span><span class="line"><span class="ln">2</span><span class="cl">calico-node-fghij
+</span></span><span class="line"><span class="ln">3</span><span class="cl">calico-node-klmno
+</span></span></code></pre></div><p>数量与节点数相同。</p>
+<hr>
+<h1 id="十daemonset-与-deployment-对比">十、DaemonSet 与 Deployment 对比</h1>
+<table>
+  <thead>
+      <tr>
+          <th>对比项</th>
+          <th>Deployment</th>
+          <th>DaemonSet</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Pod 数量</td>
+          <td>replicas 指定</td>
+          <td>节点数决定</td>
+      </tr>
+      <tr>
+          <td>自动扩容</td>
+          <td>是</td>
+          <td>否</td>
+      </tr>
+      <tr>
+          <td>一个节点多个 Pod</td>
+          <td>可以</td>
+          <td>默认一个</td>
+      </tr>
+      <tr>
+          <td>新节点加入</td>
+          <td>不一定创建 Pod</td>
+          <td>自动创建</td>
+      </tr>
+      <tr>
+          <td>节点删除</td>
+          <td>不影响</td>
+          <td>自动删除对应 Pod</td>
+      </tr>
+      <tr>
+          <td>典型场景</td>
+          <td>Web、API、业务服务</td>
+          <td>日志、监控、网络插件</td>
+      </tr>
+      <tr>
+          <td>更新策略</td>
+          <td>RollingUpdate/Recreate</td>
+          <td>RollingUpdate/OnDelete</td>
+      </tr>
+      <tr>
+          <td>replicas 字段</td>
+          <td>有</td>
+          <td>没有</td>
+      </tr>
+      <tr>
+          <td>是否常配 hostPath</td>
+          <td>较少</td>
+          <td>非常常见</td>
+      </tr>
+      <tr>
+          <td>是否常配 hostNetwork</td>
+          <td>较少</td>
+          <td>很常见</td>
+      </tr>
+  </tbody>
+</table>
+<hr>
+<h1 id="十一生产环境最常见-daemonset">十一、生产环境最常见 DaemonSet</h1>
+<table>
+  <thead>
+      <tr>
+          <th>组件</th>
+          <th>功能</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>calico-node</td>
+          <td>网络插件</td>
+      </tr>
+      <tr>
+          <td>kube-proxy</td>
+          <td>Service 转发</td>
+      </tr>
+      <tr>
+          <td>node-exporter</td>
+          <td>节点监控</td>
+      </tr>
+      <tr>
+          <td>fluentd</td>
+          <td>日志采集</td>
+      </tr>
+      <tr>
+          <td>filebeat</td>
+          <td>日志采集</td>
+      </tr>
+      <tr>
+          <td>metricbeat</td>
+          <td>指标采集</td>
+      </tr>
+      <tr>
+          <td>csi-node</td>
+          <td>存储插件</td>
+      </tr>
+      <tr>
+          <td>longhorn-manager</td>
+          <td>Longhorn 存储</td>
+      </tr>
+      <tr>
+          <td>falco</td>
+          <td>安全监控</td>
+      </tr>
+      <tr>
+          <td>osquery</td>
+          <td>主机安全</td>
+      </tr>
+  </tbody>
+</table>
+<hr>
+<h1 id="daemonset-层级结构">DaemonSet 层级结构</h1>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln"> 1</span><span class="cl">DaemonSet
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl">│
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl">├── metadata
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl">│
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl">└── spec
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">    ├── selector
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl">    ├── updateStrategy
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl">    │     ├── RollingUpdate
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">    │     └── OnDelete
+</span></span><span class="line"><span class="ln">10</span><span class="cl">    │
+</span></span><span class="line"><span class="ln">11</span><span class="cl">    └── template
+</span></span><span class="line"><span class="ln">12</span><span class="cl">          │
+</span></span><span class="line"><span class="ln">13</span><span class="cl">          ├── metadata
+</span></span><span class="line"><span class="ln">14</span><span class="cl">          │     └── labels
+</span></span><span class="line"><span class="ln">15</span><span class="cl">          │
+</span></span><span class="line"><span class="ln">16</span><span class="cl">          └── spec
+</span></span><span class="line"><span class="ln">17</span><span class="cl">                ├── containers
+</span></span><span class="line"><span class="ln">18</span><span class="cl">                │     ├── image
+</span></span><span class="line"><span class="ln">19</span><span class="cl">                │     ├── ports
+</span></span><span class="line"><span class="ln">20</span><span class="cl">                │     ├── env
+</span></span><span class="line"><span class="ln">21</span><span class="cl">                │     ├── resources
+</span></span><span class="line"><span class="ln">22</span><span class="cl">                │     ├── probes
+</span></span><span class="line"><span class="ln">23</span><span class="cl">                │     └── volumeMounts
+</span></span><span class="line"><span class="ln">24</span><span class="cl">                │
+</span></span><span class="line"><span class="ln">25</span><span class="cl">                ├── hostNetwork
+</span></span><span class="line"><span class="ln">26</span><span class="cl">                ├── hostPID
+</span></span><span class="line"><span class="ln">27</span><span class="cl">                ├── hostIPC
+</span></span><span class="line"><span class="ln">28</span><span class="cl">                ├── nodeSelector
+</span></span><span class="line"><span class="ln">29</span><span class="cl">                ├── affinity
+</span></span><span class="line"><span class="ln">30</span><span class="cl">                ├── tolerations
+</span></span><span class="line"><span class="ln">31</span><span class="cl">                ├── serviceAccountName
+</span></span><span class="line"><span class="ln">32</span><span class="cl">                ├── imagePullSecrets
+</span></span><span class="line"><span class="ln">33</span><span class="cl">                └── volumes
+</span></span><span class="line"><span class="ln">34</span><span class="cl">                        ├── hostPath
+</span></span><span class="line"><span class="ln">35</span><span class="cl">                        ├── configMap
+</span></span><span class="line"><span class="ln">36</span><span class="cl">                        ├── secret
+</span></span><span class="line"><span class="ln">37</span><span class="cl">                        └── pvc
+</span></span></code></pre></div><p>在 Kubernetes 核心组件中，<code>kube-proxy</code>、<code>calico-node</code> 都是 DaemonSet，因此 DaemonSet 可以说是学习 Kubernetes 网络和节点插件时最重要的控制器之一。</p>
 <hr>
 <h1 id="job和cronjob任务和定时任务资源对象"><strong>Job和CronJob(任务和定时任务)资源对象</strong></h1>
 <blockquote>
 <p>管理一次性任务或定期执行的任务</p>
 </blockquote>
+<h1 id="kubernetes-job-与-cronjob-资源详解"><strong>Kubernetes Job 与 CronJob 资源详解</strong></h1>
+<p>Job 和 CronJob 是 Kubernetes 中专门用于执行 <strong>一次性任务</strong> 和 <strong>周期性任务</strong> 的控制器。</p>
+<p>它们与 Deployment、StatefulSet、DaemonSet 的最大区别在于：</p>
+<blockquote>
+<p>Job/CronJob 关注的是 <strong>任务是否执行完成</strong>，而不是一直保持 Pod 存活。</p>
+</blockquote>
+<hr>
+<h1 id="一job-与-cronjob-的定位">一、Job 与 CronJob 的定位</h1>
+<h2 id="deployment">Deployment</h2>
+<p>适用于长期运行服务：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">nginx
+</span></span><span class="line"><span class="ln">2</span><span class="cl">mysql
+</span></span><span class="line"><span class="ln">3</span><span class="cl">redis
+</span></span><span class="line"><span class="ln">4</span><span class="cl">springboot
+</span></span></code></pre></div><p>特点：</p>
+<ul>
+<li>Pod 挂掉自动重建</li>
+<li>一直保持运行</li>
+</ul>
+<hr>
+<h2 id="job">Job</h2>
+<p>适用于：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">数据导入
+</span></span><span class="line"><span class="ln">2</span><span class="cl">数据库初始化
+</span></span><span class="line"><span class="ln">3</span><span class="cl">备份任务
+</span></span><span class="line"><span class="ln">4</span><span class="cl">批处理任务
+</span></span><span class="line"><span class="ln">5</span><span class="cl">脚本执行
+</span></span><span class="line"><span class="ln">6</span><span class="cl">AI训练任务
+</span></span></code></pre></div><p>特点：</p>
+<ul>
+<li>执行完成后结束</li>
+<li>不会一直运行</li>
+</ul>
+<p>例如：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln"> 1</span><span class="cl">执行：
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl">python import.py
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl">↓
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl">任务结束
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">↓
+</span></span><span class="line"><span class="ln">10</span><span class="cl">
+</span></span><span class="line"><span class="ln">11</span><span class="cl">Pod状态：
+</span></span><span class="line"><span class="ln">12</span><span class="cl">
+</span></span><span class="line"><span class="ln">13</span><span class="cl">Completed
+</span></span></code></pre></div><hr>
+<h2 id="cronjob">CronJob</h2>
+<p>适用于：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">每天备份数据库
+</span></span><span class="line"><span class="ln">2</span><span class="cl">每小时同步数据
+</span></span><span class="line"><span class="ln">3</span><span class="cl">每周生成报表
+</span></span><span class="line"><span class="ln">4</span><span class="cl">定时清理日志
+</span></span></code></pre></div><p>类似 Linux：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">crontab
+</span></span></code></pre></div><hr>
+<h1 id="二job-工作原理">二、Job 工作原理</h1>
+<p>例如：</p>
+<p>执行：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl"><span class="nb">echo</span> hello
+</span></span></code></pre></div><p>流程：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln"> 1</span><span class="cl">Job
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl"> │
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl"> ↓
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl">Pod
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl"> │
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl"> ↓
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl">容器运行
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl"> │
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl"> ↓
+</span></span><span class="line"><span class="ln">10</span><span class="cl">退出码=0
+</span></span><span class="line"><span class="ln">11</span><span class="cl"> │
+</span></span><span class="line"><span class="ln">12</span><span class="cl"> ↓
+</span></span><span class="line"><span class="ln">13</span><span class="cl">Pod Completed
+</span></span><span class="line"><span class="ln">14</span><span class="cl"> │
+</span></span><span class="line"><span class="ln">15</span><span class="cl"> ↓
+</span></span><span class="line"><span class="ln">16</span><span class="cl">Job Complete
+</span></span></code></pre></div><p>查看：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">kubectl get <span class="nb">jobs</span>
+</span></span></code></pre></div><p>输出：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">NAME       COMPLETIONS   DURATION   AGE
+</span></span><span class="line"><span class="ln">2</span><span class="cl">my-job     1/1           5s         1m
+</span></span></code></pre></div><p>查看 Pod：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">kubectl get pod
+</span></span></code></pre></div><p>输出：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">NAME             STATUS
+</span></span><span class="line"><span class="ln">2</span><span class="cl">my-job-l8w9x     Completed
+</span></span></code></pre></div><hr>
+<h1 id="三job-yaml-结构">三、Job YAML 结构</h1>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="ln">1</span><span class="cl"><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l">batch/v1</span><span class="w">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="w"></span><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l">Job</span><span class="w">
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="w"></span><span class="nt">metadata</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="w"></span><span class="nt">spec</span><span class="p">:</span><span class="w">
+</span></span></span></code></pre></div><p>完整结构：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="ln">1</span><span class="cl"><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l">batch/v1</span><span class="w">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="w"></span><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l">Job</span><span class="w">
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="w"></span><span class="nt">metadata</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="w">  </span><span class="l">...</span><span class="w">
+</span></span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="w"></span><span class="nt">spec</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln">6</span><span class="cl"><span class="w">  </span><span class="l">...</span><span class="w">
+</span></span></span></code></pre></div><hr>
+<h1 id="四job-常见字段">四、Job 常见字段</h1>
+<h2 id="metadata">metadata</h2>
+<p>与其他资源一致：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="ln">1</span><span class="cl"><span class="nt">metadata</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="w">  </span><span class="nt">namespace</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="w">  </span><span class="nt">labels</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="w">  </span><span class="nt">annotations</span><span class="p">:</span><span class="w">
+</span></span></span></code></pre></div><hr>
+<h2 id="template">template</h2>
+<p>定义 Pod 模板：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="ln">1</span><span class="cl"><span class="nt">spec</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="w">  </span><span class="nt">template</span><span class="p">:</span><span class="w">
+</span></span></span></code></pre></div><p>内部：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="ln">1</span><span class="cl"><span class="nt">template</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="w">  </span><span class="nt">metadata</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="w">  </span><span class="nt">spec</span><span class="p">:</span><span class="w">
+</span></span></span></code></pre></div><hr>
+<h2 id="containers-1">containers</h2>
+<p>定义任务容器：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="ln">1</span><span class="cl"><span class="nt">containers</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="w"></span>- <span class="nt">name</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="w">  </span><span class="nt">image</span><span class="p">:</span><span class="w">
+</span></span></span></code></pre></div><hr>
+<h2 id="restartpolicy-1">restartPolicy</h2>
+<p>Job 中只能是：</p>
+<h3 id="never">Never</h3>
+<p>失败不重启：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="ln">1</span><span class="cl"><span class="nt">restartPolicy</span><span class="p">:</span><span class="w"> </span><span class="l">Never</span><span class="w">
+</span></span></span></code></pre></div><hr>
+<h3 id="onfailure">OnFailure</h3>
+<p>失败自动重启：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="ln">1</span><span class="cl"><span class="nt">restartPolicy</span><span class="p">:</span><span class="w"> </span><span class="l">OnFailure</span><span class="w">
+</span></span></span></code></pre></div><p>最常用。</p>
+<hr>
+<h1 id="五最简单-job-示例">五、最简单 Job 示例</h1>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l">batch/v1</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="w"></span><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l">Job</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="w"></span><span class="nt">metadata</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">hello-job</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="ln"> 6</span><span class="cl"><span class="w"></span><span class="nt">spec</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="w">  </span><span class="nt">template</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 9</span><span class="cl"><span class="w">    </span><span class="nt">spec</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="ln">11</span><span class="cl"><span class="w">      </span><span class="nt">containers</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln">12</span><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="ln">13</span><span class="cl"><span class="w">      </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">hello</span><span class="w">
+</span></span></span><span class="line"><span class="ln">14</span><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="ln">15</span><span class="cl"><span class="w">        </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l">busybox</span><span class="w">
+</span></span></span><span class="line"><span class="ln">16</span><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="ln">17</span><span class="cl"><span class="w">        </span><span class="nt">command</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln">18</span><span class="cl"><span class="w">        </span>- <span class="l">sh</span><span class="w">
+</span></span></span><span class="line"><span class="ln">19</span><span class="cl"><span class="w">        </span>- -<span class="l">c</span><span class="w">
+</span></span></span><span class="line"><span class="ln">20</span><span class="cl"><span class="w">        </span>- <span class="l">echo &#34;hello kubernetes&#34;</span><span class="w">
+</span></span></span><span class="line"><span class="ln">21</span><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="ln">22</span><span class="cl"><span class="w">      </span><span class="nt">restartPolicy</span><span class="p">:</span><span class="w"> </span><span class="l">Never</span><span class="w">
+</span></span></span></code></pre></div><p>创建：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">kubectl apply -f job.yaml
+</span></span></code></pre></div><p>查看：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">kubectl get <span class="nb">jobs</span>
+</span></span></code></pre></div><p>查看日志：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">kubectl logs pod-name
+</span></span></code></pre></div><hr>
+<h1 id="六completions">六、completions</h1>
+<p>表示成功完成多少次。</p>
+<p>例如：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="ln">1</span><span class="cl"><span class="nt">spec</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="w">  </span><span class="nt">completions</span><span class="p">:</span><span class="w"> </span><span class="m">3</span><span class="w">
+</span></span></span></code></pre></div><p>表示：</p>
+<p>需要成功执行 3 次。</p>
+<p>流程：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">Pod1 → Success
+</span></span><span class="line"><span class="ln">2</span><span class="cl">
+</span></span><span class="line"><span class="ln">3</span><span class="cl">Pod2 → Success
+</span></span><span class="line"><span class="ln">4</span><span class="cl">
+</span></span><span class="line"><span class="ln">5</span><span class="cl">Pod3 → Success
+</span></span><span class="line"><span class="ln">6</span><span class="cl">
+</span></span><span class="line"><span class="ln">7</span><span class="cl">↓
+</span></span><span class="line"><span class="ln">8</span><span class="cl">
+</span></span><span class="line"><span class="ln">9</span><span class="cl">Job Complete
+</span></span></code></pre></div><p>查看：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">3/3
+</span></span></code></pre></div><hr>
+<h1 id="七parallelism">七、parallelism</h1>
+<p>并行执行数量。</p>
+<p>例如：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="ln">1</span><span class="cl"><span class="nt">parallelism</span><span class="p">:</span><span class="w"> </span><span class="m">2</span><span class="w">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="w"></span><span class="nt">completions</span><span class="p">:</span><span class="w"> </span><span class="m">6</span><span class="w">
+</span></span></span></code></pre></div><p>表示：</p>
+<p>最多同时运行两个 Pod。</p>
+<p>执行过程：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln"> 1</span><span class="cl">Pod1 Pod2
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl">完成
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl">Pod3 Pod4
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl">完成
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">Pod5 Pod6
+</span></span><span class="line"><span class="ln">10</span><span class="cl">
+</span></span><span class="line"><span class="ln">11</span><span class="cl">完成
+</span></span></code></pre></div><hr>
+<h3 id="默认">默认</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="ln">1</span><span class="cl"><span class="nt">parallelism</span><span class="p">:</span><span class="w"> </span><span class="m">1</span><span class="w">
+</span></span></span></code></pre></div><p>串行执行。</p>
+<hr>
+<h1 id="八backofflimit">八、backoffLimit</h1>
+<p>失败重试次数。</p>
+<p>默认：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="ln">1</span><span class="cl"><span class="nt">backoffLimit</span><span class="p">:</span><span class="w"> </span><span class="m">6</span><span class="w">
+</span></span></span></code></pre></div><p>例如：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="ln">1</span><span class="cl"><span class="nt">backoffLimit</span><span class="p">:</span><span class="w"> </span><span class="m">3</span><span class="w">
+</span></span></span></code></pre></div><p>流程：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln"> 1</span><span class="cl">失败
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl">第一次重试
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl">失败
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl">第二次重试
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">失败
+</span></span><span class="line"><span class="ln">10</span><span class="cl">
+</span></span><span class="line"><span class="ln">11</span><span class="cl">第三次重试
+</span></span><span class="line"><span class="ln">12</span><span class="cl">
+</span></span><span class="line"><span class="ln">13</span><span class="cl">失败
+</span></span><span class="line"><span class="ln">14</span><span class="cl">
+</span></span><span class="line"><span class="ln">15</span><span class="cl">↓
+</span></span><span class="line"><span class="ln">16</span><span class="cl">
+</span></span><span class="line"><span class="ln">17</span><span class="cl">Job Failed
+</span></span></code></pre></div><p>查看：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">kubectl describe job myjob
+</span></span></code></pre></div><p>事件：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">BackoffLimitExceeded
+</span></span></code></pre></div><hr>
+<h1 id="九activedeadlineseconds">九、activeDeadlineSeconds</h1>
+<p>任务最长运行时间。</p>
+<p>例如：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="ln">1</span><span class="cl"><span class="nt">activeDeadlineSeconds</span><span class="p">:</span><span class="w"> </span><span class="m">300</span><span class="w">
+</span></span></span></code></pre></div><p>表示：</p>
+<p>5分钟后强制终止。</p>
+<p>流程：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln"> 1</span><span class="cl">任务运行
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl">超过300秒
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl">↓
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl">Kill Pod
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">↓
+</span></span><span class="line"><span class="ln">10</span><span class="cl">
+</span></span><span class="line"><span class="ln">11</span><span class="cl">Job Failed
+</span></span></code></pre></div><hr>
+<h1 id="十ttlsecondsafterfinished">十、ttlSecondsAfterFinished</h1>
+<p>任务完成后自动删除。</p>
+<p>例如：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="ln">1</span><span class="cl"><span class="nt">ttlSecondsAfterFinished</span><span class="p">:</span><span class="w"> </span><span class="m">300</span><span class="w">
+</span></span></span></code></pre></div><p>表示：</p>
+<p>5分钟后自动删除 Job。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln"> 1</span><span class="cl">Job完成
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl">↓
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl">等待300秒
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl">↓
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">Job删除
+</span></span><span class="line"><span class="ln">10</span><span class="cl">
+</span></span><span class="line"><span class="ln">11</span><span class="cl">↓
+</span></span><span class="line"><span class="ln">12</span><span class="cl">
+</span></span><span class="line"><span class="ln">13</span><span class="cl">Pod删除
+</span></span></code></pre></div><p>非常推荐生产环境配置。</p>
+<hr>
+<h1 id="十一并行-job-示例">十一、并行 Job 示例</h1>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l">batch/v1</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="w"></span><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l">Job</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="w"></span><span class="nt">metadata</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">parallel-job</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 6</span><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="w"></span><span class="nt">spec</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="ln"> 9</span><span class="cl"><span class="w">  </span><span class="nt">completions</span><span class="p">:</span><span class="w"> </span><span class="m">6</span><span class="w">
+</span></span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="ln">11</span><span class="cl"><span class="w">  </span><span class="nt">parallelism</span><span class="p">:</span><span class="w"> </span><span class="m">2</span><span class="w">
+</span></span></span><span class="line"><span class="ln">12</span><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="ln">13</span><span class="cl"><span class="w">  </span><span class="nt">backoffLimit</span><span class="p">:</span><span class="w"> </span><span class="m">3</span><span class="w">
+</span></span></span><span class="line"><span class="ln">14</span><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="ln">15</span><span class="cl"><span class="w">  </span><span class="nt">template</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln">16</span><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="ln">17</span><span class="cl"><span class="w">    </span><span class="nt">spec</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln">18</span><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="ln">19</span><span class="cl"><span class="w">      </span><span class="nt">containers</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln">20</span><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="ln">21</span><span class="cl"><span class="w">      </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">worker</span><span class="w">
+</span></span></span><span class="line"><span class="ln">22</span><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="ln">23</span><span class="cl"><span class="w">        </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l">busybox</span><span class="w">
+</span></span></span><span class="line"><span class="ln">24</span><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="ln">25</span><span class="cl"><span class="w">        </span><span class="nt">command</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln">26</span><span class="cl"><span class="w">        </span>- <span class="l">sh</span><span class="w">
+</span></span></span><span class="line"><span class="ln">27</span><span class="cl"><span class="w">        </span>- -<span class="l">c</span><span class="w">
+</span></span></span><span class="line"><span class="ln">28</span><span class="cl"><span class="w">        </span>- <span class="l">sleep 10</span><span class="w">
+</span></span></span><span class="line"><span class="ln">29</span><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="ln">30</span><span class="cl"><span class="w">      </span><span class="nt">restartPolicy</span><span class="p">:</span><span class="w"> </span><span class="l">OnFailure</span><span class="w">
+</span></span></span></code></pre></div><p>执行：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">同时2个Pod
+</span></span><span class="line"><span class="ln">2</span><span class="cl">
+</span></span><span class="line"><span class="ln">3</span><span class="cl">总共6次
+</span></span><span class="line"><span class="ln">4</span><span class="cl">
+</span></span><span class="line"><span class="ln">5</span><span class="cl">成功后结束
+</span></span></code></pre></div><hr>
+<h1 id="十二cronjob">十二、CronJob</h1>
+<p>CronJob = Job + 定时器。</p>
+<p>关系：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln"> 1</span><span class="cl">CronJob
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl">每隔一段时间
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl">↓
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl">创建 Job
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">↓
+</span></span><span class="line"><span class="ln">10</span><span class="cl">
+</span></span><span class="line"><span class="ln">11</span><span class="cl">创建 Pod
+</span></span><span class="line"><span class="ln">12</span><span class="cl">
+</span></span><span class="line"><span class="ln">13</span><span class="cl">↓
+</span></span><span class="line"><span class="ln">14</span><span class="cl">
+</span></span><span class="line"><span class="ln">15</span><span class="cl">执行完成
+</span></span></code></pre></div><p>即：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">CronJob
+</span></span><span class="line"><span class="ln">2</span><span class="cl">   ↓
+</span></span><span class="line"><span class="ln">3</span><span class="cl"> Job
+</span></span><span class="line"><span class="ln">4</span><span class="cl">   ↓
+</span></span><span class="line"><span class="ln">5</span><span class="cl"> Pod
+</span></span></code></pre></div><hr>
+<h1 id="十三cronjob-yaml-结构">十三、CronJob YAML 结构</h1>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="ln">1</span><span class="cl"><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l">batch/v1</span><span class="w">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="w"></span><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l">CronJob</span><span class="w">
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="w"></span><span class="nt">metadata</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="w"></span><span class="nt">spec</span><span class="p">:</span><span class="w">
+</span></span></span></code></pre></div><hr>
+<h1 id="十四schedule">十四、schedule</h1>
+<p>定时表达式。</p>
+<p>例如：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="ln">1</span><span class="cl"><span class="nt">schedule</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;*/5 * * * *&#34;</span><span class="w">
+</span></span></span></code></pre></div><p>表示：</p>
+<p>每5分钟执行一次。</p>
+<hr>
+<h3 id="格式">格式</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">分 时 日 月 星期
+</span></span></code></pre></div><p>共五位：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">* * * * *
+</span></span></code></pre></div><hr>
+<h3 id="常见示例">常见示例</h3>
+<h4 id="每分钟">每分钟</h4>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="ln">1</span><span class="cl"><span class="s2">&#34;* * * * *&#34;</span><span class="w">
+</span></span></span></code></pre></div><hr>
+<h4 id="每5分钟">每5分钟</h4>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="ln">1</span><span class="cl"><span class="s2">&#34;*/5 * * * *&#34;</span><span class="w">
+</span></span></span></code></pre></div><hr>
+<h4 id="每小时">每小时</h4>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="ln">1</span><span class="cl"><span class="s2">&#34;0 * * * *&#34;</span><span class="w">
+</span></span></span></code></pre></div><hr>
+<h4 id="每天凌晨1点">每天凌晨1点</h4>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="ln">1</span><span class="cl"><span class="s2">&#34;0 1 * * *&#34;</span><span class="w">
+</span></span></span></code></pre></div><hr>
+<h4 id="每周一凌晨2点">每周一凌晨2点</h4>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="ln">1</span><span class="cl"><span class="s2">&#34;0 2 * * 1&#34;</span><span class="w">
+</span></span></span></code></pre></div><hr>
+<h4 id="每月1号">每月1号</h4>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="ln">1</span><span class="cl"><span class="s2">&#34;0 0 1 * *&#34;</span><span class="w">
+</span></span></span></code></pre></div><hr>
+<h1 id="十五concurrencypolicy">十五、concurrencyPolicy</h1>
+<p>控制并发任务。</p>
+<p>支持：</p>
+<h3 id="allow">Allow</h3>
+<p>默认。</p>
+<p>允许多个任务同时运行。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="ln">1</span><span class="cl"><span class="nt">concurrencyPolicy</span><span class="p">:</span><span class="w"> </span><span class="l">Allow</span><span class="w">
+</span></span></span></code></pre></div><p>例如：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">1:00开始
+</span></span><span class="line"><span class="ln">2</span><span class="cl">
+</span></span><span class="line"><span class="ln">3</span><span class="cl">任务还没结束
+</span></span><span class="line"><span class="ln">4</span><span class="cl">
+</span></span><span class="line"><span class="ln">5</span><span class="cl">1:05再次启动
+</span></span></code></pre></div><p>两个任务同时存在。</p>
+<hr>
+<h3 id="forbid">Forbid</h3>
+<p>禁止并发。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="ln">1</span><span class="cl"><span class="nt">concurrencyPolicy</span><span class="p">:</span><span class="w"> </span><span class="l">Forbid</span><span class="w">
+</span></span></span></code></pre></div><p>前一个任务没结束：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">跳过下一次调度
+</span></span></code></pre></div><hr>
+<h3 id="replace">Replace</h3>
+<p>替换旧任务。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="ln">1</span><span class="cl"><span class="nt">concurrencyPolicy</span><span class="p">:</span><span class="w"> </span><span class="l">Replace</span><span class="w">
+</span></span></span></code></pre></div><p>新任务到来：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">删除旧任务
+</span></span><span class="line"><span class="ln">2</span><span class="cl">
+</span></span><span class="line"><span class="ln">3</span><span class="cl">↓
+</span></span><span class="line"><span class="ln">4</span><span class="cl">
+</span></span><span class="line"><span class="ln">5</span><span class="cl">启动新任务
+</span></span></code></pre></div><hr>
+<h1 id="十六suspend">十六、suspend</h1>
+<p>暂停 CronJob。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="ln">1</span><span class="cl"><span class="nt">suspend</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
+</span></span></span></code></pre></div><p>暂停：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">不再创建 Job
+</span></span></code></pre></div><p>恢复：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="ln">1</span><span class="cl"><span class="nt">suspend</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="w">
+</span></span></span></code></pre></div><hr>
+<h1 id="十七successfuljobshistorylimit">十七、successfulJobsHistoryLimit</h1>
+<p>保留成功 Job 数量。</p>
+<p>例如：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="ln">1</span><span class="cl"><span class="nt">successfulJobsHistoryLimit</span><span class="p">:</span><span class="w"> </span><span class="m">3</span><span class="w">
+</span></span></span></code></pre></div><p>默认：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="ln">1</span><span class="cl"><span class="m">3</span><span class="w">
+</span></span></span></code></pre></div><hr>
+<h1 id="十八failedjobshistorylimit">十八、failedJobsHistoryLimit</h1>
+<p>保留失败 Job 数量。</p>
+<p>例如：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="ln">1</span><span class="cl"><span class="nt">failedJobsHistoryLimit</span><span class="p">:</span><span class="w"> </span><span class="m">1</span><span class="w">
+</span></span></span></code></pre></div><p>默认：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="ln">1</span><span class="cl"><span class="m">1</span><span class="w">
+</span></span></span></code></pre></div><hr>
+<h1 id="十九startingdeadlineseconds">十九、startingDeadlineSeconds</h1>
+<p>错过调度后的补偿时间。</p>
+<p>例如：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="ln">1</span><span class="cl"><span class="nt">startingDeadlineSeconds</span><span class="p">:</span><span class="w"> </span><span class="m">60</span><span class="w">
+</span></span></span></code></pre></div><p>表示：</p>
+<p>错过任务后：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">60秒内补执行
+</span></span></code></pre></div><p>超过：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">直接跳过
+</span></span></code></pre></div><hr>
+<h1 id="二十cronjob-完整示例">二十、CronJob 完整示例</h1>
+<p>每5分钟执行一次：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l">batch/v1</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="w"></span><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l">CronJob</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="w"></span><span class="nt">metadata</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">backup-job</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 6</span><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="w"></span><span class="nt">spec</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="ln"> 9</span><span class="cl"><span class="w">  </span><span class="nt">schedule</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;*/5 * * * *&#34;</span><span class="w">
+</span></span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="ln">11</span><span class="cl"><span class="w">  </span><span class="nt">concurrencyPolicy</span><span class="p">:</span><span class="w"> </span><span class="l">Forbid</span><span class="w">
+</span></span></span><span class="line"><span class="ln">12</span><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="ln">13</span><span class="cl"><span class="w">  </span><span class="nt">successfulJobsHistoryLimit</span><span class="p">:</span><span class="w"> </span><span class="m">3</span><span class="w">
+</span></span></span><span class="line"><span class="ln">14</span><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="ln">15</span><span class="cl"><span class="w">  </span><span class="nt">failedJobsHistoryLimit</span><span class="p">:</span><span class="w"> </span><span class="m">1</span><span class="w">
+</span></span></span><span class="line"><span class="ln">16</span><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="ln">17</span><span class="cl"><span class="w">  </span><span class="nt">jobTemplate</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln">18</span><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="ln">19</span><span class="cl"><span class="w">    </span><span class="nt">spec</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln">20</span><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="ln">21</span><span class="cl"><span class="w">      </span><span class="nt">backoffLimit</span><span class="p">:</span><span class="w"> </span><span class="m">3</span><span class="w">
+</span></span></span><span class="line"><span class="ln">22</span><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="ln">23</span><span class="cl"><span class="w">      </span><span class="nt">template</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln">24</span><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="ln">25</span><span class="cl"><span class="w">        </span><span class="nt">spec</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln">26</span><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="ln">27</span><span class="cl"><span class="w">          </span><span class="nt">containers</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln">28</span><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="ln">29</span><span class="cl"><span class="w">          </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">backup</span><span class="w">
+</span></span></span><span class="line"><span class="ln">30</span><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="ln">31</span><span class="cl"><span class="w">            </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l">busybox</span><span class="w">
+</span></span></span><span class="line"><span class="ln">32</span><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="ln">33</span><span class="cl"><span class="w">            </span><span class="nt">command</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln">34</span><span class="cl"><span class="w">            </span>- <span class="l">sh</span><span class="w">
+</span></span></span><span class="line"><span class="ln">35</span><span class="cl"><span class="w">            </span>- -<span class="l">c</span><span class="w">
+</span></span></span><span class="line"><span class="ln">36</span><span class="cl"><span class="w">            </span>- <span class="l">date</span><span class="w">
+</span></span></span><span class="line"><span class="ln">37</span><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="ln">38</span><span class="cl"><span class="w">          </span><span class="nt">restartPolicy</span><span class="p">:</span><span class="w"> </span><span class="l">OnFailure</span><span class="w">
+</span></span></span></code></pre></div><hr>
+<h1 id="二十一查看-cronjob">二十一、查看 CronJob</h1>
+<p>查看：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">kubectl get cronjob
+</span></span></code></pre></div><p>输出：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">NAME          SCHEDULE
+</span></span><span class="line"><span class="ln">2</span><span class="cl">backup-job    */5 * * * *
+</span></span></code></pre></div><p>查看 Job：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">kubectl get <span class="nb">jobs</span>
+</span></span></code></pre></div><p>查看 Pod：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">kubectl get pod
+</span></span></code></pre></div><p>查看日志：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">kubectl logs pod-name
+</span></span></code></pre></div><hr>
+<h1 id="二十二实际生产中的-cronjob">二十二、实际生产中的 CronJob</h1>
+<h3 id="mysql备份">MySQL备份</h3>
+<p>每天凌晨：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">0 2 * * *
+</span></span></code></pre></div><p>执行：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">mysqldump
+</span></span></code></pre></div><hr>
+<h3 id="清理日志">清理日志</h3>
+<p>每天：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">0 0 * * *
+</span></span></code></pre></div><p>执行：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">find /log -mtime +7 -delete
+</span></span></code></pre></div><hr>
+<h3 id="同步数据">同步数据</h3>
+<p>每10分钟：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">*/10 * * * *
+</span></span></code></pre></div><p>执行：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">sync.sh
+</span></span></code></pre></div><hr>
+<h3 id="etl任务">ETL任务</h3>
+<p>每小时：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">0 * * * *
+</span></span></code></pre></div><p>执行：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">etl.py
+</span></span></code></pre></div><hr>
+<h1 id="二十三job-与-cronjob-对比">二十三、Job 与 CronJob 对比</h1>
+<table>
+  <thead>
+      <tr>
+          <th>项目</th>
+          <th>Job</th>
+          <th>CronJob</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>API版本</td>
+          <td>batch/v1</td>
+          <td>batch/v1</td>
+      </tr>
+      <tr>
+          <td>执行方式</td>
+          <td>一次性</td>
+          <td>周期性</td>
+      </tr>
+      <tr>
+          <td>是否自动调度</td>
+          <td>否</td>
+          <td>是</td>
+      </tr>
+      <tr>
+          <td>是否产生 Pod</td>
+          <td>是</td>
+          <td>是</td>
+      </tr>
+      <tr>
+          <td>是否产生 Job</td>
+          <td>自身就是 Job</td>
+          <td>创建 Job</td>
+      </tr>
+      <tr>
+          <td>支持并发</td>
+          <td>是</td>
+          <td>是</td>
+      </tr>
+      <tr>
+          <td>支持失败重试</td>
+          <td>是</td>
+          <td>是</td>
+      </tr>
+      <tr>
+          <td>类似 Linux</td>
+          <td>shell脚本</td>
+          <td>crontab</td>
+      </tr>
+      <tr>
+          <td>常见场景</td>
+          <td>初始化、导入数据</td>
+          <td>定时备份、日志清理</td>
+      </tr>
+  </tbody>
+</table>
+<hr>
+<h1 id="二十四四大控制器对比">二十四、四大控制器对比</h1>
+<table>
+  <thead>
+      <tr>
+          <th>控制器</th>
+          <th>作用</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Deployment</td>
+          <td>长期运行服务</td>
+      </tr>
+      <tr>
+          <td>StatefulSet</td>
+          <td>有状态服务</td>
+      </tr>
+      <tr>
+          <td>DaemonSet</td>
+          <td>每节点一个 Pod</td>
+      </tr>
+      <tr>
+          <td>Job</td>
+          <td>一次性任务</td>
+      </tr>
+      <tr>
+          <td>CronJob</td>
+          <td>周期性任务</td>
+      </tr>
+  </tbody>
+</table>
+<hr>
+<h1 id="二十五层级结构图">二十五、层级结构图</h1>
+<h3 id="job-1">Job</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln"> 1</span><span class="cl">Job
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl">│
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl">├── metadata
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl">│
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl">└── spec
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">      ├── completions
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl">      ├── parallelism
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl">      ├── backoffLimit
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">      ├── activeDeadlineSeconds
+</span></span><span class="line"><span class="ln">10</span><span class="cl">      ├── ttlSecondsAfterFinished
+</span></span><span class="line"><span class="ln">11</span><span class="cl">      │
+</span></span><span class="line"><span class="ln">12</span><span class="cl">      └── template
+</span></span><span class="line"><span class="ln">13</span><span class="cl">            └── spec
+</span></span><span class="line"><span class="ln">14</span><span class="cl">                  ├── containers
+</span></span><span class="line"><span class="ln">15</span><span class="cl">                  └── restartPolicy
+</span></span></code></pre></div><hr>
+<h3 id="cronjob-1">CronJob</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln"> 1</span><span class="cl">CronJob
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl">│
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl">├── metadata
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl">│
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl">└── spec
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">      ├── schedule
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl">      ├── concurrencyPolicy
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl">      ├── suspend
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">      ├── startingDeadlineSeconds
+</span></span><span class="line"><span class="ln">10</span><span class="cl">      ├── successfulJobsHistoryLimit
+</span></span><span class="line"><span class="ln">11</span><span class="cl">      ├── failedJobsHistoryLimit
+</span></span><span class="line"><span class="ln">12</span><span class="cl">      │
+</span></span><span class="line"><span class="ln">13</span><span class="cl">      └── jobTemplate
+</span></span><span class="line"><span class="ln">14</span><span class="cl">              │
+</span></span><span class="line"><span class="ln">15</span><span class="cl">              └── spec
+</span></span><span class="line"><span class="ln">16</span><span class="cl">                    │
+</span></span><span class="line"><span class="ln">17</span><span class="cl">                    └── Job
+</span></span><span class="line"><span class="ln">18</span><span class="cl">                           │
+</span></span><span class="line"><span class="ln">19</span><span class="cl">                           └── Pod
+</span></span></code></pre></div><p>可以把它们理解成：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">Deployment —— 永远运行
+</span></span><span class="line"><span class="ln">2</span><span class="cl">DaemonSet —— 每节点运行
+</span></span><span class="line"><span class="ln">3</span><span class="cl">StatefulSet —— 有状态运行
+</span></span><span class="line"><span class="ln">4</span><span class="cl">Job —— 执行完结束
+</span></span><span class="line"><span class="ln">5</span><span class="cl">CronJob —— 定时执行结束
+</span></span></code></pre></div><p>其中，<strong>Job 和 CronJob 是 Kubernetes batch/v1 API 中最核心的两个批处理资源，也是 CKA、CKAD 和生产环境运维中必须掌握的内容。</strong></p>
 
     </div><div class="post_comments">
   
