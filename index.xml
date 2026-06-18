@@ -7,7 +7,414 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
     <copyright>Copyright © 1989–2025, 李建林 </copyright>
-    <lastBuildDate>Sun, 26 Apr 2026 10:56:16 +0800</lastBuildDate><atom:link href="https://jianlin-li.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sun, 26 Apr 2026 10:57:16 +0800</lastBuildDate><atom:link href="https://jianlin-li.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Kubernetes的知识库-5</title>
+      <link>https://jianlin-li.github.io/post/k8s_review_5/</link>
+      <pubDate>Sun, 26 Apr 2026 10:57:16 +0800</pubDate>
+      
+      <guid>https://jianlin-li.github.io/post/k8s_review_5/</guid>
+      <description>
+        
+          
+            &lt;h1 id=&#34;service资源对象&#34;&gt;&lt;strong&gt;Service资源对象&lt;/strong&gt;&lt;/h1&gt;
+&lt;h2 id=&#34;service资源对象概述&#34;&gt;&lt;strong&gt;Service资源对象概述&lt;/strong&gt;&lt;/h2&gt;
+&lt;p&gt;&lt;figure&gt;
+  &lt;picture&gt;
+
+    
+      
+        
+        
+        
+        
+        
+        
+    &lt;img
+      loading=&#34;lazy&#34;
+      decoding=&#34;async&#34;
+      alt=&#34;Service资源对象概述&#34;
+      
+        class=&#34;image_figure image_internal image_unprocessed&#34;
+        src=&#34;https://jianlin-li.github.io/images/k8s/18.png&#34;
+      
+      
+    /&gt;
+
+    &lt;/picture&gt;
+&lt;/figure&gt;
+&lt;/p&gt;
+&lt;h2 id=&#34;service的标签选择器&#34;&gt;&lt;strong&gt;Service的标签选择器&lt;/strong&gt;&lt;/h2&gt;
+&lt;p&gt;&lt;figure&gt;
+  &lt;picture&gt;
+
+    
+      
+        
+        
+        
+        
+        
+        
+    &lt;img
+      loading=&#34;lazy&#34;
+      decoding=&#34;async&#34;
+      alt=&#34;Service的标签选择器&#34;
+      
+        class=&#34;image_figure image_internal image_unprocessed&#34;
+        src=&#34;https://jianlin-li.github.io/images/k8s/19.png&#34;
+      
+      
+    /&gt;
+
+    &lt;/picture&gt;
+&lt;/figure&gt;
+&lt;/p&gt;
+&lt;h2 id=&#34;service的多端口映射&#34;&gt;&lt;strong&gt;Service的多端口映射&lt;/strong&gt;&lt;/h2&gt;
+&lt;p&gt;&lt;figure&gt;
+  &lt;picture&gt;
+
+    
+      
+        
+        
+        
+        
+        
+        
+    &lt;img
+      loading=&#34;lazy&#34;
+      decoding=&#34;async&#34;
+      alt=&#34;Service的多端口映射&#34;
+      
+        class=&#34;image_figure image_internal image_unprocessed&#34;
+        src=&#34;https://jianlin-li.github.io/images/k8s/20.png&#34;
+      
+      
+    /&gt;
+
+    &lt;/picture&gt;
+&lt;/figure&gt;
+&lt;/p&gt;
+&lt;h2 id=&#34;service的公开类型&#34;&gt;&lt;strong&gt;Service的公开类型&lt;/strong&gt;&lt;/h2&gt;
+&lt;p&gt;&lt;figure&gt;
+  &lt;picture&gt;
+
+    
+      
+        
+        
+        
+        
+        
+        
+    &lt;img
+      loading=&#34;lazy&#34;
+      decoding=&#34;async&#34;
+      alt=&#34;Service的公开类型&#34;
+      
+        class=&#34;image_figure image_internal image_unprocessed&#34;
+        src=&#34;https://jianlin-li.github.io/images/k8s/21.png&#34;
+      
+      
+    /&gt;
+
+    &lt;/picture&gt;
+&lt;/figure&gt;
+&lt;/p&gt;
+&lt;h2 id=&#34;service的clusterip&#34;&gt;&lt;strong&gt;Service的ClusterIP&lt;/strong&gt;&lt;/h2&gt;
+&lt;p&gt;&lt;figure&gt;
+  &lt;picture&gt;
+
+    
+      
+        
+        
+        
+        
+        
+        
+    &lt;img
+      loading=&#34;lazy&#34;
+      decoding=&#34;async&#34;
+      alt=&#34;Service的ClusterIP&#34;
+      
+        class=&#34;image_figure image_internal image_unprocessed&#34;
+        src=&#34;https://jianlin-li.github.io/images/k8s/22.png&#34;
+      
+      
+    /&gt;
+
+    &lt;/picture&gt;
+&lt;/figure&gt;
+
+&lt;figure&gt;
+  &lt;picture&gt;
+
+    
+      
+        
+        
+        
+        
+        
+        
+    &lt;img
+      loading=&#34;lazy&#34;
+      decoding=&#34;async&#34;
+      alt=&#34;Service的ClusterIP类型配置示例&#34;
+      
+        class=&#34;image_figure image_internal image_unprocessed&#34;
+        src=&#34;https://jianlin-li.github.io/images/k8s/23.png&#34;
+      
+      
+    /&gt;
+
+    &lt;/picture&gt;
+&lt;/figure&gt;
+&lt;/p&gt;
+&lt;h2 id=&#34;service的nodeport&#34;&gt;&lt;strong&gt;Service的NodePort&lt;/strong&gt;&lt;/h2&gt;
+&lt;p&gt;&lt;figure&gt;
+  &lt;picture&gt;
+
+    
+      
+        
+        
+        
+        
+        
+        
+    &lt;img
+      loading=&#34;lazy&#34;
+      decoding=&#34;async&#34;
+      alt=&#34;Service的NodePort&#34;
+      
+        class=&#34;image_figure image_internal image_unprocessed&#34;
+        src=&#34;https://jianlin-li.github.io/images/k8s/24.png&#34;
+      
+      
+    /&gt;
+
+    &lt;/picture&gt;
+&lt;/figure&gt;
+
+&lt;figure&gt;
+  &lt;picture&gt;
+
+    
+      
+        
+        
+        
+        
+        
+        
+    &lt;img
+      loading=&#34;lazy&#34;
+      decoding=&#34;async&#34;
+      alt=&#34;Service的NodePort类型配置示例&#34;
+      
+        class=&#34;image_figure image_internal image_unprocessed&#34;
+        src=&#34;https://jianlin-li.github.io/images/k8s/25.png&#34;
+      
+      
+    /&gt;
+
+    &lt;/picture&gt;
+&lt;/figure&gt;
+&lt;/p&gt;
+&lt;h2 id=&#34;service的loadbalancer&#34;&gt;&lt;strong&gt;Service的LoadBalancer&lt;/strong&gt;&lt;/h2&gt;
+&lt;p&gt;&lt;figure&gt;
+  &lt;picture&gt;
+
+    
+      
+        
+        
+        
+        
+        
+        
+    &lt;img
+      loading=&#34;lazy&#34;
+      decoding=&#34;async&#34;
+      alt=&#34;Service的LoadBalancer&#34;
+      
+        class=&#34;image_figure image_internal image_unprocessed&#34;
+        src=&#34;https://jianlin-li.github.io/images/k8s/26.png&#34;
+      
+      
+    /&gt;
+
+    &lt;/picture&gt;
+&lt;/figure&gt;
+
+&lt;figure&gt;
+  &lt;picture&gt;
+
+    
+      
+        
+        
+        
+        
+        
+        
+    &lt;img
+      loading=&#34;lazy&#34;
+      decoding=&#34;async&#34;
+      alt=&#34;Service的LoadBalancer类型配置示例&#34;
+      
+        class=&#34;image_figure image_internal image_unprocessed&#34;
+        src=&#34;https://jianlin-li.github.io/images/k8s/27.png&#34;
+      
+      
+    /&gt;
+
+    &lt;/picture&gt;
+&lt;/figure&gt;
+&lt;/p&gt;
+&lt;h2 id=&#34;service的externalname&#34;&gt;&lt;strong&gt;Service的ExternalName&lt;/strong&gt;&lt;/h2&gt;
+&lt;p&gt;&lt;figure&gt;
+  &lt;picture&gt;
+
+    
+      
+        
+        
+        
+        
+        
+        
+    &lt;img
+      loading=&#34;lazy&#34;
+      decoding=&#34;async&#34;
+      alt=&#34;Service的ExternalName&#34;
+      
+        class=&#34;image_figure image_internal image_unprocessed&#34;
+        src=&#34;https://jianlin-li.github.io/images/k8s/28.png&#34;
+      
+      
+    /&gt;
+
+    &lt;/picture&gt;
+&lt;/figure&gt;
+
+&lt;figure&gt;
+  &lt;picture&gt;
+
+    
+      
+        
+        
+        
+        
+        
+        
+    &lt;img
+      loading=&#34;lazy&#34;
+      decoding=&#34;async&#34;
+      alt=&#34;Service的ExternalName类型配置示例&#34;
+      
+        class=&#34;image_figure image_internal image_unprocessed&#34;
+        src=&#34;https://jianlin-li.github.io/images/k8s/29.png&#34;
+      
+      
+    /&gt;
+
+    &lt;/picture&gt;
+&lt;/figure&gt;
+&lt;/p&gt;
+&lt;hr&gt;
+&lt;h1 id=&#34;endpoints资源对象&#34;&gt;&lt;strong&gt;Endpoints资源对象&lt;/strong&gt;&lt;/h1&gt;
+&lt;p&gt;&lt;figure&gt;
+  &lt;picture&gt;
+
+    
+      
+        
+        
+        
+        
+        
+        
+    &lt;img
+      loading=&#34;lazy&#34;
+      decoding=&#34;async&#34;
+      alt=&#34;Service与Endpoints对象的关系&#34;
+      
+        class=&#34;image_figure image_internal image_unprocessed&#34;
+        src=&#34;https://jianlin-li.github.io/images/k8s/30.png&#34;
+      
+      
+    /&gt;
+
+    &lt;/picture&gt;
+&lt;/figure&gt;
+&lt;/p&gt;
+&lt;h3 id=&#34;endpoints资源手动创建&#34;&gt;&lt;strong&gt;Endpoints资源手动创建&lt;/strong&gt;&lt;/h3&gt;
+&lt;p&gt;&lt;figure&gt;
+  &lt;picture&gt;
+
+    
+      
+        
+        
+        
+        
+        
+        
+    &lt;img
+      loading=&#34;lazy&#34;
+      decoding=&#34;async&#34;
+      alt=&#34;Endpoints资源手动创建&#34;
+      
+        class=&#34;image_figure image_internal image_unprocessed&#34;
+        src=&#34;https://jianlin-li.github.io/images/k8s/31.png&#34;
+      
+      
+    /&gt;
+
+    &lt;/picture&gt;
+&lt;/figure&gt;
+&lt;/p&gt;
+&lt;h3 id=&#34;查看service与endpoints对象&#34;&gt;&lt;strong&gt;查看Service与Endpoints对象&lt;/strong&gt;&lt;/h3&gt;
+&lt;p&gt;&lt;figure&gt;
+  &lt;picture&gt;
+
+    
+      
+        
+        
+        
+        
+        
+        
+    &lt;img
+      loading=&#34;lazy&#34;
+      decoding=&#34;async&#34;
+      alt=&#34;查看Service与Endpoints对象&#34;
+      
+        class=&#34;image_figure image_internal image_unprocessed&#34;
+        src=&#34;https://jianlin-li.github.io/images/k8s/32.png&#34;
+      
+      
+    /&gt;
+
+    &lt;/picture&gt;
+&lt;/figure&gt;
+&lt;/p&gt;
+&lt;hr&gt;
+&lt;h1 id=&#34;service服务发现&#34;&gt;&lt;strong&gt;Service服务发现&lt;/strong&gt;&lt;/h1&gt;
+&lt;h2 id=&#34;service-服务发现机制&#34;&gt;Service 服务发现机制&lt;/h2&gt;
+&lt;p&gt;Kubernetes 提供两种服务发现：&lt;/p&gt;
+          
+          
+        
+      </description>
+    </item>
+    
     <item>
       <title>Kubernetes的知识库-4</title>
       <link>https://jianlin-li.github.io/post/k8s_review_4/</link>
