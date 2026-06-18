@@ -7,7 +7,136 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
     <copyright>Copyright © 1989–2025, 李建林 </copyright>
-    <lastBuildDate>Sun, 26 Apr 2026 10:57:16 +0800</lastBuildDate><atom:link href="https://jianlin-li.github.io/categories/kubernetes/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sun, 26 Apr 2026 10:58:16 +0800</lastBuildDate><atom:link href="https://jianlin-li.github.io/categories/kubernetes/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Kubernetes的知识库-6</title>
+      <link>https://jianlin-li.github.io/post/k8s_review_6/</link>
+      <pubDate>Sun, 26 Apr 2026 10:58:16 +0800</pubDate>
+      
+      <guid>https://jianlin-li.github.io/post/k8s_review_6/</guid>
+      <description>
+        
+          
+            &lt;h1 id=&#34;ingress对象&#34;&gt;&lt;strong&gt;Ingress对象&lt;/strong&gt;&lt;/h1&gt;
+&lt;p&gt;&lt;figure&gt;
+  &lt;picture&gt;
+
+    
+      
+        
+        
+        
+        
+        
+        
+    &lt;img
+      loading=&#34;lazy&#34;
+      decoding=&#34;async&#34;
+      alt=&#34;Ingress工作流程&#34;
+      
+        class=&#34;image_figure image_internal image_unprocessed&#34;
+        src=&#34;https://jianlin-li.github.io/images/k8s/35.png&#34;
+      
+      
+    /&gt;
+
+    &lt;/picture&gt;
+&lt;/figure&gt;
+&lt;/p&gt;
+&lt;h2 id=&#34;nginx-ingress的v180版本安装yaml文件国内镜像&#34;&gt;&lt;strong&gt;nginx-ingress的v1.8.0版本安装yaml文件(国内镜像)&lt;/strong&gt;&lt;/h2&gt;
+&lt;p&gt;&lt;a href=&#34;https://jianlin-li.github.io/pdfs/ingress-nginx-stable.yaml&#34;&gt;nginx-ingress的v1.8.0版本安装yaml文件(国内镜像)&lt;/a&gt;&lt;/p&gt;
+&lt;h2 id=&#34;ingress的访问流程&#34;&gt;&lt;strong&gt;Ingress的访问流程&lt;/strong&gt;&lt;/h2&gt;
+&lt;p&gt;&lt;figure&gt;
+  &lt;picture&gt;
+
+    
+      
+        
+        
+        
+        
+        
+        
+    &lt;img
+      loading=&#34;lazy&#34;
+      decoding=&#34;async&#34;
+      alt=&#34;Ingress的访问流程&#34;
+      
+        class=&#34;image_figure image_internal image_unprocessed&#34;
+        src=&#34;https://jianlin-li.github.io/images/k8s/36.png&#34;
+      
+      
+    /&gt;
+
+    &lt;/picture&gt;
+&lt;/figure&gt;
+&lt;/p&gt;
+&lt;h2 id=&#34;互联网用户访问ingress的流程&#34;&gt;&lt;strong&gt;互联网用户访问Ingress的流程&lt;/strong&gt;&lt;/h2&gt;
+&lt;p&gt;&lt;figure&gt;
+  &lt;picture&gt;
+
+    
+      
+        
+        
+        
+        
+        
+        
+    &lt;img
+      loading=&#34;lazy&#34;
+      decoding=&#34;async&#34;
+      alt=&#34;互联网用户访问Ingress的流程&#34;
+      
+        class=&#34;image_figure image_internal image_unprocessed&#34;
+        src=&#34;https://jianlin-li.github.io/images/k8s/37.png&#34;
+      
+      
+    /&gt;
+
+    &lt;/picture&gt;
+&lt;/figure&gt;
+&lt;/p&gt;
+&lt;hr&gt;
+&lt;h1 id=&#34;kubernetes-ingress-对象详解&#34;&gt;&lt;strong&gt;Kubernetes Ingress 对象详解&lt;/strong&gt;&lt;/h1&gt;
+&lt;h1 id=&#34;一什么是-ingress&#34;&gt;一、什么是 Ingress&lt;/h1&gt;
+&lt;p&gt;&lt;strong&gt;Ingress（入口）&lt;/strong&gt; 是 Kubernetes 提供的一种七层（HTTP/HTTPS）负载均衡资源对象，用于管理集群外部访问 Service 的方式。&lt;/p&gt;
+&lt;p&gt;简单理解：&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Ingress = K8S 集群的 HTTP/HTTPS 网关&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;它可以实现：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;域名访问&lt;/li&gt;
+&lt;li&gt;URL 路径转发&lt;/li&gt;
+&lt;li&gt;HTTPS/TLS 加密&lt;/li&gt;
+&lt;li&gt;虚拟主机（多个域名）&lt;/li&gt;
+&lt;li&gt;流量重定向&lt;/li&gt;
+&lt;li&gt;灰度发布&lt;/li&gt;
+&lt;li&gt;负载均衡&lt;/li&gt;
+&lt;li&gt;认证、限流等高级功能（依赖 Ingress Controller）&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;h1 id=&#34;二ingress-工作原理&#34;&gt;二、Ingress 工作原理&lt;/h1&gt;
+&lt;p&gt;访问流程：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-text&#34; data-lang=&#34;text&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt; 1&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;浏览器
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt; 2&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;    ↓
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt; 3&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;www.example.com
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt; 4&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;    ↓
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt; 5&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;Ingress Controller（nginx）
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt; 6&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;    ↓
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt; 7&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;Ingress资源规则
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt; 8&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;    ↓
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt; 9&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;Service
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt;10&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;    ↓
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt;11&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;Pod
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;整体架构：&lt;/p&gt;
+          
+          
+        
+      </description>
+    </item>
+    
     <item>
       <title>Kubernetes的知识库-5</title>
       <link>https://jianlin-li.github.io/post/k8s_review_5/</link>
