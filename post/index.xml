@@ -7,7 +7,180 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
     <copyright>Copyright © 1989–2025, 李建林 </copyright>
-    <lastBuildDate>Sun, 26 Apr 2026 10:58:16 +0800</lastBuildDate><atom:link href="https://jianlin-li.github.io/post/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sun, 26 Apr 2026 10:59:16 +0800</lastBuildDate><atom:link href="https://jianlin-li.github.io/post/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Kubernetes的知识库-7</title>
+      <link>https://jianlin-li.github.io/post/k8s_review_7/</link>
+      <pubDate>Sun, 26 Apr 2026 10:59:16 +0800</pubDate>
+      
+      <guid>https://jianlin-li.github.io/post/k8s_review_7/</guid>
+      <description>
+        
+          
+            &lt;h1 id=&#34;卷的概述&#34;&gt;&lt;strong&gt;卷的概述&lt;/strong&gt;&lt;/h1&gt;
+&lt;p&gt;&lt;figure&gt;
+  &lt;picture&gt;
+
+    
+      
+        
+        
+        
+        
+        
+        
+    &lt;img
+      loading=&#34;lazy&#34;
+      decoding=&#34;async&#34;
+      alt=&#34;卷的概述&#34;
+      
+        class=&#34;image_figure image_internal image_unprocessed&#34;
+        src=&#34;https://jianlin-li.github.io/images/k8s/38.png&#34;
+      
+      
+    /&gt;
+
+    &lt;/picture&gt;
+&lt;/figure&gt;
+&lt;/p&gt;
+&lt;hr&gt;
+&lt;h1 id=&#34;kubernetes-常用卷volume类型汇总&#34;&gt;&lt;strong&gt;Kubernetes 常用卷（Volume）类型汇总&lt;/strong&gt;&lt;/h1&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Kubernetes 中，Volume（卷）用于解决容器文件系统临时性的问题，实现数据共享、持久化存储以及配置注入。&lt;/p&gt;
+&lt;p&gt;Volume 的生命周期与 Pod 绑定，而底层存储资源（PV）可以独立于 Pod 存在。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;hr&gt;
+&lt;h1 id=&#34;一volume-分类&#34;&gt;一、Volume 分类&lt;/h1&gt;
+&lt;p&gt;按照用途，可以将 Kubernetes 常用卷分为：&lt;/p&gt;
+&lt;table&gt;
+  &lt;thead&gt;
+      &lt;tr&gt;
+          &lt;th&gt;分类&lt;/th&gt;
+          &lt;th&gt;卷类型&lt;/th&gt;
+          &lt;th&gt;是否持久化&lt;/th&gt;
+          &lt;th&gt;典型用途&lt;/th&gt;
+      &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+      &lt;tr&gt;
+          &lt;td&gt;临时卷&lt;/td&gt;
+          &lt;td&gt;emptyDir&lt;/td&gt;
+          &lt;td&gt;×&lt;/td&gt;
+          &lt;td&gt;Pod 内多个容器共享数据&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;临时卷&lt;/td&gt;
+          &lt;td&gt;hostPath&lt;/td&gt;
+          &lt;td&gt;×（依赖节点）&lt;/td&gt;
+          &lt;td&gt;挂载宿主机目录&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;配置卷&lt;/td&gt;
+          &lt;td&gt;configMap&lt;/td&gt;
+          &lt;td&gt;×&lt;/td&gt;
+          &lt;td&gt;注入配置文件&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;配置卷&lt;/td&gt;
+          &lt;td&gt;secret&lt;/td&gt;
+          &lt;td&gt;×&lt;/td&gt;
+          &lt;td&gt;保存密码、证书&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;配置卷&lt;/td&gt;
+          &lt;td&gt;downwardAPI&lt;/td&gt;
+          &lt;td&gt;×&lt;/td&gt;
+          &lt;td&gt;获取 Pod 元数据&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;配置卷&lt;/td&gt;
+          &lt;td&gt;projected&lt;/td&gt;
+          &lt;td&gt;×&lt;/td&gt;
+          &lt;td&gt;多种配置合并挂载&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;持久化卷&lt;/td&gt;
+          &lt;td&gt;persistentVolumeClaim(PVC)&lt;/td&gt;
+          &lt;td&gt;√&lt;/td&gt;
+          &lt;td&gt;最常用持久化存储&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;网络存储&lt;/td&gt;
+          &lt;td&gt;NFS&lt;/td&gt;
+          &lt;td&gt;√&lt;/td&gt;
+          &lt;td&gt;多节点共享存储&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;云存储&lt;/td&gt;
+          &lt;td&gt;CSI Volume&lt;/td&gt;
+          &lt;td&gt;√&lt;/td&gt;
+          &lt;td&gt;Ceph、EBS、云盘等&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;本地存储&lt;/td&gt;
+          &lt;td&gt;local&lt;/td&gt;
+          &lt;td&gt;√&lt;/td&gt;
+          &lt;td&gt;本地 SSD、NVMe&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;块存储&lt;/td&gt;
+          &lt;td&gt;iscsi&lt;/td&gt;
+          &lt;td&gt;√&lt;/td&gt;
+          &lt;td&gt;SAN 存储&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;文件存储&lt;/td&gt;
+          &lt;td&gt;cephfs&lt;/td&gt;
+          &lt;td&gt;√&lt;/td&gt;
+          &lt;td&gt;Ceph 文件系统&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;对象存储&lt;/td&gt;
+          &lt;td&gt;S3 CSI&lt;/td&gt;
+          &lt;td&gt;√&lt;/td&gt;
+          &lt;td&gt;MinIO、AWS S3&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;特殊卷&lt;/td&gt;
+          &lt;td&gt;ephemeral volume&lt;/td&gt;
+          &lt;td&gt;×&lt;/td&gt;
+          &lt;td&gt;临时 PVC&lt;/td&gt;
+      &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;hr&gt;
+&lt;h1 id=&#34;二emptydir&#34;&gt;二、emptyDir&lt;/h1&gt;
+&lt;p&gt;&lt;figure&gt;
+  &lt;picture&gt;
+
+    
+      
+        
+        
+        
+        
+        
+        
+    &lt;img
+      loading=&#34;lazy&#34;
+      decoding=&#34;async&#34;
+      alt=&#34;容器之间的数据共享&#34;
+      
+        class=&#34;image_figure image_internal image_unprocessed&#34;
+        src=&#34;https://jianlin-li.github.io/images/k8s/39.png&#34;
+      
+      
+    /&gt;
+
+    &lt;/picture&gt;
+&lt;/figure&gt;
+&lt;/p&gt;
+          
+          
+        
+      </description>
+    </item>
+    
     <item>
       <title>Kubernetes的知识库-6</title>
       <link>https://jianlin-li.github.io/post/k8s_review_6/</link>
