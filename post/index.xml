@@ -7,7 +7,158 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
     <copyright>Copyright © 1989–2025, 李建林 </copyright>
-    <lastBuildDate>Sun, 26 Apr 2026 10:59:16 +0800</lastBuildDate><atom:link href="https://jianlin-li.github.io/post/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sun, 26 Apr 2026 11:00:16 +0800</lastBuildDate><atom:link href="https://jianlin-li.github.io/post/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Kubernetes的知识库-8</title>
+      <link>https://jianlin-li.github.io/post/k8s_review_8/</link>
+      <pubDate>Sun, 26 Apr 2026 11:00:16 +0800</pubDate>
+      
+      <guid>https://jianlin-li.github.io/post/k8s_review_8/</guid>
+      <description>
+        
+          
+            &lt;h1 id=&#34;有状态应用管理&#34;&gt;&lt;strong&gt;有状态应用管理&lt;/strong&gt;&lt;/h1&gt;
+&lt;blockquote&gt;
+&lt;ol&gt;
+&lt;li&gt;Pod之间不对等：每个实例通常扮演不同的角色，具有特定的功能和职责&lt;/li&gt;
+&lt;li&gt;Pod独享存储：由于实例之间存在不对等的关系，那么Pod中的数据存储也需要保持独立性&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/blockquote&gt;
+&lt;h1 id=&#34;statefulset资源的特点&#34;&gt;&lt;strong&gt;StatefulSet资源的特点&lt;/strong&gt;&lt;/h1&gt;
+&lt;p&gt;&lt;figure&gt;
+  &lt;picture&gt;
+
+    
+      
+        
+        
+        
+        
+        
+        
+    &lt;img
+      loading=&#34;lazy&#34;
+      decoding=&#34;async&#34;
+      alt=&#34;StatefulSet资源的特点&#34;
+      
+        class=&#34;image_figure image_internal image_unprocessed&#34;
+        src=&#34;https://jianlin-li.github.io/images/k8s/55.png&#34;
+      
+      
+    /&gt;
+
+    &lt;/picture&gt;
+&lt;/figure&gt;
+&lt;/p&gt;
+&lt;p&gt;&lt;figure&gt;
+  &lt;picture&gt;
+
+    
+      
+        
+        
+        
+        
+        
+        
+    &lt;img
+      loading=&#34;lazy&#34;
+      decoding=&#34;async&#34;
+      alt=&#34;StatefulSet资源的定义关系&#34;
+      
+        class=&#34;image_figure image_internal image_unprocessed&#34;
+        src=&#34;https://jianlin-li.github.io/images/k8s/56.png&#34;
+      
+      
+    /&gt;
+
+    &lt;/picture&gt;
+&lt;/figure&gt;
+&lt;/p&gt;
+&lt;hr&gt;
+&lt;h1 id=&#34;kubernetes-statefulset-工作负载资源详解&#34;&gt;&lt;strong&gt;Kubernetes StatefulSet 工作负载资源详解&lt;/strong&gt;&lt;/h1&gt;
+&lt;hr&gt;
+&lt;h1 id=&#34;一statefulset-是什么&#34;&gt;一、StatefulSet 是什么&lt;/h1&gt;
+&lt;p&gt;&lt;strong&gt;StatefulSet（有状态副本集）&lt;/strong&gt; 是 Kubernetes 中专门用于部署 &lt;strong&gt;有状态应用（Stateful Application）&lt;/strong&gt; 的工作负载资源。&lt;/p&gt;
+&lt;p&gt;它能够保证：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Pod 名称固定&lt;/li&gt;
+&lt;li&gt;Pod 启动顺序固定&lt;/li&gt;
+&lt;li&gt;Pod 删除顺序固定&lt;/li&gt;
+&lt;li&gt;每个 Pod 拥有独立持久化存储&lt;/li&gt;
+&lt;li&gt;Pod 重建后身份不变（网络标识不变）&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;非常适用于：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;MySQL&lt;/li&gt;
+&lt;li&gt;Redis Cluster&lt;/li&gt;
+&lt;li&gt;MongoDB&lt;/li&gt;
+&lt;li&gt;Elasticsearch&lt;/li&gt;
+&lt;li&gt;Kafka&lt;/li&gt;
+&lt;li&gt;ZooKeeper&lt;/li&gt;
+&lt;li&gt;RabbitMQ&lt;/li&gt;
+&lt;li&gt;PostgreSQL&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;h1 id=&#34;二deployment-与-statefulset-的区别&#34;&gt;二、Deployment 与 StatefulSet 的区别&lt;/h1&gt;
+&lt;table&gt;
+  &lt;thead&gt;
+      &lt;tr&gt;
+          &lt;th&gt;对比项&lt;/th&gt;
+          &lt;th&gt;Deployment&lt;/th&gt;
+          &lt;th&gt;StatefulSet&lt;/th&gt;
+      &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+      &lt;tr&gt;
+          &lt;td&gt;Pod名称&lt;/td&gt;
+          &lt;td&gt;随机&lt;/td&gt;
+          &lt;td&gt;固定&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;网络身份&lt;/td&gt;
+          &lt;td&gt;不固定&lt;/td&gt;
+          &lt;td&gt;固定&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;启动顺序&lt;/td&gt;
+          &lt;td&gt;无序&lt;/td&gt;
+          &lt;td&gt;有序&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;删除顺序&lt;/td&gt;
+          &lt;td&gt;无序&lt;/td&gt;
+          &lt;td&gt;有序&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;PVC&lt;/td&gt;
+          &lt;td&gt;共享或手动创建&lt;/td&gt;
+          &lt;td&gt;自动创建&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;Pod恢复&lt;/td&gt;
+          &lt;td&gt;新Pod&lt;/td&gt;
+          &lt;td&gt;原身份恢复&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;Headless Service&lt;/td&gt;
+          &lt;td&gt;不需要&lt;/td&gt;
+          &lt;td&gt;必须&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;适用场景&lt;/td&gt;
+          &lt;td&gt;无状态应用&lt;/td&gt;
+          &lt;td&gt;有状态应用&lt;/td&gt;
+      &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;例如：&lt;/p&gt;
+          
+          
+        
+      </description>
+    </item>
+    
     <item>
       <title>Kubernetes的知识库-7</title>
       <link>https://jianlin-li.github.io/post/k8s_review_7/</link>
