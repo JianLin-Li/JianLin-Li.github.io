@@ -7,7 +7,134 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
     <copyright>Copyright © 1989–2025, 李建林 </copyright>
-    <lastBuildDate>Sun, 26 Apr 2026 11:03:16 +0800</lastBuildDate><atom:link href="https://jianlin-li.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sun, 26 Apr 2026 11:04:16 +0800</lastBuildDate><atom:link href="https://jianlin-li.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Kubernetes的知识库-11</title>
+      <link>https://jianlin-li.github.io/post/k8s_review_11/</link>
+      <pubDate>Sun, 26 Apr 2026 11:04:16 +0800</pubDate>
+      
+      <guid>https://jianlin-li.github.io/post/k8s_review_11/</guid>
+      <description>
+        
+          
+            &lt;h1 id=&#34;kubernetes-网络插件之calico&#34;&gt;&lt;strong&gt;Kubernetes 网络插件之Calico&lt;/strong&gt;&lt;/h1&gt;
+&lt;h1 id=&#34;docker的网络模型&#34;&gt;Docker的网络模型&lt;/h1&gt;
+&lt;p&gt;&lt;figure&gt;
+  &lt;picture&gt;
+
+    
+      
+        
+        
+        
+        
+        
+        
+    &lt;img
+      loading=&#34;lazy&#34;
+      decoding=&#34;async&#34;
+      alt=&#34;Docker的网络模型&#34;
+      
+        class=&#34;image_figure image_internal image_unprocessed&#34;
+        src=&#34;https://jianlin-li.github.io/images/k8s/61.png&#34;
+      
+      
+    /&gt;
+
+    &lt;/picture&gt;
+&lt;/figure&gt;
+&lt;/p&gt;
+&lt;hr&gt;
+&lt;h1 id=&#34;kubernetes的网络模型&#34;&gt;Kubernetes的网络模型&lt;/h1&gt;
+&lt;p&gt;&lt;figure&gt;
+  &lt;picture&gt;
+
+    
+      
+        
+        
+        
+        
+        
+        
+    &lt;img
+      loading=&#34;lazy&#34;
+      decoding=&#34;async&#34;
+      alt=&#34;Kubernetes的网络模型&#34;
+      
+        class=&#34;image_figure image_internal image_unprocessed&#34;
+        src=&#34;https://jianlin-li.github.io/images/k8s/62.png&#34;
+      
+      
+    /&gt;
+
+    &lt;/picture&gt;
+&lt;/figure&gt;
+&lt;/p&gt;
+&lt;hr&gt;
+&lt;h1 id=&#34;按照docker网络--kubernetes网络--calico网络插件三个层次进行梳理并结合工作原理部署运维进行总结适合作为后续查阅的文档&#34;&gt;按照**&amp;quot;Docker网络 → Kubernetes网络 → Calico网络插件&amp;quot;**三个层次进行梳理，并结合工作原理、部署、运维进行总结，适合作为后续查阅的文档。&lt;/h1&gt;
+&lt;hr&gt;
+&lt;h1 id=&#34;docker网络模型与kubernetes网络模型calico知识汇总&#34;&gt;Docker网络模型与Kubernetes网络模型（Calico）知识汇总&lt;/h1&gt;
+&lt;hr&gt;
+&lt;h1 id=&#34;一docker-网络模型&#34;&gt;一、Docker 网络模型&lt;/h1&gt;
+&lt;p&gt;Docker 本质上就是 Linux Namespace + Linux Bridge + veth Pair + iptables 的组合。&lt;/p&gt;
+&lt;h2 id=&#34;1docker-默认网络&#34;&gt;1、Docker 默认网络&lt;/h2&gt;
+&lt;p&gt;Docker 创建容器时，会自动创建几个网络。&lt;/p&gt;
+&lt;table&gt;
+  &lt;thead&gt;
+      &lt;tr&gt;
+          &lt;th&gt;网络模式&lt;/th&gt;
+          &lt;th&gt;驱动&lt;/th&gt;
+          &lt;th&gt;描述&lt;/th&gt;
+          &lt;th&gt;是否跨主机&lt;/th&gt;
+      &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+      &lt;tr&gt;
+          &lt;td&gt;bridge&lt;/td&gt;
+          &lt;td&gt;bridge&lt;/td&gt;
+          &lt;td&gt;默认网络，每个容器一个IP&lt;/td&gt;
+          &lt;td&gt;×&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;host&lt;/td&gt;
+          &lt;td&gt;host&lt;/td&gt;
+          &lt;td&gt;与宿主机共享网络&lt;/td&gt;
+          &lt;td&gt;×&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;none&lt;/td&gt;
+          &lt;td&gt;null&lt;/td&gt;
+          &lt;td&gt;无网络&lt;/td&gt;
+          &lt;td&gt;×&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;overlay&lt;/td&gt;
+          &lt;td&gt;overlay&lt;/td&gt;
+          &lt;td&gt;Docker Swarm跨主机网络&lt;/td&gt;
+          &lt;td&gt;√&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;macvlan&lt;/td&gt;
+          &lt;td&gt;macvlan&lt;/td&gt;
+          &lt;td&gt;每个容器拥有真实MAC地址&lt;/td&gt;
+          &lt;td&gt;√&lt;/td&gt;
+      &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;Docker查看网络&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;docker network ls
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;查看网络详情&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;docker network inspect bridge
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;hr&gt;
+&lt;h2 id=&#34;2bridge-网络&#34;&gt;2、Bridge 网络&lt;/h2&gt;
+&lt;p&gt;默认情况下：&lt;/p&gt;
+          
+          
+        
+      </description>
+    </item>
+    
     <item>
       <title>Kubernetes的知识库-10</title>
       <link>https://jianlin-li.github.io/post/k8s_review_10/</link>
