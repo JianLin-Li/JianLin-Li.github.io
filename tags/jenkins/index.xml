@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>DevOps - JenKins on 李建林--个人知识库</title>
-    <link>https://jianlin-li.github.io/tags/devops---jenkins/</link>
-    <description>Recent content in DevOps - JenKins on 李建林--个人知识库</description>
+    <title>JenKins on 李建林--个人知识库</title>
+    <link>https://jianlin-li.github.io/tags/jenkins/</link>
+    <description>Recent content in JenKins on 李建林--个人知识库</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
     <copyright>Copyright © 1989–2025, 李建林 </copyright>
-    <lastBuildDate>Wed, 10 Jun 2026 10:32:29 +0800</lastBuildDate><atom:link href="https://jianlin-li.github.io/tags/devops---jenkins/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Wed, 10 Jun 2026 10:32:29 +0800</lastBuildDate><atom:link href="https://jianlin-li.github.io/tags/jenkins/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>架构-基于JenKins的CI/CD平台</title>
       <link>https://jianlin-li.github.io/post/jiagou-cicd-jenkins/</link>
