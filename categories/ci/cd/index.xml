@@ -7,7 +7,73 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
     <copyright>Copyright © 1989–2025, 李建林 </copyright>
-    <lastBuildDate>Wed, 10 Jun 2026 10:32:29 +0800</lastBuildDate><atom:link href="https://jianlin-li.github.io/categories/ci/cd/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Wed, 10 Jun 2026 10:33:29 +0800</lastBuildDate><atom:link href="https://jianlin-li.github.io/categories/ci/cd/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>架构-基于JenKins的CI/CD平台之Argo CD</title>
+      <link>https://jianlin-li.github.io/post/jiagou-cicd-jenkins-argo/</link>
+      <pubDate>Wed, 10 Jun 2026 10:33:29 +0800</pubDate>
+      
+      <guid>https://jianlin-li.github.io/post/jiagou-cicd-jenkins-argo/</guid>
+      <description>
+        
+          
+            &lt;h1 id=&#34;argo-cd-知识点汇总gitops-持续交付最佳实践&#34;&gt;Argo CD 知识点汇总（GitOps 持续交付最佳实践）&lt;/h1&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;适用版本：Argo CD 2.x（当前主流版本）&lt;/strong&gt;
+&lt;strong&gt;阅读对象：&lt;/strong&gt; Kubernetes 运维工程师、DevOps 工程师、平台架构师、CI/CD 工程师&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;hr&gt;
+&lt;p&gt;&lt;figure&gt;
+  &lt;picture&gt;
+
+    
+      
+        
+        
+        
+        
+        
+        
+    &lt;img
+      loading=&#34;lazy&#34;
+      decoding=&#34;async&#34;
+      alt=&#34;Jenkins与Argo CD结合&#34;
+      
+        class=&#34;image_figure image_internal image_unprocessed&#34;
+        src=&#34;https://jianlin-li.github.io/images/k8s/69.png&#34;
+      
+      
+    /&gt;
+
+    &lt;/picture&gt;
+&lt;/figure&gt;
+&lt;/p&gt;
+&lt;h1 id=&#34;一什么是-argo-cd&#34;&gt;一、什么是 Argo CD&lt;/h1&gt;
+&lt;h2 id=&#34;1argo-cd-概述&#34;&gt;1、Argo CD 概述&lt;/h2&gt;
+&lt;p&gt;Argo CD 是一个运行在 Kubernetes 集群中的 &lt;strong&gt;声明式（Declarative）GitOps 持续交付（Continuous Delivery，CD）工具&lt;/strong&gt;。&lt;/p&gt;
+&lt;p&gt;它最大的特点就是：&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;Git 仓库就是整个 Kubernetes 集群的唯一真实来源（Single Source of Truth）。&lt;/strong&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;所有 Kubernetes YAML、Helm Chart、Kustomize 配置都保存在 Git 中。&lt;/p&gt;
+&lt;p&gt;Argo CD 会不断比较：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt; 1&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;Git Repository
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt; 2&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;        │
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt; 3&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;        │ Desired State（期望状态）
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt; 4&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;        ▼
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt; 5&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;    Argo CD
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt; 6&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;        │ Compare
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt; 7&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;        ▼
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt; 8&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt; Kubernetes Cluster
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt; 9&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;        ▲
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt;10&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;        │ Actual State（实际状态）
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;如果发现：&lt;/p&gt;
+          
+          
+        
+      </description>
+    </item>
+    
     <item>
       <title>架构-基于JenKins的CI/CD平台</title>
       <link>https://jianlin-li.github.io/post/jiagou-cicd-jenkins/</link>
@@ -35,7 +101,7 @@
       alt=&#34;持续集成&#34;
       
         class=&#34;image_figure image_internal image_unprocessed&#34;
-        src=&#34;https://jianlin-li.github.io/images/k8s/66.jpg&#34;
+        src=&#34;https://jianlin-li.github.io/images/k8s/66.png&#34;
       
       
     /&gt;
@@ -60,7 +126,7 @@
       alt=&#34;持续交付和持续部署&#34;
       
         class=&#34;image_figure image_internal image_unprocessed&#34;
-        src=&#34;https://jianlin-li.github.io/images/k8s/67.jpg&#34;
+        src=&#34;https://jianlin-li.github.io/images/k8s/67.png&#34;
       
       
     /&gt;
@@ -85,7 +151,7 @@
       alt=&#34;CI/CD流程设计&#34;
       
         class=&#34;image_figure image_internal image_unprocessed&#34;
-        src=&#34;https://jianlin-li.github.io/images/k8s/68.jpg&#34;
+        src=&#34;https://jianlin-li.github.io/images/k8s/68.png&#34;
       
       
     /&gt;
