@@ -43,6 +43,31 @@
     &lt;/picture&gt;
 &lt;/figure&gt;
 &lt;/p&gt;
+&lt;p&gt;&lt;figure&gt;
+  &lt;picture&gt;
+
+    
+      
+        
+        
+        
+        
+        
+        
+    &lt;img
+      loading=&#34;lazy&#34;
+      decoding=&#34;async&#34;
+      alt=&#34;Prometheus告警工作流程&#34;
+      
+        class=&#34;image_figure image_internal image_unprocessed&#34;
+        src=&#34;https://jianlin-li.github.io/images/k8s/71.png&#34;
+      
+      
+    /&gt;
+
+    &lt;/picture&gt;
+&lt;/figure&gt;
+&lt;/p&gt;
 &lt;hr&gt;
 &lt;h1 id=&#34;prometheus--grafana-知识汇总企业级教程&#34;&gt;Prometheus + Grafana 知识汇总（企业级教程）&lt;/h1&gt;
 &lt;blockquote&gt;
