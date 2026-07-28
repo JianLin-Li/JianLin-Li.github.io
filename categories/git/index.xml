@@ -17,11 +17,39 @@
       <description>
         
           
-            &lt;h1 id=&#34;git-reset-和-git-revert-都是用来撤销更改的但它们的运作方式和对项目历史的影响截然不同&#34;&gt;&lt;code&gt;git reset&lt;/code&gt; 和 &lt;code&gt;git revert&lt;/code&gt; 都是用来撤销更改的，但它们的运作方式和对项目历史的影响截然不同。&lt;/h1&gt;
+            &lt;h1 id=&#34;实用git命令--可视化&#34;&gt;实用Git命令--可视化&lt;/h1&gt;
+&lt;p&gt;&lt;figure&gt;
+  &lt;picture&gt;
+
+    
+      
+        
+        
+        
+        
+        
+        
+    &lt;img
+      loading=&#34;lazy&#34;
+      decoding=&#34;async&#34;
+      alt=&#34;快进合并（fast-forward）&#34;
+      
+        class=&#34;image_figure image_internal image_unprocessed&#34;
+        src=&#34;https://jianlin-li.github.io/images/k8s/81.webp&#34;
+      
+      
+    /&gt;
+
+    &lt;/picture&gt;
+&lt;/figure&gt;
+&lt;/p&gt;
+&lt;h1 id=&#34;git-reset-和-git-revert-都是用来撤销更改的但它们的运作方式和对项目历史的影响截然不同&#34;&gt;&lt;code&gt;git reset&lt;/code&gt; 和 &lt;code&gt;git revert&lt;/code&gt; 都是用来撤销更改的，但它们的运作方式和对项目历史的影响截然不同。&lt;/h1&gt;
 &lt;p&gt;简单来说，核心区别在于：&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;&lt;strong&gt;&lt;code&gt;git revert&lt;/code&gt;&lt;/strong&gt;：&lt;strong&gt;安全地&lt;/strong&gt;撤销。它会&lt;strong&gt;创建一个新的提交&lt;/strong&gt;来抵消之前的更改，从而&lt;strong&gt;保留完整的历史记录&lt;/strong&gt;。&lt;/li&gt;
 &lt;li&gt;&lt;strong&gt;&lt;code&gt;git reset&lt;/code&gt;&lt;/strong&gt;：&lt;strong&gt;彻底地&lt;/strong&gt;回退。它会将分支指针&lt;strong&gt;直接移动到指定的历史提交&lt;/strong&gt;，从而&lt;strong&gt;修改或抹掉提交历史&lt;/strong&gt;。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;在回滚这一操作上看，效果差不多。但是在日后继续merge以前的老版本时有区别。因为git revert是用一次逆向的commit“中和”之前的提交，因此日后合并老的branch时，导致这部分改变不会再次出现，但是git reset是之间把某些commit在某个branch上删除，因而和老的branch再次merge时，这些被回滚的commit应该还会被引入。&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;git reset 是把HEAD向后移动了一下，而git revert是HEAD继续前进，只是新的commit的内容和要revert的内容正好相反，能够抵消要被revert的内容。&lt;/strong&gt;&lt;/li&gt;
 &lt;/ul&gt;
 &lt;p&gt;一个形象的比喻是：&lt;/p&gt;
 &lt;ul&gt;
@@ -79,13 +107,6 @@
 &lt;/li&gt;
 &lt;li&gt;
 &lt;p&gt;&lt;strong&gt;&lt;code&gt;git reset --mixed &amp;lt;commit_id&amp;gt;&lt;/code&gt;&lt;/strong&gt; (默认模式)&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;strong&gt;效果&lt;/strong&gt;：移动 &lt;code&gt;HEAD&lt;/code&gt; 指针，并&lt;strong&gt;重置暂存区&lt;/strong&gt;，但工作目录的内容保持不变。&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;场景&lt;/strong&gt;：当你想撤销提交，并取消文件的暂存状态，但保留代码修改，以便重新组织提交。&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;&lt;strong&gt;&lt;code&gt;git reset --hard &amp;lt;commit_id&amp;gt;&lt;/code&gt;&lt;/strong&gt;&lt;/p&gt;
           
           
         

@@ -600,9 +600,8 @@ Broker:它提供一种传输服务,它的角色就是维护一条从生产者到
       <div class="excerpt_footer">
         <div class="pale">
           
-            <p>git reset 和 git revert 都是用来撤销更改的，但它们的运作方式和对项目历史的影响截然不同。 简单来说，核心区别在于：
-git revert：安全地撤销。它会创建一个新的提交来抵消之前的更改，从而保留完整的历史记录。 git reset：彻底地回退。它会将分支指针直接移动到指定的历史提交，从而修改或抹掉提交历史。 一个形象的比喻是：
-git revert 就像是在文章后面加一个勘误说明，原文还在，但大家都知道哪里错了。 git reset 就像是直接把文章撕掉几页，然后从某个地方重新开始写。 🔎 核心区别对比 方面 git reset git revert 对历史的影响 修改历史，会删除提交记录。 保留历史，通过新 …</p>
+            <p>实用Git命令--可视化 git reset 和 git revert 都是用来撤销更改的，但它们的运作方式和对项目历史的影响截然不同。 简单来说，核心区别在于：
+git revert：安全地撤销。它会创建一个新的提交来抵消之前的更改，从而保留完整的历史记录。 git reset：彻底地回退。它会将分支指针直接移动到指定的历史提交，从而修改或抹掉提交历史。 在回滚这一操作上看，效果差不多。但是在日后继续merge以前的老版本时有区别。因为git revert是用一次逆向的commit“中和”之前的提交，因此日后合并老的branch时，导致这部分改变不会再次出现，但是git reset是之间把某些commit在某个branch上删除， …</p>
           
           <br>
           <a href="https://jianlin-li.github.io/post/git_review_1/" title="阅读更多" class="excerpt_more button">阅读更多</a>
