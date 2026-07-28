@@ -118,6 +118,31 @@
     &lt;/picture&gt;
 &lt;/figure&gt;
 &lt;/p&gt;
+&lt;p&gt;&lt;figure&gt;
+  &lt;picture&gt;
+
+    
+      
+        
+        
+        
+        
+        
+        
+    &lt;img
+      loading=&#34;lazy&#34;
+      decoding=&#34;async&#34;
+      alt=&#34;k8s集群中Pod里面采用ELK架构收集日志流程&#34;
+      
+        class=&#34;image_figure image_internal image_unprocessed&#34;
+        src=&#34;https://jianlin-li.github.io/images/k8s/97.png&#34;
+      
+      
+    /&gt;
+
+    &lt;/picture&gt;
+&lt;/figure&gt;
+&lt;/p&gt;
 &lt;h1 id=&#34;使用elk-stack在本地macbookpro搭建一套日志收集并且可视化系统&#34;&gt;&lt;strong&gt;使用ELK Stack在本地Macbookpro搭建一套日志收集并且可视化系统&lt;/strong&gt;&lt;/h1&gt;
 &lt;h1 id=&#34;架构如下&#34;&gt;&lt;strong&gt;架构如下：&lt;/strong&gt;&lt;/h1&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-text&#34; data-lang=&#34;text&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt; 1&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;/usr/local/var/log/*
