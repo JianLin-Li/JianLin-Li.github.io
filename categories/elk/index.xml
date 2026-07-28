@@ -7,17 +7,68 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
     <copyright>Copyright © 1989–2025, 李建林 </copyright>
-    <lastBuildDate>Thu, 10 Apr 2025 10:37:29 +0800</lastBuildDate><atom:link href="https://jianlin-li.github.io/categories/elk/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Thu, 11 Jun 2026 10:34:29 +0800</lastBuildDate><atom:link href="https://jianlin-li.github.io/categories/elk/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>架构-使用ELK Stack在本地Macbookpro搭建一套日志收集并且可视化系统</title>
-      <link>https://jianlin-li.github.io/post/jiagou-elk-stack_1/</link>
-      <pubDate>Thu, 10 Apr 2025 10:37:29 +0800</pubDate>
+      <link>https://jianlin-li.github.io/post/jiagou-elk-stack/</link>
+      <pubDate>Thu, 11 Jun 2026 10:34:29 +0800</pubDate>
       
-      <guid>https://jianlin-li.github.io/post/jiagou-elk-stack_1/</guid>
+      <guid>https://jianlin-li.github.io/post/jiagou-elk-stack/</guid>
       <description>
         
           
-            &lt;h1 id=&#34;使用elk-stack在本地macbookpro搭建一套日志收集并且可视化系统&#34;&gt;&lt;strong&gt;使用ELK Stack在本地Macbookpro搭建一套日志收集并且可视化系统&lt;/strong&gt;&lt;/h1&gt;
+            &lt;h1 id=&#34;概念-架构图&#34;&gt;概念-架构图&lt;/h1&gt;
+&lt;p&gt;&lt;figure&gt;
+  &lt;picture&gt;
+
+    
+      
+        
+        
+        
+        
+        
+        
+    &lt;img
+      loading=&#34;lazy&#34;
+      decoding=&#34;async&#34;
+      alt=&#34;ELK Stack架构图&#34;
+      
+        class=&#34;image_figure image_internal image_unprocessed&#34;
+        src=&#34;https://jianlin-li.github.io/images/k8s/79.png&#34;
+      
+      
+    /&gt;
+
+    &lt;/picture&gt;
+&lt;/figure&gt;
+&lt;/p&gt;
+&lt;p&gt;&lt;figure&gt;
+  &lt;picture&gt;
+
+    
+      
+        
+        
+        
+        
+        
+        
+    &lt;img
+      loading=&#34;lazy&#34;
+      decoding=&#34;async&#34;
+      alt=&#34;EFK Stack架构图&#34;
+      
+        class=&#34;image_figure image_internal image_unprocessed&#34;
+        src=&#34;https://jianlin-li.github.io/images/k8s/80.png&#34;
+      
+      
+    /&gt;
+
+    &lt;/picture&gt;
+&lt;/figure&gt;
+&lt;/p&gt;
+&lt;h1 id=&#34;使用elk-stack在本地macbookpro搭建一套日志收集并且可视化系统&#34;&gt;&lt;strong&gt;使用ELK Stack在本地Macbookpro搭建一套日志收集并且可视化系统&lt;/strong&gt;&lt;/h1&gt;
 &lt;h1 id=&#34;架构如下&#34;&gt;&lt;strong&gt;架构如下：&lt;/strong&gt;&lt;/h1&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-text&#34; data-lang=&#34;text&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt; 1&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;/usr/local/var/log/*
 &lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt; 2&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;        ↓
