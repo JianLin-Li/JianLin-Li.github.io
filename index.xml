@@ -2891,7 +2891,7 @@
         class=&#34;image_figure image_external image_processed&#34;
         width=&#34;1080&#34;
         height=&#34;514&#34;
-        src=&#34;https://jianlin-li.github.io/images/640_1938257308939286587.webp&#34;
+        src=&#34;https://jianlin-li.github.io/images/640_1938257308939286587.png&#34;
       
       
     /&gt;
@@ -2921,7 +2921,7 @@
         class=&#34;image_figure image_external image_processed&#34;
         width=&#34;630&#34;
         height=&#34;343&#34;
-        src=&#34;https://jianlin-li.github.io/images/640_10982213880157477699.webp&#34;
+        src=&#34;https://jianlin-li.github.io/images/640_10982213880157477699.png&#34;
       
       
     /&gt;
@@ -3074,7 +3074,7 @@
         class=&#34;image_figure image_external image_processed&#34;
         width=&#34;1080&#34;
         height=&#34;492&#34;
-        src=&#34;https://jianlin-li.github.io/images/640_18048263023642273291.webp&#34;
+        src=&#34;https://jianlin-li.github.io/images/640_18048263023642273291.png&#34;
       
       
     /&gt;
@@ -4698,6 +4698,50 @@ fanout是路由广播的形式,将会把消息发给绑定它的全部队列,即
     </item>
     
     <item>
+      <title>MySQL的知识点2--MySQL 主从复制</title>
+      <link>https://jianlin-li.github.io/post/mysql_review_2/</link>
+      <pubDate>Fri, 27 Feb 2026 10:29:13 +0800</pubDate>
+      
+      <guid>https://jianlin-li.github.io/post/mysql_review_2/</guid>
+      <description>
+        
+          
+            &lt;h1 id=&#34;mysql-主从复制知识重点覆盖&#34;&gt;&lt;strong&gt;MySQL 主从复制知识，重点覆盖：&lt;/strong&gt;&lt;/h1&gt;
+&lt;ul&gt;
+&lt;li&gt;主从复制原理&lt;/li&gt;
+&lt;li&gt;Binlog / Relay Log&lt;/li&gt;
+&lt;li&gt;I/O 线程、SQL/Applier 线程&lt;/li&gt;
+&lt;li&gt;GTID&lt;/li&gt;
+&lt;li&gt;搭建完整范例&lt;/li&gt;
+&lt;li&gt;一主一从&lt;/li&gt;
+&lt;li&gt;一主多从&lt;/li&gt;
+&lt;li&gt;多线程复制 MTS&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;LOGICAL_CLOCK&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;binlog_transaction_dependency_tracking&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;并行复制为什么能加速、什么时候加速不明显&lt;/li&gt;
+&lt;li&gt;延迟分析&lt;/li&gt;
+&lt;li&gt;故障排查&lt;/li&gt;
+&lt;li&gt;主从切换&lt;/li&gt;
+&lt;li&gt;半同步复制&lt;/li&gt;
+&lt;li&gt;读写分离&lt;/li&gt;
+&lt;li&gt;常用 SQL&lt;/li&gt;
+&lt;li&gt;生产环境配置建议&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;以下以 &lt;strong&gt;MySQL 8.0&lt;/strong&gt; 为主。MySQL 官方文档目前仍将传统术语逐步改为 &lt;code&gt;source/replica&lt;/code&gt;，例如 MySQL 8.0.23 起推荐 &lt;code&gt;CHANGE REPLICATION SOURCE TO&lt;/code&gt;，旧版本常见 &lt;code&gt;CHANGE MASTER TO&lt;/code&gt;。(&lt;a href=&#34;https://dev.mysql.com/doc/mysql-replication-excerpt/8.0/en/?utm_source=chatgpt.com&#34; title=&#34;MySQL :: MySQL Replication&#34;&gt;MySQL开发者专区&lt;/a&gt;)&lt;/p&gt;
+&lt;hr&gt;
+&lt;h1 id=&#34;一mysql-主从复制是什么&#34;&gt;一、MySQL 主从复制是什么？&lt;/h1&gt;
+&lt;p&gt;MySQL Replication 的核心思想非常简单：&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;主库发生数据变化 → 写入 Binlog → 从库读取 Binlog → 写入 Relay Log → 从库执行这些日志中的事务。&lt;/strong&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;官方定义也是类似的：Source 将数据库变更记录到 Binary Log，Replica 请求并读取这些 Binary Log，然后在自己的数据库上重新执行这些变化。默认情况下复制是&lt;strong&gt;异步复制&lt;/strong&gt;。(&lt;a href=&#34;https://dev.mysql.com/doc/refman/8.0/en/replication-implementation.html?utm_source=chatgpt.com&#34; title=&#34;MySQL :: MySQL 8.0 Reference Manual :: 19.2 Replication Implementation&#34;&gt;MySQL开发者专区&lt;/a&gt;)&lt;/p&gt;
+          
+          
+        
+      </description>
+    </item>
+    
+    <item>
       <title>MySQL的知识点-1</title>
       <link>https://jianlin-li.github.io/post/mysql_review_1/</link>
       <pubDate>Fri, 27 Feb 2026 10:29:12 +0800</pubDate>
@@ -4706,7 +4750,7 @@ fanout是路由广播的形式,将会把消息发给绑定它的全部队列,即
       <description>
         
           
-            &lt;p&gt;MySQL 存储过程。整理一套 &lt;strong&gt;从入门 → 进阶 → 高级 → 生产实战&lt;/strong&gt; 的完整教程体系，并且对比说明 MySQL 存储过程和函数的区别。&lt;/p&gt;
+            &lt;h1 id=&#34;mysql-存储过程整理一套-从入门--进阶--高级--生产实战-的完整教程体系并且对比说明-mysql-存储过程和函数的区别&#34;&gt;MySQL 存储过程。整理一套 &lt;strong&gt;从入门 → 进阶 → 高级 → 生产实战&lt;/strong&gt; 的完整教程体系，并且对比说明 MySQL 存储过程和函数的区别。&lt;/h1&gt;
 &lt;hr&gt;
 &lt;h1 id=&#34;一mysql-存储过程-vs-函数区别&#34;&gt;一、MySQL 存储过程 vs 函数区别&lt;/h1&gt;
 &lt;table&gt;
