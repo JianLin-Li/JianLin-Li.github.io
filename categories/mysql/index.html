@@ -131,6 +131,73 @@
   <div class="excerpt">
     <div class="excerpt_header">
       <h3 class="post_link">
+        <a href="https://jianlin-li.github.io/post/mysql_review_3/" title="MySQL的知识点-3">MySQL的知识点-3</a>
+      </h3>
+      
+  <div class="post_meta">
+    <span><svg class="icon">
+  <title>calendar</title>
+  <use xlink:href="#calendar"></use>
+</svg>
+</span>
+    <span class="post_date">
+      2026-02-27	  
+    </span>
+    <span class="post_time"> · 3 分钟阅读</span><span>&nbsp;· <a href='https://jianlin-li.github.io/tags/mysql/' title="MySQL" class="post_tag button button_translucent">MySQL
+        </a>
+    </span>
+    <span class="page_only">&nbsp;·
+  <div class="post_share">
+    分享到:
+    <a href="https://twitter.com/intent/tweet?text=MySQL%e7%9a%84%e7%9f%a5%e8%af%86%e7%82%b9-3&url=https%3a%2f%2fjianlin-li.github.io%2fpost%2fmysql_review_3%2f&tw_p=tweetbutton" class="twitter" title="分享到 Twitter" target="_blank" rel="nofollow">
+      <svg class="icon">
+  <title>twitter</title>
+  <use xlink:href="#twitter"></use>
+</svg>
+
+    </a>
+    <a href="https://www.facebook.com/sharer.php?u=https%3a%2f%2fjianlin-li.github.io%2fpost%2fmysql_review_3%2f&t=MySQL%e7%9a%84%e7%9f%a5%e8%af%86%e7%82%b9-3" class="facebook" title="分享到 Facebook" target="_blank" rel="nofollow">
+      <svg class="icon">
+  <title>facebook</title>
+  <use xlink:href="#facebook"></use>
+</svg>
+
+    </a>
+    <a href="#linkedinshare" id = "linkedinshare" class="linkedin" title="分享到 LinkedIn" rel="nofollow">
+      <svg class="icon">
+  <title>linkedin</title>
+  <use xlink:href="#linkedin"></use>
+</svg>
+
+    </a>
+    <a href="https://jianlin-li.github.io/post/mysql_review_3/" title="Copy Link" class="link link_yank">
+      <svg class="icon">
+  <title>copy</title>
+  <use xlink:href="#copy"></use>
+</svg>
+
+    </a>
+  </div>
+  </span>
+  </div>
+
+    </div>
+      <div class="excerpt_footer">
+        <div class="pale">
+          
+            <p>MySQL 存储过程。整理一套 从入门 → 进阶 → 高级 → 生产实战 的完整教程体系，并且对比说明 MySQL 存储过程和函数的区别。 一、MySQL 存储过程 vs 函数区别 对比项 存储过程（Procedure） 函数（Function） 是否必须返回值 不必须 必须返回一个值 使用位置 通过 CALL 调用 可以直接在 SELECT 中使用 返回方式 OUT 参数 / SELECT RETURN 是否可修改数据 可以 可以（但不建议） 是否可在SQL语句中使用 不可以 可以 适合场景 业务逻辑、事务处理 计算、字段加工 示例对比 存储过程 1CALL get_user(1); 函数 1SELECT …</p>
+          
+          <br>
+          <a href="https://jianlin-li.github.io/post/mysql_review_3/" title="阅读更多" class="excerpt_more button">阅读更多</a>
+        </div>
+      </div>
+    </div>
+  </li>
+
+        <li class="post_item">
+  <div class="excerpt">
+    <div class="excerpt_header">
+      <h3 class="post_link">
         <a href="https://jianlin-li.github.io/post/mysql_review_2/" title="MySQL的知识点2--MySQL 主从复制">MySQL的知识点2--MySQL 主从复制</a>
       </h3>
       
@@ -211,7 +278,7 @@
     <span class="post_date">
       2026-02-27	  
     </span>
-    <span class="post_time"> · 10 分钟阅读</span><span>&nbsp;· <a href='https://jianlin-li.github.io/tags/mysql/' title="MySQL" class="post_tag button button_translucent">MySQL
+    <span class="post_time"> · 7 分钟阅读</span><span>&nbsp;· <a href='https://jianlin-li.github.io/tags/mysql/' title="MySQL" class="post_tag button button_translucent">MySQL
         </a>
     </span>
     <span class="page_only">&nbsp;·
@@ -253,7 +320,12 @@
       <div class="excerpt_footer">
         <div class="pale">
           
-            <p>MySQL 存储过程。整理一套 从入门 → 进阶 → 高级 → 生产实战 的完整教程体系，并且对比说明 MySQL 存储过程和函数的区别。 一、MySQL 存储过程 vs 函数区别 对比项 存储过程（Procedure） 函数（Function） 是否必须返回值 不必须 必须返回一个值 使用位置 通过 CALL 调用 可以直接在 SELECT 中使用 返回方式 OUT 参数 / SELECT RETURN 是否可修改数据 可以 可以（但不建议） 是否可在SQL语句中使用 不可以 可以 适合场景 业务逻辑、事务处理 计算、字段加工 示例对比 存储过程 1CALL get_user(1); 函数 1SELECT …</p>
+            <p>MySQL 的“三大范式”（3NF）是数据库设计中非常核心的一套规范，用来减少数据冗余、提高数据一致性、避免更新异常。 🌟 一、什么是数据库范式？ 简单说一句话：
+👉 范式 = 表设计的规范标准
+目的就是：
+避免数据重复 防止插入 / 删除 / 更新异常 让数据结构更清晰 🧱 二、第一范式（1NF）——字段必须“原子化” 📌 核心规则 👉 表中的每一列必须是不可再分的最小单位
+❌ 不符合 1NF（错误示例） 学生ID 姓名 电话 1 张三 138xxx,139xxx 👉 问题：
+一个字段存多个值（电话有多个） ✅ 符合 1NF（正确示例） 学生ID 姓名 电话 1 张三 138xxx 1 张三 139xxx 💡 总结一句话 👉 每个 …</p>
           
           <br>
           <a href="https://jianlin-li.github.io/post/mysql_review_1/" title="阅读更多" class="excerpt_more button">阅读更多</a>
@@ -447,14 +519,14 @@
           <span class="button_tally">5</span>
         </a>
         
-        <a href='https://jianlin-li.github.io/categories/rabbitmq/' class="post_tag button button_translucent" title="rabbitmq">
-          RABBITMQ
+        <a href='https://jianlin-li.github.io/categories/mysql/' class="post_tag button button_translucent" title="mysql">
+          MYSQL
           <span class="button_tally">4</span>
         </a>
         
-        <a href='https://jianlin-li.github.io/categories/mysql/' class="post_tag button button_translucent" title="mysql">
-          MYSQL
-          <span class="button_tally">3</span>
+        <a href='https://jianlin-li.github.io/categories/rabbitmq/' class="post_tag button button_translucent" title="rabbitmq">
+          RABBITMQ
+          <span class="button_tally">4</span>
         </a>
         
         <a href='https://jianlin-li.github.io/categories/ci/cd/' class="post_tag button button_translucent" title="ci/cd">
@@ -533,7 +605,7 @@
             </a>
             
             
-            <a href='https://jianlin-li.github.io/categories/mysql/' class=" post_tag button button_translucent" data-position=3 title="mysql">MYSQL<span class="button_tally">3</span>
+            <a href='https://jianlin-li.github.io/categories/mysql/' class=" post_tag button button_translucent" data-position=4 title="mysql">MYSQL<span class="button_tally">4</span>
             </a>
             
             
@@ -637,6 +709,11 @@
           <span class="button_tally">5</span>
         </a>
         
+        <a href='https://jianlin-li.github.io/tags/mysql/' class="post_tag button button_translucent" title="mysql">
+          MYSQL
+          <span class="button_tally">4</span>
+        </a>
+        
         <a href='https://jianlin-li.github.io/tags/rabbitmq/' class="post_tag button button_translucent" title="rabbitmq">
           RABBITMQ
           <span class="button_tally">4</span>
@@ -644,11 +721,6 @@
         
         <a href='https://jianlin-li.github.io/tags/devops/' class="post_tag button button_translucent" title="devops">
           DEVOPS
-          <span class="button_tally">3</span>
-        </a>
-        
-        <a href='https://jianlin-li.github.io/tags/mysql/' class="post_tag button button_translucent" title="mysql">
-          MYSQL
           <span class="button_tally">3</span>
         </a>
         
@@ -744,7 +816,7 @@
             </a>
             
             
-            <a href='https://jianlin-li.github.io/tags/mysql/' class=" post_tag button button_translucent" data-position=3 title="mysql">MYSQL<span class="button_tally">3</span>
+            <a href='https://jianlin-li.github.io/tags/mysql/' class=" post_tag button button_translucent" data-position=4 title="mysql">MYSQL<span class="button_tally">4</span>
             </a>
             
             

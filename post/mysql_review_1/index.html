@@ -168,7 +168,7 @@
     <span class="post_date">
       2026-02-27	  
     </span>
-    <span class="post_time"> · 10 分钟阅读</span><span>&nbsp;· <a href='https://jianlin-li.github.io/tags/mysql/' title="MySQL" class="post_tag button button_translucent">MySQL
+    <span class="post_time"> · 7 分钟阅读</span><span>&nbsp;· <a href='https://jianlin-li.github.io/tags/mysql/' title="MySQL" class="post_tag button button_translucent">MySQL
         </a>
     </span>
     <span class="page_only">&nbsp;·
@@ -206,303 +206,7 @@
   </span>
   </div>
 
-    <div class="post_body"><h1 id="mysql-存储过程整理一套-从入门--进阶--高级--生产实战-的完整教程体系并且对比说明-mysql-存储过程和函数的区别">MySQL 存储过程。整理一套 <strong>从入门 → 进阶 → 高级 → 生产实战</strong> 的完整教程体系，并且对比说明 MySQL 存储过程和函数的区别。</h1>
-<hr>
-<h1 id="一mysql-存储过程-vs-函数区别">一、MySQL 存储过程 vs 函数区别</h1>
-<table>
-  <thead>
-      <tr>
-          <th>对比项</th>
-          <th>存储过程（Procedure）</th>
-          <th>函数（Function）</th>
-      </tr>
-  </thead>
-  <tbody>
-      <tr>
-          <td>是否必须返回值</td>
-          <td>不必须</td>
-          <td>必须返回一个值</td>
-      </tr>
-      <tr>
-          <td>使用位置</td>
-          <td>通过 <code>CALL</code> 调用</td>
-          <td>可以直接在 <code>SELECT</code> 中使用</td>
-      </tr>
-      <tr>
-          <td>返回方式</td>
-          <td>OUT 参数 / SELECT</td>
-          <td>RETURN</td>
-      </tr>
-      <tr>
-          <td>是否可修改数据</td>
-          <td>可以</td>
-          <td>可以（但不建议）</td>
-      </tr>
-      <tr>
-          <td>是否可在SQL语句中使用</td>
-          <td>不可以</td>
-          <td>可以</td>
-      </tr>
-      <tr>
-          <td>适合场景</td>
-          <td>业务逻辑、事务处理</td>
-          <td>计算、字段加工</td>
-      </tr>
-  </tbody>
-</table>
-<h3 id="示例对比">示例对比</h3>
-<h3 id="存储过程">存储过程</h3>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="ln">1</span><span class="cl"><span class="k">CALL</span><span class="w"> </span><span class="n">get_user</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span><span class="w">
-</span></span></span></code></pre></div><h3 id="函数">函数</h3>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="ln">1</span><span class="cl"><span class="k">SELECT</span><span class="w"> </span><span class="n">get_user_name</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span><span class="w">
-</span></span></span></code></pre></div><hr>
-<h1 id="二mysql-存储过程基础">二、MySQL 存储过程基础</h1>
-<h2 id="1-创建存储过程">1️⃣ 创建存储过程</h2>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="ln">1</span><span class="cl"><span class="k">DELIMITER</span><span class="w"> </span><span class="err">$$</span><span class="w">
-</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="w">
-</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="w"></span><span class="k">CREATE</span><span class="w"> </span><span class="k">PROCEDURE</span><span class="w"> </span><span class="n">hello_world</span><span class="p">()</span><span class="w">
-</span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="w"></span><span class="k">BEGIN</span><span class="w">
-</span></span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="w">    </span><span class="k">SELECT</span><span class="w"> </span><span class="s1">&#39;Hello MySQL&#39;</span><span class="p">;</span><span class="w">
-</span></span></span><span class="line"><span class="ln">6</span><span class="cl"><span class="w"></span><span class="k">END</span><span class="w"> </span><span class="err">$$</span><span class="w">
-</span></span></span><span class="line"><span class="ln">7</span><span class="cl"><span class="w">
-</span></span></span><span class="line"><span class="ln">8</span><span class="cl"><span class="w"></span><span class="k">DELIMITER</span><span class="w"> </span><span class="p">;</span><span class="w">
-</span></span></span></code></pre></div><h3 id="关键点解释">关键点解释</h3>
-<ul>
-<li><code>DELIMITER $$</code>
-因为过程内部有 <code>;</code>，必须临时修改结束符</li>
-<li><code>BEGIN ... END</code>
-过程体</li>
-<li>执行方式：</li>
-</ul>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="ln">1</span><span class="cl"><span class="k">CALL</span><span class="w"> </span><span class="n">hello_world</span><span class="p">();</span><span class="w">
-</span></span></span></code></pre></div><hr>
-<h2 id="2-带参数的存储过程">2️⃣ 带参数的存储过程</h2>
-<p>参数类型：</p>
-<ul>
-<li>IN（输入参数）</li>
-<li>OUT（输出参数）</li>
-<li>INOUT（输入输出）</li>
-</ul>
-<h3 id="示例">示例</h3>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="ln">1</span><span class="cl"><span class="k">DELIMITER</span><span class="w"> </span><span class="err">$$</span><span class="w">
-</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="w">
-</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="w"></span><span class="k">CREATE</span><span class="w"> </span><span class="k">PROCEDURE</span><span class="w"> </span><span class="n">get_user_by_id</span><span class="p">(</span><span class="k">IN</span><span class="w"> </span><span class="n">p_id</span><span class="w"> </span><span class="nb">INT</span><span class="p">)</span><span class="w">
-</span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="w"></span><span class="k">BEGIN</span><span class="w">
-</span></span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="w">    </span><span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">users</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">p_id</span><span class="p">;</span><span class="w">
-</span></span></span><span class="line"><span class="ln">6</span><span class="cl"><span class="w"></span><span class="k">END</span><span class="w"> </span><span class="err">$$</span><span class="w">
-</span></span></span><span class="line"><span class="ln">7</span><span class="cl"><span class="w">
-</span></span></span><span class="line"><span class="ln">8</span><span class="cl"><span class="w"></span><span class="k">DELIMITER</span><span class="w"> </span><span class="p">;</span><span class="w">
-</span></span></span></code></pre></div><p>调用：</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="ln">1</span><span class="cl"><span class="k">CALL</span><span class="w"> </span><span class="n">get_user_by_id</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span><span class="w">
-</span></span></span></code></pre></div><hr>
-<h2 id="3-out-参数示例">3️⃣ OUT 参数示例</h2>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="ln">1</span><span class="cl"><span class="k">DELIMITER</span><span class="w"> </span><span class="err">$$</span><span class="w">
-</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="w">
-</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="w"></span><span class="k">CREATE</span><span class="w"> </span><span class="k">PROCEDURE</span><span class="w"> </span><span class="n">count_user</span><span class="p">(</span><span class="k">OUT</span><span class="w"> </span><span class="n">total</span><span class="w"> </span><span class="nb">INT</span><span class="p">)</span><span class="w">
-</span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="w"></span><span class="k">BEGIN</span><span class="w">
-</span></span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="w">    </span><span class="k">SELECT</span><span class="w"> </span><span class="k">COUNT</span><span class="p">(</span><span class="o">*</span><span class="p">)</span><span class="w"> </span><span class="k">INTO</span><span class="w"> </span><span class="n">total</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">users</span><span class="p">;</span><span class="w">
-</span></span></span><span class="line"><span class="ln">6</span><span class="cl"><span class="w"></span><span class="k">END</span><span class="w"> </span><span class="err">$$</span><span class="w">
-</span></span></span><span class="line"><span class="ln">7</span><span class="cl"><span class="w">
-</span></span></span><span class="line"><span class="ln">8</span><span class="cl"><span class="w"></span><span class="k">DELIMITER</span><span class="w"> </span><span class="p">;</span><span class="w">
-</span></span></span></code></pre></div><p>调用：</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="ln">1</span><span class="cl"><span class="k">CALL</span><span class="w"> </span><span class="n">count_user</span><span class="p">(</span><span class="o">@</span><span class="n">t</span><span class="p">);</span><span class="w">
-</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="w"></span><span class="k">SELECT</span><span class="w"> </span><span class="o">@</span><span class="n">t</span><span class="p">;</span><span class="w">
-</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="w"></span><span class="c1">-- @t为定义的会话作用域类型变量 --
-</span></span></span></code></pre></div><hr>
-<h2 id="4-inout-示例">4️⃣ INOUT 示例</h2>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="ln">1</span><span class="cl"><span class="k">DELIMITER</span><span class="w"> </span><span class="err">$$</span><span class="w">
-</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="w">
-</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="w"></span><span class="k">CREATE</span><span class="w"> </span><span class="k">PROCEDURE</span><span class="w"> </span><span class="n">add_one</span><span class="p">(</span><span class="k">INOUT</span><span class="w"> </span><span class="n">num</span><span class="w"> </span><span class="nb">INT</span><span class="p">)</span><span class="w">
-</span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="w"></span><span class="k">BEGIN</span><span class="w">
-</span></span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="w">    </span><span class="k">SET</span><span class="w"> </span><span class="n">num</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">num</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w">
-</span></span></span><span class="line"><span class="ln">6</span><span class="cl"><span class="w"></span><span class="k">END</span><span class="w"> </span><span class="err">$$</span><span class="w">
-</span></span></span><span class="line"><span class="ln">7</span><span class="cl"><span class="w">
-</span></span></span><span class="line"><span class="ln">8</span><span class="cl"><span class="w"></span><span class="k">DELIMITER</span><span class="w"> </span><span class="p">;</span><span class="w">
-</span></span></span></code></pre></div><p>调用：</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="ln">1</span><span class="cl"><span class="k">SET</span><span class="w"> </span><span class="o">@</span><span class="n">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">5</span><span class="p">;</span><span class="w">
-</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="w"></span><span class="k">CALL</span><span class="w"> </span><span class="n">add_one</span><span class="p">(</span><span class="o">@</span><span class="n">a</span><span class="p">);</span><span class="w">
-</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="w"></span><span class="k">SELECT</span><span class="w"> </span><span class="o">@</span><span class="n">a</span><span class="p">;</span><span class="w">
-</span></span></span></code></pre></div><hr>
-<h1 id="三流程控制初级--中级">三、流程控制（初级 → 中级）</h1>
-<h2 id="1-变量定义">1️⃣ 变量定义</h2>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="ln">1</span><span class="cl"><span class="k">DECLARE</span><span class="w"> </span><span class="n">total</span><span class="w"> </span><span class="nb">INT</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w">
-</span></span></span></code></pre></div><hr>
-<h2 id="2-if-语句">2️⃣ IF 语句</h2>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="ln">1</span><span class="cl"><span class="k">IF</span><span class="w"> </span><span class="n">total</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">10</span><span class="w"> </span><span class="k">THEN</span><span class="w">
-</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="w">    </span><span class="k">SELECT</span><span class="w"> </span><span class="s1">&#39;大于10&#39;</span><span class="p">;</span><span class="w">
-</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="w"></span><span class="k">ELSE</span><span class="w">
-</span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="w">    </span><span class="k">SELECT</span><span class="w"> </span><span class="s1">&#39;小于等于10&#39;</span><span class="p">;</span><span class="w">
-</span></span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="w"></span><span class="k">END</span><span class="w"> </span><span class="k">IF</span><span class="p">;</span><span class="w">
-</span></span></span></code></pre></div><hr>
-<h2 id="3-case-语句">3️⃣ CASE 语句</h2>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="ln">1</span><span class="cl"><span class="k">CASE</span><span class="w"> </span><span class="n">status</span><span class="w">
-</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="w">    </span><span class="k">WHEN</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="k">THEN</span><span class="w"> </span><span class="k">SELECT</span><span class="w"> </span><span class="s1">&#39;正常&#39;</span><span class="p">;</span><span class="w">
-</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="w">    </span><span class="k">WHEN</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="k">THEN</span><span class="w"> </span><span class="k">SELECT</span><span class="w"> </span><span class="s1">&#39;禁用&#39;</span><span class="p">;</span><span class="w">
-</span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="w"></span><span class="k">END</span><span class="w"> </span><span class="k">CASE</span><span class="p">;</span><span class="w">
-</span></span></span></code></pre></div><hr>
-<h2 id="4-while-循环">4️⃣ WHILE 循环</h2>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="ln">1</span><span class="cl"><span class="k">DECLARE</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="nb">INT</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w">
-</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="w">
-</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="w"></span><span class="n">WHILE</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="mi">5</span><span class="w"> </span><span class="k">DO</span><span class="w">
-</span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="w">    </span><span class="k">INSERT</span><span class="w"> </span><span class="k">INTO</span><span class="w"> </span><span class="n">test_table</span><span class="w"> </span><span class="k">VALUES</span><span class="p">(</span><span class="n">i</span><span class="p">);</span><span class="w">
-</span></span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="w">    </span><span class="k">SET</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w">
-</span></span></span><span class="line"><span class="ln">6</span><span class="cl"><span class="w"></span><span class="k">END</span><span class="w"> </span><span class="n">WHILE</span><span class="p">;</span><span class="w">
-</span></span></span></code></pre></div><hr>
-<h2 id="5-loop-循环">5️⃣ LOOP 循环</h2>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="ln">1</span><span class="cl"><span class="n">label1</span><span class="p">:</span><span class="w"> </span><span class="n">LOOP</span><span class="w">
-</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="w">    </span><span class="k">IF</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">5</span><span class="w"> </span><span class="k">THEN</span><span class="w">
-</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="w">        </span><span class="n">LEAVE</span><span class="w"> </span><span class="n">label1</span><span class="p">;</span><span class="w">
-</span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="w">    </span><span class="k">END</span><span class="w"> </span><span class="k">IF</span><span class="p">;</span><span class="w">
-</span></span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="w">    </span><span class="k">SET</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w">
-</span></span></span><span class="line"><span class="ln">6</span><span class="cl"><span class="w"></span><span class="k">END</span><span class="w"> </span><span class="n">LOOP</span><span class="p">;</span><span class="w">
-</span></span></span></code></pre></div><hr>
-<h2 id="6-repeat-循环">6️⃣ REPEAT 循环</h2>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="ln">1</span><span class="cl"><span class="n">REPEAT</span><span class="w">
-</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="w">    </span><span class="k">SET</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w">
-</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="w"></span><span class="k">UNTIL</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">5</span><span class="w">
-</span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="w"></span><span class="k">END</span><span class="w"> </span><span class="n">REPEAT</span><span class="p">;</span><span class="w">
-</span></span></span></code></pre></div><hr>
-<h1 id="四游标cursor-中级必学">四、游标（Cursor）— 中级必学</h1>
-<p>当你需要逐行处理数据时使用。</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="k">DELIMITER</span><span class="w"> </span><span class="err">$$</span><span class="w">
-</span></span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="w">
-</span></span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="w"></span><span class="k">CREATE</span><span class="w"> </span><span class="k">PROCEDURE</span><span class="w"> </span><span class="n">cursor_demo</span><span class="p">()</span><span class="w">
-</span></span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="w"></span><span class="k">BEGIN</span><span class="w">
-</span></span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="w">    </span><span class="k">DECLARE</span><span class="w"> </span><span class="n">done</span><span class="w"> </span><span class="nb">INT</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="k">FALSE</span><span class="p">;</span><span class="w">
-</span></span></span><span class="line"><span class="ln"> 6</span><span class="cl"><span class="w">    </span><span class="k">DECLARE</span><span class="w"> </span><span class="n">user_id</span><span class="w"> </span><span class="nb">INT</span><span class="p">;</span><span class="w">
-</span></span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="w">
-</span></span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="w">    </span><span class="k">DECLARE</span><span class="w"> </span><span class="n">cur</span><span class="w"> </span><span class="k">CURSOR</span><span class="w"> </span><span class="k">FOR</span><span class="w"> </span><span class="k">SELECT</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">users</span><span class="p">;</span><span class="w">
-</span></span></span><span class="line"><span class="ln"> 9</span><span class="cl"><span class="w">    </span><span class="k">DECLARE</span><span class="w"> </span><span class="k">CONTINUE</span><span class="w"> </span><span class="k">HANDLER</span><span class="w"> </span><span class="k">FOR</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">FOUND</span><span class="w"> </span><span class="k">SET</span><span class="w"> </span><span class="n">done</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">TRUE</span><span class="p">;</span><span class="w">
-</span></span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="w">
-</span></span></span><span class="line"><span class="ln">11</span><span class="cl"><span class="w">    </span><span class="k">OPEN</span><span class="w"> </span><span class="n">cur</span><span class="p">;</span><span class="w">
-</span></span></span><span class="line"><span class="ln">12</span><span class="cl"><span class="w">
-</span></span></span><span class="line"><span class="ln">13</span><span class="cl"><span class="w">    </span><span class="n">read_loop</span><span class="p">:</span><span class="w"> </span><span class="n">LOOP</span><span class="w">
-</span></span></span><span class="line"><span class="ln">14</span><span class="cl"><span class="w">        </span><span class="k">FETCH</span><span class="w"> </span><span class="n">cur</span><span class="w"> </span><span class="k">INTO</span><span class="w"> </span><span class="n">user_id</span><span class="p">;</span><span class="w">
-</span></span></span><span class="line"><span class="ln">15</span><span class="cl"><span class="w">        </span><span class="k">IF</span><span class="w"> </span><span class="n">done</span><span class="w"> </span><span class="k">THEN</span><span class="w">
-</span></span></span><span class="line"><span class="ln">16</span><span class="cl"><span class="w">            </span><span class="n">LEAVE</span><span class="w"> </span><span class="n">read_loop</span><span class="p">;</span><span class="w">
-</span></span></span><span class="line"><span class="ln">17</span><span class="cl"><span class="w">        </span><span class="k">END</span><span class="w"> </span><span class="k">IF</span><span class="p">;</span><span class="w">
-</span></span></span><span class="line"><span class="ln">18</span><span class="cl"><span class="w">
-</span></span></span><span class="line"><span class="ln">19</span><span class="cl"><span class="w">        </span><span class="k">UPDATE</span><span class="w"> </span><span class="n">users</span><span class="w"> </span><span class="k">SET</span><span class="w"> </span><span class="n">status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">user_id</span><span class="p">;</span><span class="w">
-</span></span></span><span class="line"><span class="ln">20</span><span class="cl"><span class="w">    </span><span class="k">END</span><span class="w"> </span><span class="n">LOOP</span><span class="p">;</span><span class="w">
-</span></span></span><span class="line"><span class="ln">21</span><span class="cl"><span class="w">
-</span></span></span><span class="line"><span class="ln">22</span><span class="cl"><span class="w">    </span><span class="k">CLOSE</span><span class="w"> </span><span class="n">cur</span><span class="p">;</span><span class="w">
-</span></span></span><span class="line"><span class="ln">23</span><span class="cl"><span class="w"></span><span class="k">END</span><span class="w"> </span><span class="err">$$</span><span class="w">
-</span></span></span><span class="line"><span class="ln">24</span><span class="cl"><span class="w">
-</span></span></span><span class="line"><span class="ln">25</span><span class="cl"><span class="w"></span><span class="k">DELIMITER</span><span class="w"> </span><span class="p">;</span><span class="w">
-</span></span></span></code></pre></div><hr>
-<h1 id="五事务控制高级">五、事务控制（高级）</h1>
-<p>MySQL 存储过程可以控制事务。</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="k">DELIMITER</span><span class="w"> </span><span class="err">$$</span><span class="w">
-</span></span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="w">
-</span></span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="w"></span><span class="k">CREATE</span><span class="w"> </span><span class="k">PROCEDURE</span><span class="w"> </span><span class="n">transfer_money</span><span class="p">(</span><span class="w">
-</span></span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="w">    </span><span class="k">IN</span><span class="w"> </span><span class="n">from_id</span><span class="w"> </span><span class="nb">INT</span><span class="p">,</span><span class="w">
-</span></span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="w">    </span><span class="k">IN</span><span class="w"> </span><span class="n">to_id</span><span class="w"> </span><span class="nb">INT</span><span class="p">,</span><span class="w">
-</span></span></span><span class="line"><span class="ln"> 6</span><span class="cl"><span class="w">    </span><span class="k">IN</span><span class="w"> </span><span class="n">amount</span><span class="w"> </span><span class="nb">DECIMAL</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span><span class="w">
-</span></span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="w"></span><span class="p">)</span><span class="w">
-</span></span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="w"></span><span class="k">BEGIN</span><span class="w">
-</span></span></span><span class="line"><span class="ln"> 9</span><span class="cl"><span class="w">    </span><span class="k">START</span><span class="w"> </span><span class="k">TRANSACTION</span><span class="p">;</span><span class="w">
-</span></span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="w">
-</span></span></span><span class="line"><span class="ln">11</span><span class="cl"><span class="w">    </span><span class="k">UPDATE</span><span class="w"> </span><span class="n">account</span><span class="w"> </span><span class="k">SET</span><span class="w"> </span><span class="n">balance</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">balance</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">amount</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">from_id</span><span class="p">;</span><span class="w">
-</span></span></span><span class="line"><span class="ln">12</span><span class="cl"><span class="w">    </span><span class="k">UPDATE</span><span class="w"> </span><span class="n">account</span><span class="w"> </span><span class="k">SET</span><span class="w"> </span><span class="n">balance</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">balance</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">amount</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">to_id</span><span class="p">;</span><span class="w">
-</span></span></span><span class="line"><span class="ln">13</span><span class="cl"><span class="w">
-</span></span></span><span class="line"><span class="ln">14</span><span class="cl"><span class="w">    </span><span class="k">COMMIT</span><span class="p">;</span><span class="w">
-</span></span></span><span class="line"><span class="ln">15</span><span class="cl"><span class="w"></span><span class="k">END</span><span class="w"> </span><span class="err">$$</span><span class="w">
-</span></span></span><span class="line"><span class="ln">16</span><span class="cl"><span class="w">
-</span></span></span><span class="line"><span class="ln">17</span><span class="cl"><span class="w"></span><span class="k">DELIMITER</span><span class="w"> </span><span class="p">;</span><span class="w">
-</span></span></span></code></pre></div><hr>
-<h1 id="六异常处理高级">六、异常处理（高级）</h1>
-<p>MySQL 使用 HANDLER 机制。</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="ln">1</span><span class="cl"><span class="k">DECLARE</span><span class="w"> </span><span class="n">EXIT</span><span class="w"> </span><span class="k">HANDLER</span><span class="w"> </span><span class="k">FOR</span><span class="w"> </span><span class="k">SQLEXCEPTION</span><span class="w">
-</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="w"></span><span class="k">BEGIN</span><span class="w">
-</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="w">    </span><span class="k">ROLLBACK</span><span class="p">;</span><span class="w">
-</span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="w"></span><span class="k">END</span><span class="p">;</span><span class="w">
-</span></span></span></code></pre></div><p>完整示例：</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="k">START</span><span class="w"> </span><span class="k">TRANSACTION</span><span class="p">;</span><span class="w">
-</span></span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="w">
-</span></span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="w"></span><span class="k">DECLARE</span><span class="w"> </span><span class="n">EXIT</span><span class="w"> </span><span class="k">HANDLER</span><span class="w"> </span><span class="k">FOR</span><span class="w"> </span><span class="k">SQLEXCEPTION</span><span class="w">
-</span></span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="w"></span><span class="k">BEGIN</span><span class="w">
-</span></span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="w">    </span><span class="k">ROLLBACK</span><span class="p">;</span><span class="w">
-</span></span></span><span class="line"><span class="ln"> 6</span><span class="cl"><span class="w"></span><span class="k">END</span><span class="p">;</span><span class="w">
-</span></span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="w">
-</span></span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="w"></span><span class="k">UPDATE</span><span class="w"> </span><span class="n">account</span><span class="w"> </span><span class="k">SET</span><span class="w"> </span><span class="n">balance</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">balance</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">100</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w">
-</span></span></span><span class="line"><span class="ln"> 9</span><span class="cl"><span class="w"></span><span class="k">UPDATE</span><span class="w"> </span><span class="n">account</span><span class="w"> </span><span class="k">SET</span><span class="w"> </span><span class="n">balance</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">balance</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">100</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span><span class="p">;</span><span class="w">
-</span></span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="w">
-</span></span></span><span class="line"><span class="ln">11</span><span class="cl"><span class="w"></span><span class="k">COMMIT</span><span class="p">;</span><span class="w">
-</span></span></span></code></pre></div><hr>
-<h1 id="七动态-sql高级进阶">七、动态 SQL（高级进阶）</h1>
-<p>MySQL 不支持直接 EXEC，需要 PREPARE。</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="ln">1</span><span class="cl"><span class="k">SET</span><span class="w"> </span><span class="o">@</span><span class="k">sql</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;SELECT * FROM users WHERE id = ?&#39;</span><span class="p">;</span><span class="w">
-</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="w">
-</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="w"></span><span class="k">PREPARE</span><span class="w"> </span><span class="n">stmt</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="o">@</span><span class="k">sql</span><span class="p">;</span><span class="w">
-</span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="w"></span><span class="k">SET</span><span class="w"> </span><span class="o">@</span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w">
-</span></span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="w"></span><span class="k">EXECUTE</span><span class="w"> </span><span class="n">stmt</span><span class="w"> </span><span class="k">USING</span><span class="w"> </span><span class="o">@</span><span class="n">id</span><span class="p">;</span><span class="w">
-</span></span></span><span class="line"><span class="ln">6</span><span class="cl"><span class="w"></span><span class="k">DEALLOCATE</span><span class="w"> </span><span class="k">PREPARE</span><span class="w"> </span><span class="n">stmt</span><span class="p">;</span><span class="w">
-</span></span></span></code></pre></div><hr>
-<h1 id="八函数function教程">八、函数（Function）教程</h1>
-<h2 id="创建函数">创建函数</h2>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="k">DELIMITER</span><span class="w"> </span><span class="err">$$</span><span class="w">
-</span></span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="w">
-</span></span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="w"></span><span class="k">CREATE</span><span class="w"> </span><span class="k">FUNCTION</span><span class="w"> </span><span class="n">get_user_count</span><span class="p">()</span><span class="w">
-</span></span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="w"></span><span class="k">RETURNS</span><span class="w"> </span><span class="nb">INT</span><span class="w">
-</span></span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="w"></span><span class="k">DETERMINISTIC</span><span class="w">
-</span></span></span><span class="line"><span class="ln"> 6</span><span class="cl"><span class="w"></span><span class="k">BEGIN</span><span class="w">
-</span></span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="w">    </span><span class="k">DECLARE</span><span class="w"> </span><span class="n">total</span><span class="w"> </span><span class="nb">INT</span><span class="p">;</span><span class="w">
-</span></span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="w">    </span><span class="k">SELECT</span><span class="w"> </span><span class="k">COUNT</span><span class="p">(</span><span class="o">*</span><span class="p">)</span><span class="w"> </span><span class="k">INTO</span><span class="w"> </span><span class="n">total</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">users</span><span class="p">;</span><span class="w">
-</span></span></span><span class="line"><span class="ln"> 9</span><span class="cl"><span class="w">    </span><span class="k">RETURN</span><span class="w"> </span><span class="n">total</span><span class="p">;</span><span class="w">
-</span></span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="w"></span><span class="k">END</span><span class="w"> </span><span class="err">$$</span><span class="w">
-</span></span></span><span class="line"><span class="ln">11</span><span class="cl"><span class="w">
-</span></span></span><span class="line"><span class="ln">12</span><span class="cl"><span class="w"></span><span class="k">DELIMITER</span><span class="w"> </span><span class="p">;</span><span class="w">
-</span></span></span></code></pre></div><p>使用：</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="ln">1</span><span class="cl"><span class="k">SELECT</span><span class="w"> </span><span class="n">get_user_count</span><span class="p">();</span><span class="w">
-</span></span></span></code></pre></div><hr>
-<h1 id="九存储过程-vs-函数使用场景总结">九、存储过程 vs 函数使用场景总结</h1>
-<h3 id="用存储过程的场景">用存储过程的场景：</h3>
-<ul>
-<li>复杂业务流程</li>
-<li>多表事务</li>
-<li>批量处理</li>
-<li>审核流程</li>
-<li>报表生成</li>
-</ul>
-<h3 id="用函数的场景">用函数的场景：</h3>
-<ul>
-<li>计算字段</li>
-<li>金额转换</li>
-<li>状态转换</li>
-<li>数据格式处理</li>
-</ul>
-<hr>
-<h1 id="十性能与生产建议非常重要">十、性能与生产建议（非常重要）</h1>
-<h3 id="-不建议">❌ 不建议：</h3>
-<ul>
-<li>在高并发系统中滥用游标</li>
-<li>在函数中写大量更新逻辑</li>
-<li>用存储过程替代所有业务代码</li>
-</ul>
-<h3 id="-建议">✅ 建议：</h3>
-<ul>
-<li>用于核心数据逻辑封装</li>
-<li>用于减少网络往返</li>
-<li>用于权限控制</li>
-<li>用于复杂事务</li>
-</ul>
-<hr>
-<h1 id="十一进阶路线图给你推荐学习顺序">十一、进阶路线图（给你推荐学习顺序）</h1>
-<ol>
-<li>基础语法（创建 / 参数 / IF / LOOP）</li>
-<li>变量和 SELECT INTO</li>
-<li>游标</li>
-<li>事务控制</li>
-<li>异常处理</li>
-<li>动态 SQL</li>
-<li>性能优化</li>
-<li>与应用层配合（PHP / Java）</li>
-</ol>
-<hr>
-<hr>
-<hr>
-<hr>
-<h1 id="mysql-的三大范式3nf是数据库设计中非常核心的一套规范用来减少数据冗余提高数据一致性避免更新异常">MySQL 的“三大范式”（3NF）是数据库设计中非常核心的一套规范，用来<strong>减少数据冗余、提高数据一致性、避免更新异常</strong>。</h1>
+    <div class="post_body"><h1 id="mysql-的三大范式3nf是数据库设计中非常核心的一套规范用来减少数据冗余提高数据一致性避免更新异常">MySQL 的“三大范式”（3NF）是数据库设计中非常核心的一套规范，用来<strong>减少数据冗余、提高数据一致性、避免更新异常</strong>。</h1>
 <hr>
 <h1 id="-一什么是数据库范式">🌟 一、什么是数据库范式？</h1>
 <p>简单说一句话：</p>
@@ -804,7 +508,7 @@
 <h3 id="步骤-4-刷新权限">步骤 4: 刷新权限</h3>
 <p>完成权限分配后，记得刷新权限以便使更改生效：</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="ln">1</span><span class="cl"><span class="n">FLUSH</span><span class="w"> </span><span class="k">PRIVILEGES</span><span class="p">;</span><span class="w">
-</span></span></span></code></pre></div><h3 id="示例-1">示例</h3>
+</span></span></span></code></pre></div><h3 id="示例">示例</h3>
 <p>假设你要创建一个名为 <code>app_user</code> 的用户，允许其从任何主机连接，并对该用户授予 <code>my_database</code> 数据库的所有操作权限，你可以按如下步骤操作：</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="ln">1</span><span class="cl"><span class="k">CREATE</span><span class="w"> </span><span class="k">USER</span><span class="w"> </span><span class="s1">&#39;app_user&#39;</span><span class="o">@</span><span class="s1">&#39;%&#39;</span><span class="w"> </span><span class="n">IDENTIFIED</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="s1">&#39;secure_password&#39;</span><span class="p">;</span><span class="w">
 </span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="w"></span><span class="k">GRANT</span><span class="w"> </span><span class="k">ALL</span><span class="w"> </span><span class="k">PRIVILEGES</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">my_database</span><span class="p">.</span><span class="o">*</span><span class="w"> </span><span class="k">TO</span><span class="w"> </span><span class="s1">&#39;app_user&#39;</span><span class="o">@</span><span class="s1">&#39;%&#39;</span><span class="p">;</span><span class="w">
@@ -976,7 +680,7 @@
 <li><strong>REPEATABLE READ</strong>（默认）：在这个级别下，InnoDB 提供了更强的一致性读保证，在同一个事务内的多次读取将返回相同的结果集，除非事务本身进行了修改。</li>
 <li><strong>SERIALIZABLE</strong>：最高的隔离级别，强制所有的查询都变成当前读，并且加上共享锁，阻止其他事务的写入操作，实现最高程度的数据一致性和事务隔离。</li>
 </ul>
-<h3 id="示例-2">示例</h3>
+<h3 id="示例-1">示例</h3>
 <p>假设有一个表 <code>accounts</code>，包含两个账户 A 和 B，初始余额分别为 100 和 200。</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="c1">-- 开始事务
 </span></span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="c1"></span><span class="k">START</span><span class="w"> </span><span class="k">TRANSACTION</span><span class="p">;</span><span class="w">
@@ -1282,14 +986,14 @@
           <span class="button_tally">5</span>
         </a>
         
-        <a href='https://jianlin-li.github.io/categories/rabbitmq/' class="post_tag button button_translucent" title="rabbitmq">
-          RABBITMQ
+        <a href='https://jianlin-li.github.io/categories/mysql/' class="post_tag button button_translucent" title="mysql">
+          MYSQL
           <span class="button_tally">4</span>
         </a>
         
-        <a href='https://jianlin-li.github.io/categories/mysql/' class="post_tag button button_translucent" title="mysql">
-          MYSQL
-          <span class="button_tally">3</span>
+        <a href='https://jianlin-li.github.io/categories/rabbitmq/' class="post_tag button button_translucent" title="rabbitmq">
+          RABBITMQ
+          <span class="button_tally">4</span>
         </a>
         
         <a href='https://jianlin-li.github.io/categories/ci/cd/' class="post_tag button button_translucent" title="ci/cd">
@@ -1368,7 +1072,7 @@
             </a>
             
             
-            <a href='https://jianlin-li.github.io/categories/mysql/' class=" post_tag button button_translucent" data-position=3 title="mysql">MYSQL<span class="button_tally">3</span>
+            <a href='https://jianlin-li.github.io/categories/mysql/' class=" post_tag button button_translucent" data-position=4 title="mysql">MYSQL<span class="button_tally">4</span>
             </a>
             
             
@@ -1472,6 +1176,11 @@
           <span class="button_tally">5</span>
         </a>
         
+        <a href='https://jianlin-li.github.io/tags/mysql/' class="post_tag button button_translucent" title="mysql">
+          MYSQL
+          <span class="button_tally">4</span>
+        </a>
+        
         <a href='https://jianlin-li.github.io/tags/rabbitmq/' class="post_tag button button_translucent" title="rabbitmq">
           RABBITMQ
           <span class="button_tally">4</span>
@@ -1479,11 +1188,6 @@
         
         <a href='https://jianlin-li.github.io/tags/devops/' class="post_tag button button_translucent" title="devops">
           DEVOPS
-          <span class="button_tally">3</span>
-        </a>
-        
-        <a href='https://jianlin-li.github.io/tags/mysql/' class="post_tag button button_translucent" title="mysql">
-          MYSQL
           <span class="button_tally">3</span>
         </a>
         
@@ -1579,7 +1283,7 @@
             </a>
             
             
-            <a href='https://jianlin-li.github.io/tags/mysql/' class=" post_tag button button_translucent" data-position=3 title="mysql">MYSQL<span class="button_tally">3</span>
+            <a href='https://jianlin-li.github.io/tags/mysql/' class=" post_tag button button_translucent" data-position=4 title="mysql">MYSQL<span class="button_tally">4</span>
             </a>
             
             
