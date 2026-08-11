@@ -511,7 +511,7 @@
     <span class="post_date">
       2026-02-27	  
     </span>
-    <span class="post_time"> · 7 分钟阅读</span><span>&nbsp;· <a href='https://jianlin-li.github.io/tags/mysql/' title="MySQL" class="post_tag button button_translucent">MySQL
+    <span class="post_time"> · 20 分钟阅读</span><span>&nbsp;· <a href='https://jianlin-li.github.io/tags/mysql/' title="MySQL" class="post_tag button button_translucent">MySQL
         </a>
     </span>
     <span class="page_only">&nbsp;·
@@ -553,12 +553,8 @@
       <div class="excerpt_footer">
         <div class="pale">
           
-            <p>MySQL 的“三大范式”（3NF）是数据库设计中非常核心的一套规范，用来减少数据冗余、提高数据一致性、避免更新异常。 🌟 一、什么是数据库范式？ 简单说一句话：
-👉 范式 = 表设计的规范标准
-目的就是：
-避免数据重复 防止插入 / 删除 / 更新异常 让数据结构更清晰 🧱 二、第一范式（1NF）——字段必须“原子化” 📌 核心规则 👉 表中的每一列必须是不可再分的最小单位
-❌ 不符合 1NF（错误示例） 学生ID 姓名 电话 1 张三 138xxx,139xxx 👉 问题：
-一个字段存多个值（电话有多个） ✅ 符合 1NF（正确示例） 学生ID 姓名 电话 1 张三 138xxx 1 张三 139xxx 💡 总结一句话 👉 每个 …</p>
+            <p>MySQL 中 CHAR 类型字段的长度并不是只能是 255，但它的最大长度确实受到限制，具体情况如下： ✅ 官方定义（MySQL 8.0）： CHAR(n) 中的 n 表示字符数（不是字节数）。 最大长度为 255 个字符。 即：CHAR(0) 到 CHAR(255) 是合法的。 超过 255 会报错：Data too long for column ... 或语法错误。 📌 注意：这是 字符数上限，不是字节上限。实际占用的存储空间取决于所用字符集：
+对于 latin1：1 字符 = 1 字节 → 最多 255 字节 对于 utf8mb3：1 字符最多 3 字节 → 最多 765 字节 对于 utf8mb4：1 字符最多 4 字节 …</p>
           
           <br>
           <a href="https://jianlin-li.github.io/post/mysql_review_1/" title="阅读更多" class="excerpt_more button">阅读更多</a>
