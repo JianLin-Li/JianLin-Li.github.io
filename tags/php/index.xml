@@ -7,7 +7,53 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
     <copyright>Copyright © 1989–2025, 李建林 </copyright>
-    <lastBuildDate>Mon, 30 Mar 2026 19:52:37 +0800</lastBuildDate><atom:link href="https://jianlin-li.github.io/tags/php/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Mon, 30 Mar 2026 19:52:38 +0800</lastBuildDate><atom:link href="https://jianlin-li.github.io/tags/php/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>PHP语言的知识点-7</title>
+      <link>https://jianlin-li.github.io/post/php_review_7/</link>
+      <pubDate>Mon, 30 Mar 2026 19:52:38 +0800</pubDate>
+      
+      <guid>https://jianlin-li.github.io/post/php_review_7/</guid>
+      <description>
+        
+          
+            &lt;h1 id=&#34;phpunit-是-php-生态里最常用的自动化测试框架你可以把它理解成用-php-代码去验证另一段-php-代码是否按照预期工作&#34;&gt;PHPUnit 是 PHP 生态里最常用的自动化测试框架。你可以把它理解成：用 PHP 代码去验证另一段 PHP 代码是否按照预期工作。&lt;/h1&gt;
+&lt;p&gt;例如，你写了一个计算折扣的方法：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-php&#34; data-lang=&#34;php&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;nv&#34;&gt;$price&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;nv&#34;&gt;$calculator&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;discount&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;100&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;mf&#34;&gt;0.8&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;你希望结果永远是 &lt;code&gt;80&lt;/code&gt;。PHPUnit 可以自动运行这段验证，并在以后修改代码导致结果出错时立即告诉你。&lt;/p&gt;
+&lt;h2 id=&#34;一为什么要写单元测试&#34;&gt;一、为什么要写单元测试&lt;/h2&gt;
+&lt;p&gt;单元测试主要解决几个问题：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;修改代码后，快速判断有没有破坏原来的功能&lt;/li&gt;
+&lt;li&gt;把需求转换成可以重复执行的验证&lt;/li&gt;
+&lt;li&gt;减少依赖手动点页面、打印变量&lt;/li&gt;
+&lt;li&gt;帮助重构代码&lt;/li&gt;
+&lt;li&gt;在 CI/CD 中自动阻止有问题的代码上线&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;测试不能证明程序完全没有问题，但能显著降低修改代码时的风险。&lt;/p&gt;
+&lt;h2 id=&#34;二安装-phpunit&#34;&gt;二、安装 PHPUnit&lt;/h2&gt;
+&lt;p&gt;PHPUnit 一般通过 Composer 安装：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;composer require --dev phpunit/phpunit
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;这里的 &lt;code&gt;--dev&lt;/code&gt; 表示 PHPUnit 只用于开发和测试，不属于生产环境依赖。&lt;/p&gt;
+&lt;p&gt;安装完成后查看版本：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;vendor/bin/phpunit --version
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;不同 PHPUnit 版本对 PHP 版本有要求。如果 Composer 无法安装最新版，它通常会根据当前 PHP 版本选择兼容版本，也可以在项目的 &lt;code&gt;composer.json&lt;/code&gt; 中明确指定。&lt;/p&gt;
+&lt;p&gt;一个典型项目结构如下：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-text&#34; data-lang=&#34;text&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;project/
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt;2&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;├── src/
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt;3&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;│   └── Calculator.php
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt;4&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;├── tests/
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt;5&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;│   └── CalculatorTest.php
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt;6&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;├── composer.json
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;ln&#34;&gt;7&lt;/span&gt;&lt;span class=&#34;cl&#34;&gt;└── phpunit.xml
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;三第一个测试&#34;&gt;三、第一个测试&lt;/h2&gt;
+&lt;p&gt;被测试的代码：&lt;/p&gt;
+          
+          
+        
+      </description>
+    </item>
+    
     <item>
       <title>PHP语言的知识点-6</title>
       <link>https://jianlin-li.github.io/post/php_review_6/</link>
