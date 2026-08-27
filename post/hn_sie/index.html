@@ -1,0 +1,2048 @@
+
+<!DOCTYPE html>
+<html
+  lang="zh-cn"
+  data-figures="true"
+  
+    class="page"
+  
+  
+  >
+  <head>
+<title>gtc敏感信息加密方案 | 李建林个人知识库</title>
+<meta charset="utf-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+
+
+
+
+
+<meta property="og:locale" content="zh-cn" />
+
+<meta property="og:type" content="article">
+<meta name="description" content="Article description." />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:creator" content="">
+<meta name="twitter:title" content="gtc敏感信息加密方案" />
+<meta name="twitter:image" content="https://jianlin-li.github.io/images/path/share.png"/>
+<meta property="og:url" content="https://jianlin-li.github.io/post/hn_sie/" />
+<meta property="og:title" content="gtc敏感信息加密方案" />
+<meta property="og:description" content="Article description." />
+<meta property="og:image" content="https://jianlin-li.github.io/images/path/share.png" />
+  <meta name="keywords" content="gtc" />
+  <script type="application/ld+json">
+    {
+      "@context": "http://schema.org",
+      "@type": "BlogPosting",
+      "mainEntityOfPage":"https:\/\/jianlin-li.github.io\/post\/hn_sie\/",
+      "name": "李建林个人知识库",
+      "headline": "gtc敏感信息加密方案",
+      "description": "Article description.",
+      "url": "https:\/\/jianlin-li.github.io\/post\/hn_sie\/",
+      "datePublished": "2026-08-17T13:54:44+08:00",
+      "dateModified": "2026-08-17T13:54:44+08:00",
+      "keywords": ["gtc"],
+        "articleSection": ["gtc"],
+      "author": {
+        "@type": "Person",
+        "name": "map[name:李建林 photo:images\/fish-head.png]"
+      },
+      "image":{
+        "@type":"ImageObject",
+        "url": "https:\/\/jianlin-li.github.io\/images\/path\/share.png"
+      },
+      "publisher": {
+        "@type": "Organization",
+        "logo": {
+          "@type":"ImageObject",
+          "url": "https:\/\/jianlin-li.github.io\/logos\/logo.png"
+        },
+        "name": "李建林个人知识库"
+      }
+    }
+  </script>
+
+<link rel="apple-touch-icon" sizes="180x180" href="https://jianlin-li.github.io/icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://jianlin-li.github.io/icons/favicon-32x32.png">
+<link rel="manifest" href="https://jianlin-li.github.io/icons/site.webmanifest">
+
+<link rel="canonical" href="https://jianlin-li.github.io/post/hn_sie/">
+
+
+
+<link rel="preload" href="https://jianlin-li.github.io/css/styles.dc38388a8f0b890e788bd3a99b7495d14e7d5ac4359ed3b49abeb778497863b284ad4cc7e496ef58c84139295f9bafed82f5a41345eda86bd2d429cccb7c2596.css" integrity = "sha512-3Dg4io8LiQ54i9Opm3SV0U59WsQ1ntO0mr63eEl4Y7KErUzH5JbvWMhBOSlfm6/tgvWkE0XtqGvS1CnMy3wllg==" as="style" crossorigin="anonymous">
+
+
+
+<link rel="preload" href="https://jianlin-li.github.io/zh-cn/js/bundle.e4e0e4fbe8acb50d7f973828f4138cdbea727800047fc93f9abbd6751e8f3422d6ef193f98da36fdb8488219c25692d73da89480f46abc8421a4ee3526dd6c23.js" as="script" integrity=
+"sha512-5ODk&#43;&#43;istQ1/lzgo9BOM2&#43;pyeAAEf8k/mrvWdR6PNCLW7xk/mNo2/bhIghnCVpLXPaiUgPRqvIQhpO41Jt1sIw==" crossorigin="anonymous">
+
+
+<link rel="stylesheet" type="text/css" href="https://jianlin-li.github.io/css/styles.dc38388a8f0b890e788bd3a99b7495d14e7d5ac4359ed3b49abeb778497863b284ad4cc7e496ef58c84139295f9bafed82f5a41345eda86bd2d429cccb7c2596.css" integrity="sha512-3Dg4io8LiQ54i9Opm3SV0U59WsQ1ntO0mr63eEl4Y7KErUzH5JbvWMhBOSlfm6/tgvWkE0XtqGvS1CnMy3wllg==" crossorigin="anonymous">
+
+  </head>
+  <body
+    data-code="10"
+    data-lines="false"
+    id="documentTop"
+    data-lang="zh-cn"
+  >
+
+<header class="nav_header" >
+  <nav class="nav"><a href='https://jianlin-li.github.io/' class="nav_brand nav_item" title="李建林个人知识库">
+  <img src="https://jianlin-li.github.io/logos/logo.png" class="logo" alt="李建林个人知识库">
+  <div class="nav_close">
+    <div><svg class="icon">
+  <title>open-menu</title>
+  <use xlink:href="#open-menu"></use>
+</svg>
+<svg class="icon">
+  <title>closeme</title>
+  <use xlink:href="#closeme"></use>
+</svg>
+</div>
+  </div>
+</a>
+
+    <div class='nav_body nav_body_left'>
+      
+      
+      
+        
+
+  <div class="nav_parent">
+    <a href="https://jianlin-li.github.io/" class="nav_item" title="首页">首页 </a>
+  </div>
+  <div class="nav_parent">
+    <a href="https://jianlin-li.github.io/archives/" class="nav_item" title="归档">归档 </a>
+  </div>
+  <div class="nav_parent">
+    <a href="https://jianlin-li.github.io/categories/" class="nav_item" title="分类">分类 </a>
+  </div>
+  <div class="nav_parent">
+    <a href="https://jianlin-li.github.io/tags/" class="nav_item" title="标签">标签 </a>
+  </div>
+  <div class="nav_parent">
+    <a href="https://jianlin-li.github.io/about/" class="nav_item" title="关于">关于 </a>
+  </div>
+      
+<div class='follow'>
+  <a href="https://github.com/JianLin-Li">
+    <svg class="icon">
+  <title>github</title>
+  <use xlink:href="#github"></use>
+</svg>
+
+  </a>
+  <a href="http://local.gitlab.com">
+    <svg class="icon">
+  <title>gitlab</title>
+  <use xlink:href="#gitlab"></use>
+</svg>
+
+  </a>
+<div class="color_mode">
+  <input type="checkbox" class="color_choice" id="mode">
+</div>
+
+</div>
+
+    </div>
+  </nav>
+</header>
+
+    <main>
+  
+<div class="grid-inverse wrap content">
+  <article class="post_content">
+    <h1 class="post_title">gtc敏感信息加密方案</h1>
+  <div class="post_meta">
+    <span><svg class="icon">
+  <title>calendar</title>
+  <use xlink:href="#calendar"></use>
+</svg>
+</span>
+    <span class="post_date">
+      2026-08-17	  
+    </span>
+    <span class="post_time"> · 9 分钟阅读</span><span>&nbsp;· <a href='https://jianlin-li.github.io/tags/gtc/' title="gtc" class="post_tag button button_translucent">gtc
+        </a>
+    </span>
+    <span class="page_only">&nbsp;·
+  <div class="post_share">
+    分享到:
+    <a href="https://twitter.com/intent/tweet?text=gtc%e6%95%8f%e6%84%9f%e4%bf%a1%e6%81%af%e5%8a%a0%e5%af%86%e6%96%b9%e6%a1%88&url=https%3a%2f%2fjianlin-li.github.io%2fpost%2fhn_sie%2f&tw_p=tweetbutton" class="twitter" title="分享到 Twitter" target="_blank" rel="nofollow">
+      <svg class="icon">
+  <title>twitter</title>
+  <use xlink:href="#twitter"></use>
+</svg>
+
+    </a>
+    <a href="https://www.facebook.com/sharer.php?u=https%3a%2f%2fjianlin-li.github.io%2fpost%2fhn_sie%2f&t=gtc%e6%95%8f%e6%84%9f%e4%bf%a1%e6%81%af%e5%8a%a0%e5%af%86%e6%96%b9%e6%a1%88" class="facebook" title="分享到 Facebook" target="_blank" rel="nofollow">
+      <svg class="icon">
+  <title>facebook</title>
+  <use xlink:href="#facebook"></use>
+</svg>
+
+    </a>
+    <a href="#linkedinshare" id = "linkedinshare" class="linkedin" title="分享到 LinkedIn" rel="nofollow">
+      <svg class="icon">
+  <title>linkedin</title>
+  <use xlink:href="#linkedin"></use>
+</svg>
+
+    </a>
+    <a href="https://jianlin-li.github.io/post/hn_sie/" title="Copy Link" class="link link_yank">
+      <svg class="icon">
+  <title>copy</title>
+  <use xlink:href="#copy"></use>
+</svg>
+
+    </a>
+  </div>
+  </span>
+  </div>
+
+    <div class="post_body"><h1 id="某个表敏感字段加密-推荐采用应用层可逆加密--hmac-sha256-盲索引--统一会员敏感字段读写服务--影子列分阶段迁移"><strong>某个表敏感字段加密 推荐采用“应用层可逆加密 + HMAC-SHA256 盲索引 + 统一会员敏感字段读写服务 + 影子列分阶段迁移”</strong></h1>
+
+<div class="notices tip">
+    <div class="label">第一轮方案提词</div>
+    <p>现在有个新需求，下面是我归纳的当前的一些现状和已知或者已决定的事项</p>
+<ol>
+<li>
+<p>新需求要求把数据库表t_member中敏感的字段phone和identity进行加密处理，我刚看了下这两个字段在数据字典中的定义分别是<code>phone</code> varchar(30) CHARACTER SET utf8 NOT NULL DEFAULT '',<code>identity</code> varchar(50) CHARACTER SET utf8 DEFAULT NULL COMMENT '身份ID'，需求要求加密后，以前的各个业务不能受影响，比如现有 hideListEmailPhone()、详情页手机号脱敏和 KYC 列表脱敏可以继续保留，但必须保证它们拿到的是解密后的值，而不是密文，但是phone和identity加密后不再保留前缀/包含搜索，这个需要把老的逻辑改造。</p>
+</li>
+<li>
+<p>phone按照数据库最终保存的完整手机号，避免同一个手机号因为区号拼接方式不同导致查不到，identity当前允许字母和数字，且数据库比较可能受大小写不敏感影，</p>
+</li>
+<li>
+<p>t_member表由于现有的字段已经非常的多了，加密敏感字段方案中需要考虑把新增的影子列或者过渡字段放入t_member_other表中，</p>
+</li>
+<li>
+<p>phone和identity采用可逆加密，加密算法采用最优的方案</p>
+</li>
+<li>
+<p>phone 和 identity 分别使用独立的密钥，独立的盲索引 HMAC 密钥</p>
+</li>
+<li>
+<p>密钥加入项目的.env文件中，后端统一密钥格式、编码方式和版本号，但是需要设计密钥轮换和旧版本解密策略，</p>
+</li>
+<li>
+<p>HMAC-SHA256 盲索引 phone和identity的密钥分别独立 生成的hash 用于精准查询</p>
+</li>
+<li>
+<p>需要统一一个加密/索引适配层服务，这个就写入crm后台代码库中，如果其他代码库项目有需要加解密则需要在crm后台项目中设计调用接口的形式来加解密敏感字段，统一负责包括和不限于以下功能：
+8.1 手机号、证件号规范化；
+8.2 加密和解密；
+8.3 HMAC 索引生成；
+8.4 查询条件生成；
+8.5 批量解密；
+8.6 密钥轮换；
+8.7 密文损坏或解密失败处理。
+8.8 供其他项目加解密phone和identity的接口
+8.9 按主键游标批量回填历史数据</p>
+</li>
+<li>
+<p>需要考虑日志、缓存已有的业务逻辑对于phone和identity加密后的处理</p>
+</li>
+<li>
+<p>外部接口如果涉及phone和identity字段，则使用解密后的</p>
+<p>以上几点是我提出来的，有可能并不全面，基于这个需求，帮我分析以及影响范围进行深度评估，比如改动的代码库都有哪些，然后综合考虑出一套改动最小、影响最小的最优方案，需要慎重考虑以前的老业务逻辑，方案的交付步骤，以及每个交付步骤需要的详细流程，不要遗漏接口兼容和回归验证。</p>
+</li>
+</ol>
+<p>不要做任何改动，只出方案，我需要核对你出的方案，再继续做决定</p>
+
+  </div>
+
+<h1 id="第一轮具体方案"><strong>‼️️‼️第一轮具体方案</strong></h1>
+<h2 id="一结论">一、结论</h2>
+<p>这不是单纯修改 <code>t_member.phone</code>、<code>t_member.identity</code> 两列，而是一次跨两个后端、一个前端、多个数据副本和外部系统的迁移。</p>
+<p>推荐采用：</p>
+<blockquote>
+<p>先确认威胁模型并补齐数据库/备份保护，再建设 CRM 统一敏感字段适配层，先迁移所有读写入口，最后启用 <code>t_member</code> 密文存储和 HMAC 精确查询。</p>
+</blockquote>
+<p>不建议直接把明文替换为密文后再逐个修业务，因为当前大量代码使用：</p>
+<ul>
+<li><code>phone</code>、<code>identity</code> 直接 <code>where</code></li>
+<li><code>LIKE '%phone%'</code></li>
+<li><code>select m.phone</code></li>
+<li><code>$member-&gt;phone</code></li>
+<li>日志、缓存、KYC JSON、短信记录和 MT 外发</li>
+<li>前端默认假设后端返回的是脱敏明文</li>
+</ul>
+<h2 id="二已确认的影响范围">二、已确认的影响范围</h2>
+<h3 id="1-数据库结构">1. 数据库结构</h3>
+<p><code>t_member.phone</code> 和 <code>identity</code> 当前分别是 <code>varchar(30)</code>、<code>varchar(50)</code>，没有专用索引：<a href="/Users/jalen/www/local/local.gtctrader1203.com/docs/%E6%95%B0%E6%8D%AE%E5%AD%97%E5%85%B8.sql:2849">数据字典.sql</a></p>
+<p><code>t_member_other</code> 具有唯一的 <code>member_id</code>，可放置盲索引和迁移元数据：<a href="/Users/jalen/www/local/local.gtctrader1203.com/docs/%E6%95%B0%E6%8D%AE%E5%AD%97%E5%85%B8.sql:3770">数据字典.sql</a></p>
+<p>密文长度会超过现有字段长度，因此必须先扩大字段，建议使用 ASCII 编码的 <code>varchar(512)</code> 或等效二进制字段。不能继续使用 <code>varchar(30)</code>/<code>varchar(50)</code>。</p>
+<p>需要重点处理的明文副本包括：</p>
+<ul>
+<li><code>t_kyc_user_content.kyc_content</code>：KYC JSON 中包含手机号、证件号：<a href="/Users/jalen/www/local/local.gtctrader1203.com/docs/%E6%95%B0%E6%8D%AE%E5%AD%97%E5%85%B8.sql:2641">数据字典.sql</a></li>
+<li><code>t_logger.postdata</code>：<a href="/Users/jalen/www/local/local.gtctrader1203.com/docs/%E6%95%B0%E6%8D%AE%E5%AD%97%E5%85%B8.sql:2670">数据字典.sql</a></li>
+<li><code>t_member_detail_log.before/after</code>：<a href="/Users/jalen/www/local/local.gtctrader1203.com/docs/%E6%95%B0%E6%8D%AE%E5%AD%97%E5%85%B8.sql:3221">数据字典.sql</a></li>
+<li><code>t_member_idcard.idcardnum</code>：<a href="/Users/jalen/www/local/local.gtctrader1203.com/docs/%E6%95%B0%E6%8D%AE%E5%AD%97%E5%85%B8.sql:3545">数据字典.sql</a></li>
+<li><code>t_activity_user.identity</code>：<a href="/Users/jalen/www/local/local.gtctrader1203.com/docs/%E6%95%B0%E6%8D%AE%E5%AD%97%E5%85%B8.sql:165">数据字典.sql</a></li>
+<li><code>t_member_reg_apply.phone</code>：<a href="/Users/jalen/www/local/local.gtctrader1203.com/docs/%E6%95%B0%E6%8D%AE%E5%AD%97%E5%85%B8.sql:3848">数据字典.sql</a></li>
+<li><code>t_member_request_log.request_body</code>：<a href="/Users/jalen/www/local/local.gtctrader1203.com/docs/%E6%95%B0%E6%8D%AE%E5%AD%97%E5%85%B8.sql:3914">数据字典.sql</a></li>
+<li><code>t_msg_log.phone</code>：<a href="/Users/jalen/www/local/local.gtctrader1203.com/docs/%E6%95%B0%E6%8D%AE%E5%AD%97%E5%85%B8.sql:4770">数据字典.sql</a></li>
+<li><code>t_mt_apply.phone</code>：<a href="/Users/jalen/www/local/local.gtctrader1203.com/docs/%E6%95%B0%E6%8D%AE%E5%AD%97%E5%85%B8.sql:4847">数据字典.sql</a></li>
+<li><code>t_member_other.kyc_profile_snapshot</code> 中的 KYC 快照也需要检查。</li>
+</ul>
+<p>如果只加密 <code>t_member</code>，上述表、SelectDB、ETL、CDC、备份和导出仍可能泄露相同数据，无法完整实现“数据库被盗不泄露”。</p>
+<h3 id="2-crm-后端必须修改">2. CRM 后端：必须修改</h3>
+<p>CRM 中最重要的入口包括：</p>
+<ul>
+<li>旧会员列表按手机号模糊查询：<a href="/Users/jalen/www/local/local.gtctrader1203.com/app/admin/controller/Member.php:99">Member.php</a></li>
+<li>树形会员查询仍然 <code>LOWER(phone) LIKE</code>：<a href="/Users/jalen/www/local/local.gtctrader1203.com/app/admin/service/MemberFastService.php:56">MemberFastService.php</a></li>
+<li>新会员列表把 <code>phone</code>、<code>identity</code> 直接查出并脱敏：<a href="/Users/jalen/www/local/local.gtctrader1203.com/app/admin/controller/Member.php:577">Member.php</a></li>
+<li>修改手机号、证件号和重复校验：<a href="/Users/jalen/www/local/local.gtctrader1203.com/app/admin/controller/Member.php:1103">Member.php</a></li>
+<li>旧详情读取后再脱敏：<a href="/Users/jalen/www/local/local.gtctrader1203.com/app/admin/controller/Member.php:1383">Member.php</a></li>
+<li>新详情使用 <code>m.*</code>：<a href="/Users/jalen/www/local/local.gtctrader1203.com/app/admin/controller/Member.php:1465">Member.php</a></li>
+<li>权限通过后查看完整手机号/证件号：<a href="/Users/jalen/www/local/local.gtctrader1203.com/app/admin/controller/Member.php:4337">Member.php</a></li>
+<li>KYC 审核手机号和证件号重复校验：<a href="/Users/jalen/www/local/local.gtctrader1203.com/app/admin/controller/Kyc.php:1083">Kyc.php</a></li>
+<li>KYC 直接写入 <code>member.phone</code>、<code>member.identity</code>：<a href="/Users/jalen/www/local/local.gtctrader1203.com/app/admin/controller/Kyc.php:1172">Kyc.php</a></li>
+<li>KYC 通过后更新会员字段，并使用 <code>member_other</code>：<a href="/Users/jalen/www/local/local.gtctrader1203.com/app/admin/controller/Kyc.php:1233">Kyc.php</a></li>
+<li>MT 同步读取并向 MT 发送手机号、证件号：<a href="/Users/jalen/www/local/local.gtctrader1203.com/app/service/MtService.php:529">MtService.php</a></li>
+<li>短信服务按明文手机号查询会员并写入短信日志：<a href="/Users/jalen/www/local/local.gtctrader1203.com/app/service/InformationService.php:244">InformationService.php</a></li>
+<li>全局搜索、代理、跟单、提现、报表、Salesforce、风险同步等还有多处直接 <code>LIKE</code> 或 <code>field(...phone...)</code>。</li>
+</ul>
+<p>另外，当前后台 BaseController 会直接读取会员整行数据：<a href="/Users/jalen/www/local/local.gtctrader1203.com/app/admin/controller/BaseController.php:94">BaseController.php</a>。不能让所有请求上下文默认携带密文或明文，建议改成“非敏感字段默认加载，敏感字段按业务用途显式读取”。</p>
+<p><code>member_other</code> 当前存在 <code>replace(true)-&gt;insert(...)</code> 用法。新增敏感列后必须重点审计，这种操作可能先删除旧行再重建，导致盲索引和迁移状态被覆盖：<a href="/Users/jalen/www/local/local.gtctrader1203.com/app/admin/controller/Kyc.php:1244">Kyc.php</a></p>
+<h3 id="3-gtcuser-后端必须联动修改">3. <code>gtcuser</code> 后端：必须联动修改</h3>
+<p><code>gtcuser</code> 不是只读消费者，它直接参与注册、登录、换绑手机号和证件绑定：</p>
+<ul>
+<li><code>TMember</code> 将 <code>phone</code>、<code>identity</code> 当普通字段：<a href="/Users/jalen/www/local/gtcuser/app/Model/member/TMember.php:154">TMember.php</a></li>
+<li>Repository 直接按明文手机号、证件号查询：<a href="/Users/jalen/www/local/gtcuser/app/Repository/member/TMemberRepository.php:38">TMemberRepository.php</a></li>
+<li>登录按手机号查询：<a href="/Users/jalen/www/local/gtcuser/app/Http/Api/Controller/V1/PubController.php:318">PubController.php</a></li>
+<li>检查手机号是否注册：<a href="/Users/jalen/www/local/gtcuser/app/Http/Api/Controller/V1/PubController.php:525">PubController.php</a></li>
+<li>注册时重复校验和写入手机号、证件号：<a href="/Users/jalen/www/local/gtcuser/app/Service/member/TMemberService.php:1775">TMemberService.php</a></li>
+<li>换绑手机号直接保存到 <code>t_member</code>：<a href="/Users/jalen/www/local/gtcuser/app/Service/member/TMemberService.php:897">TMemberService.php</a></li>
+<li>验证码缓存使用 <code>md5(phone)</code>：<a href="/Users/jalen/www/local/gtcuser/app/Service/member/TMemberService.php:3702">TMemberService.php</a></li>
+<li>身份证绑定限制按 <code>identity</code> 查询：<a href="/Users/jalen/www/local/gtcuser/app/Service/member/TMemberService.php:5622">TMemberService.php</a></li>
+<li>请求日志保存整个请求体：<a href="/Users/jalen/www/local/gtcuser/app/Service/member/TMemberService.php:960">TMemberService.php</a></li>
+<li>短信反滥发逻辑按 <code>t_msg_log.phone</code> 做 distinct 和比较：<a href="/Users/jalen/www/local/gtcuser/app/Service/SmsAbuseDetectorService.php:675">SmsAbuseDetectorService.php</a></li>
+</ul>
+<p>因此，<code>gtcuser</code> 不能继续直接查询或更新加密后的 <code>t_member.phone</code>、<code>identity</code>。需要增加 CRM 内部敏感字段客户端，至少替换 Repository 的手机号/证件号查询和写入路径。</p>
+<h3 id="4-vue-管理前端接口兼容为主仍需回归">4. Vue 管理前端：接口兼容为主，仍需回归</h3>
+<p>前端主要依赖以下契约：</p>
+<ul>
+<li>会员列表接口：<code>/admin/member/index</code>、<code>/admin/member/member_index</code>：<a href="/Users/jalen/www/local/gtc_admin_vue/src/api/member/member/index.js:38">member/index.js</a></li>
+<li>旧/新详情接口：<a href="/Users/jalen/www/local/gtc_admin_vue/src/api/member/member/index.js:55">member/index.js</a></li>
+<li>完整联系方式查看接口 <code>/admin/member/lookmemberinfo</code>：<a href="/Users/jalen/www/local/gtc_admin_vue/src/api/member/member/index.js:290">member/index.js</a></li>
+<li><code>MemberEmailPhone</code> 默认显示后端传入的脱敏值，点击眼睛后调用查看接口：<a href="/Users/jalen/www/local/gtc_admin_vue/src/components/memberemailphone/memberEmailPhone.vue:102">memberEmailPhone.vue</a></li>
+<li>编辑页依赖详情返回的手机号：<a href="/Users/jalen/www/local/gtc_admin_vue/src/views/member/membernew/index.vue:2693">membernew/index.vue</a></li>
+</ul>
+<p>最小改动方式是保持接口路径、字段名、返回结构和权限逻辑不变：</p>
+<ul>
+<li>列表仍返回脱敏后的 <code>phone</code>、<code>identity</code></li>
+<li>详情仍返回现有格式</li>
+<li><code>lookmemberinfo</code> 仍按 <code>type=1/2</code> 返回完整值</li>
+<li>前端绝不能收到密文</li>
+<li>手机号搜索从“包含搜索”改成“完整号码精确搜索”</li>
+<li>清理前端 <code>console.log(record.phone)</code> 等敏感日志</li>
+</ul>
+<h2 id="三推荐加密方案">三、推荐加密方案</h2>
+<h3 id="1-算法">1. 算法</h3>
+<p>PHP 8.0 优先使用 <code>libsodium</code>：</p>
+<ul>
+<li><code>XChaCha20-Poly1305-IETF</code></li>
+<li>每次加密随机 nonce</li>
+<li>自带认证标签，可检测篡改</li>
+<li>密文格式建议：</li>
+</ul>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">enc:v1:&lt;key_id&gt;:&lt;nonce_base64url&gt;:&lt;ciphertext_base64url&gt;
+</span></span></code></pre></div><p>AAD 绑定：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">crm-member|field|member_id|normalize_version
+</span></span></code></pre></div><p>这样可以防止把某个会员的密文复制到另一个会员或另一个字段。</p>
+<p>如果生产有强制 FIPS 要求，再评估 AES-256-GCM；不能使用没有完整认证保护的 AES-CBC，也不应使用 RSA 作为数据库字段加密算法。</p>
+<h3 id="2-密钥">2. 密钥</h3>
+<p>手机号和证件号分别使用四组完全独立的密钥：</p>
+<ul>
+<li>phone encryption key</li>
+<li>phone HMAC key</li>
+<li>identity encryption key</li>
+<li>identity HMAC key</li>
+</ul>
+<p>密钥统一使用：</p>
+<ul>
+<li>原始 32 字节随机值</li>
+<li>Base64url 编码</li>
+<li>明确的 <code>key_id</code> 和版本号</li>
+<li>current/previous key ring</li>
+</ul>
+<p>新数据只使用 current key；读取时根据密文中的 <code>key_id</code> 使用旧密钥解密；轮换完成后再批量重加密。</p>
+<p>密钥只存在 CRM 的部署环境或密钥管理系统中。<code>.env</code> 只能作为注入方式，不能放入数据库、前端或仓库。当前几个项目存在被 Git 跟踪的环境样例文件，正式实施前应先做 secret scan、清理样例和必要的密钥轮换。</p>
+<h3 id="3-规范化">3. 规范化</h3>
+<p>手机号不能再简单依赖 <code>$d_code . $phone</code>。</p>
+<p>统一规则：</p>
+<ul>
+<li>使用 <code>libphonenumber</code> 解析</li>
+<li>输入可能是国际格式，也可能是区号加本地号码</li>
+<li>输出统一为完整 E.164 格式，例如 <code>+&lt;country&gt;&lt;national_number&gt;</code></li>
+<li>区号缺失、国家不明确、号码不合法时拒绝自动写入，进入人工处理</li>
+<li><code>d_code</code> 可以继续保留用于界面和外部供应商，但不再作为手机号唯一身份依据</li>
+</ul>
+<p><code>gtcuser</code> 当前已有 <code>giggsey/libphonenumber-for-php</code> 依赖：<a href="/Users/jalen/www/local/gtcuser/composer.lock:1899">composer.lock</a></p>
+<p>证件号统一：</p>
+<ul>
+<li><code>trim</code></li>
+<li>只允许 ASCII 字母和数字</li>
+<li><code>strtoupper</code></li>
+<li>空值继续保持 <code>NULL</code> 或空字符串语义</li>
+<li>重复判断与 HMAC 使用同一规范化结果</li>
+<li>迁移时必须统计大小写冲突，不能因为数据库原有大小写不敏感而静默合并账号</li>
+</ul>
+<h3 id="4-t_member_other-影子字段">4. <code>t_member_other</code> 影子字段</h3>
+<p>建议增加：</p>
+<ul>
+<li><code>phone_hmac</code></li>
+<li><code>identity_hmac</code></li>
+<li><code>phone_hmac_key_version</code></li>
+<li><code>identity_hmac_key_version</code></li>
+<li><code>phone_migration_status</code></li>
+<li><code>identity_migration_status</code></li>
+<li><code>phone_last_error_code</code></li>
+<li><code>identity_last_error_code</code></li>
+<li><code>phone_migrated_at</code></li>
+<li><code>identity_migrated_at</code></li>
+</ul>
+<p>盲索引使用 HMAC-SHA256，建议存 <code>BINARY(32)</code> 并建立普通索引，不建立唯一索引，因为现有业务允许一个手机号或证件号绑定多个账号。</p>
+<p>查询时由服务计算 current/previous 版本的 HMAC：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">WHERE member_other.phone_hmac IN (?, ?)
+</span></span></code></pre></div><p>所有查询参数必须绑定，不能拼接 SQL。</p>
+<p>如果会员数量很大、<code>member_other</code> 当前行数很少，需先评估为所有会员补建副表记录带来的空间和写入压力。若不可接受，再单独建立紧凑的 <code>t_member_sensitive_index</code> 表，但默认仍可先使用 <code>t_member_other</code>，符合现有架构。</p>
+<h2 id="四统一适配层职责">四、统一适配层职责</h2>
+<p>CRM 中新增统一服务，建议放在 <code>app/service</code> 下，并由控制器、Repository、KYC、短信、MT 和外部接口统一调用。</p>
+<p>至少提供：</p>
+<ul>
+<li><code>normalizePhone()</code></li>
+<li><code>normalizeIdentity()</code></li>
+<li><code>encryptField()</code></li>
+<li><code>decryptField()</code></li>
+<li><code>buildPhoneHmac()</code></li>
+<li><code>buildIdentityHmac()</code></li>
+<li><code>buildExactMemberQuery()</code></li>
+<li><code>batchDecryptMembers()</code></li>
+<li><code>writeMemberSensitiveFields()</code></li>
+<li><code>rotateKeys()</code></li>
+<li><code>backfillByMemberIdCursor()</code></li>
+<li><code>handleDecryptFailure()</code></li>
+</ul>
+<p>读取策略：</p>
+<ul>
+<li>密文格式合法：解密并返回明文</li>
+<li>旧版密文：使用旧 key 解密</li>
+<li>迁移期间的旧明文：兼容读取，并补写 HMAC</li>
+<li>密文损坏、未知版本、认证失败：不返回密文，记录错误码和会员 ID，列表显示脱敏/异常状态，关键业务返回通用错误</li>
+</ul>
+<p>不要通过全局 ORM accessor 对每一行做网络解密，否则会造成 N+1 请求和 Hyperf 长驻进程中的性能问题。应在 Repository 或列表服务中批量读取和批量解密。</p>
+<h2 id="五内部接口设计">五、内部接口设计</h2>
+<p>CRM 是唯一持有敏感字段密钥的系统。</p>
+<p>建议新增仅内网可访问的接口：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">POST /internal/sensitive/member/resolve
+</span></span></code></pre></div><p>用途：手机号/证件号精确查询，只返回 <code>member_id</code>，不返回密文。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">POST /internal/sensitive/member/reveal
+</span></span></code></pre></div><p>用途：按会员 ID、字段和业务用途返回明文，必须经过服务权限和审计。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">POST /internal/sensitive/member/batch-reveal
+</span></span></code></pre></div><p>用途：列表页、批量同步、报表等批量解密，限制批次大小。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">POST /internal/sensitive/member/write
+</span></span></code></pre></div><p>用途：注册、修改手机号、修改证件号，由 CRM 完成规范化、加密、HMAC、事务更新。</p>
+<p>接口要求：</p>
+<ul>
+<li>独立服务账号，不复用普通用户 token</li>
+<li>HTTPS，最好 mTLS</li>
+<li>时间戳、请求 ID、签名和防重放</li>
+<li>IP 白名单、调用方 scope、超时、熔断、重试</li>
+<li>每次 reveal 记录调用方、会员 ID、字段、用途、操作人和请求 ID</li>
+<li>CRM 不可用时，敏感业务 fail closed，不能退回直接查密文</li>
+<li>旧客户端仍提交原始手机号/证件号，由服务端兼容处理</li>
+</ul>
+<h2 id="六详细交付顺序">六、详细交付顺序</h2>
+<h3 id="阶段-0决策和数据盘点">阶段 0：决策和数据盘点</h3>
+<p>先确认：</p>
+<ul>
+<li>“数据库被盗”是数据库文件/备份泄露，还是数据库账号逻辑导出</li>
+<li>是否覆盖 SelectDB、ETL、CDC、日志、缓存、OSS、报表和外部供应商</li>
+<li>生产是否允许 CRM 作为内部解密服务</li>
+<li>会员总量、空手机号、非法号码、国家缺失、重复值、大小写冲突</li>
+<li><code>member_other</code> 缺失行数量</li>
+<li>现有外部项目和 SQL 账号是否能禁止直接读敏感列</li>
+</ul>
+<p>如果只是防数据库文件、快照和备份泄露，TDE、磁盘加密、加密备份、KMS 分离和 DB 权限收紧是低改动基础措施。字段级加密不能防止已取得应用主机、应用密钥或高权限 DB 账号的人读取明文。</p>
+<h3 id="阶段-1冻结协议和测试向量">阶段 1：冻结协议和测试向量</h3>
+<p>先确定：</p>
+<ul>
+<li>密文 envelope 格式</li>
+<li>key ID 和版本规则</li>
+<li>Base64url 编码</li>
+<li>手机号、证件号规范化版本</li>
+<li>HMAC 输入域分离格式</li>
+<li>错误码</li>
+<li>内部 API 请求和返回 JSON</li>
+<li>current/previous 轮换规则</li>
+</ul>
+<p>使用测试密钥建立固定测试向量，禁止使用生产密钥做开发测试。</p>
+<h3 id="阶段-2只加数据库结构">阶段 2：只加数据库结构</h3>
+<p>先执行可回滚的加法变更：</p>
+<ul>
+<li>扩大 <code>t_member.phone</code>、<code>identity</code></li>
+<li>增加 <code>t_member_other</code> 盲索引和迁移字段</li>
+<li>增加普通索引</li>
+<li>更新数据字典</li>
+<li>检查变更锁表时间和复制延迟</li>
+</ul>
+<p>此阶段不切换读写，不改变业务含义。</p>
+<h3 id="阶段-3先上线适配层保持明文模式">阶段 3：先上线适配层，保持明文模式</h3>
+<p>适配层先支持：</p>
+<ul>
+<li>明文读取</li>
+<li>明文规范化</li>
+<li>HMAC 补写</li>
+<li>明文/密文双读</li>
+<li>统一错误处理</li>
+<li>统一日志脱敏</li>
+</ul>
+<p>先把 CRM、<code>gtcuser</code> 的所有敏感读写入口切到适配层，但数据库仍保存明文。这样可以先验证业务调用链，不把加密风险和代码改造风险叠加。</p>
+<h3 id="阶段-4迁移查询和展示">阶段 4：迁移查询和展示</h3>
+<p>必须改造：</p>
+<ul>
+<li>所有手机号/证件号精确查询为 HMAC 查询</li>
+<li>所有 <code>LIKE '%phone%'</code>、<code>LOWER(phone)</code> 删除</li>
+<li>列表先分页取会员 ID，再批量解密，再调用 <code>hideListEmailPhone()</code></li>
+<li>详情和 <code>lookmemberinfo</code> 按权限解密</li>
+<li>BaseController 默认不加载敏感字段</li>
+<li><code>gtcuser</code> Repository 特殊处理 phone/identity</li>
+<li>不能让任何接口返回密文</li>
+</ul>
+<p>手机号模糊搜索应改成完整手机号精确搜索；证件号也只支持完整精确搜索。前缀和包含搜索在随机密文 + HMAC 方案下无法继续支持。</p>
+<h3 id="阶段-5迁移写入">阶段 5：迁移写入</h3>
+<p>所有新增和修改入口统一调用写入服务：</p>
+<ul>
+<li>后台新增会员</li>
+<li>后台修改会员</li>
+<li><code>saveImportInfo</code></li>
+<li><code>saveNew</code></li>
+<li>API 注册</li>
+<li>API 换绑手机号</li>
+<li>KYC 审核和第三方 KYC 回调</li>
+<li>MT 同步回写</li>
+<li>修复脚本和后台命令</li>
+</ul>
+<p>写入必须在一个事务中完成：</p>
+<ol>
+<li>锁定会员行</li>
+<li>规范化手机号/证件号</li>
+<li>计算 HMAC</li>
+<li>生成随机密文</li>
+<li>更新 <code>t_member</code></li>
+<li>更新 <code>t_member_other</code></li>
+<li>记录不含明文的审计信息</li>
+</ol>
+<p>重复绑定检查需要按 HMAC 查询，并对同一个 HMAC 使用分布式锁或数据库锁，避免并发绕过绑定上限。</p>
+<h3 id="阶段-6日志缓存和副本治理">阶段 6：日志、缓存和副本治理</h3>
+<p>必须同步处理：</p>
+<ul>
+<li><code>LogOperationMiddleware</code> 增加 <code>phone</code>、<code>identity</code> 脱敏</li>
+<li><code>member_detail_log.before/after</code> 不再保存原值</li>
+<li><code>member_request_log.request_body</code> 删除或掩码敏感字段</li>
+<li><code>t_logger.postdata</code> 不再记录完整值</li>
+<li>Redis 验证码 key 改用 HMAC 或会员 ID，不再使用 <code>md5(phone)</code></li>
+<li>短信日志改为会员 ID、HMAC 或掩码手机号</li>
+<li>SMS abuse 查询改为会员 ID/HMAC</li>
+<li>清理 <code>loginfo</code>、调试日志和前端 console 中的手机号</li>
+<li>新写入的 KYC JSON、活动、MT 申请记录禁止继续保存明文副本</li>
+<li>对历史 KYC JSON、短信日志、申请记录明确选择加密、掩码、删除或保留在 TDE 保护范围内</li>
+</ul>
+<h3 id="阶段-7历史数据回填">阶段 7：历史数据回填</h3>
+<p>按会员主键游标执行，不使用深分页：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">id &gt; last_id
+</span></span><span class="line"><span class="ln">2</span><span class="cl">ORDER BY id ASC
+</span></span><span class="line"><span class="ln">3</span><span class="cl">LIMIT batch_size
+</span></span></code></pre></div><p>每批流程：</p>
+<ol>
+<li>读取 <code>id、phone、identity、d_code、country</code></li>
+<li>判断明文、旧密文、空值或损坏值</li>
+<li>规范化</li>
+<li>生成 HMAC</li>
+<li>加密</li>
+<li>短事务更新主表和副表</li>
+<li>保存 checkpoint</li>
+<li>记录成功、跳过、失败、人工处理数量</li>
+</ol>
+<p>失败记录只保存错误类型和会员 ID，不保存原始敏感值。迁移必须支持断点续跑和幂等。</p>
+<h3 id="阶段-8灰度和切换">阶段 8：灰度和切换</h3>
+<p>推荐顺序：</p>
+<ol>
+<li>测试库回填</li>
+<li>生产影子校验</li>
+<li>单品牌/小比例会员灰度</li>
+<li>新写入全部加密</li>
+<li>历史数据分批回填</li>
+<li>禁止旧 SQL 直接读写敏感字段</li>
+<li>全量校验无明文残留</li>
+<li>保留旧密钥和回滚窗口</li>
+<li>最后关闭明文兼容模式</li>
+</ol>
+<h3 id="阶段-9密钥轮换">阶段 9：密钥轮换</h3>
+<p>轮换步骤：</p>
+<ol>
+<li>新 key 加入 key ring，设为 current</li>
+<li>旧 key 变为 previous</li>
+<li>新写入使用新 key</li>
+<li>读取按 <code>key_id</code> 兼容旧密文</li>
+<li>HMAC 查询同时计算新旧版本</li>
+<li>批量重加密和重建 HMAC</li>
+<li>校验数量、值一致性和失败记录</li>
+<li>等待回滚窗口结束后废弃旧 key</li>
+</ol>
+<p>旧 key 未完成备份、回滚和重加密前，不能删除。</p>
+<h2 id="七接口和回归验收">七、接口和回归验收</h2>
+<p>必须覆盖：</p>
+<ul>
+<li>邮箱登录、手机号登录</li>
+<li>注册、检查手机号、重复注册</li>
+<li>手机号验证、换绑手机号、验证码发送和校验</li>
+<li>后台新增、编辑、详情、查看完整联系方式</li>
+<li>普通会员列表、树形列表、代理列表、KYC 列表</li>
+<li>KYC 提交、审核、驳回、证件重复绑定</li>
+<li><code>hideListEmailPhone()</code>、详情脱敏、KYC 脱敏</li>
+<li>MT 开户、MT 资料同步</li>
+<li>短信、邮件、提现、支付、Salesforce、跟单、PAMM</li>
+<li>SMS 反滥发和黑名单共享手机号判断</li>
+<li>SelectDB 查询、报表、导出和异步任务</li>
+<li>密文篡改、错误 key、未知版本、空值和旧数据兼容</li>
+<li>并发修改手机号、重复校验和事务回滚</li>
+<li>前端 <code>MemberEmailPhone</code> 眼睛查看、复制、隐藏、组件复用</li>
+<li>所有旧接口字段名、状态码和权限行为</li>
+</ul>
+<p>测试应验证真实行为、返回值、状态变化和依赖调用，不能用源码字符串匹配代替行为测试。</p>
+<h2 id="八仍需确认的风险">八、仍需确认的风险</h2>
+<p>目前无法从代码仓库确认：</p>
+<ul>
+<li>生产真实数据库类型和版本</li>
+<li><code>mySelectDb</code>/<code>selectdb</code> 的数据同步方式</li>
+<li>ETL、CDC、备份、快照和导出链路</li>
+<li>外部 MT、SMS、支付、KYC、Salesforce 等是否保留明文</li>
+<li>生产是否具备独立 KMS、mTLS 和高可用内部 API</li>
+<li>历史手机号缺失国家信息的比例</li>
+<li>是否要求同步清理所有历史日志和 KYC JSON</li>
+<li><code>gtcuser</code> 是否可以停止直接访问敏感列</li>
+</ul>
+<p>因此，当前最稳妥的决策是：</p>
+<ol>
+<li>先完成威胁模型和副本盘点；</li>
+<li>同时补齐 TDE/备份/密钥隔离基础措施；</li>
+<li>再按上述阶段建设 CRM 适配层；</li>
+<li>先迁移读写代码，再启用密文；</li>
+<li>最后进行历史回填和副本清理。</li>
+</ol>
+<hr>
+<h1 id="第一轮具体方案的实际执行计划"><strong>‼️️‼️第一轮具体方案的实际执行计划</strong></h1>
+<p>下面是基于前一版方案的实际执行计划。默认前提是：已经确认仅靠 TDE、磁盘加密和备份加密无法满足需求，因此确实要做应用层字段加密。本轮只输出执行方案，未修改代码、SQL、<code>.env</code> 或生产数据，三个工作区当前均无未提交变更。</p>
+<p>整体顺序如下：
+<figure>
+  <picture>
+
+    
+      
+        
+        
+        
+        
+        
+        
+    <img
+      loading="lazy"
+      decoding="async"
+      alt="整体顺序"
+      
+        class="image_figure image_internal image_unprocessed"
+        src="https://jianlin-li.github.io/images/hn_sie.png"
+      
+      
+    />
+
+    </picture>
+</figure>
+</p>
+<h2 id="阶段一执行前审批和数据盘点">阶段一：执行前审批和数据盘点</h2>
+<h3 id="11-确认威胁模型">1.1 确认威胁模型</h3>
+<p>需要由安全、DBA、运维和业务共同确认“数据库被盗”具体指什么：</p>
+<ol>
+<li>数据库文件、磁盘、快照、备份泄露。</li>
+<li>数据库账号被盗后执行逻辑查询或导出。</li>
+<li>SelectDB、ETL、CDC、报表库、临时文件泄露。</li>
+<li>管理员或内部服务可以直接查询明文。</li>
+</ol>
+<p>如果只需要防止文件、快照、备份泄露，应优先执行：</p>
+<ul>
+<li>RDS/MySQL TDE 或磁盘加密。</li>
+<li>备份、快照、导出文件加密。</li>
+<li>KMS 托管密钥，应用和 DBA 权限分离。</li>
+<li>限制数据库账号、网络和导出权限。</li>
+</ul>
+<p>这一分支可以保留现有查询逻辑，风险和代码改动都明显更小。TDE 无法防御被盗数据库账号直接执行 SQL 导出，因此若该场景也必须防护，再进入字段级加密实施。</p>
+<h3 id="12-建立敏感数据清单">1.2 建立敏感数据清单</h3>
+<p>三个代码库都要进行只读扫描，形成一份字段使用清单：</p>
+<ul>
+<li><code>/Users/jalen/www/local/local.gtctrader1203.com</code></li>
+<li><code>/Users/jalen/www/local/gtcuser</code></li>
+<li><code>/Users/jalen/www/local/gtc_admin_vue</code></li>
+</ul>
+<p>清单字段至少包括：</p>
+<table>
+  <thead>
+      <tr>
+          <th>类型</th>
+          <th>需要记录的内容</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>读取</td>
+          <td>列表、详情、KYC、登录、注册、支付、MT、风控</td>
+      </tr>
+      <tr>
+          <td>写入</td>
+          <td>创建会员、修改手机号、KYC 审核、同步任务</td>
+      </tr>
+      <tr>
+          <td>查询</td>
+          <td>精确、前缀、包含、模糊、大小写转换</td>
+      </tr>
+      <tr>
+          <td>输出</td>
+          <td>外部 API、后台 API、短信、邮件、报表</td>
+      </tr>
+      <tr>
+          <td>持久化</td>
+          <td>日志、缓存、KYC JSON、活动记录、操作日志</td>
+      </tr>
+      <tr>
+          <td>副本</td>
+          <td>SelectDB、ETL、CDC、备份、导出、测试库</td>
+      </tr>
+  </tbody>
+</table>
+<p>重点复核以下现有位置：</p>
+<ul>
+<li>CRM 会员列表、详情和修改：<a href="/Users/jalen/www/local/local.gtctrader1203.com/app/admin/controller/Member.php:99">Member.php</a></li>
+<li>树形会员查询：<a href="/Users/jalen/www/local/local.gtctrader1203.com/app/admin/service/MemberFastService.php:56">MemberFastService.php</a></li>
+<li>KYC 流程：<a href="/Users/jalen/www/local/local.gtctrader1203.com/app/admin/controller/Kyc.php:574">Kyc.php</a></li>
+<li>会员变更日志：<a href="/Users/jalen/www/local/local.gtctrader1203.com/app/service/MemberService.php:1448">MemberService.php</a></li>
+<li>短信查询和日志：<a href="/Users/jalen/www/local/local.gtctrader1203.com/app/service/InformationService.php:244">InformationService.php</a></li>
+<li>MT 同步：<a href="/Users/jalen/www/local/local.gtctrader1203.com/app/service/MtService.php:529">MtService.php</a></li>
+<li>Hyperf 会员模型：<a href="/Users/jalen/www/local/gtcuser/app/Model/member/TMember.php:154">TMember.php</a></li>
+<li>Hyperf Repository：<a href="/Users/jalen/www/local/gtcuser/app/Repository/member/TMemberRepository.php:38">TMemberRepository.php</a></li>
+<li>Hyperf 登录、注册、换绑手机号：<a href="/Users/jalen/www/local/gtcuser/app/Http/Api/Controller/V1/PubController.php:318">PubController.php</a>、<a href="/Users/jalen/www/local/gtcuser/app/Service/member/TMemberService.php:1775">TMemberService.php</a></li>
+<li>短信反滥发：<a href="/Users/jalen/www/local/gtcuser/app/Service/SmsAbuseDetectorService.php:675">SmsAbuseDetectorService.php</a></li>
+<li>管理端查看明文组件：<a href="/Users/jalen/www/local/gtc_admin_vue/src/components/memberemailphone/memberEmailPhone.vue:102">memberEmailPhone.vue</a></li>
+</ul>
+<h3 id="13-建立迁移基线">1.3 建立迁移基线</h3>
+<p>生产执行前先采集，不修改数据：</p>
+<ul>
+<li><code>t_member</code> 总行数。</li>
+<li><code>phone</code>、<code>identity</code> 的空值和异常格式数量。</li>
+<li>按规范化手机号统计重复数量。</li>
+<li>identity 转大写后的重复数量。</li>
+<li>KYC、日志、短信、报表中的明文副本数量。</li>
+<li>现有接口响应样本和接口耗时。</li>
+<li>现有列表搜索结果样本，作为迁移后的差异比对基线。</li>
+</ul>
+<p>手机号缺失国家码、国家码含义不明确、格式无法判断的记录必须进入人工处理清单，不能自动猜测。</p>
+<h2 id="阶段二冻结加密规范化和接口契约">阶段二：冻结加密、规范化和接口契约</h2>
+<h3 id="21-固定加密协议">2.1 固定加密协议</h3>
+<p>新增统一适配层，协议版本固定为 <code>v1</code>：</p>
+<ul>
+<li>算法：PHP 8.0 可用的 <code>libsodium XChaCha20-Poly1305-IETF</code>。</li>
+<li>每次加密生成随机 nonce。</li>
+<li>认证标签由 AEAD 生成。</li>
+<li>AAD 至少绑定：
+<ul>
+<li>字段名：<code>phone</code> 或 <code>identity</code>。</li>
+<li><code>member_id</code>。</li>
+<li>规范化版本。</li>
+</ul>
+</li>
+<li>密文格式：</li>
+</ul>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">enc:v1:&lt;key_id&gt;:&lt;nonce_base64url&gt;:&lt;ciphertext_base64url&gt;
+</span></span></code></pre></div><p>密文使用 ASCII 字符集和二进制安全比较，不依赖数据库大小写排序规则。</p>
+<h3 id="22-固定规范化规则">2.2 固定规范化规则</h3>
+<p>手机号：</p>
+<ol>
+<li>去除首尾空格。</li>
+<li>使用统一的电话号码解析库。</li>
+<li>转换为完整 E.164 格式，例如 <code>+8613800138000</code>。</li>
+<li>国家码缺失或有歧义时返回明确错误，不自动补国家码。</li>
+<li>HMAC 只对规范化后的完整号码计算。</li>
+</ol>
+<p>identity：</p>
+<ol>
+<li><code>trim</code>。</li>
+<li>转换为大写。</li>
+<li>只允许 ASCII 字母和数字。</li>
+<li>空值保持 <code>NULL</code>，不把 <code>NULL</code> 转为空字符串。</li>
+<li>HMAC 只对大写后的规范化值计算。</li>
+</ol>
+<p>因此，数据库大小写不敏感不会影响 identity 的精确匹配，查询统一使用 HMAC 结果。</p>
+<h3 id="23-固定盲索引规则">2.3 固定盲索引规则</h3>
+<p>phone 和 identity 使用不同的 HMAC-SHA256 密钥。</p>
+<p>建议存储：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">v1:&lt;64位小写十六进制摘要&gt;
+</span></span></code></pre></div><p>字段建议：</p>
+<ul>
+<li><code>phone_hmac_index varchar(80) CHARACTER SET ascii COLLATE ascii_bin</code></li>
+<li><code>identity_hmac_index varchar(80) CHARACTER SET ascii COLLATE ascii_bin</code></li>
+</ul>
+<p>分别建立普通索引，不设置唯一约束，因为一个手机号或证件号可能绑定多个会员账号。</p>
+<p>密钥轮换期间，查询层需要根据当前版本和允许读取的旧版本生成多个候选 HMAC，使用 <code>IN (...)</code> 查询，完成回填后再停用旧版本。</p>
+<h3 id="24-固定内部-api-契约">2.4 固定内部 API 契约</h3>
+<p>CRM 作为唯一密钥持有方。其他后端不得持有加密密钥，也不能直接解密数据库字段。</p>
+<p>建议新增内部接口：</p>
+<table>
+  <thead>
+      <tr>
+          <th>接口</th>
+          <th>用途</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>POST /internal/v1/member-sensitive/query</code></td>
+          <td>根据 phone 或 identity 精确查询会员 ID</td>
+      </tr>
+      <tr>
+          <td><code>GET /internal/v1/member-sensitive/{memberId}</code></td>
+          <td>按权限获取已解密值或脱敏值</td>
+      </tr>
+      <tr>
+          <td><code>PUT /internal/v1/member-sensitive/{memberId}</code></td>
+          <td>规范化、加密、写入 t_member 和 t_member_other</td>
+      </tr>
+      <tr>
+          <td><code>POST /internal/v1/member-sensitive/decrypt-batch</code></td>
+          <td>批量解密，限制批量大小和调用权限</td>
+      </tr>
+      <tr>
+          <td><code>POST /internal/v1/member-sensitive/validate</code></td>
+          <td>校验和规范化输入，不返回密钥</td>
+      </tr>
+      <tr>
+          <td><code>POST /internal/v1/member-sensitive/rotate</code></td>
+          <td>受控密钥轮换和重加密任务</td>
+      </tr>
+  </tbody>
+</table>
+<p>接口要求：</p>
+<ul>
+<li>mTLS 或服务间签名认证。</li>
+<li>权限分为 <code>query</code>、<code>decrypt</code>、<code>write</code>、<code>batch</code>、<code>rotate</code>。</li>
+<li>每次请求带调用方、用途、幂等号和 trace ID。</li>
+<li>响应不返回密钥。</li>
+<li>失败不能返回原始密文作为可展示值。</li>
+<li>不记录请求中的 phone、identity 明文。</li>
+<li>批量解密接口必须限制会员数量、字段数量和调用频率。</li>
+</ul>
+<h2 id="阶段三数据库结构变更">阶段三：数据库结构变更</h2>
+<h3 id="31-修改-t_member-字段长度和字符集">3.1 修改 t_member 字段长度和字符集</h3>
+<p>数据字典当前定义位于：<a href="/Users/jalen/www/local/local.gtctrader1203.com/docs/%E6%95%B0%E6%8D%AE%E5%AD%97%E5%85%B8.sql:2849">数据字典.sql</a>。</p>
+<p>建议：</p>
+<ul>
+<li><code>phone</code> 扩大到 <code>varchar(255)</code>。</li>
+<li><code>identity</code> 扩大到 <code>varchar(255)</code>。</li>
+<li>使用 <code>ascii_bin</code> 或等价二进制比较规则。</li>
+<li>保留 <code>phone NOT NULL</code> 和 <code>identity NULL</code> 的业务语义。</li>
+<li>不在加密密文字段上建立前缀或包含搜索索引。</li>
+</ul>
+<p>执行顺序：</p>
+<ol>
+<li>在测试库执行在线 DDL。</li>
+<li>观察锁等待、复制延迟和执行时间。</li>
+<li>在预生产进行完整回归。</li>
+<li>生产使用 DBA 审核后的版本化迁移脚本。</li>
+<li>迁移完成后再部署依赖新长度的代码。</li>
+</ol>
+<h3 id="32-在-t_member_other-增加影子列和迁移状态">3.2 在 t_member_other 增加影子列和迁移状态</h3>
+<p>当前表结构位于：<a href="/Users/jalen/www/local/local.gtctrader1203.com/docs/%E6%95%B0%E6%8D%AE%E5%AD%97%E5%85%B8.sql:3770">数据字典.sql</a>。</p>
+<p>建议新增：</p>
+<ul>
+<li><code>phone_hmac_index</code></li>
+<li><code>identity_hmac_index</code></li>
+<li><code>phone_crypto_version</code></li>
+<li><code>identity_crypto_version</code></li>
+<li><code>sensitive_state</code></li>
+<li><code>sensitive_backfill_at</code></li>
+<li><code>sensitive_last_error</code></li>
+<li><code>sensitive_updated_at</code></li>
+</ul>
+<p>新增索引：</p>
+<ul>
+<li><code>idx_phone_hmac_index (phone_hmac_index)</code></li>
+<li><code>idx_identity_hmac_index (identity_hmac_index)</code></li>
+</ul>
+<p>注意：</p>
+<ul>
+<li>不设置 HMAC 唯一索引。</li>
+<li>KYC 现有 <code>replace(true)</code> 写法必须改为字段白名单更新或安全 upsert，否则会覆盖新增敏感字段。</li>
+<li>迁移状态只能反映当前行状态，批处理全局 checkpoint 使用已有任务表或新增小型任务表，不要依赖 Redis 作为唯一进度记录。</li>
+</ul>
+<h2 id="阶段四crm-统一适配层">阶段四：CRM 统一适配层</h2>
+<h3 id="41-新增位置">4.1 新增位置</h3>
+<p>按现有三层结构新增：</p>
+<ul>
+<li><code>app/service/SensitiveData/CryptoKeyRing.php</code></li>
+<li><code>app/service/SensitiveData/MemberSensitiveService.php</code></li>
+<li><code>app/service/SensitiveData/PhoneNormalizer.php</code></li>
+<li><code>app/service/SensitiveData/IdentityNormalizer.php</code></li>
+<li><code>app/service/SensitiveData/SensitiveException.php</code></li>
+<li><code>config/sensitive.php</code></li>
+<li>内部接口控制器，放在现有 internal controller/route 目录；如果项目没有统一 internal 模块，则新增 <code>app/internal/controller/MemberSensitiveController.php</code>。</li>
+</ul>
+<p>具体命名需以项目现有目录规范为准，新增 PHP 必须兼容 PHP 8.0。</p>
+<h3 id="42-适配层职责">4.2 适配层职责</h3>
+<p><code>MemberSensitiveService</code> 统一提供：</p>
+<ul>
+<li><code>normalizePhone</code></li>
+<li><code>normalizeIdentity</code></li>
+<li><code>encrypt</code></li>
+<li><code>decrypt</code></li>
+<li><code>generateBlindIndex</code></li>
+<li><code>buildExactQuery</code></li>
+<li><code>decryptBatch</code></li>
+<li><code>protectMember</code></li>
+<li><code>rotateMember</code></li>
+<li><code>handleDecryptFailure</code></li>
+<li><code>backfillByCursor</code></li>
+</ul>
+<p>禁止业务控制器自行：</p>
+<ul>
+<li>拼接密文。</li>
+<li>调用 sodium。</li>
+<li>生成 HMAC。</li>
+<li>直接读取 <code>phone_hmac_index</code>。</li>
+<li>直接把密文当手机号输出。</li>
+</ul>
+<h3 id="43-异常和损坏数据处理">4.3 异常和损坏数据处理</h3>
+<p>解密失败必须区分：</p>
+<ul>
+<li>密钥版本不存在。</li>
+<li>密文格式错误。</li>
+<li>nonce 长度错误。</li>
+<li>AAD 不匹配。</li>
+<li>认证标签校验失败。</li>
+<li>字段规范化失败。</li>
+</ul>
+<p>处理原则：</p>
+<ol>
+<li>对外返回统一的“敏感信息暂不可用”。</li>
+<li>列表接口返回脱敏占位，不返回密文。</li>
+<li>记录会员 ID、字段、版本、错误码和 trace ID，不记录明文。</li>
+<li>更新 <code>sensitive_state</code> 和错误信息。</li>
+<li>进入可重试或人工处理队列。</li>
+<li>连续失败达到阈值时暂停回填或切换。</li>
+</ol>
+<h2 id="阶段五crm-业务代码改造">阶段五：CRM 业务代码改造</h2>
+<h3 id="51-member-控制器和列表">5.1 Member 控制器和列表</h3>
+<p>修改：<a href="/Users/jalen/www/local/local.gtctrader1203.com/app/admin/controller/Member.php">Member.php</a></p>
+<p>具体动作：</p>
+<ul>
+<li>旧列表中的手机号查询由 <code>LIKE</code> 改为 HMAC 精确查询。</li>
+<li>新列表不能直接返回 <code>m.*</code> 中的密文。</li>
+<li>先通过 HMAC 查询会员 ID，再批量解密，最后调用现有脱敏函数。</li>
+<li><code>hideListEmailPhone()</code> 保留，但入参必须是解密后的明文。</li>
+<li>保留原有响应字段名 <code>phone</code>、<code>identity</code>，避免前端字段契约变化。</li>
+<li>对旧的 <code>prefix</code>、<code>contains</code> 参数：
+<ul>
+<li>兼容参数名；</li>
+<li>能规范化时转换成精确查询；</li>
+<li>不能精确转换时返回明确的“不再支持模糊查询”错误码；</li>
+<li>不再对密文执行 <code>LIKE</code>。</li>
+</ul>
+</li>
+<li>详情页 <code>m.*</code> 改为显式字段选择和敏感字段批量解密。</li>
+<li>完整联系方式查看接口继续走权限、审计和脱敏策略，只在授权场景返回解密值。</li>
+<li>修改手机号、identity 时统一调用 <code>protectMember</code>，不能直接 <code>save()</code> 明文。</li>
+</ul>
+<h3 id="52-memberfastservice">5.2 MemberFastService</h3>
+<p>修改：<a href="/Users/jalen/www/local/local.gtctrader1203.com/app/admin/service/MemberFastService.php:56">MemberFastService.php</a></p>
+<ul>
+<li>删除或隔离 <code>LOWER(phone) LIKE</code> 逻辑。</li>
+<li>改为调用统一精确查询服务。</li>
+<li>保留树形会员查询的权限、层级和分页逻辑。</li>
+<li>解密采用批量方式，禁止列表逐行调用解密接口。</li>
+</ul>
+<h3 id="53-kyc">5.3 KYC</h3>
+<p>修改：<a href="/Users/jalen/www/local/local.gtctrader1203.com/app/admin/controller/Kyc.php">Kyc.php</a></p>
+<p>覆盖：</p>
+<ul>
+<li>KYC 列表显示和脱敏。</li>
+<li>KYC 审核详情。</li>
+<li>identity 重复校验。</li>
+<li>KYC 提交时的 phone/identity 写入。</li>
+<li><code>member_other</code> 的 upsert/replace 逻辑。</li>
+</ul>
+<p>要求：</p>
+<ul>
+<li>KYC 列表先查会员 ID，再批量解密后脱敏。</li>
+<li>identity 重复校验使用大写规范化后的 HMAC。</li>
+<li>KYC JSON、审核记录中的证件号必须同步治理，不允许继续保存新明文。</li>
+<li>已有 <code>replace(true)</code> 改为不会覆盖敏感影子列的字段白名单更新。</li>
+</ul>
+<h3 id="54-日志短信mt-和服务层">5.4 日志、短信、MT 和服务层</h3>
+<p>修改：</p>
+<ul>
+<li><a href="/Users/jalen/www/local/local.gtctrader1203.com/app/service/MemberService.php:1448">MemberService.php</a></li>
+<li><a href="/Users/jalen/www/local/local.gtctrader1203.com/app/service/InformationService.php:244">InformationService.php</a></li>
+<li><a href="/Users/jalen/www/local/local.gtctrader1203.com/app/service/MtService.php:529">MtService.php</a></li>
+<li><a href="/Users/jalen/www/local/local.gtctrader1203.com/app/admin/middleware/LogOperationMiddleware.php:208">LogOperationMiddleware.php</a></li>
+</ul>
+<p>具体要求：</p>
+<ul>
+<li>before/after 变更日志只记录会员 ID、掩码值和操作类型。</li>
+<li>如审计确实需要原值，放入独立、权限更高、加密的审计存储，不写普通日志。</li>
+<li>短信发送前通过服务解析明文手机号，短信日志只保存会员 ID、掩码手机号和发送状态。</li>
+<li>MT 同步前解密，发送后不持久化明文。</li>
+<li>操作日志敏感字段过滤中增加 <code>phone</code>、<code>identity</code>。</li>
+<li>搜索 <code>app/risk</code>、报表、导出、定时任务和同步服务，逐个替换直接字段读取。</li>
+</ul>
+<h2 id="阶段六gtcuser-改造">阶段六：gtcuser 改造</h2>
+<h3 id="61-新增-crm-客户端">6.1 新增 CRM 客户端</h3>
+<p>建议新增：</p>
+<ul>
+<li><code>app/Service/SensitiveData/CrmSensitiveClient.php</code></li>
+<li><code>app/Service/SensitiveData/SensitiveMemberGateway.php</code></li>
+<li>配置文件和服务认证配置。</li>
+<li>超时、重试、熔断、幂等和 trace 传递。</li>
+</ul>
+<p><code>gtcuser</code> 不保存 phone/identity 加密密钥，也不在本地实现另一套算法。</p>
+<h3 id="62-repository-和模型">6.2 Repository 和模型</h3>
+<p>修改：</p>
+<ul>
+<li><a href="/Users/jalen/www/local/gtcuser/app/Model/member/TMember.php:154">TMember.php</a></li>
+<li><a href="/Users/jalen/www/local/gtcuser/app/Repository/member/TMemberRepository.php:38">TMemberRepository.php</a></li>
+</ul>
+<p>要求：</p>
+<ul>
+<li>Repository 中按 phone/identity 的直接 SQL 查询替换为 CRM 精确查询接口。</li>
+<li>ORM accessor 不应隐式发起网络解密，避免列表产生 N+1 请求。</li>
+<li>敏感字段采用显式 Gateway 调用和批量读取。</li>
+<li>禁止在 mass assignment 中直接写入明文 <code>phone</code>、<code>identity</code>。</li>
+</ul>
+<h3 id="63-登录注册换绑和验证码">6.3 登录、注册、换绑和验证码</h3>
+<p>修改：</p>
+<ul>
+<li><a href="/Users/jalen/www/local/gtcuser/app/Http/Api/Controller/V1/PubController.php:318">PubController.php</a></li>
+<li><a href="/Users/jalen/www/local/gtcuser/app/Service/member/TMemberService.php:897">TMemberService.php</a></li>
+<li><a href="/Users/jalen/www/local/gtcuser/app/Service/member/TMemberService.php:1775">TMemberService.php</a></li>
+<li><a href="/Users/jalen/www/local/gtcuser/app/Service/member/TMemberService.php:3702">TMemberService.php</a></li>
+</ul>
+<p>具体动作：</p>
+<ul>
+<li>登录手机号检查改为 CRM 精确查询。</li>
+<li>注册重复校验改为规范化手机号加 HMAC 查询。</li>
+<li>换绑手机号使用 CRM 原子写入接口。</li>
+<li>原有 <code>md5(phone)</code> 替换为带域隔离的 HMAC 标识，不能继续使用明文 MD5。</li>
+<li>短信验证码、登录限流、找回密码均使用统一规范化结果。</li>
+<li>CRM 写入失败时，注册流程必须进入可重试状态，不能产生“会员创建成功但敏感字段未保存”的半完成状态。</li>
+</ul>
+<h3 id="64-日志缓存和风控">6.4 日志、缓存和风控</h3>
+<p>修改：</p>
+<ul>
+<li><a href="/Users/jalen/www/local/gtcuser/app/Service/SmsAbuseDetectorService.php:675">SmsAbuseDetectorService.php</a></li>
+<li>请求日志中保存整个请求体的逻辑。</li>
+<li>所有缓存 key 中的明文手机号。</li>
+<li>KYC、PAMM、支付、MT、风控和营销服务中直接读取 <code>phone</code>、<code>identity</code> 的代码。</li>
+</ul>
+<p>规则：</p>
+<ul>
+<li>日志只保留会员 ID、掩码和错误码。</li>
+<li>缓存 key 使用带版本和用途域隔离的 HMAC。</li>
+<li>缓存 value 不存明文 phone/identity。</li>
+<li>旧缓存命名空间设置过期时间，不能无限期保留。</li>
+<li>不能让每个调用方自行实现一套脱敏规则。</li>
+</ul>
+<h2 id="阶段七管理前端改造">阶段七：管理前端改造</h2>
+<p>修改：</p>
+<ul>
+<li><a href="/Users/jalen/www/local/gtc_admin_vue/src/api/member/member/index.js:38">member/index.js</a></li>
+<li><a href="/Users/jalen/www/local/gtc_admin_vue/src/components/memberemailphone/memberEmailPhone.vue:102">memberEmailPhone.vue</a></li>
+<li><a href="/Users/jalen/www/local/gtc_admin_vue/src/views/member/membernew/index.vue:2693">membernew/index.vue</a></li>
+</ul>
+<p>执行内容：</p>
+<ul>
+<li>保持现有接口路径和字段名，避免无必要的前端大改。</li>
+<li>列表搜索界面明确为手机号、证件号精准查询。</li>
+<li>删除或禁用前缀和包含搜索控件。</li>
+<li>详情编辑页继续读取解密后的手机号。</li>
+<li><code>MemberEmailPhone</code> 继续使用原权限和查看接口。</li>
+<li>前端不接触密文，不保存密文到 localStorage、Vuex 或浏览器日志。</li>
+<li>检查所有 KYC、会员详情、导出和搜索页面对 <code>phone</code>、<code>identity</code> 的依赖。</li>
+</ul>
+<h2 id="阶段八同步报表和明文副本治理">阶段八：同步、报表和明文副本治理</h2>
+<p>需要数据平台和运维参与，不能只改三个代码库：</p>
+<ol>
+<li>
+<p>SelectDB：</p>
+<ul>
+<li>明确是否同步密文、HMAC 还是脱敏字段。</li>
+<li>报表精确关联使用 HMAC。</li>
+<li>展示类报表使用掩码列。</li>
+<li>不把 CRM 解密接口批量调用放进实时大查询。</li>
+</ul>
+</li>
+<li>
+<p>ETL/CDC：</p>
+<ul>
+<li>识别 t_member 字段变化事件。</li>
+<li>避免把新密文解析成手机号。</li>
+<li>明确 HMAC 和密文字段的版本传播规则。</li>
+</ul>
+</li>
+<li>
+<p>日志和审计：</p>
+<ul>
+<li>新日志不记录明文。</li>
+<li>历史日志是否脱敏、加密或删除，必须经过数据保留审批。</li>
+<li><code>t_logger</code>、短信日志、请求日志、活动记录、KYC JSON 和证件审核记录都要单独盘点。</li>
+</ul>
+</li>
+<li>
+<p>备份和导出：</p>
+<ul>
+<li>迁移前备份必须加密并限制访问。</li>
+<li>导出、临时 CSV、人工下载文件纳入清理和留存期限。</li>
+<li>生产备份不能因为回滚需要而长期保留明文副本。</li>
+</ul>
+</li>
+</ol>
+<h2 id="阶段九灰度发布和历史回填">阶段九：灰度发布和历史回填</h2>
+<h3 id="91-增加运行开关">9.1 增加运行开关</h3>
+<p>建议至少设置：</p>
+<ul>
+<li><code>SENSITIVE_READ_MODE=legacy|dual|encrypted</code></li>
+<li><code>SENSITIVE_WRITE_MODE=legacy|encrypted</code></li>
+<li><code>SENSITIVE_SEARCH_MODE=dual|hmac_only</code></li>
+<li><code>SENSITIVE_REVEAL_ENABLED</code></li>
+<li><code>SENSITIVE_BACKFILL_ENABLED</code></li>
+</ul>
+<p>配置通过部署平台或密钥配置中心注入，<code>.env.example</code> 只放变量名和格式说明，不放真实密钥。</p>
+<h3 id="92-灰度顺序">9.2 灰度顺序</h3>
+<ol>
+<li>
+<p><strong>数据库兼容结构阶段</strong></p>
+<ul>
+<li>只增加字段、索引和状态列。</li>
+<li>业务仍使用旧明文。</li>
+<li>验证 DDL、复制和索引。</li>
+</ul>
+</li>
+<li>
+<p><strong>双读阶段</strong></p>
+<ul>
+<li>读取时识别明文和 <code>enc:v1</code>。</li>
+<li>新代码可以解密密文。</li>
+<li>搜索同时尝试 HMAC 和旧数据精确查询。</li>
+<li>模糊搜索暂时只对未迁移旧数据保留。</li>
+</ul>
+</li>
+<li>
+<p><strong>加密写入阶段</strong></p>
+<ul>
+<li>所有新建、修改、KYC、换绑数据直接写密文和 HMAC。</li>
+<li>不再产生新的明文。</li>
+<li>CRM 负责 t_member 与 t_member_other 的事务性写入。</li>
+<li>gtcuser 不能直接更新敏感列。</li>
+</ul>
+</li>
+<li>
+<p><strong>历史回填阶段</strong></p>
+<ul>
+<li>使用 CRM CLI，例如 <code>app/command/MemberSensitiveBackfill.php</code>。</li>
+<li>查询方式：</li>
+</ul>
+</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="ln">1</span><span class="cl"><span class="k">WHERE</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="p">:</span><span class="n">last_id</span><span class="w">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="w"></span><span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="k">ASC</span><span class="w">
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="w"></span><span class="k">LIMIT</span><span class="w"> </span><span class="p">:</span><span class="n">batch_size</span><span class="w">
+</span></span></span></code></pre></div><ul>
+<li>每批独立事务。</li>
+<li>已是当前版本密文的跳过。</li>
+<li>明文记录先规范化，再加密、生成 HMAC、更新状态。</li>
+<li>规范化失败或数据异常的记录进入错误队列，不覆盖原值。</li>
+<li>使用 <code>WHERE id = ? AND phone = :old_value</code> 或行锁处理并发更新。</li>
+<li>checkpoint 持久化，支持 <code>--from-id</code>、<code>--to-id</code>、<code>--batch</code>、失败重试和断点续跑。</li>
+<li>不能使用深分页，也不能执行全表无条件一次性 UPDATE。</li>
+</ul>
+<ol start="5">
+<li><strong>全量切换阶段</strong>
+<ul>
+<li>验证所有可写入口均已加密。</li>
+<li>验证明文行数为零或全部进入已审批异常清单。</li>
+<li>切换为 <code>hmac_only</code> 精确查询。</li>
+<li>禁止手机号和 identity 前缀、包含搜索。</li>
+<li>保留旧版本解密能力，但不再保留旧明文查询代码。</li>
+</ul>
+</li>
+</ol>
+<h3 id="93-回填验收">9.3 回填验收</h3>
+<p>必须完成：</p>
+<ul>
+<li>t_member 行数与回填成功数一致。</li>
+<li>phone 非空记录都有 HMAC。</li>
+<li>identity 非 NULL 记录都有 HMAC。</li>
+<li>HMAC 索引无异常重复丢失。</li>
+<li>随机抽样解密值与迁移前基线一致或符合已批准的规范化结果。</li>
+<li>迁移前后精确查询结果集合一致。</li>
+<li>解密失败记录均有错误码和人工处理状态。</li>
+<li>回填期间无明文新写入。</li>
+</ul>
+<h2 id="阶段十密钥轮换">阶段十：密钥轮换</h2>
+<p>轮换不是一次性替换 <code>.env</code>，按以下流程执行：</p>
+<ol>
+<li>生成新的 phone 加密密钥和 HMAC 密钥。</li>
+<li>旧密钥进入 <code>previous</code> key ring。</li>
+<li>新写入使用新版本。</li>
+<li>读取同时支持 current 和 previous。</li>
+<li>使用主键游标重加密旧版本密文并重算 HMAC。</li>
+<li>验证旧版本记录数归零。</li>
+<li>等待备份、缓存和消息队列保留期结束。</li>
+<li>再撤销旧密钥。</li>
+<li>保留轮换审计记录，但不能记录密钥内容。</li>
+</ol>
+<p>phone 和 identity 的密钥必须始终独立轮换，不能共用一把密钥。</p>
+<h2 id="阶段十一回滚和停止条件">阶段十一：回滚和停止条件</h2>
+<h3 id="111-回滚原则">11.1 回滚原则</h3>
+<ul>
+<li>双读阶段可以通过开关切回旧读路径。</li>
+<li>加密写入启用后，不能直接把旧版程序部署回去，因为旧版会把密文当手机号。</li>
+<li>如需恢复旧系统，必须：
+<ol>
+<li>停止加密写入。</li>
+<li>使用受控备份或 CRM 解密脚本恢复明文。</li>
+<li>验证恢复结果。</li>
+<li>再切换旧版本程序。</li>
+</ol>
+</li>
+<li>恢复出来的明文只能存在于受控回滚窗口，不能作为长期状态。</li>
+</ul>
+<h3 id="112-自动停止条件">11.2 自动停止条件</h3>
+<p>出现以下任一情况，暂停灰度或回填：</p>
+<ul>
+<li>解密失败率超过批准阈值。</li>
+<li>迁移前后精确查询结果不一致。</li>
+<li>发现新的明文写入来源。</li>
+<li>会员详情、KYC、登录或注册出现敏感字段错误。</li>
+<li>数据库锁等待、复制延迟或接口延迟超过基线。</li>
+<li>内部接口出现未授权调用或明文日志。</li>
+<li>HMAC 计算结果与测试向量不一致。</li>
+<li>回填错误队列持续增长且无法自动恢复。</li>
+</ul>
+<h2 id="阶段十二测试和验收清单">阶段十二：测试和验收清单</h2>
+<h3 id="121-单元测试">12.1 单元测试</h3>
+<p>新增测试覆盖：</p>
+<ul>
+<li>phone E.164 规范化。</li>
+<li>identity 大写和非法字符。</li>
+<li>加密解密往返。</li>
+<li>nonce 随机性。</li>
+<li>AAD 篡改失败。</li>
+<li>密文认证标签篡改失败。</li>
+<li>phone/identity 密钥隔离。</li>
+<li>HMAC 稳定性和版本变化。</li>
+<li>null、空字符串和异常输入。</li>
+<li>旧版本解密。</li>
+<li>密文损坏处理。</li>
+<li>重复手机号和重复 identity。</li>
+</ul>
+<h3 id="122-集成测试">12.2 集成测试</h3>
+<p>验证：</p>
+<ul>
+<li>明文旧行、密文新行混合读取。</li>
+<li>HMAC 精确查询返回全部重复会员。</li>
+<li>KYC <code>member_other</code> 更新不覆盖敏感列。</li>
+<li>CRM 内部接口认证、权限、超时、重试和幂等。</li>
+<li>批量解密不会产生 N+1。</li>
+<li>回填中断后可从 checkpoint 继续。</li>
+<li>并发修改不会覆盖新手机号。</li>
+</ul>
+<h3 id="123-业务回归">12.3 业务回归</h3>
+<p>至少回归：</p>
+<ul>
+<li>管理后台会员列表和精确查询。</li>
+<li>会员详情和手机号查看权限。</li>
+<li><code>hideListEmailPhone()</code>、详情脱敏、KYC 列表脱敏。</li>
+<li>会员注册、登录、换绑手机号。</li>
+<li>短信验证码和反滥发。</li>
+<li>KYC 提交、审核、重复身份校验。</li>
+<li>MT 开户和 MT 同步。</li>
+<li>支付、出入金、风控、PAMM、返佣相关读取。</li>
+<li>报表、导出、SelectDB 同步。</li>
+<li>外部接口 phone/identity 字段兼容性。</li>
+</ul>
+<h3 id="124-安全和性能验证">12.4 安全和性能验证</h3>
+<ul>
+<li>数据库导出只能看到密文和 HMAC。</li>
+<li>日志、缓存、消息和临时文件不出现新明文。</li>
+<li>未授权调用内部解密接口返回 401/403。</li>
+<li>HMAC 索引使用 <code>EXPLAIN</code> 验证，不能出现全表扫描。</li>
+<li>统计回填使用主键游标，不使用深分页。</li>
+<li>测量 CRM 解密接口 p95、p99 延迟。</li>
+<li>验证批量解密、KYC 列表和会员列表的数据库连接数。</li>
+<li>进行备份恢复演练和回滚演练。</li>
+</ul>
+<h3 id="125-每次代码交付的校验">12.5 每次代码交付的校验</h3>
+<p>修改 PHP 后执行：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">php -l path/to/changed-file.php
+</span></span><span class="line"><span class="ln">2</span><span class="cl">composer dump-autoload
+</span></span></code></pre></div><p>按模块执行对应测试：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">composer <span class="nb">test</span>
+</span></span></code></pre></div><p>没有现成测试的功能，必须补充接口级、数据库级或可重复的人工回归记录，不能用源码字符串匹配代替行为测试。</p>
+<h2 id="最终交付物">最终交付物</h2>
+<p>正式执行前应先形成并评审：</p>
+<ol>
+<li>敏感字段全链路清单。</li>
+<li>加密协议和测试向量文档。</li>
+<li>密钥生成、托管、轮换和撤销手册。</li>
+<li>数据库迁移脚本和回滚脚本。</li>
+<li>CRM 内部 API OpenAPI 文档。</li>
+<li>三个代码库的改动清单。</li>
+<li>灰度开关和发布顺序。</li>
+<li>历史回填运行手册。</li>
+<li>数据副本、日志、缓存和报表治理清单。</li>
+<li>回归测试矩阵和生产验收表。</li>
+<li>监控指标、告警阈值和停止条件。</li>
+<li>上线后旧密文版本清理计划。</li>
+</ol>
+<p>本轮结论仍然是方案和执行步骤，未修改任何代码、数据库、配置或密钥。生产数据库类型、实际数据量、SelectDB/ETL/CDC 链路、备份保留策略、密钥托管方式和外部系统清单仍需由 DBA、运维和数据平台确认后，才能进入阶段三的实际实施。</p>
+<hr>
+<hr>
+<hr>
+<hr>
+
+<div class="notices tip">
+    <div class="label">‼️️‼️重要概念</div>
+    <p>HMAC-SHA256 盲索引 概念</p>
+
+  </div>
+
+<h2 id="hmac-sha256-盲索引">HMAC-SHA256 盲索引</h2>
+<p>“HMAC-SHA256 盲索引”可以理解为：<strong>为敏感字段生成一个只有系统能计算、但不能反向还原原文的精准查询指纹</strong>。</p>
+<p>以手机号 <code>13800138000</code> 为例：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">手机号原文：13800138000
+</span></span><span class="line"><span class="ln">2</span><span class="cl">系统密钥：K_phone_v1   // 保存在 KMS/密钥服务中，不放数据库
+</span></span><span class="line"><span class="ln">3</span><span class="cl">盲索引：HMAC-SHA256(K_phone_v1, &#34;13800138000&#34;)
+</span></span></code></pre></div><p>数据库中可以保存：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">phone_ciphertext     = 加密后的手机号
+</span></span><span class="line"><span class="ln">2</span><span class="cl">phone_search_hash    = 上面生成的 HMAC 值
+</span></span></code></pre></div><p><code>phone_search_hash</code> 是 32 字节二进制值，也可以使用 64 位十六进制字符串保存。它不能解密出手机号，但同一个手机号在同一个密钥下会生成相同的值。</p>
+<p>查询时，不再这样查询：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="ln">1</span><span class="cl"><span class="k">WHERE</span><span class="w"> </span><span class="n">phone</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;13800138000&#39;</span><span class="w">
+</span></span></span></code></pre></div><p>而是由应用先计算盲索引：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln">1</span><span class="cl"><span class="nv">$phone</span> <span class="o">=</span> <span class="nx">normalizePhone</span><span class="p">(</span><span class="nv">$inputPhone</span><span class="p">);</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="nv">$searchHash</span> <span class="o">=</span> <span class="nx">hash_hmac</span><span class="p">(</span><span class="s1">&#39;sha256&#39;</span><span class="p">,</span> <span class="nv">$phone</span><span class="p">,</span> <span class="nv">$phoneKey</span><span class="p">,</span> <span class="k">true</span><span class="p">);</span>
+</span></span></code></pre></div><p>再查询：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="ln">1</span><span class="cl"><span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="w"></span><span class="k">FROM</span><span class="w"> </span><span class="n">t_member</span><span class="w">
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="w"></span><span class="k">WHERE</span><span class="w"> </span><span class="n">phone_search_hash</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">:</span><span class="n">search_hash</span><span class="w">
+</span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="w"></span><span class="k">LIMIT</span><span class="w"> </span><span class="mi">1</span><span class="w">
+</span></span></span></code></pre></div><p>查到记录后，应用使用自己的密钥解密 <code>phone_ciphertext</code>，继续发送短信、展示掩码手机号或执行后续业务。</p>
+<p>完整流程如下：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">用户输入手机号
+</span></span><span class="line"><span class="ln">2</span><span class="cl">    ↓
+</span></span><span class="line"><span class="ln">3</span><span class="cl">统一格式化，例如去空格、统一国家区号
+</span></span><span class="line"><span class="ln">4</span><span class="cl">    ↓
+</span></span><span class="line"><span class="ln">5</span><span class="cl">使用应用密钥计算 HMAC-SHA256
+</span></span><span class="line"><span class="ln">6</span><span class="cl">    ↓
+</span></span><span class="line"><span class="ln">7</span><span class="cl">用盲索引做等值查询
+</span></span><span class="line"><span class="ln">8</span><span class="cl">    ↓
+</span></span><span class="line"><span class="ln">9</span><span class="cl">取出密文并由应用解密
+</span></span></code></pre></div><p>证件号 <code>identity</code> 也可以采用同样方式，但建议使用独立密钥：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">phone   -&gt; K_phone_v1
+</span></span><span class="line"><span class="ln">2</span><span class="cl">identity -&gt; K_identity_v1
+</span></span></code></pre></div><p>这样做有几个重要特点：</p>
+<ol>
+<li>
+<p><strong>支持精准查询</strong></p>
+<p>注册重复校验、找回密码、后台按手机号查询、证件号去重等 <code>=</code> 查询都可以继续支持。</p>
+</li>
+<li>
+<p><strong>不能支持普通模糊查询</strong></p>
+<p>例如：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="ln">1</span><span class="cl"><span class="n">phone</span><span class="w"> </span><span class="k">LIKE</span><span class="w"> </span><span class="s1">&#39;%1380%&#39;</span><span class="w">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="w"></span><span class="n">phone</span><span class="w"> </span><span class="k">LIKE</span><span class="w"> </span><span class="s1">&#39;138%&#39;</span><span class="w">
+</span></span></span></code></pre></div><p>盲索引无法支持这类查询。需要改成完整手机号精准搜索，或者额外设计前缀索引，但后者会泄露更多信息。</p>
+</li>
+<li>
+<p><strong>HMAC 不是加密</strong></p>
+<p>盲索引不能还原手机号，所以它只能解决“怎么查”的问题。若数据库中仍保存明文 <code>phone</code>，数据库泄露时明文仍然会暴露。</p>
+<p>因此完整方案通常是：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">phone       -&gt; AES-GCM 等可逆加密
+</span></span><span class="line"><span class="ln">2</span><span class="cl">phone_hash  -&gt; HMAC-SHA256，用于精准查询
+</span></span></code></pre></div></li>
+<li>
+<p><strong>为什么不用普通 SHA256</strong></p>
+<p>手机号和证件号的格式空间相对有限，攻击者可以准备大量候选号码进行字典匹配：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">SHA256(&#34;13800138000&#34;)
+</span></span><span class="line"><span class="ln">2</span><span class="cl">SHA256(&#34;13800138001&#34;)
+</span></span><span class="line"><span class="ln">3</span><span class="cl">SHA256(&#34;13800138002&#34;)
+</span></span><span class="line"><span class="ln">4</span><span class="cl">...
+</span></span></code></pre></div><p>HMAC 多了一个不在数据库中的密钥。只有拿到应用密钥，攻击者才能有效验证候选值。因此密钥必须放在 KMS、独立密钥服务或受保护的运行环境中，不能和数据库备份放在一起。</p>
+</li>
+<li>
+<p><strong>盲索引本身仍会泄露相等关系</strong></p>
+<p>如果两条记录的 <code>phone_search_hash</code> 相同，攻击者可以知道它们对应同一个手机号，虽然不知道具体号码。因此还需要考虑重复账号、日志、缓存、数仓同步等其他泄露面。</p>
+</li>
+</ol>
+<p>对当前项目而言，盲索引不是单独替换字段就能自动兼容旧逻辑。所有手机号、证件号的写入和精准查询，都需要统一经过一个加密/索引适配层；但它可以保留原有“输入明文、精准查询、应用内解密”的业务体验。</p>
+
+    </div><div class="post_comments">
+  
+  
+  
+  
+</div>
+
+
+
+
+  </article>
+<aside class="sidebar">
+  <section class="sidebar_inner">
+    <br>
+    
+  
+  <div class="search">
+    <input type="search" class="search_field form_field" placeholder='搜索内容...' id="find" autocomplete="off" data-scope='post'>
+    <label for="find" class="search_label"><svg class="icon">
+  <title>search</title>
+  <use xlink:href="#search"></use>
+</svg>
+
+    </label>
+    
+    <div class="search_results results"></div>
+  </div>
+
+        <div class="author_header">
+          <img src="https://jianlin-li.github.io/images/fish-head.png" alt="李建林 photo">
+          <h2>李建林</h2>
+        </div>
+      <div class="author_bio">
+        PHP, Go, MySQL, Redis, RabbitMQ, Elasticsearch, Docker, Kubernetes, Shell
+      </div>
+      <a href='https://jianlin-li.github.io/about/' class="button mt-1" role="button" title='阅读更多'>阅读更多</a>
+
+    
+    <h2 class="mt-4">精选文章</h2>
+    <ul>
+      <li>
+        <a href="https://jianlin-li.github.io/post/jiagou-elk-stack/" class="nav-link" title="架构-使用ELK Stack在本地Macbookpro搭建一套日志收集并且可视化系统">架构-使用ELK Stack在本地Macbookpro搭建一套日志收集并且可视化系统</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/jiagou-prometheus-grafana/" class="nav-link" title="架构-Prometheus&#43;Grafana">架构-Prometheus+Grafana</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/jiagou-cicd-jenkins-argo/" class="nav-link" title="架构-基于JenKins的CI/CD平台之Argo CD">架构-基于JenKins的CI/CD平台之Argo CD</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/jiagou-cicd-jenkins/" class="nav-link" title="架构-基于JenKins的CI/CD平台">架构-基于JenKins的CI/CD平台</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/k8s_review_12/" class="nav-link" title="Kubernetes的知识库-12">Kubernetes的知识库-12</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/k8s_review_11/" class="nav-link" title="Kubernetes的知识库-11">Kubernetes的知识库-11</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/k8s_review_10/" class="nav-link" title="Kubernetes的知识库-10">Kubernetes的知识库-10</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/k8s_review_9/" class="nav-link" title="Kubernetes的知识库-9">Kubernetes的知识库-9</a>
+      </li>
+    </ul>
+    <h2 class="mt-4">最新文章</h2>
+    <ul class="flex-column">
+      <li>
+        <a href="https://jianlin-li.github.io/post/k8s_review_8/" class="nav-link" title="Kubernetes的知识库-8">Kubernetes的知识库-8</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/k8s_review_7/" class="nav-link" title="Kubernetes的知识库-7">Kubernetes的知识库-7</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/k8s_review_6/" class="nav-link" title="Kubernetes的知识库-6">Kubernetes的知识库-6</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/k8s_review_5/" class="nav-link" title="Kubernetes的知识库-5">Kubernetes的知识库-5</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/k8s_review_4/" class="nav-link" title="Kubernetes的知识库-4">Kubernetes的知识库-4</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/k8s_review_3/" class="nav-link" title="Kubernetes的知识库-3">Kubernetes的知识库-3</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/k8s_review_2/" class="nav-link" title="Kubernetes的知识库-2">Kubernetes的知识库-2</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/k8s_review_1/" class="nav-link" title="Kubernetes的知识库-1">Kubernetes的知识库-1</a>
+      </li>
+    </ul>
+    <div>
+      <h2 class="mt-4 taxonomy" id="categories-section">分类</h2>
+      <nav class="tags_nav">
+        <a href='https://jianlin-li.github.io/categories/kubernetes/' class="post_tag button button_translucent" title="kubernetes">
+          KUBERNETES
+          <span class="button_tally">13</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/categories/php%E8%AF%AD%E8%A8%80/' class="post_tag button button_translucent" title="php语言">
+          PHP语言
+          <span class="button_tally">7</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/categories/%E6%9E%B6%E6%9E%84/' class="post_tag button button_translucent" title="架构">
+          架构
+          <span class="button_tally">7</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/categories/go%E8%AF%AD%E8%A8%80/' class="post_tag button button_translucent" title="go语言">
+          GO语言
+          <span class="button_tally">6</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/categories/elasticsearch/' class="post_tag button button_translucent" title="elasticsearch">
+          ELASTICSEARCH
+          <span class="button_tally">5</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/categories/redis/' class="post_tag button button_translucent" title="redis">
+          REDIS
+          <span class="button_tally">5</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/categories/mysql/' class="post_tag button button_translucent" title="mysql">
+          MYSQL
+          <span class="button_tally">4</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/categories/rabbitmq/' class="post_tag button button_translucent" title="rabbitmq">
+          RABBITMQ
+          <span class="button_tally">4</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/categories/ci/cd/' class="post_tag button button_translucent" title="ci/cd">
+          CI/CD
+          <span class="button_tally">2</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/categories/git/' class="post_tag button button_translucent" title="git">
+          GIT
+          <span class="button_tally">2</span>
+        </a>
+        
+        
+        <br>
+        <div class="post_tags_toggle button">所有分类</div>
+        <div class="post_tags">
+          <div class="tags_list">
+            
+            <a href='https://jianlin-li.github.io/categories/argo/' class=" post_tag button button_translucent" data-position=1 title="argo">ARGO<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/centos7/' class=" post_tag button button_translucent" data-position=1 title="centos7">CENTOS7<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/ci/cd/' class=" post_tag button button_translucent" data-position=2 title="ci/cd">CI/CD<span class="button_tally">2</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/c%E8%AF%AD%E8%A8%80/' class=" post_tag button button_translucent" data-position=1 title="c语言">C语言<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/devops/' class=" post_tag button button_translucent" data-position=1 title="devops">DEVOPS<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/docker/' class=" post_tag button button_translucent" data-position=1 title="docker">DOCKER<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/elasticsearch/' class=" post_tag button button_translucent" data-position=5 title="elasticsearch">ELASTICSEARCH<span class="button_tally">5</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/elk/' class=" post_tag button button_translucent" data-position=1 title="elk">ELK<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/git/' class=" post_tag button button_translucent" data-position=2 title="git">GIT<span class="button_tally">2</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/go%E8%AF%AD%E8%A8%80/' class=" post_tag button button_translucent" data-position=6 title="go语言">GO语言<span class="button_tally">6</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/grafana/' class=" post_tag button button_translucent" data-position=1 title="grafana">GRAFANA<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/gtc/' class=" post_tag button button_translucent" data-position=2 title="gtc">GTC<span class="button_tally">2</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/gtcadmin/' class=" post_tag button button_translucent" data-position=1 title="gtcadmin">GTCADMIN<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/gtcuser/' class=" post_tag button button_translucent" data-position=1 title="gtcuser">GTCUSER<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/hugo/' class=" post_tag button button_translucent" data-position=1 title="hugo">HUGO<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/jenkins/' class=" post_tag button button_translucent" data-position=2 title="jenkins">JENKINS<span class="button_tally">2</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/kubernetes/' class=" post_tag button button_translucent" data-position=13 title="kubernetes">KUBERNETES<span class="button_tally">13</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/mkcert/' class=" post_tag button button_translucent" data-position=1 title="mkcert">MKCERT<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/mysql/' class=" post_tag button button_translucent" data-position=4 title="mysql">MYSQL<span class="button_tally">4</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/nginx/' class=" post_tag button button_translucent" data-position=1 title="nginx">NGINX<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/php%E8%AF%AD%E8%A8%80/' class=" post_tag button button_translucent" data-position=7 title="php语言">PHP语言<span class="button_tally">7</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/prometheus/' class=" post_tag button button_translucent" data-position=1 title="prometheus">PROMETHEUS<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/rabbitmq/' class=" post_tag button button_translucent" data-position=4 title="rabbitmq">RABBITMQ<span class="button_tally">4</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/redis/' class=" post_tag button button_translucent" data-position=5 title="redis">REDIS<span class="button_tally">5</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/shell/' class=" post_tag button button_translucent" data-position=2 title="shell">SHELL<span class="button_tally">2</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/web%E6%9C%8D%E5%8A%A1%E5%99%A8/' class=" post_tag button button_translucent" data-position=1 title="web服务器">WEB服务器<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/%E6%9C%AC%E5%9C%B0%E7%8E%AF%E5%A2%83/' class=" post_tag button button_translucent" data-position=2 title="本地环境">本地环境<span class="button_tally">2</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/%E5%A4%8D%E4%B9%A0/' class=" post_tag button button_translucent" data-position=1 title="复习">复习<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/%E5%8D%8E%E5%BE%AE%E4%B8%96%E7%BA%AA/' class=" post_tag button button_translucent" data-position=1 title="华微世纪">华微世纪<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/%E6%9E%B6%E6%9E%84/' class=" post_tag button button_translucent" data-position=7 title="架构">架构<span class="button_tally">7</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/%E6%95%99%E7%A8%8B/' class=" post_tag button button_translucent" data-position=1 title="教程">教程<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/%E8%A7%86%E9%A2%91/' class=" post_tag button button_translucent" data-position=1 title="视频">视频<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/%E4%B9%A6%E7%B1%8D/' class=" post_tag button button_translucent" data-position=1 title="书籍">书籍<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/%E7%AE%97%E6%B3%95/' class=" post_tag button button_translucent" data-position=1 title="算法">算法<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/%E8%87%AA%E7%AD%BE%E5%90%8D%E8%AF%81%E4%B9%A6/' class=" post_tag button button_translucent" data-position=1 title="自签名证书">自签名证书<span class="button_tally">1</span>
+            </a>
+            
+            <div class="tags_sort"><span title="sort alphabetically">[A~Z]</span><span title="sort by count">[0~9]</span>
+            </div>
+            <span class="tags_hide"><svg class="icon">
+            <use xlink:href="#closeme"></use>
+          </svg></span>
+          </div>
+        </div>
+      </nav>
+    </div>
+    <div>
+      <h2 class="mt-4 taxonomy" id="tags-section">标签</h2>
+      <nav class="tags_nav">
+        <a href='https://jianlin-li.github.io/tags/kubernetes/' class="post_tag button button_translucent" title="kubernetes">
+          KUBERNETES
+          <span class="button_tally">13</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/tags/php/' class="post_tag button button_translucent" title="php">
+          PHP
+          <span class="button_tally">7</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/tags/go/' class="post_tag button button_translucent" title="go">
+          GO
+          <span class="button_tally">6</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/tags/elasticsearch/' class="post_tag button button_translucent" title="elasticsearch">
+          ELASTICSEARCH
+          <span class="button_tally">5</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/tags/redis/' class="post_tag button button_translucent" title="redis">
+          REDIS
+          <span class="button_tally">5</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/tags/mysql/' class="post_tag button button_translucent" title="mysql">
+          MYSQL
+          <span class="button_tally">4</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/tags/rabbitmq/' class="post_tag button button_translucent" title="rabbitmq">
+          RABBITMQ
+          <span class="button_tally">4</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/tags/devops/' class="post_tag button button_translucent" title="devops">
+          DEVOPS
+          <span class="button_tally">3</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/tags/ci/cd/' class="post_tag button button_translucent" title="ci/cd">
+          CI/CD
+          <span class="button_tally">2</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/tags/git/' class="post_tag button button_translucent" title="git">
+          GIT
+          <span class="button_tally">2</span>
+        </a>
+        
+        
+        <br>
+        <div class="post_tags_toggle button">所有标签</div>
+        <div class="post_tags">
+          <div class="tags_list">
+            
+            <a href='https://jianlin-li.github.io/tags/argo/' class=" post_tag button button_translucent" data-position=1 title="argo">ARGO<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/centos7/' class=" post_tag button button_translucent" data-position=1 title="centos7">CENTOS7<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/ci/cd/' class=" post_tag button button_translucent" data-position=2 title="ci/cd">CI/CD<span class="button_tally">2</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/c%E8%AF%AD%E8%A8%80/' class=" post_tag button button_translucent" data-position=1 title="c语言">C语言<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/devops/' class=" post_tag button button_translucent" data-position=3 title="devops">DEVOPS<span class="button_tally">3</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/docker/' class=" post_tag button button_translucent" data-position=1 title="docker">DOCKER<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/elasticsearch/' class=" post_tag button button_translucent" data-position=5 title="elasticsearch">ELASTICSEARCH<span class="button_tally">5</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/elk/' class=" post_tag button button_translucent" data-position=1 title="elk">ELK<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/emoji/' class=" post_tag button button_translucent" data-position=1 title="emoji">EMOJI<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/git/' class=" post_tag button button_translucent" data-position=2 title="git">GIT<span class="button_tally">2</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/go/' class=" post_tag button button_translucent" data-position=6 title="go">GO<span class="button_tally">6</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/grafana/' class=" post_tag button button_translucent" data-position=1 title="grafana">GRAFANA<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/gtc/' class=" post_tag button button_translucent" data-position=2 title="gtc">GTC<span class="button_tally">2</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/gtcadmin/' class=" post_tag button button_translucent" data-position=1 title="gtcadmin">GTCADMIN<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/gtcuser/' class=" post_tag button button_translucent" data-position=1 title="gtcuser">GTCUSER<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/hosts/' class=" post_tag button button_translucent" data-position=1 title="hosts">HOSTS<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/hugo/' class=" post_tag button button_translucent" data-position=1 title="hugo">HUGO<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/jenkins/' class=" post_tag button button_translucent" data-position=2 title="jenkins">JENKINS<span class="button_tally">2</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/kubernetes/' class=" post_tag button button_translucent" data-position=13 title="kubernetes">KUBERNETES<span class="button_tally">13</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/markdown/' class=" post_tag button button_translucent" data-position=1 title="markdown">MARKDOWN<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/math/' class=" post_tag button button_translucent" data-position=1 title="math">MATH<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/mkcert/' class=" post_tag button button_translucent" data-position=1 title="mkcert">MKCERT<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/mysql/' class=" post_tag button button_translucent" data-position=4 title="mysql">MYSQL<span class="button_tally">4</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/nginx/' class=" post_tag button button_translucent" data-position=1 title="nginx">NGINX<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/notices/' class=" post_tag button button_translucent" data-position=1 title="notices">NOTICES<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/openstreetmap/' class=" post_tag button button_translucent" data-position=1 title="openstreetmap">OPENSTREETMAP<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/php/' class=" post_tag button button_translucent" data-position=7 title="php">PHP<span class="button_tally">7</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/prometheus/' class=" post_tag button button_translucent" data-position=1 title="prometheus">PROMETHEUS<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/rabbitmq/' class=" post_tag button button_translucent" data-position=4 title="rabbitmq">RABBITMQ<span class="button_tally">4</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/redis/' class=" post_tag button button_translucent" data-position=5 title="redis">REDIS<span class="button_tally">5</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/shell/' class=" post_tag button button_translucent" data-position=2 title="shell">SHELL<span class="button_tally">2</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/sql/' class=" post_tag button button_translucent" data-position=1 title="sql">SQL<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/web%E6%9C%8D%E5%8A%A1%E5%99%A8/' class=" post_tag button button_translucent" data-position=1 title="web服务器">WEB服务器<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/%E6%9C%AC%E5%9C%B0%E7%8E%AF%E5%A2%83/' class=" post_tag button button_translucent" data-position=1 title="本地环境">本地环境<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/%E5%A4%8D%E4%B9%A0/' class=" post_tag button button_translucent" data-position=1 title="复习">复习<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/%E6%95%99%E7%A8%8B/' class=" post_tag button button_translucent" data-position=1 title="教程">教程<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/%E4%B9%B1%E7%A0%81/' class=" post_tag button button_translucent" data-position=1 title="乱码">乱码<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/%E8%A7%86%E9%A2%91/' class=" post_tag button button_translucent" data-position=1 title="视频">视频<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/%E4%B9%A6%E7%B1%8D/' class=" post_tag button button_translucent" data-position=1 title="书籍">书籍<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/%E7%AE%97%E6%B3%95/' class=" post_tag button button_translucent" data-position=1 title="算法">算法<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6/' class=" post_tag button button_translucent" data-position=1 title="主从复制">主从复制<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/%E8%87%AA%E7%AD%BE%E5%90%8D%E8%AF%81%E4%B9%A6/' class=" post_tag button button_translucent" data-position=1 title="自签名证书">自签名证书<span class="button_tally">1</span>
+            </a>
+            
+            <div class="tags_sort"><span title="sort alphabetically">[A~Z]</span><span title="sort by count">[0~9]</span>
+            </div>
+            <span class="tags_hide"><svg class="icon">
+            <use xlink:href="#closeme"></use>
+          </svg></span>
+          </div>
+        </div>
+      </nav>
+    </div>
+  </section>
+</aside>
+
+  
+</div>
+    </main><svg width="0" height="0" class="hidden">
+  <symbol viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" id="facebook">
+    <path d="M437 0H75C33.648 0 0 33.648 0 75v362c0 41.352 33.648 75 75 75h151V331h-60v-90h60v-61c0-49.629 40.371-90 90-90h91v90h-91v61h91l-15 90h-76v181h121c41.352 0 75-33.648 75-75V75c0-41.352-33.648-75-75-75zm0 0"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18.001 18.001" id="twitter">
+    <path d="M15.891 4.013c.808-.496 1.343-1.173 1.605-2.034a8.68 8.68 0 0 1-2.351.861c-.703-.756-1.593-1.14-2.66-1.14-1.043 0-1.924.366-2.643 1.078a3.56 3.56 0 0 0-1.076 2.605c0 .309.039.585.117.819-3.076-.105-5.622-1.381-7.628-3.837-.34.601-.51 1.213-.51 1.846 0 1.301.549 2.332 1.645 3.089-.625-.053-1.176-.211-1.645-.47 0 .929.273 1.705.82 2.388a3.623 3.623 0 0 0 2.115 1.291c-.312.08-.641.118-.979.118-.312 0-.533-.026-.664-.083.23.757.664 1.371 1.291 1.841a3.652 3.652 0 0 0 2.152.743C4.148 14.173 2.625 14.69.902 14.69c-.422 0-.721-.006-.902-.038 1.697 1.102 3.586 1.649 5.676 1.649 2.139 0 4.029-.542 5.674-1.626 1.645-1.078 2.859-2.408 3.639-3.974a10.77 10.77 0 0 0 1.172-4.892v-.468a7.788 7.788 0 0 0 1.84-1.921 8.142 8.142 0 0 1-2.11.593z"
+      ></path>
+  </symbol>
+  <symbol aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" id="mail">
+    <path  d="M502.3 190.8c3.9-3.1 9.7-.2 9.7 4.7V400c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V195.6c0-5 5.7-7.8 9.7-4.7 22.4 17.4 52.1 39.5 154.1 113.6 21.1 15.4 56.7 47.8 92.2 47.6 35.7.3 72-32.8 92.3-47.6 102-74.1 131.6-96.3 154-113.7zM256 320c23.2.4 56.6-29.2 73.4-41.4 132.7-96.3 142.8-104.7 173.4-128.7 5.8-4.5 9.2-11.5 9.2-18.9v-19c0-26.5-21.5-48-48-48H48C21.5 64 0 85.5 0 112v19c0 7.4 3.4 14.3 9.2 18.9 30.6 23.9 40.7 32.4 173.4 128.7 16.8 12.2 50.2 41.8 73.4 41.4z"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" id="calendar">
+    <path d="M452 40h-24V0h-40v40H124V0H84v40H60C26.916 40 0 66.916 0 100v352c0 33.084 26.916 60 60 60h392c33.084 0 60-26.916 60-60V100c0-33.084-26.916-60-60-60zm20 412c0 11.028-8.972 20-20 20H60c-11.028 0-20-8.972-20-20V188h432v264zm0-304H40v-48c0-11.028 8.972-20 20-20h24v40h40V80h264v40h40V80h24c11.028 0 20 8.972 20 20v48z"></path>
+    <path d="M76 230h40v40H76zm80 0h40v40h-40zm80 0h40v40h-40zm80 0h40v40h-40zm80 0h40v40h-40zM76 310h40v40H76zm80 0h40v40h-40zm80 0h40v40h-40zm80 0h40v40h-40zM76 390h40v40H76zm80 0h40v40h-40zm80 0h40v40h-40zm80 0h40v40h-40zm80-80h40v40h-40z"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" id="github">
+    <path d="M255.968 5.329C114.624 5.329 0 120.401 0 262.353c0 113.536 73.344 209.856 175.104 243.872 12.8 2.368 17.472-5.568 17.472-12.384 0-6.112-.224-22.272-.352-43.712-71.2 15.52-86.24-34.464-86.24-34.464-11.616-29.696-28.416-37.6-28.416-37.6-23.264-15.936 1.728-15.616 1.728-15.616 25.696 1.824 39.2 26.496 39.2 26.496 22.848 39.264 59.936 27.936 74.528 21.344 2.304-16.608 8.928-27.936 16.256-34.368-56.832-6.496-116.608-28.544-116.608-127.008 0-28.064 9.984-51.008 26.368-68.992-2.656-6.496-11.424-32.64 2.496-68 0 0 21.504-6.912 70.4 26.336 20.416-5.696 42.304-8.544 64.096-8.64 21.728.128 43.648 2.944 64.096 8.672 48.864-33.248 70.336-26.336 70.336-26.336 13.952 35.392 5.184 61.504 2.56 68 16.416 17.984 26.304 40.928 26.304 68.992 0 98.72-59.84 120.448-116.864 126.816 9.184 7.936 17.376 23.616 17.376 47.584 0 34.368-.32 62.08-.32 70.496 0 6.88 4.608 14.88 17.6 12.352C438.72 472.145 512 375.857 512 262.353 512 120.401 397.376 5.329 255.968 5.329z"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 212 212" id="gitlab">
+    <path d="M12.3 74.7h54L43.3 3c-1-3.6-6.4-3.6-7.6 0L12.3 74.8z" />
+    <path d="M12.3 74.7L.5 111c-1 3.2 0 6.8 3 8.8l101.6 74-92.5-119z"/>
+    <path d="M105 193.7l-38.6-119h-54l92.7 119z"/>
+    <path d="M105 193.7l38.7-119H66.4l38.7 119z"/>
+    <path d="M105 193.7l38.7-119H198l-93 119z"/>
+    <path d="M198 74.7l11.6 36.2c1 3 0 6.6-3 8.6l-101.5 74 93-119z"/>
+    <path d="M198 74.7h-54.3L167 3c1.2-3.6 6.4-3.6 7.6 0L198 74.8z"/>
+  </symbol>
+  <symbol viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" id="rss">
+    <circle cx="3.429" cy="20.571" r="3.429"></circle>
+    <path d="M11.429 24h4.57C15.999 15.179 8.821 8.001 0 8v4.572c6.302.001 11.429 5.126 11.429 11.428z"></path>
+    <path d="M24 24C24 10.766 13.234 0 0 0v4.571c10.714 0 19.43 8.714 19.43 19.429z"></path>
+  </symbol>
+  <symbol viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" id="linkedin">
+    <path d="M437 0H75C33.648 0 0 33.648 0 75v362c0 41.352 33.648 75 75 75h362c41.352 0 75-33.648 75-75V75c0-41.352-33.648-75-75-75zM181 406h-60V196h60zm0-240h-60v-60h60zm210 240h-60V286c0-16.54-13.46-30-30-30s-30 13.46-30 30v120h-60V196h60v11.309C286.719 202.422 296.93 196 316 196c40.691.043 75 36.547 75 79.688zm0 0"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 612 612" id="to-top">
+    <path d="M604.501 440.509L325.398 134.956c-5.331-5.357-12.423-7.627-19.386-7.27-6.989-.357-14.056 1.913-19.387 7.27L7.499 440.509c-9.999 10.024-9.999 26.298 0 36.323s26.223 10.024 36.222 0l262.293-287.164L568.28 476.832c9.999 10.024 26.222 10.024 36.221 0 9.999-10.023 9.999-26.298 0-36.323z"></path>
+  </symbol>
+  <symbol viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" id="carly">
+    <path d="M504.971 239.029L448 182.059V84c0-46.317-37.682-84-84-84h-44c-13.255 0-24 10.745-24 24s10.745 24 24 24h44c19.851 0 36 16.149 36 36v108c0 6.365 2.529 12.47 7.029 16.971L454.059 256l-47.029 47.029A24.002 24.002 0 0 0 400 320v108c0 19.851-16.149 36-36 36h-44c-13.255 0-24 10.745-24 24s10.745 24 24 24h44c46.318 0 84-37.683 84-84v-98.059l56.971-56.971c9.372-9.372 9.372-24.568 0-33.941zM112 192V84c0-19.851 16.149-36 36-36h44c13.255 0 24-10.745 24-24S205.255 0 192 0h-44c-46.318 0-84 37.683-84 84v98.059l-56.971 56.97c-9.373 9.373-9.373 24.568 0 33.941L64 329.941V428c0 46.317 37.682 84 84 84h44c13.255 0 24-10.745 24-24s-10.745-24-24-24h-44c-19.851 0-36-16.149-36-36V320c0-6.365-2.529-12.47-7.029-16.971L57.941 256l47.029-47.029A24.002 24.002 0 0 0 112 192z"></path>
+  </symbol>
+  <symbol viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" id="copy">
+    <path d="M23 2.75A2.75 2.75 0 0 0 20.25 0H8.75A2.75 2.75 0 0 0 6 2.75v13.5A2.75 2.75 0 0 0 8.75 19h11.5A2.75 2.75 0 0 0 23 16.25zM18.25 14.5h-7.5a.75.75 0 0 1 0-1.5h7.5a.75.75 0 0 1 0 1.5zm0-3h-7.5a.75.75 0 0 1 0-1.5h7.5a.75.75 0 0 1 0 1.5zm0-3h-7.5a.75.75 0 0 1 0-1.5h7.5a.75.75 0 0 1 0 1.5z"></path>
+    <path d="M8.75 20.5a4.255 4.255 0 0 1-4.25-4.25V2.75c0-.086.02-.166.025-.25H3.75A2.752 2.752 0 0 0 1 5.25v16A2.752 2.752 0 0 0 3.75 24h12a2.752 2.752 0 0 0 2.75-2.75v-.75z"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512.001 512.001" id="closeme">
+    <path d="M284.286 256.002L506.143 34.144c7.811-7.811 7.811-20.475 0-28.285-7.811-7.81-20.475-7.811-28.285 0L256 227.717 34.143 5.859c-7.811-7.811-20.475-7.811-28.285 0-7.81 7.811-7.811 20.475 0 28.285l221.857 221.857L5.858 477.859c-7.811 7.811-7.811 20.475 0 28.285a19.938 19.938 0 0 0 14.143 5.857 19.94 19.94 0 0 0 14.143-5.857L256 284.287l221.857 221.857c3.905 3.905 9.024 5.857 14.143 5.857s10.237-1.952 14.143-5.857c7.811-7.811 7.811-20.475 0-28.285L284.286 256.002z"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" id="open-menu">
+    <path d="M492 236H20c-11.046 0-20 8.954-20 20s8.954 20 20 20h472c11.046 0 20-8.954 20-20s-8.954-20-20-20zm0-160H20C8.954 76 0 84.954 0 96s8.954 20 20 20h472c11.046 0 20-8.954 20-20s-8.954-20-20-20zm0 320H20c-11.046 0-20 8.954-20 20s8.954 20 20 20h472c11.046 0 20-8.954 20-20s-8.954-20-20-20z"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" id="instagram">
+    <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" id=youtube>
+    <path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" id="stackoverflow">
+    <path d="M21 27v-8h3v11H0V19h3v8h18z"></path><path d="M17.1.2L15 1.8l7.9 10.6 2.1-1.6L17.1.2zm3.7 14.7L10.6 6.4l1.7-2 10.2 8.5-1.7 2zM7.2 12.3l12 5.6 1.1-2.4-12-5.6-1.1 2.4zm-1.8 6.8l13.56 1.96.17-2.38-13.26-2.55-.47 2.97zM19 25H5v-3h14v3z"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" id="xing">
+    <path d="M18.188 0c-.517 0-.741.325-.927.66 0 0-7.455 13.224-7.702 13.657.015.024 4.919 9.023 4.919 9.023.17.308.436.66.967.66h3.454c.211 0 .375-.078.463-.22.089-.151.089-.346-.009-.536l-4.879-8.916c-.004-.006-.004-.016 0-.022L22.139.756c.095-.191.097-.387.006-.535C22.056.078 21.894 0 21.686 0h-3.498zM3.648 4.74c-.211 0-.385.074-.473.216-.09.149-.078.339.02.531l2.34 4.05c.004.01.004.016 0 .021L1.86 16.051c-.099.188-.093.381 0 .529.085.142.239.234.45.234h3.461c.518 0 .766-.348.945-.667l3.734-6.609-2.378-4.155c-.172-.315-.434-.659-.962-.659H3.648v.016z"/>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 71 55" id="discord">
+    <path d="M60.1045 4.8978C55.5792 2.8214 50.7265 1.2916 45.6527 0.41542C45.5603 0.39851 45.468 0.440769 45.4204 0.525289C44.7963 1.6353 44.105 3.0834 43.6209 4.2216C38.1637 3.4046 32.7345 3.4046 27.3892 4.2216C26.905 3.0581 26.1886 1.6353 25.5617 0.525289C25.5141 0.443589 25.4218 0.40133 25.3294 0.41542C20.2584 1.2888 15.4057 2.8186 10.8776 4.8978C10.8384 4.9147 10.8048 4.9429 10.7825 4.9795C1.57795 18.7309 -0.943561 32.1443 0.293408 45.3914C0.299005 45.4562 0.335386 45.5182 0.385761 45.5576C6.45866 50.0174 12.3413 52.7249 18.1147 54.5195C18.2071 54.5477 18.305 54.5139 18.3638 54.4378C19.7295 52.5728 20.9469 50.6063 21.9907 48.5383C22.0523 48.4172 21.9935 48.2735 21.8676 48.2256C19.9366 47.4931 18.0979 46.6 16.3292 45.5858C16.1893 45.5041 16.1781 45.304 16.3068 45.2082C16.679 44.9293 17.0513 44.6391 17.4067 44.3461C17.471 44.2926 17.5606 44.2813 17.6362 44.3151C29.2558 49.6202 41.8354 49.6202 53.3179 44.3151C53.3935 44.2785 53.4831 44.2898 53.5502 44.3433C53.9057 44.6363 54.2779 44.9293 54.6529 45.2082C54.7816 45.304 54.7732 45.5041 54.6333 45.5858C52.8646 46.6197 51.0259 47.4931 49.0921 48.2228C48.9662 48.2707 48.9102 48.4172 48.9718 48.5383C50.038 50.6034 51.2554 52.5699 52.5959 54.435C52.6519 54.5139 52.7526 54.5477 52.845 54.5195C58.6464 52.7249 64.529 50.0174 70.6019 45.5576C70.6551 45.5182 70.6887 45.459 70.6943 45.3942C72.1747 30.0791 68.2147 16.7757 60.1968 4.9823C60.1772 4.9429 60.1437 4.9147 60.1045 4.8978ZM23.7259 37.3253C20.2276 37.3253 17.3451 34.1136 17.3451 30.1693C17.3451 26.225 20.1717 23.0133 23.7259 23.0133C27.308 23.0133 30.1626 26.2532 30.1066 30.1693C30.1066 34.1136 27.28 37.3253 23.7259 37.3253ZM47.3178 37.3253C43.8196 37.3253 40.9371 34.1136 40.9371 30.1693C40.9371 26.225 43.7636 23.0133 47.3178 23.0133C50.9 23.0133 53.7545 26.2532 53.6986 30.1693C53.6986 34.1136 50.9 37.3253 47.3178 37.3253Z"/>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 17 18" id="mastodon">
+    <path
+    fill="#ffffff"
+    d="m 15.054695,9.8859583 c -0.22611,1.1632697 -2.02517,2.4363497 -4.09138,2.6830797 -1.0774504,0.12856 -2.1382704,0.24673 -3.2694704,0.19484 -1.84996,-0.0848 -3.30971,-0.44157 -3.30971,-0.44157 0,0.1801 0.0111,0.35157 0.0333,0.51194 0.24051,1.82571 1.81034,1.93508 3.29737,1.98607 1.50088,0.0514 2.8373104,-0.37004 2.8373104,-0.37004 l 0.0617,1.35686 c 0,0 -1.0498104,0.56374 -2.9199404,0.66742 -1.03124,0.0567 -2.3117,-0.0259 -3.80308,-0.42069 -3.23454998,-0.85613 -3.79081998,-4.304 -3.87592998,-7.8024197 -0.026,-1.03871 -0.01,-2.01815 -0.01,-2.83732 0,-3.57732 2.34385998,-4.62587996 2.34385998,-4.62587996 1.18184,-0.54277 3.20976,-0.77101 5.318,-0.7882499985409 h 0.0518 C 9.8267646,0.01719834 11.856025,0.24547834 13.037775,0.78824834 c 0,0 2.34377,1.04855996 2.34377,4.62587996 0,0 0.0294,2.63937 -0.32687,4.47183"/>
+ <path
+    fill="#000000"
+    d="m 12.616925,5.6916583 v 4.3315297 h -1.71607 V 5.8189683 c 0,-0.88624 -0.37289,-1.33607 -1.1187604,-1.33607 -0.82467,0 -1.23799,0.53361 -1.23799,1.58875 v 2.30122 h -1.70594 v -2.30122 c 0,-1.05514 -0.4134,-1.58875 -1.23808,-1.58875 -0.74587,0 -1.11876,0.44983 -1.11876,1.33607 v 4.2042197 h -1.71607 V 5.6916583 c 0,-0.88527 0.22541,-1.58876 0.67817,-2.10922 0.46689,-0.52047 1.07833,-0.78727 1.83735,-0.78727 0.87816,0 1.54317,0.33752 1.98288,1.01267 l 0.42744,0.71655 0.42753,-0.71655 c 0.43961,-0.67515 1.10463,-1.01267 1.9828704,-1.01267 0.75893,0 1.37037,0.2668 1.83735,0.78727 0.45268,0.52046 0.67808,1.22395 0.67808,2.10922"/>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 530" id="bluesky" >
+    <path d="m135.72 44.03c66.496 49.921 138.02 151.14 164.28 205.46 26.262-54.316 97.782-155.54 164.28-205.46 47.98-36.021 125.72-63.892 125.72 24.795 0 17.712-10.155 148.79-16.111 170.07-20.703 73.984-96.144 92.854-163.25 81.433 117.3 19.964 147.14 86.092 82.697 152.22-122.39 125.59-175.91-31.511-189.63-71.766-2.514-7.3797-3.6904-10.832-3.7077-7.8964-0.0174-2.9357-1.1937 0.51669-3.7077 7.8964-13.714 40.255-67.233 197.36-189.63 71.766-64.444-66.128-34.605-132.26 82.697-152.22-67.108 11.421-142.55-7.4491-163.25-81.433-5.9562-21.282-16.111-152.36-16.111-170.07 0-88.687 77.742-60.816 125.72-24.795z"/>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" id="ko-fi">
+    <path fill="#ffffff" d="M4.5,9.8527H32.7947a0,0,0,0,1,0,0v19.225a9.07,9.07,0,0,1-9.07,9.07H13.57a9.07,9.07,0,0,1-9.07-9.07V9.8527A0,0,0,0,1,4.5,9.8527Z"/>
+    <path fill="#000000" d="M12.197,25.9493l6.45,6.45,6.45-6.45a8.2,8.2,0,0,0,2.4016-5.798h0a4.5082,4.5082,0,0,0-4.212-4.5459,4.4262,4.4262,0,0,0-4.64,4.4209,4.4261,4.4261,0,0,0-4.64-4.4209,4.5082,4.5082,0,0,0-4.212,4.5459h0A8.2,8.2,0,0,0,12.197,25.9493Z"/>
+    <path fill="#ffffff" d="M32.7947,9.8527H35.73a7.77,7.77,0,0,1,0,15.5394H32.7947"/>
+  </svg>
+  </symbol>
+</svg>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha512-aOFyMMzZF7l7ei3vOKgQiRhZnYqk9YC/uMzl4T0j5N5D3Kul+QAFU8ssENDRMAqr/lxDOjMF69dSYJ8HYqY+WQ==" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" integrity="sha512-UPFOadao2nEorjtjl0xUTtN3w20Ja143UPEU6EyJ1mi5MB2bDtMkiWmqGDqi47xNLB5z1dy31GKJDEWhjUJFiQ==" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" integrity="sha512-YJVxTjqttjsU3cSvaTRqsSl0wbRgZUNF+NGGCgto/MUbIvaLdXQzGTCQu4CvyJZbZctgflVB0PXw9LLmTWm5/w==" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
+<footer class="footer">
+  <div class="footer_inner wrap pale">
+    <img src='https://jianlin-li.github.io/icons/apple-touch-icon.png' class="icon icon_2 transparent" alt="Copyright © 1989–2025, 李建林 ">
+    <p>Copyright&nbsp;1989-&nbsp;<span class="year"></span>&nbsp;COPYRIGHT © 1989–2025, 李建林 . All Rights Reserved</p><a class="to_top" href="#documentTop">
+  <svg class="icon">
+  <title>to-top</title>
+  <use xlink:href="#to-top"></use>
+</svg>
+
+</a>
+
+  </div>
+</footer>
+
+<script type="text/javascript" src="https://jianlin-li.github.io/zh-cn/js/bundle.e4e0e4fbe8acb50d7f973828f4138cdbea727800047fc93f9abbd6751e8f3422d6ef193f98da36fdb8488219c25692d73da89480f46abc8421a4ee3526dd6c23.js" integrity="sha512-5ODk&#43;&#43;istQ1/lzgo9BOM2&#43;pyeAAEf8k/mrvWdR6PNCLW7xk/mNo2/bhIghnCVpLXPaiUgPRqvIQhpO41Jt1sIw==" crossorigin="anonymous"></script>
+
+  <script src="https://jianlin-li.github.io/js/search.min.4c2b0421d128bbd7c43fc7d662fb5dfd8e439c60ee92c900a26d72d9c3271d2256f5bac9f6f919cddfd55101e9272898716cbb3381b4360bf43a66a5f7664f54.js"></script>
+
+  </body>
+</html>

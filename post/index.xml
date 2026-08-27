@@ -7,7 +7,7 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
     <copyright>Copyright © 1989–2025, 李建林 </copyright>
-    <lastBuildDate>Mon, 17 Aug 2026 13:52:44 +0800</lastBuildDate><atom:link href="https://jianlin-li.github.io/post/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Mon, 17 Aug 2026 13:54:44 +0800</lastBuildDate><atom:link href="https://jianlin-li.github.io/post/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>架构-使用ELK Stack在本地Macbookpro搭建一套日志收集并且可视化系统</title>
       <link>https://jianlin-li.github.io/post/jiagou-elk-stack/</link>
@@ -2814,7 +2814,7 @@
         class=&#34;image_figure image_external image_processed&#34;
         width=&#34;833&#34;
         height=&#34;590&#34;
-        src=&#34;https://jianlin-li.github.io/images/640_3928304774531292164.png&#34;
+        src=&#34;https://jianlin-li.github.io/images/640_3928304774531292164.webp&#34;
       
       
     /&gt;
@@ -3074,7 +3074,7 @@
         class=&#34;image_figure image_external image_processed&#34;
         width=&#34;1080&#34;
         height=&#34;492&#34;
-        src=&#34;https://jianlin-li.github.io/images/640_18048263023642273291.png&#34;
+        src=&#34;https://jianlin-li.github.io/images/640_18048263023642273291.webp&#34;
       
       
     /&gt;
