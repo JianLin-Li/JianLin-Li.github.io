@@ -168,7 +168,7 @@
     <span class="post_date">
       2026-08-17	  
     </span>
-    <span class="post_time"> · 9 分钟阅读</span><span>&nbsp;· <a href='https://jianlin-li.github.io/tags/gtc/' title="gtc" class="post_tag button button_translucent">gtc
+    <span class="post_time"> · 15 分钟阅读</span><span>&nbsp;· <a href='https://jianlin-li.github.io/tags/gtc/' title="gtc" class="post_tag button button_translucent">gtc
         </a>
     </span>
     <span class="page_only">&nbsp;·
@@ -1319,6 +1319,860 @@
 <li>上线后旧密文版本清理计划。</li>
 </ol>
 <p>本轮结论仍然是方案和执行步骤，未修改任何代码、数据库、配置或密钥。生产数据库类型、实际数据量、SelectDB/ETL/CDC 链路、备份保留策略、密钥托管方式和外部系统清单仍需由 DBA、运维和数据平台确认后，才能进入阶段三的实际实施。</p>
+
+<div class="notices tip">
+    <div class="label">第二轮方案提词</div>
+    <p>根据上面你出的方案和实际执行计划我再追加以下新的决定</p>
+<ol>
+<li>只加密 t_member中的phone和identity字段，其他表结构中的不做处理，因此涉及其他表中的phone和identity处理不要改动。</li>
+<li>t_member表中的phone和identity字段暂时不要删除，因为整体方案是在t_member_other表中新增字段，也就是t_member表中在未来就不再存储phone和identity字段，</li>
+<li>CRM 后端当前后台 BaseController 会直接读取会员整行数据，因为整体方案是在t_member_other表中新增字段，所以这里需要注意会员整行数据需要关联t_member_other表，再处理成明文的相对应字段数据，整合成一个完整的会员整行数据。</li>
+<li>member_other 当前存在 replace(true)-&gt;insert(...) 用法，这个地方需要综合考虑因为整体方案中的改动而导致业务出错的问题</li>
+<li>gtcuser项目中的改动，需要谨慎处理老业务逻辑以及t_member中的phone和identity字段加密改造后在t_member_other表中新增字段带来的问题，而且gtcuser对phone和identity字段的处理只能经过CRM 后端接口去处理，不能在gtcuser项目里面又写一份对phone和identity字段的加密处理。</li>
+<li>Vue 管理前端需要保持接口路径、字段名、返回结构和权限逻辑不变</li>
+<li>PHP 8.0 已经是内置了 libsodium，密钥只存在 CRM 的.env中，.env发布的时候是需要单独发布的，所以这个改动后需要特别提醒我要发布的内容，</li>
+<li>手机号和证件号的规范化还需要你再进一步的进行核验，手机号和证件号确实会有存在各个国家的数据问题，这个需要你根据代码库中已有的处理逻辑来综合考虑本次需求改造需要如何进行处理，不能进行危险性和破坏性的进行改造</li>
+<li>重要注意事项，现有业务中发现允许一个手机号或证件号绑定多个会员账号，这个需要严重的关注到，会不会影响整体方案的改造</li>
+<li>t_member_other 新增的字段或者影子字段 一定要慎重考虑，不要过多的加字段，只加非常重要且能方便日后潜在需求的字段，加的每个字段要明确写明是什么含义以及用法。</li>
+<li>CRM 中新增统一服务统一适配层职责要严格控制好，目录结构一定要参照crm项目的规范，要考虑外部系统调用接口的方便性，不能过于复杂，对外的接口需要生成接口文档，方便能直接导入到apifox，</li>
+<li>CRM 是唯一持有敏感字段密钥的系统，内部接口设计需要遵守项目的规范，不要有破坏性的改造，接口需要满足易用性，不要过度的复杂，接口需要生成接口文档，方便能直接导入到apifox</li>
+<li>不要再考虑数据库被盗数据库文件/备份泄露等问题了，现在的需求就是唯一的目标就是t_member中的phone和identity字段加密改造，在t_member_other表中新增字段</li>
+<li>SelectDB会自动同步t_member和t_member_other表结构，ETL、CDC、日志、缓存、OSS、报表和外部供应商，这些地方以前是如何处理的继续按原来的逻辑处理，我们只需要按现在唯一的目标执行就行。</li>
+<li>空手机号、非法号码、国家缺失、重复值、大小写冲突，member_other 缺失行数量问题，你需要出方案给我，我后面按你的方案进行整体按步骤执行</li>
+<li>冻结协议和测试向量问题，你需要给我使用最优的方案，方案不要过度复杂，要能满足业务需求的同时也要能方便使用，不要过度的封装和加密</li>
+<li>数据库结构问题t_member中的字段不要去改动，任何有新增的字段或者索引都要考虑在t_member_other处理</li>
+<li>先把 CRM、gtcuser 的所有敏感读写入口切到适配层，但数据库t_member中仍保存明文，t_member_other中按新逻辑处理。这样可以先验证业务调用链，不把加密风险和代码改造风险叠加。</li>
+<li>手机号模糊搜索应改成完整手机号精确搜索；证件号也只支持完整精确搜索。</li>
+<li>历史数据回填t_member,t_member_other两个表中的数据回填问题，需要你出具体的方案和实现方式给我</li>
+<li>密钥轮换需要简单易用，不要过度的复杂，并且需要出一份详细的使用说明给我，以防后面的开发人员出现严重的配置错误。</li>
+</ol>
+
+  </div>
+
+<h1 id="第二轮具体方案"><strong>‼️️‼️第二轮具体方案</strong></h1>
+<p>下面是根据你新增决定重新收敛后的执行方案。当前仍然是方案设计，未修改代码、数据库、配置或 <code>.env</code>。</p>
+<p>先明确一个关键结论：</p>
+<ul>
+<li><code>t_member.phone</code>、<code>t_member.identity</code> 的字段结构暂不修改，不扩容、不加索引、不删除。</li>
+<li>新增加密值和盲索引全部放到 <code>t_member_other</code>。</li>
+<li>最终切换完成后，<code>t_member.phone</code> 保留字段但不再保存业务手机号，按现有字段约束保存为空字符串；<code>t_member.identity</code> 保存为 <code>NULL</code>。</li>
+<li>所有 CRM 和 <code>gtcuser</code> 的业务读取、写入必须经过 CRM 适配层。</li>
+<li>其他表中名为 <code>phone</code>、<code>identity</code> 的字段不迁移、不加密、不改查询逻辑。</li>
+</ul>
+<h2 id="一最终数据结构">一、最终数据结构</h2>
+<h3 id="1-t_member-保持原结构">1. <code>t_member</code> 保持原结构</h3>
+<p>不执行以下操作：</p>
+<ul>
+<li>不修改 <code>phone varchar(30)</code>。</li>
+<li>不修改 <code>identity varchar(50)</code>。</li>
+<li>不新增索引。</li>
+<li>不删除字段。</li>
+<li>不把密文写回 <code>t_member</code>。</li>
+</ul>
+<p>最终状态：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">t_member.phone     = &#39;&#39;
+</span></span><span class="line"><span class="ln">2</span><span class="cl">t_member.identity  = NULL
+</span></span></code></pre></div><p>这意味着所有直接查询 <code>t_member.phone</code> 或 <code>t_member.identity</code> 的旧代码必须在最终切换前清理完毕。</p>
+<h3 id="2-t_member_other-只增加-5-个字段">2. <code>t_member_other</code> 只增加 5 个字段</h3>
+<p>建议字段如下：</p>
+<table>
+  <thead>
+      <tr>
+          <th>字段</th>
+          <th>建议类型</th>
+          <th>含义</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>phone_ciphertext</code></td>
+          <td><code>varchar(255) CHARACTER SET ascii COLLATE ascii_bin NULL</code></td>
+          <td>手机号加密值，保存完整规范化手机号</td>
+      </tr>
+      <tr>
+          <td><code>identity_ciphertext</code></td>
+          <td><code>varchar(255) CHARACTER SET ascii COLLATE ascii_bin NULL</code></td>
+          <td>证件号加密值，保存去首尾空格后的原始大小写形式</td>
+      </tr>
+      <tr>
+          <td><code>phone_hmac_index</code></td>
+          <td><code>varchar(70) CHARACTER SET ascii COLLATE ascii_bin NULL</code></td>
+          <td>手机号精确查询盲索引</td>
+      </tr>
+      <tr>
+          <td><code>identity_hmac_index</code></td>
+          <td><code>varchar(70) CHARACTER SET ascii COLLATE ascii_bin NULL</code></td>
+          <td>证件号精确查询盲索引</td>
+      </tr>
+      <tr>
+          <td><code>sensitive_state</code></td>
+          <td><code>tinyint unsigned NOT NULL DEFAULT 0</code></td>
+          <td>本行敏感字段迁移状态</td>
+      </tr>
+  </tbody>
+</table>
+<p><code>sensitive_state</code> 建议定义：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">0 = 未处理或 member_other 行缺失
+</span></span><span class="line"><span class="ln">2</span><span class="cl">1 = phone、identity 均已处理，空值也视为已确认
+</span></span><span class="line"><span class="ln">3</span><span class="cl">2 = 数据异常，需要人工处理
+</span></span><span class="line"><span class="ln">4</span><span class="cl">3 = 解密或密文校验失败
+</span></span></code></pre></div><p>不增加单独的版本字段，因为：</p>
+<ul>
+<li>密文自身携带 <code>v1</code>、<code>v2</code> 等版本。</li>
+<li>HMAC 索引自身携带版本前缀。</li>
+<li>失败详情写入 CRM 任务日志和监控，不再增加错误描述字段。</li>
+</ul>
+<p>索引：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">KEY idx_phone_hmac_index (phone_hmac_index)
+</span></span><span class="line"><span class="ln">2</span><span class="cl">KEY idx_identity_hmac_index (identity_hmac_index)
+</span></span></code></pre></div><p>两个索引都不能设置唯一约束，因为同一个手机号或证件号允许绑定多个会员。</p>
+<h2 id="二加密协议和测试向量">二、加密协议和测试向量</h2>
+<h3 id="1-加密算法">1. 加密算法</h3>
+<p>PHP 8.0 已内置 libsodium，不增加 Composer 依赖，使用：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln">1</span><span class="cl"><span class="nx">sodium_crypto_aead_xchacha20poly1305_ietf_encrypt</span><span class="p">()</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="nx">sodium_crypto_aead_xchacha20poly1305_ietf_decrypt</span><span class="p">()</span>
+</span></span></code></pre></div><p>选择：</p>
+<ul>
+<li>XChaCha20-Poly1305-IETF。</li>
+<li>随机 nonce。</li>
+<li>自带认证标签。</li>
+<li>支持 AAD。</li>
+<li>PHP 8.0 可直接使用。</li>
+<li>不自行实现 AES、随机数或 MAC 拼接。</li>
+</ul>
+<h3 id="2-密文格式">2. 密文格式</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">enc:v1:&lt;key_id&gt;:&lt;nonce_base64url&gt;:&lt;ciphertext_base64url&gt;
+</span></span></code></pre></div><p>例如：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">enc:v1:phone-2026-01:&lt;nonce&gt;:&lt;ciphertext&gt;
+</span></span></code></pre></div><p><code>key_id</code> 只表示版本和用途，不包含密钥内容。</p>
+<h3 id="3-aad-格式">3. AAD 格式</h3>
+<p>固定为：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">crm-member-sensitive|member_id=&lt;id&gt;|field=&lt;phone|identity&gt;|normalizer=v1
+</span></span></code></pre></div><p>作用：</p>
+<ul>
+<li>防止手机号密文复制到 identity 字段。</li>
+<li>防止一个会员的密文复制到另一个会员。</li>
+<li>防止规范化版本变更后误解密。</li>
+<li>防止密文被跨业务复用。</li>
+</ul>
+<h3 id="4-规范化和加密值的区别">4. 规范化和加密值的区别</h3>
+<p>为减少历史业务显示变化：</p>
+<h4 id="手机号">手机号</h4>
+<ul>
+<li>加密值：保存完整规范化手机号。</li>
+<li>HMAC：对完整规范化手机号生成。</li>
+<li>API 兼容输出：根据原有接口约定拆分成 <code>phone</code> 和 <code>d_code</code>。</li>
+<li>内部服务同时保留 <code>phone_e164</code>，供短信、登录和查询使用。</li>
+</ul>
+<h4 id="identity">identity</h4>
+<ul>
+<li>加密值：保存 <code>trim</code> 后的原始大小写形式，避免页面显示被强制改成大写。</li>
+<li>HMAC：对 <code>strtoupper(trim(identity))</code> 生成。</li>
+<li>因此 <code>abc123</code> 和 <code>ABC123</code> 查询结果一致，但详情页可以继续展示原始大小写。</li>
+</ul>
+<h3 id="5-测试向量">5. 测试向量</h3>
+<p>在 CRM 中新增固定文档：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">docs/security/member-sensitive-crypto-v1.md
+</span></span></code></pre></div><p>测试向量必须包含：</p>
+<ul>
+<li>固定测试 key。</li>
+<li>固定 nonce。</li>
+<li>固定 member_id。</li>
+<li>固定字段名。</li>
+<li>固定规范化版本。</li>
+<li>明文。</li>
+<li>AAD。</li>
+<li>预期密文。</li>
+<li>预期 HMAC。</li>
+<li>篡改密文后的失败结果。</li>
+<li>使用 phone 密钥解密 identity 的失败结果。</li>
+<li>v1 密文使用 v2 密钥解密的失败结果。</li>
+</ul>
+<p>生产环境 nonce 必须随机；固定 nonce 只能用于测试向量。</p>
+<h2 id="三手机号规范化方案">三、手机号规范化方案</h2>
+<p>现有代码存在两种手机号处理方式：</p>
+<ul>
+<li>CRM 管理端保存时会把 <code>d_code . phone</code> 写入 <code>t_member.phone</code>。</li>
+<li>详情页又会根据 <code>d_code</code> 把区号从 <code>phone</code> 中剥离。</li>
+<li><code>gtcuser</code> 登录和验证码逻辑同时依赖 <code>phone</code>、<code>d_code</code>。</li>
+<li>CRM 短信服务还存在针对 <code>+86</code>、<code>+</code> 的特殊处理。</li>
+</ul>
+<p>因此不能直接把所有历史值简单执行 <code>+</code>、去空格或纯数字化。</p>
+<h3 id="规范化输入">规范化输入</h3>
+<p>适配层统一接收：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">raw_phone
+</span></span><span class="line"><span class="ln">2</span><span class="cl">d_code
+</span></span><span class="line"><span class="ln">3</span><span class="cl">country
+</span></span><span class="line"><span class="ln">4</span><span class="cl">source
+</span></span><span class="line"><span class="ln">5</span><span class="cl">member_id
+</span></span></code></pre></div><p>处理顺序：</p>
+<ol>
+<li>去除首尾空格。</li>
+<li>如果 <code>raw_phone</code> 已经以完整国际区号开头，禁止再次拼接 <code>d_code</code>。</li>
+<li>如果 <code>d_code</code> 存在，则清理 <code>+</code> 后与本地号码组合。</li>
+<li>如果 <code>d_code</code> 缺失，则尝试从明确的 <code>country</code> 映射国家区号。</li>
+<li>国家或区号无法唯一确定时，不自动猜测。</li>
+<li>使用现有项目已有的电话号码库进行解析和有效性校验。</li>
+<li>通过校验后转换为 E.164。</li>
+<li>只对 E.164 结果生成 HMAC。</li>
+</ol>
+<h3 id="分类处理">分类处理</h3>
+<table>
+  <thead>
+      <tr>
+          <th>情况</th>
+          <th>处理</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>phone=''</code> 且无区号</td>
+          <td>不生成 phone 密文和 HMAC，标记为已确认空值</td>
+      </tr>
+      <tr>
+          <td>合法完整国际号码</td>
+          <td>正常规范化、加密、生成 HMAC</td>
+      </tr>
+      <tr>
+          <td>本地号码且 <code>d_code</code> 明确</td>
+          <td>拼接后验证，成功后正常处理</td>
+      </tr>
+      <tr>
+          <td><code>d_code</code> 缺失但国家明确且唯一</td>
+          <td>允许自动补全，但生成审计记录</td>
+      </tr>
+      <tr>
+          <td>国家和区号都缺失</td>
+          <td>不自动猜测，标记人工处理</td>
+      </tr>
+      <tr>
+          <td>字符非法、长度非法、解析失败</td>
+          <td>不迁移该条，保留 t_member 明文，标记异常</td>
+      </tr>
+      <tr>
+          <td>同一号码不同拼接方式</td>
+          <td>规范化后生成同一个 HMAC</td>
+      </tr>
+      <tr>
+          <td>同一号码绑定多个账号</td>
+          <td>全部保留，不使用唯一索引</td>
+      </tr>
+  </tbody>
+</table>
+<p>特别注意：无法确认国家或区号的号码不能强行转换，否则可能把两个不同国家的号码转换成错误的同一个号码。</p>
+<h2 id="四identity-规范化方案">四、identity 规范化方案</h2>
+<p>当前管理端已有：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">^[a-zA-Z0-9]{1,50}$
+</span></span></code></pre></div><p>执行规则：</p>
+<ol>
+<li><code>trim</code>。</li>
+<li>保留字母和数字限制。</li>
+<li>加密前保存原始大小写形式。</li>
+<li>HMAC 前统一 <code>strtoupper</code>。</li>
+<li>历史数据如果包含非字母数字字符，标记异常，不自动删除或截断。</li>
+<li>大小写冲突不视为数据损坏，而视为同一个匹配值。</li>
+<li>继续执行现有 <code>ID_OF_USER_NUM</code> 绑定数量限制。</li>
+</ol>
+<p>例如：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">abc001
+</span></span><span class="line"><span class="ln">2</span><span class="cl">ABC001
+</span></span></code></pre></div><p>两条数据的 HMAC 相同，但可以继续绑定多个会员；是否允许新增绑定，仍由原有账号绑定上限决定。</p>
+<h2 id="五分阶段执行步骤">五、分阶段执行步骤</h2>
+<h2 id="阶段-0执行审批和范围冻结">阶段 0：执行审批和范围冻结</h2>
+<h3 id="步骤-01-冻结改动范围">步骤 0.1 冻结改动范围</h3>
+<p>明确不改：</p>
+<ul>
+<li>其他表的 <code>phone</code>、<code>identity</code>。</li>
+<li>ETL、CDC、SelectDB、日志、缓存、OSS、报表和外部供应商已有处理逻辑。</li>
+<li>Vue 接口路径、字段名、返回结构、权限判断。</li>
+<li>t_member 字段结构。</li>
+</ul>
+<p>必须改：</p>
+<ul>
+<li>CRM 读取和写入 t_member 敏感字段的入口。</li>
+<li><code>gtcuser</code> 对 t_member 敏感字段的访问方式。</li>
+<li><code>t_member_other</code> 的影子字段。</li>
+<li>CRM 内部适配层。</li>
+<li>CRM 对外内部接口文档。</li>
+</ul>
+<h3 id="步骤-02-建立代码入口清单">步骤 0.2 建立代码入口清单</h3>
+<p>CRM：</p>
+<ul>
+<li><a href="/Users/jalen/www/local/local.gtctrader1203.com/app/admin/controller/BaseController.php:94">BaseController.php</a></li>
+<li><a href="/Users/jalen/www/local/local.gtctrader1203.com/app/admin/controller/Member.php:99">Member.php</a></li>
+<li><a href="/Users/jalen/www/local/local.gtctrader1203.com/app/admin/service/MemberFastService.php:56">MemberFastService.php</a></li>
+<li><a href="/Users/jalen/www/local/local.gtctrader1203.com/app/admin/controller/Kyc.php:574">Kyc.php</a></li>
+<li><a href="/Users/jalen/www/local/local.gtctrader1203.com/app/admin/model/Member/Member.php:111">Member.php Model</a></li>
+<li><a href="/Users/jalen/www/local/local.gtctrader1203.com/app/admin/model/MemberOther.php:19">MemberOther.php</a></li>
+<li><a href="/Users/jalen/www/local/local.gtctrader1203.com/app/service/MemberService.php:1448">MemberService.php</a></li>
+<li><a href="/Users/jalen/www/local/local.gtctrader1203.com/app/service/InformationService.php:244">InformationService.php</a></li>
+<li><a href="/Users/jalen/www/local/local.gtctrader1203.com/app/service/MtService.php:529">MtService.php</a></li>
+</ul>
+<p>gtcuser：</p>
+<ul>
+<li><a href="/Users/jalen/www/local/gtcuser/app/Model/member/TMember.php:154">TMember.php</a></li>
+<li><a href="/Users/jalen/www/local/gtcuser/app/Repository/member/TMemberRepository.php:38">TMemberRepository.php</a></li>
+<li><a href="/Users/jalen/www/local/gtcuser/app/Http/Api/Controller/V1/PubController.php:318">PubController.php</a></li>
+<li><a href="/Users/jalen/www/local/gtcuser/app/Service/member/TMemberService.php:897">TMemberService.php</a></li>
+<li><a href="/Users/jalen/www/local/gtcuser/app/Service/member/TMemberService.php:1775">TMemberService.php</a></li>
+<li><a href="/Users/jalen/www/local/gtcuser/app/Service/member/TMemberService.php:3702">TMemberService.php</a></li>
+<li><a href="/Users/jalen/www/local/gtcuser/app/Service/SmsAbuseDetectorService.php:675">SmsAbuseDetectorService.php</a></li>
+</ul>
+<p>这一步只形成清单和扫描结果，不改代码。</p>
+<h2 id="阶段-1历史数据质量盘点">阶段 1：历史数据质量盘点</h2>
+<h3 id="步骤-11-统计-t_member-异常数据">步骤 1.1 统计 t_member 异常数据</h3>
+<p>只读执行统计：</p>
+<ul>
+<li>空手机号数量。</li>
+<li>仅有区号、没有本地号的数量。</li>
+<li>仅有本地号、没有区号的数量。</li>
+<li><code>phone</code> 已包含区号但 <code>d_code</code> 也存在的数量。</li>
+<li>国家和区号不一致的数量。</li>
+<li>无法解析的手机号数量。</li>
+<li>identity 为空数量。</li>
+<li>identity 非字母数字数量。</li>
+<li>identity 大小写冲突数量。</li>
+<li>规范化后重复手机号数量。</li>
+<li>大写后重复 identity 数量。</li>
+<li>t_member 有数据但 t_member_other 缺失行数量。</li>
+</ul>
+<h3 id="步骤-12-形成异常处置清单">步骤 1.2 形成异常处置清单</h3>
+<p>每条异常至少记录：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">member_id
+</span></span><span class="line"><span class="ln">2</span><span class="cl">异常类型
+</span></span><span class="line"><span class="ln">3</span><span class="cl">原始字段是否为空
+</span></span><span class="line"><span class="ln">4</span><span class="cl">d_code
+</span></span><span class="line"><span class="ln">5</span><span class="cl">country
+</span></span><span class="line"><span class="ln">6</span><span class="cl">是否允许自动修复
+</span></span><span class="line"><span class="ln">7</span><span class="cl">人工处理结果
+</span></span></code></pre></div><p>原始手机号和证件号只能在受控环境展示，普通日志中不得输出。</p>
+<h3 id="步骤-13-设定上线门槛">步骤 1.3 设定上线门槛</h3>
+<p>建议：</p>
+<ul>
+<li>空手机号可以自动完成迁移。</li>
+<li>合法号码必须全部完成。</li>
+<li>国家缺失、无法解析、非法 identity 不得自动迁移。</li>
+<li>最终切换前，异常记录必须为零，或者经过业务负责人书面批准为例外。</li>
+</ul>
+<h2 id="阶段-2crm-适配层设计和实现">阶段 2：CRM 适配层设计和实现</h2>
+<h3 id="步骤-21-新增目录">步骤 2.1 新增目录</h3>
+<p>目录参照 CRM 现有 <code>app/service</code> 规范，建议：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">app/service/MemberSensitive/
+</span></span><span class="line"><span class="ln">2</span><span class="cl">    MemberSensitiveService.php
+</span></span><span class="line"><span class="ln">3</span><span class="cl">    PhoneNormalizer.php
+</span></span><span class="line"><span class="ln">4</span><span class="cl">    IdentityNormalizer.php
+</span></span><span class="line"><span class="ln">5</span><span class="cl">    CryptoKeyRing.php
+</span></span><span class="line"><span class="ln">6</span><span class="cl">    SensitiveException.php
+</span></span></code></pre></div><p>配置：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">config/member_sensitive.php
+</span></span></code></pre></div><p>不在每个控制器中新增加密私有方法。</p>
+<h3 id="步骤-22-适配层公开方法">步骤 2.2 适配层公开方法</h3>
+<p>只保留必要职责：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln"> 1</span><span class="cl">normalizePhone()
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl">normalizeIdentity()
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl">encryptPhone()
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl">encryptIdentity()
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl">decryptPhone()
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">decryptIdentity()
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl">buildPhoneIndex()
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl">buildIdentityIndex()
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">findMemberIdsByPhone()
+</span></span><span class="line"><span class="ln">10</span><span class="cl">findMemberIdsByIdentity()
+</span></span><span class="line"><span class="ln">11</span><span class="cl">readMemberSensitive()
+</span></span><span class="line"><span class="ln">12</span><span class="cl">readMemberSensitiveBatch()
+</span></span><span class="line"><span class="ln">13</span><span class="cl">writeMemberSensitive()
+</span></span></code></pre></div><p>历史回填和密钥轮换使用 CRM CLI，不暴露为普通业务 API。</p>
+<h3 id="步骤-23-crm-数据访问方式">步骤 2.3 CRM 数据访问方式</h3>
+<p>新增统一的会员读取方法，例如：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">loadMemberWithSensitive($memberId)
+</span></span><span class="line"><span class="ln">2</span><span class="cl">loadMembersWithSensitive(array $memberIds)
+</span></span></code></pre></div><p>执行方式：</p>
+<ol>
+<li>查询 t_member 基础字段。</li>
+<li><code>LEFT JOIN t_member_other</code>。</li>
+<li>取出 <code>phone_ciphertext</code>、<code>identity_ciphertext</code>。</li>
+<li>通过适配层批量解密。</li>
+<li>将明文重新写回数组的 <code>phone</code>、<code>identity</code> 键。</li>
+<li>保持原有整行数据结构不变。</li>
+</ol>
+<p>不得把密文字段直接返回给控制器、Vue 或外部接口。</p>
+<h2 id="阶段-3basecontroller-和整行数据兼容">阶段 3：BaseController 和整行数据兼容</h2>
+<h3 id="步骤-31-修改-basecontroller-初始化读取">步骤 3.1 修改 BaseController 初始化读取</h3>
+<p>当前 <a href="/Users/jalen/www/local/local.gtctrader1203.com/app/admin/controller/BaseController.php:94">BaseController.php</a> 直接读取会员整行。</p>
+<p>改造为调用统一会员读取方法：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">t_member 基础信息
+</span></span><span class="line"><span class="ln">2</span><span class="cl">    + t_member_other 影子字段
+</span></span><span class="line"><span class="ln">3</span><span class="cl">    + 适配层解密
+</span></span><span class="line"><span class="ln">4</span><span class="cl">    = 原有完整会员数组
+</span></span></code></pre></div><p>必须保持：</p>
+<ul>
+<li><code>$this-&gt;memberinfo['phone']</code> 仍然存在。</li>
+<li><code>$this-&gt;memberinfo['identity']</code> 仍然存在。</li>
+<li>原有权限、scope、server_id、status 判断不变。</li>
+<li>不修改控制器调用方。</li>
+</ul>
+<h3 id="步骤-32-处理-member_other-缺失">步骤 3.2 处理 member_other 缺失</h3>
+<p>在兼容阶段：</p>
+<ul>
+<li><code>member_other</code> 缺失时允许从 t_member 明文读取。</li>
+<li>同时记录缺失指标。</li>
+<li>自动创建 t_member_other 行并写入影子数据。</li>
+<li>不把缺失情况静默当作正常。</li>
+</ul>
+<p>最终阶段：</p>
+<ul>
+<li><code>member_other</code> 缺失视为数据异常。</li>
+<li>接口返回安全占位或明确业务错误。</li>
+<li>不返回密文。</li>
+<li>进入人工补偿任务。</li>
+</ul>
+<h2 id="阶段-4解决-replacetrue-insert-风险">阶段 4：解决 <code>replace(true)-&gt;insert(...)</code> 风险</h2>
+<p>当前 KYC 使用 <code>member_other</code> 的 <code>replace(true)-&gt;insert(...)</code>，这会导致整行替换，可能覆盖新增加的敏感字段。</p>
+<h3 id="步骤-41-新增统一安全写入方法">步骤 4.1 新增统一安全写入方法</h3>
+<p>建议在 <code>MemberOther</code> Model 或 CRM Service 中提供：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">upsertMemberOther($memberId, array $patch)
+</span></span></code></pre></div><p>规则：</p>
+<ol>
+<li>只接受字段白名单。</li>
+<li>已存在时使用 <code>UPDATE</code>。</li>
+<li>不存在时使用 <code>INSERT</code>。</li>
+<li>并发插入冲突时重新执行 UPDATE。</li>
+<li>不删除原有其他字段。</li>
+<li>敏感字段和 KYC 字段在同一事务中提交。</li>
+</ol>
+<h3 id="步骤-42-修改-kyc">步骤 4.2 修改 KYC</h3>
+<p>修改 <a href="/Users/jalen/www/local/local.gtctrader1203.com/app/admin/controller/Kyc.php:1244">Kyc.php</a>：</p>
+<ul>
+<li>禁止继续使用全字段 <code>replace(true)</code>.</li>
+<li>KYC 只更新自己的允许字段。</li>
+<li>phone、identity 统一调用 <code>writeMemberSensitive()</code>。</li>
+<li>identity 重复校验统一使用 HMAC。</li>
+<li>KYC 审核、会员更新、member_other 更新保持同一事务。</li>
+</ul>
+<h2 id="阶段-5crm-全部读写入口切适配层但暂不清空-t_member">阶段 5：CRM 全部读写入口切适配层，但暂不清空 t_member</h2>
+<p>这一阶段是最重要的业务链路验证阶段。</p>
+<h3 id="步骤-51-双写模式">步骤 5.1 双写模式</h3>
+<p>暂时保留：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">t_member.phone       = 原有明文
+</span></span><span class="line"><span class="ln">2</span><span class="cl">t_member.identity    = 原有明文
+</span></span><span class="line"><span class="ln">3</span><span class="cl">t_member_other.*     = 新规范化、加密、HMAC 值
+</span></span></code></pre></div><p>所有新建和修改操作：</p>
+<ol>
+<li>先验证输入。</li>
+<li>写入 t_member，保持旧业务兼容。</li>
+<li>同事务写入 t_member_other。</li>
+<li>解密影子值后和 t_member 明文比对。</li>
+<li>不一致则事务失败并报警。</li>
+</ol>
+<h3 id="步骤-52-改造会员控制器">步骤 5.2 改造会员控制器</h3>
+<p>修改 <a href="/Users/jalen/www/local/local.gtctrader1203.com/app/admin/controller/Member.php">Member.php</a>：</p>
+<ul>
+<li>列表查询改成 HMAC 精确查询。</li>
+<li>详情读取改成 <code>t_member + t_member_other</code>。</li>
+<li><code>m.*</code> 不再直接作为最终返回值。</li>
+<li><code>hideListEmailPhone()</code> 继续保留，输入改为解密后的明文。</li>
+<li>详情页手机号脱敏继续保留。</li>
+<li>KYC 列表脱敏继续保留。</li>
+<li>手机号前缀和包含搜索改为完整手机号精确搜索。</li>
+<li>identity 只支持完整精确搜索。</li>
+<li>原有参数名可以保留，但模糊参数必须返回明确错误，不再对密文使用 <code>LIKE</code>。</li>
+<li>手机号和 identity 修改均走统一写入服务。</li>
+</ul>
+<h3 id="步骤-53-改造-memberfastservice">步骤 5.3 改造 MemberFastService</h3>
+<p>修改 <a href="/Users/jalen/www/local/local.gtctrader1203.com/app/admin/service/MemberFastService.php:56">MemberFastService.php</a>：</p>
+<ul>
+<li>删除 <code>LOWER(phone) LIKE</code>。</li>
+<li>先生成 HMAC，再根据会员 ID 查询。</li>
+<li>保留原有树形权限和分页。</li>
+<li>批量解密，禁止循环逐条请求。</li>
+</ul>
+<h3 id="步骤-54-改造-crm-其他直接入口">步骤 5.4 改造 CRM 其他直接入口</h3>
+<p>以下逻辑必须使用适配层获取明文：</p>
+<ul>
+<li>登录和会员状态校验。</li>
+<li>短信发送前获取手机号。</li>
+<li>MT 创建和更新前获取手机号、identity。</li>
+<li>KYC 审核。</li>
+<li>管理端查看完整联系方式。</li>
+<li>会员变更记录生成。</li>
+</ul>
+<p>但按照你的决定，以下内容不做脱敏或迁移改造：</p>
+<ul>
+<li>其他表中已有 phone、identity 字段。</li>
+<li>日志表原有处理。</li>
+<li>缓存原有处理。</li>
+<li>OSS、报表、ETL、CDC 和外部供应商原有处理。</li>
+</ul>
+<p>适配层要保证这些旧逻辑收到的仍是明文业务值，避免因为 t_member 迁移产生接口行为变化。</p>
+<h2 id="阶段-6gtcuser-改造">阶段 6：gtcuser 改造</h2>
+<h3 id="步骤-61-新增-crm-客户端">步骤 6.1 新增 CRM 客户端</h3>
+<p>新增位置建议：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">app/Service/MemberSensitive/CrmSensitiveClient.php
+</span></span><span class="line"><span class="ln">2</span><span class="cl">app/Service/MemberSensitive/MemberSensitiveGateway.php
+</span></span><span class="line"><span class="ln">3</span><span class="cl">config/autoload/member_sensitive.php
+</span></span></code></pre></div><p>gtcuser 只保存：</p>
+<ul>
+<li>CRM 内部接口地址。</li>
+<li>服务认证信息。</li>
+<li>请求超时。</li>
+<li>重试次数。</li>
+<li>熔断配置。</li>
+</ul>
+<p>gtcuser 不保存：</p>
+<ul>
+<li>phone 加密密钥。</li>
+<li>identity 加密密钥。</li>
+<li>phone HMAC 密钥。</li>
+<li>identity HMAC 密钥。</li>
+<li>sodium 实现。</li>
+</ul>
+<h3 id="步骤-62-repository-禁止直接查-t_member-敏感字段">步骤 6.2 Repository 禁止直接查 t_member 敏感字段</h3>
+<p>修改 <a href="/Users/jalen/www/local/gtcuser/app/Repository/member/TMemberRepository.php:38">TMemberRepository.php</a>：</p>
+<ul>
+<li><code>where phone = ?</code> 改为调用 CRM 精确查询接口。</li>
+<li>identity 查询同样处理。</li>
+<li>不在 ORM accessor 中自动发起网络调用。</li>
+<li>批量会员列表使用批量读取接口，避免 N+1。</li>
+</ul>
+<h3 id="步骤-63-登录注册换绑">步骤 6.3 登录、注册、换绑</h3>
+<p>修改：</p>
+<ul>
+<li><a href="/Users/jalen/www/local/gtcuser/app/Http/Api/Controller/V1/PubController.php:318">PubController.php</a></li>
+<li><a href="/Users/jalen/www/local/gtcuser/app/Service/member/TMemberService.php:897">TMemberService.php</a></li>
+<li><a href="/Users/jalen/www/local/gtcuser/app/Service/member/TMemberService.php:1775">TMemberService.php</a></li>
+</ul>
+<p>要求：</p>
+<ul>
+<li>登录手机号先按 CRM 规范化，再查询候选会员 ID。</li>
+<li>不假设手机号唯一。</li>
+<li>多个候选会员继续执行原有状态、密码和账号选择逻辑。</li>
+<li>注册重复校验使用 HMAC 查询结果。</li>
+<li>换绑手机号使用 CRM 原子写入接口。</li>
+<li>CRM 写入失败时，不能返回注册成功。</li>
+</ul>
+<h3 id="步骤-64-验证码和短信反滥发">步骤 6.4 验证码和短信反滥发</h3>
+<p>修改：</p>
+<ul>
+<li><a href="/Users/jalen/www/local/gtcuser/app/Service/member/TMemberService.php:3702">TMemberService.php</a></li>
+<li><a href="/Users/jalen/www/local/gtcuser/app/Service/SmsAbuseDetectorService.php:675">SmsAbuseDetectorService.php</a></li>
+</ul>
+<p>原有：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">md5(phone)
+</span></span></code></pre></div><p>不再作为敏感字段查询依据。改为使用 CRM 返回的用途隔离 HMAC 标识。</p>
+<p>验证码缓存 key 仍保持原有业务前缀和结构，避免影响已有验证码流程；只替换手机号标识的生成来源。</p>
+<h2 id="阶段-7vue-管理端">阶段 7：Vue 管理端</h2>
+<p>修改范围尽量小：</p>
+<ul>
+<li><a href="/Users/jalen/www/local/gtc_admin_vue/src/api/member/member/index.js:38">member/index.js</a></li>
+<li><a href="/Users/jalen/www/local/gtc_admin_vue/src/components/memberemailphone/memberEmailPhone.vue:102">memberEmailPhone.vue</a></li>
+<li><a href="/Users/jalen/www/local/gtc_admin_vue/src/views/member/membernew/index.vue:2693">membernew/index.vue</a></li>
+</ul>
+<p>保持不变：</p>
+<ul>
+<li>API 路径。</li>
+<li>请求字段名。</li>
+<li>返回字段名。</li>
+<li>返回 JSON 层级。</li>
+<li>权限判断。</li>
+<li>明文查看接口。</li>
+<li>脱敏组件行为。</li>
+</ul>
+<p>只做：</p>
+<ul>
+<li>手机号搜索输入改为完整号码校验。</li>
+<li>identity 搜索改为完整精确搜索。</li>
+<li>移除前缀或包含搜索提示。</li>
+<li>保持详情页接收到的是明文或脱敏后的旧格式。</li>
+<li>不让密文进入 Vuex、localStorage、浏览器日志。</li>
+</ul>
+<h2 id="阶段-8内部接口和-apifox-文档">阶段 8：内部接口和 Apifox 文档</h2>
+<h3 id="步骤-81-只设计-3-个业务接口">步骤 8.1 只设计 3 个业务接口</h3>
+<p>CRM 内部接口建议：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">POST /internal/member-sensitive/query
+</span></span><span class="line"><span class="ln">2</span><span class="cl">POST /internal/member-sensitive/read-batch
+</span></span><span class="line"><span class="ln">3</span><span class="cl">POST /internal/member-sensitive/write
+</span></span></code></pre></div><p>用途：</p>
+<ul>
+<li><code>query</code>：phone 或 identity 精确查询，返回会员 ID 数组。</li>
+<li><code>read-batch</code>：根据会员 ID 批量返回明文或脱敏字段。</li>
+<li><code>write</code>：创建、修改、清空 phone 或 identity。</li>
+</ul>
+<p>回填和密钥轮换使用 CRM CLI，不开放普通 HTTP 接口，避免误调用。</p>
+<h3 id="步骤-82-安全要求">步骤 8.2 安全要求</h3>
+<ul>
+<li>服务间签名或 mTLS。</li>
+<li>接口权限区分 query、read、write。</li>
+<li><code>read-batch</code> 限制会员数量。</li>
+<li>所有请求携带 trace ID 和幂等号。</li>
+<li>明文不写访问日志。</li>
+<li>错误只返回错误码，不返回密文。</li>
+<li>内部接口调用失败需要超时、重试和熔断。</li>
+</ul>
+<h3 id="步骤-83-apifox-文档">步骤 8.3 Apifox 文档</h3>
+<p>新增：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">docs/apis/internal/member-sensitive.yaml
+</span></span></code></pre></div><p>使用 OpenAPI 3.0，包含：</p>
+<ul>
+<li>接口路径。</li>
+<li>Header。</li>
+<li>请求体。</li>
+<li>响应结构。</li>
+<li>错误码。</li>
+<li>鉴权方式。</li>
+<li>手机号、identity 示例。</li>
+<li>多会员返回示例。</li>
+<li>空手机号和异常数据示例。</li>
+</ul>
+<p>该文件可以直接导入 Apifox。</p>
+<h2 id="阶段-9crm-env-和发布顺序">阶段 9：CRM <code>.env</code> 和发布顺序</h2>
+<p>CRM 是唯一保存密钥的系统。</p>
+<p>建议变量：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">CRM_SENSITIVE_PHONE_ENC_KEY_V1=
+</span></span><span class="line"><span class="ln">2</span><span class="cl">CRM_SENSITIVE_PHONE_HMAC_KEY_V1=
+</span></span><span class="line"><span class="ln">3</span><span class="cl">CRM_SENSITIVE_IDENTITY_ENC_KEY_V1=
+</span></span><span class="line"><span class="ln">4</span><span class="cl">CRM_SENSITIVE_IDENTITY_HMAC_KEY_V1=
+</span></span><span class="line"><span class="ln">5</span><span class="cl">CRM_SENSITIVE_PHONE_CURRENT_VERSION=v1
+</span></span><span class="line"><span class="ln">6</span><span class="cl">CRM_SENSITIVE_IDENTITY_CURRENT_VERSION=v1
+</span></span><span class="line"><span class="ln">7</span><span class="cl">CRM_SENSITIVE_READ_MODE=legacy_shadow_compare
+</span></span><span class="line"><span class="ln">8</span><span class="cl">CRM_SENSITIVE_WRITE_MODE=dual_write
+</span></span></code></pre></div><p>密钥格式统一为：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">v1:&lt;base64-encoded-32-byte-key&gt;
+</span></span></code></pre></div><p>要求：</p>
+<ul>
+<li>每把密钥独立生成。</li>
+<li>加密密钥和 HMAC 密钥不能共用。</li>
+<li>phone 和 identity 不能共用。</li>
+<li><code>.env</code> 不提交 Git。</li>
+<li><code>.env.example</code> 只放变量名和格式说明。</li>
+<li>文件权限限制为 CRM 运行用户可读。</li>
+<li>发布平台必须把 <code>.env</code> 作为独立发布物。</li>
+<li>CRM 发布代码前，先发布 <code>.env</code>。</li>
+<li>发布后执行密钥格式、长度和版本校验。</li>
+<li>gtcuser 发布时只发布 CRM 地址和服务认证配置，不发布四把敏感字段密钥。</li>
+<li>PHP-FPM、队列和常驻进程发布后都要重启，使新 <code>.env</code> 生效。</li>
+</ul>
+<h2 id="阶段-10历史数据回填">阶段 10：历史数据回填</h2>
+<h3 id="步骤-101-回填源和目标">步骤 10.1 回填源和目标</h3>
+<p>源：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">t_member.id
+</span></span><span class="line"><span class="ln">2</span><span class="cl">t_member.phone
+</span></span><span class="line"><span class="ln">3</span><span class="cl">t_member.identity
+</span></span><span class="line"><span class="ln">4</span><span class="cl">t_member.d_code
+</span></span><span class="line"><span class="ln">5</span><span class="cl">t_member.country
+</span></span></code></pre></div><p>目标：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">t_member_other.phone_ciphertext
+</span></span><span class="line"><span class="ln">2</span><span class="cl">t_member_other.identity_ciphertext
+</span></span><span class="line"><span class="ln">3</span><span class="cl">t_member_other.phone_hmac_index
+</span></span><span class="line"><span class="ln">4</span><span class="cl">t_member_other.identity_hmac_index
+</span></span><span class="line"><span class="ln">5</span><span class="cl">t_member_other.sensitive_state
+</span></span></code></pre></div><h3 id="步骤-102-游标处理">步骤 10.2 游标处理</h3>
+<p>固定使用：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="ln">1</span><span class="cl"><span class="k">WHERE</span><span class="w"> </span><span class="n">m</span><span class="p">.</span><span class="n">id</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="p">:</span><span class="n">last_id</span><span class="w">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="w"></span><span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">m</span><span class="p">.</span><span class="n">id</span><span class="w"> </span><span class="k">ASC</span><span class="w">
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="w"></span><span class="k">LIMIT</span><span class="w"> </span><span class="p">:</span><span class="n">batch_size</span><span class="w">
+</span></span></span></code></pre></div><p>不使用：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="ln">1</span><span class="cl"><span class="k">LIMIT</span><span class="w"> </span><span class="k">offset</span><span class="p">,</span><span class="w"> </span><span class="k">size</span><span class="w">
+</span></span></span></code></pre></div><p>每批流程：</p>
+<ol>
+<li>查询一批 t_member。</li>
+<li>根据 <code>member_id</code> 批量查询 t_member_other。</li>
+<li>缺失行通过安全 upsert 创建。</li>
+<li>规范化 phone 和 identity。</li>
+<li>生成密文和 HMAC。</li>
+<li>更新 t_member_other。</li>
+<li>每批独立事务提交。</li>
+<li>成功后记录 <code>last_id</code>。</li>
+<li>异常记录 member_id、字段、错误码，继续下一批。</li>
+<li>支持按 ID 范围重试和断点续跑。</li>
+</ol>
+<h3 id="步骤-103-并发保护">步骤 10.3 并发保护</h3>
+<p>回填时会员可能正在修改手机号：</p>
+<ul>
+<li>读取源数据时保存原始值。</li>
+<li>更新时增加旧值条件或使用行锁。</li>
+<li>如果旧值已变化，放弃当前批次该行，重新读取最新值。</li>
+<li>不允许回填覆盖用户刚刚提交的新手机号。</li>
+<li>任何写入都必须经过统一适配层。</li>
+</ul>
+<h3 id="步骤-104-t_member_other-缺失行处理">步骤 10.4 t_member_other 缺失行处理</h3>
+<p>统计并处理：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">t_member 有记录、t_member_other 无记录
+</span></span></code></pre></div><p>规则：</p>
+<ul>
+<li>自动创建缺失行。</li>
+<li>不能使用 <code>replace(true)</code>。</li>
+<li>不覆盖该会员已有的其他 member_other 字段。</li>
+<li>创建失败进入重试队列。</li>
+<li>最终切换前缺失行必须为零。</li>
+</ul>
+<h2 id="阶段-11从双写验证切换到最终加密状态">阶段 11：从双写验证切换到最终加密状态</h2>
+<h3 id="步骤-111-双写验证阶段">步骤 11.1 双写验证阶段</h3>
+<p>配置：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">READ_MODE=legacy_shadow_compare
+</span></span><span class="line"><span class="ln">2</span><span class="cl">WRITE_MODE=dual_write
+</span></span></code></pre></div><p>行为：</p>
+<ul>
+<li>业务仍可从 t_member 明文读取。</li>
+<li>同时读取 t_member_other 解密值进行比对。</li>
+<li>新写入同时更新两边。</li>
+<li>所有不一致记录报警。</li>
+<li>通过完整业务回归后才能进入下一阶段。</li>
+</ul>
+<h3 id="步骤-112-影子数据主读阶段">步骤 11.2 影子数据主读阶段</h3>
+<p>配置：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">READ_MODE=shadow_primary
+</span></span><span class="line"><span class="ln">2</span><span class="cl">WRITE_MODE=shadow_primary_with_legacy_compat
+</span></span></code></pre></div><p>行为：</p>
+<ul>
+<li>CRM 和 gtcuser 优先读取 t_member_other 解密值。</li>
+<li>t_member 只用于比对和异常回退。</li>
+<li>不再允许业务代码直接查 t_member 敏感字段。</li>
+<li>观察至少一个完整业务周期。</li>
+</ul>
+<h3 id="步骤-113-最终切换阶段">步骤 11.3 最终切换阶段</h3>
+<p>确认以下条件全部满足：</p>
+<ul>
+<li>所有 CRM 敏感读写入口已迁移。</li>
+<li>gtcuser 不再直接访问 t_member 敏感字段。</li>
+<li><code>member_other</code> 缺失行数量为零。</li>
+<li>合法手机号和 identity 已全部回填。</li>
+<li>异常数据已经人工处理或正式批准。</li>
+<li>查询结果与迁移前基线一致。</li>
+<li>Vue 接口回归通过。</li>
+<li>登录、注册、KYC、短信、MT 回归通过。</li>
+</ul>
+<p>然后：</p>
+<ol>
+<li>停止旧 t_member 敏感字段写入。</li>
+<li>将业务写入切换为只写 t_member_other。</li>
+<li>分批将已完成记录的：
+<ul>
+<li><code>t_member.phone</code> 更新为空字符串。</li>
+<li><code>t_member.identity</code> 更新为 <code>NULL</code>。</li>
+</ul>
+</li>
+<li>清空前暂停直接 SQL 写入任务。</li>
+<li>清空完成后执行全库检查，确认没有新明文写入。</li>
+<li>保留字段，不删除结构。</li>
+</ol>
+<h2 id="阶段-12重复值大小写和绑定上限验证">阶段 12：重复值、大小写和绑定上限验证</h2>
+<h3 id="手机号重复">手机号重复</h3>
+<ul>
+<li>HMAC 查询返回多个会员 ID。</li>
+<li>不加唯一索引。</li>
+<li>列表展示多个会员。</li>
+<li>登录场景不能只取第一条记录。</li>
+<li>注册重复校验沿用当前业务规则，不能擅自改成“全局唯一”。</li>
+</ul>
+<h3 id="identity-重复">identity 重复</h3>
+<ul>
+<li>HMAC 对大写值生成。</li>
+<li>大小写不同的 identity 视为同一匹配值。</li>
+<li>继续使用 <code>ID_OF_USER_NUM</code> 作为绑定数量上限。</li>
+<li>查询结果按会员 ID 返回多个账号。</li>
+<li>超出上限时拒绝新增绑定，不删除旧数据。</li>
+</ul>
+<h2 id="阶段-13密钥轮换">阶段 13：密钥轮换</h2>
+<p>保持简单流程：</p>
+<h3 id="轮换前">轮换前</h3>
+<ol>
+<li>生成四把 v2 密钥。</li>
+<li>校验每把密钥为 32 字节。</li>
+<li>发布到 CRM <code>.env</code>。</li>
+<li>将 v1 配置为 previous，v2 配置为 current。</li>
+<li>重启 CRM PHP-FPM、队列和 CLI worker。</li>
+</ol>
+<h3 id="轮换期间">轮换期间</h3>
+<ul>
+<li>新写入使用 v2。</li>
+<li>读取同时支持 v1、v2。</li>
+<li>查询同时生成 v1、v2 HMAC 候选。</li>
+<li>执行主键游标重加密任务。</li>
+<li>每批校验解密结果和 HMAC 结果。</li>
+</ul>
+<h3 id="轮换完成">轮换完成</h3>
+<ul>
+<li>查询旧版本密文数量。</li>
+<li>查询旧版本 HMAC 数量。</li>
+<li>确认均为零。</li>
+<li>等待缓存、队列和备份保留周期结束。</li>
+<li>再从 <code>.env</code> 和 key ring 中删除 v1。</li>
+<li>删除前必须完成恢复演练。</li>
+</ul>
+<p>禁止：</p>
+<ul>
+<li>直接覆盖 v1 密钥。</li>
+<li>不保留旧密钥就发布新代码。</li>
+<li>phone 和 identity 共用轮换版本。</li>
+<li>只轮换加密密钥而不轮换 HMAC 密钥。</li>
+<li>在日志中打印密钥或完整密文。</li>
+</ul>
+<h2 id="阶段-14验证和验收">阶段 14：验证和验收</h2>
+<h3 id="php-和构建验证">PHP 和构建验证</h3>
+<p>每个 PHP 文件修改后：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">php -l path/to/file.php
+</span></span></code></pre></div><p>按项目要求执行：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">composer dump-autoload
+</span></span><span class="line"><span class="ln">2</span><span class="cl">composer <span class="nb">test</span>
+</span></span></code></pre></div><h3 id="核心行为测试">核心行为测试</h3>
+<p>必须验证：</p>
+<ul>
+<li>phone 加密解密往返。</li>
+<li>identity 加密解密往返。</li>
+<li>AAD 篡改失败。</li>
+<li>密文损坏失败。</li>
+<li>phone 密钥不能解密 identity。</li>
+<li>v1 密文可以被旧版本密钥读取。</li>
+<li>v2 写入不会影响 v1 读取。</li>
+<li>手机号规范化结果稳定。</li>
+<li>identity 大小写查询一致。</li>
+<li>空值不会生成错误 HMAC。</li>
+<li>一个手机号多个会员均可查询出来。</li>
+<li>identity 绑定上限仍然生效。</li>
+<li>member_other 缺失可以补建。</li>
+<li><code>replace(true)</code> 不再覆盖其他 member_other 字段。</li>
+<li>回填中断后可以从 checkpoint 继续。</li>
+<li>并发修改不会被回填覆盖。</li>
+</ul>
+<h3 id="业务回归">业务回归</h3>
+<ul>
+<li>CRM 会员列表。</li>
+<li>完整手机号精确搜索。</li>
+<li>identity 精确搜索。</li>
+<li>会员详情。</li>
+<li><code>hideListEmailPhone()</code>。</li>
+<li>详情页手机号脱敏。</li>
+<li>KYC 列表脱敏。</li>
+<li>管理员查看完整联系方式。</li>
+<li>会员注册。</li>
+<li>手机号登录。</li>
+<li>换绑手机号。</li>
+<li>验证码发送和校验。</li>
+<li>KYC 提交和审核。</li>
+<li>MT 创建和更新。</li>
+<li>gtcuser 相关客户接口。</li>
+<li>Vue 原有权限和响应结构。</li>
+</ul>
+<h2 id="第一批实际开始顺序">第一批实际开始顺序</h2>
+<p>正式执行时建议按以下顺序开始：</p>
+<ol>
+<li>只读扫描 CRM、gtcuser、Vue 的全部 t_member 敏感读写入口。</li>
+<li>执行历史数据质量统计和 <code>member_other</code> 缺失统计。</li>
+<li>冻结 v1 加密协议、规范化规则和测试向量文档。</li>
+<li>评审 <code>t_member_other</code> 五个字段及索引。</li>
+<li>在测试库执行数据库结构迁移。</li>
+<li>在 CRM 实现适配层和单元测试。</li>
+<li>改造 BaseController 的整行会员读取。</li>
+<li>改造 CRM 会员、KYC、短信、MT 入口。</li>
+<li>改造 gtcuser CRM 客户端和直接查询入口。</li>
+<li>生成 OpenAPI 文档并导入 Apifox。</li>
+<li>保持 t_member 明文，开启双写和影子比对。</li>
+<li>完成全量业务回归。</li>
+<li>执行历史主键游标回填。</li>
+<li>切换 t_member_other 主读。</li>
+<li>最后清空 t_member.phone、t_member.identity 的业务值。</li>
+</ol>
+<p>本方案中最关键的控制点是：先验证适配层和双写链路，再做历史回填，最后才清空 <code>t_member</code> 中的敏感值。否则一旦代码入口遗漏，旧业务会直接读取空手机号或空 identity。</p>
 <hr>
 <hr>
 <hr>
