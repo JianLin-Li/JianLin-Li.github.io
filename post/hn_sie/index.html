@@ -168,7 +168,7 @@
     <span class="post_date">
       2026-08-17	  
     </span>
-    <span class="post_time"> · 15 分钟阅读</span><span>&nbsp;· <a href='https://jianlin-li.github.io/tags/gtc/' title="gtc" class="post_tag button button_translucent">gtc
+    <span class="post_time"> · 16 分钟阅读</span><span>&nbsp;· <a href='https://jianlin-li.github.io/tags/gtc/' title="gtc" class="post_tag button button_translucent">gtc
         </a>
     </span>
     <span class="page_only">&nbsp;·
@@ -2173,13 +2173,100 @@
 <li>最后清空 t_member.phone、t_member.identity 的业务值。</li>
 </ol>
 <p>本方案中最关键的控制点是：先验证适配层和双写链路，再做历史回填，最后才清空 <code>t_member</code> 中的敏感值。否则一旦代码入口遗漏，旧业务会直接读取空手机号或空 identity。</p>
+<hr>
 
 <div class="notices tip">
-    <div class="label">该需求整个方案所改动的接口提词</div>
-    <p>现在已经分阶段执行全部完成，情况是这样的，今天下午我需要向领导汇报这个需求已经进行到什么进度了，我要你根据crm和gtcuser中目录docs/superpowers/specs/里面已经生成的文件docs/superpowers/specs/2026-08-28***  以及apifox接口文档汇总一下已经执行完的那些阶段都改了哪些接口，以及接下来还未执行的阶段要修改哪些接口  需要分代码库进行分类， 我这里给你一个图片参考表格格式  你要像图片里面那样列表格，不要控制器方法列，不要敏感字段场景列，不要源码列，需要加接口用途列，加一个备注列，接口列里面不要在接口的前面加POST等的请求方法，而且每个表格的第一列规定就是“是否完成” 如果已经完成的就直接帮我在里面填入 “已完成”。 直接生成一个md格式的文档供我下载</p>
+    <div class="label">‼️️‼️分多版本发布问题--提词</div>
+    <p>我突然想到，如果我第一版上线后，线上也稳定运行了一段时间，而且CRM_SENSITIVE_READ_MODE=shadow_strict，CRM_SENSITIVE_WRITE_MODE=shadow_only  那么第二版的时候我能把表t_member中的字段phone和identity删除吗</p>
 
   </div>
 
+<h1 id="分多版本发布具体方案"><strong>‼️️‼️分多版本发布具体方案</strong></h1>
+<p>可以最终删除，但不能按当前代码直接删除，也不建议把“停止写主表”和“物理删列”放在同一个第二版中。</p>
+<p>首先要纠正一个关键前提：当前第一版支持 <code>shadow_strict</code>，但不支持 <code>shadow_only</code>。</p>
+<p><a href="/Users/jalen/www/local/local.gtctrader1203.com/app/service/MemberSensitiveService.php:21">MemberSensitiveService.php</a> 当前写模式只有：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln">1</span><span class="cl"><span class="k">private</span> <span class="k">const</span> <span class="no">WRITE_MODES</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;legacy_only&#39;</span><span class="p">,</span> <span class="s1">&#39;dual_write&#39;</span><span class="p">];</span>
+</span></span></code></pre></div><p>配置成：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="ln">1</span><span class="cl">CRM_SENSITIVE_WRITE_MODE=shadow_only
+</span></span></code></pre></div><p>会触发 <code>INVALID_CONFIGURATION</code>，并不是可以稳定运行的状态。</p>
+<p><strong>当前不能删列的直接原因</strong></p>
+<p>即使读取模式是 <code>shadow_strict</code>，当前适配层仍会访问主表字段：</p>
+<ul>
+<li>精确查询始终先查 <code>t_member.phone/identity</code>：<a href="/Users/jalen/www/local/local.gtctrader1203.com/app/service/MemberSensitiveService.php:201">MemberSensitiveService.php</a></li>
+<li>批量读取仍显式加载主表敏感列：<a href="/Users/jalen/www/local/local.gtctrader1203.com/app/service/MemberSensitiveService.php:719">MemberSensitiveService.php</a></li>
+<li>写入事务仍锁定并读取 <code>phone/identity</code>：<a href="/Users/jalen/www/local/local.gtctrader1203.com/app/service/MemberSensitiveService.php:1063">MemberSensitiveService.php</a></li>
+<li>写入逻辑仍更新主表明文：<a href="/Users/jalen/www/local/local.gtctrader1203.com/app/service/MemberSensitiveService.php:438">MemberSensitiveService.php</a></li>
+<li>历史回填仍读取 <code>m.phone,m.identity</code>：<a href="/Users/jalen/www/local/local.gtctrader1203.com/app/service/MemberSensitiveMigrationService.php:652">MemberSensitiveMigrationService.php</a></li>
+<li>CRM 还有显式查询 <code>m.phone</code> 的列表：<a href="/Users/jalen/www/local/local.gtctrader1203.com/app/admin/model/Member.php:129">Member.php</a></li>
+</ul>
+<p>现在删除列会直接产生类似错误：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">Unknown column &#39;phone&#39; in &#39;field list&#39;
+</span></span><span class="line"><span class="ln">2</span><span class="cl">Unknown column &#39;identity&#39; in &#39;where clause&#39;
+</span></span></code></pre></div><p>“业务经过适配层”不等于“适配层本身已经完全不依赖主表字段”。</p>
+<p><strong>建议发布顺序</strong></p>
+<p>第二版建议只完成逻辑停写，不删除物理列：</p>
+<ol>
+<li>正式实现并测试 <code>shadow_only</code>。</li>
+<li>写入只更新 <code>t_member_other</code>，不再更新主表敏感字段。</li>
+<li>精确查询只使用非唯一 HMAC 索引，不再合并主表结果。</li>
+<li><code>shadow_strict</code> 读取不再查询主表敏感列。</li>
+<li>CRM 所有显式 <code>phone/identity</code> 查询改为查询会员 ID 后由适配层还原。</li>
+<li>gtcuser 继续只调用 CRM，不读取模型上的敏感属性。</li>
+<li>将主表历史值分批清空：</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="ln">1</span><span class="cl"><span class="n">phone</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;&#39;</span><span class="w">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="w"></span><span class="k">identity</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">NULL</span><span class="w">
+</span></span></span></code></pre></div><ol start="8">
+<li>保留两个空字段运行一段观察期，监控是否被重新写入、是否还有隐藏读取依赖。</li>
+</ol>
+<p>这个阶段即使发现遗漏，也只是读取到空值或能够回填恢复，不会因为字段不存在导致 SQL 全面报错。</p>
+<p>第三版再执行物理删列：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="ln">1</span><span class="cl"><span class="k">ALTER</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">t_member</span><span class="w">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="w">    </span><span class="k">DROP</span><span class="w"> </span><span class="k">COLUMN</span><span class="w"> </span><span class="n">phone</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="w">    </span><span class="k">DROP</span><span class="w"> </span><span class="k">COLUMN</span><span class="w"> </span><span class="k">identity</span><span class="p">;</span><span class="w">
+</span></span></span></code></pre></div><p><strong>删列前必须解决的空值问题</strong></p>
+<p>目前没有增加 <code>sensitive_state</code>。删除主表字段后，需要使用最小规则区分业务空值和数据缺失：</p>
+<table>
+  <thead>
+      <tr>
+          <th><code>t_member_other</code> 状态</th>
+          <th>含义</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>会员影子行不存在</td>
+          <td>数据异常，禁止当成空值</td>
+      </tr>
+      <tr>
+          <td>密文和 HMAC 都为 <code>NULL</code></td>
+          <td>业务字段为空</td>
+      </tr>
+      <tr>
+          <td>密文和 HMAC 都非空</td>
+          <td>有效敏感数据</td>
+      </tr>
+      <tr>
+          <td>只有一个为 <code>NULL</code></td>
+          <td>影子数据损坏</td>
+      </tr>
+  </tbody>
+</table>
+<p>因此删列前应确保每个 <code>t_member.id</code> 都存在对应的 <code>t_member_other</code> 行，包括手机号和证件号都为空的会员。这样无需再增加状态字段，直接用“影子行是否存在 + 两列是否成对”表达状态。</p>
+<p><strong>最终删列验收条件</strong></p>
+<p>必须同时满足：</p>
+<ul>
+<li><code>shadow_only</code> 已正式实现并稳定运行，而不是只修改 <code>.env</code>。</li>
+<li>主表两列已经清空，并持续观察没有重新写入。</li>
+<li>所有会员都有明确的 <code>t_member_other</code> 状态。</li>
+<li>全量密文可以解密，HMAC 可以重建，无缺失、半空和损坏记录。</li>
+<li>CRM、gtcuser、定时任务、风控脚本和迁移命令不再生成主表敏感字段 SQL。</li>
+<li>所有原接口仍返回 <code>phone/identity</code> 明文字段，Vue 契约不变。</li>
+<li>SelectDB 自动同步和其他依赖 <code>t_member</code> 表结构的消费者已验证删列兼容。</li>
+<li>已准备“重新加列并从影子密文恢复”的应急工具和回滚说明。</li>
+<li>单独评估 <code>t_member</code> 大表执行 <code>ALTER TABLE</code> 的锁表、磁盘和复制延迟风险。</li>
+</ul>
+<p>结论是：技术上可以删除，但推荐采用“第二版停写并清空、第三版物理删列”。不要在刚实现 <code>shadow_only</code> 的同一个版本里立即删除字段。这样能用空列观察期发现隐藏依赖，风险明显更低。</p>
 <hr>
 <hr>
 <hr>
