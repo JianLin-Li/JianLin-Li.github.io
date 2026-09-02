@@ -168,7 +168,7 @@
     <span class="post_date">
       2026-08-17	  
     </span>
-    <span class="post_time"> · 16 分钟阅读</span><span>&nbsp;· <a href='https://jianlin-li.github.io/tags/gtc/' title="gtc" class="post_tag button button_translucent">gtc
+    <span class="post_time"> · 19 分钟阅读</span><span>&nbsp;· <a href='https://jianlin-li.github.io/tags/gtc/' title="gtc" class="post_tag button button_translucent">gtc
         </a>
     </span>
     <span class="page_only">&nbsp;·
@@ -2267,6 +2267,405 @@
 <li>单独评估 <code>t_member</code> 大表执行 <code>ALTER TABLE</code> 的锁表、磁盘和复制延迟风险。</li>
 </ul>
 <p>结论是：技术上可以删除，但推荐采用“第二版停写并清空、第三版物理删列”。不要在刚实现 <code>shadow_only</code> 的同一个版本里立即删除字段。这样能用空列观察期发现隐藏依赖，风险明显更低。</p>
+
+<div class="notices tip">
+    <div class="label">测试环境发布流程</div>
+    <p>第一版必须保持：
+t_member.phone、t_member.identity 持续写入明文。
+t_member_other 同步写入密文和 HMAC 索引。
+不清空、不删除、不停止写入 t_member 字段。
+不改动其他表中的同名字段。
+首次发布使用 READ_MODE=legacy、WRITE_MODE=dual_write。</p>
+
+  </div>
+
+<h1 id="测试环境发布具体流程">测试环境发布具体流程</h1>
+<p>可以。下面按“最终代码分支 → <code>staging</code> 分支 → 测试环境”的顺序给出发布流程。第一版必须保持：</p>
+<ul>
+<li><code>t_member.phone</code>、<code>t_member.identity</code> 持续写入明文。</li>
+<li><code>t_member_other</code> 同步写入密文和 HMAC 索引。</li>
+<li>不清空、不删除、不停止写入 <code>t_member</code> 字段。</li>
+<li>不改动其他表中的同名字段。</li>
+<li>首次发布使用 <code>READ_MODE=legacy</code>、<code>WRITE_MODE=dual_write</code>。</li>
+</ul>
+<h2 id="一发布前确认">一、发布前确认</h2>
+<h3 id="1-确认三个仓库状态">1. 确认三个仓库状态</h3>
+<p>在发布机或 CI 中分别检查：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">git checkout feature/v2.17.0/3139-member-info-encrypt
+</span></span><span class="line"><span class="ln">2</span><span class="cl">git fetch origin
+</span></span><span class="line"><span class="ln">3</span><span class="cl">git status
+</span></span><span class="line"><span class="ln">4</span><span class="cl">git log --oneline origin/feature/v2.17.0/3139-member-info-encrypt..HEAD
+</span></span></code></pre></div><p>三个仓库：</p>
+<ul>
+<li><code>/Users/jalen/www/local/local.gtctrader1203.com</code></li>
+<li><code>/Users/jalen/www/local/gtcuser</code></li>
+<li><code>/Users/jalen/www/local/gtc_admin_vue</code></li>
+</ul>
+<p>当前最终代码状态：</p>
+<ul>
+<li>CRM：<code>3db8be1ca</code>，本地领先远端 28 个提交。</li>
+<li>gtcuser：<code>11a407917</code>，本地领先远端 17 个提交。</li>
+<li>Vue：本需求无代码差异。</li>
+</ul>
+<p>如果这些本地提交尚未推送到远端，不能直接从远端 <code>feature</code> 分支合并到 <code>staging</code>，需要先按照正常代码审核流程提交 PR 或发布构建制品。</p>
+<h3 id="2-创建或审核合并到-staging">2. 创建或审核合并到 <code>staging</code></h3>
+<p>三个仓库分别执行：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">git checkout staging
+</span></span><span class="line"><span class="ln">2</span><span class="cl">git pull --ff-only origin staging
+</span></span></code></pre></div><p>然后通过 PR 将：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">feature/v2.17.0/3139-member-info-encrypt
+</span></span><span class="line"><span class="ln">2</span><span class="cl">        -&gt;
+</span></span><span class="line"><span class="ln">3</span><span class="cl">staging
+</span></span></code></pre></div><p>合并完成后检查：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">git log -1 --oneline
+</span></span><span class="line"><span class="ln">2</span><span class="cl">git status --short --branch
+</span></span></code></pre></div><p>CRM 和 gtcuser 必须包含最终提交；Vue 即使没有业务代码改动，也要确认 <code>staging</code> 分支没有误合并其他无关改动。</p>
+<h3 id="3-记录发布版本">3. 记录发布版本</h3>
+<p>发布单中记录：</p>
+<ul>
+<li>CRM <code>staging</code> 最终 commit。</li>
+<li>gtcuser <code>staging</code> 最终 commit。</li>
+<li>Vue <code>staging</code> 最终 commit。</li>
+<li>SQL 文件版本。</li>
+<li>Composer 依赖版本。</li>
+<li>本次测试环境发布时间和发布人。</li>
+</ul>
+<h2 id="二准备测试环境配置">二、准备测试环境配置</h2>
+<h3 id="4-准备-crm-composer-依赖">4. 准备 CRM Composer 依赖</h3>
+<p>CRM 新增依赖：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">giggsey/libphonenumber-for-php:8.13.53
+</span></span></code></pre></div><p>按照项目既有构建方式安装依赖，并确认：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">composer install
+</span></span><span class="line"><span class="ln">2</span><span class="cl">php -r <span class="s2">&#34;require &#39;vendor/autoload.php&#39;; var_dump(class_exists(&#39;libphonenumber\\\\PhoneNumberUtil&#39;));&#34;</span>
+</span></span></code></pre></div><p>必须确认：</p>
+<ul>
+<li>PHP 8.0 可运行。</li>
+<li><code>ext-sodium</code> 可用。</li>
+<li><code>PhoneNumberUtil</code> 可以加载。</li>
+<li>不要只发布 PHP 源码而不发布 Composer 依赖。</li>
+</ul>
+<h3 id="5-生成测试环境独立密钥">5. 生成测试环境独立密钥</h3>
+<p>测试环境密钥不能复用生产密钥，也不能把真实值写入 Git、工单、聊天记录或日志。</p>
+<p>需要准备四把互不相同的 32 字节密钥：</p>
+<ul>
+<li>phone 加密密钥。</li>
+<li>phone HMAC 密钥。</li>
+<li>identity 加密密钥。</li>
+<li>identity HMAC 密钥。</li>
+</ul>
+<p>编码必须是无 padding 的 Base64URL。</p>
+<p>CRM 配置以下 13 项：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="ln"> 1</span><span class="cl">CRM_SENSITIVE_KEY_VERSION_CURRENT=v1
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl">CRM_SENSITIVE_PHONE_ENC_KEY_CURRENT=&lt;测试环境独立密钥&gt;
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl">CRM_SENSITIVE_PHONE_HMAC_KEY_CURRENT=&lt;测试环境独立密钥&gt;
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl">CRM_SENSITIVE_IDENTITY_ENC_KEY_CURRENT=&lt;测试环境独立密钥&gt;
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl">CRM_SENSITIVE_IDENTITY_HMAC_KEY_CURRENT=&lt;测试环境独立密钥&gt;
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl">CRM_SENSITIVE_KEY_VERSION_PREVIOUS=
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl">CRM_SENSITIVE_PHONE_ENC_KEY_PREVIOUS=
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">CRM_SENSITIVE_PHONE_HMAC_KEY_PREVIOUS=
+</span></span><span class="line"><span class="ln">10</span><span class="cl">CRM_SENSITIVE_IDENTITY_ENC_KEY_PREVIOUS=
+</span></span><span class="line"><span class="ln">11</span><span class="cl">CRM_SENSITIVE_IDENTITY_HMAC_KEY_PREVIOUS=
+</span></span><span class="line"><span class="ln">12</span><span class="cl">
+</span></span><span class="line"><span class="ln">13</span><span class="cl">CRM_SENSITIVE_READ_MODE=legacy
+</span></span><span class="line"><span class="ln">14</span><span class="cl">CRM_SENSITIVE_WRITE_MODE=dual_write
+</span></span><span class="line"><span class="ln">15</span><span class="cl">CRM_SENSITIVE_INTERNAL_TOKEN=&lt;测试环境内部接口Token&gt;
+</span></span></code></pre></div><p>重点：</p>
+<ul>
+<li><code>previous</code> 五项首次必须为空。</li>
+<li>四把 current 密钥不能复用。</li>
+<li>不能把测试环境密钥配置到 gtcuser。</li>
+<li>CRM 是唯一持有加密和 HMAC 密钥的系统。</li>
+</ul>
+<h3 id="6-配置-gtcuser">6. 配置 gtcuser</h3>
+<p>gtcuser 只配置 CRM 内部接口连接信息：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="ln">1</span><span class="cl">CRM_MEMBER_SENSITIVE_BASE_URL=&lt;测试环境CRM内部地址&gt;
+</span></span><span class="line"><span class="ln">2</span><span class="cl">CRM_MEMBER_SENSITIVE_TOKEN=&lt;必须与CRM_INTERNAL_TOKEN一致&gt;
+</span></span><span class="line"><span class="ln">3</span><span class="cl">CRM_MEMBER_SENSITIVE_TIMEOUT=3
+</span></span></code></pre></div><p>gtcuser 不得配置任何 phone 或 identity 加密密钥。</p>
+<h3 id="7-单独发布配置文件">7. 单独发布配置文件</h3>
+<p>以下内容必须作为独立发布项确认：</p>
+<p>CRM：</p>
+<ul>
+<li><code>config/member_sensitive.php</code></li>
+<li><code>config/console.php</code></li>
+<li><code>.env</code> 中 13 个 <code>CRM_SENSITIVE_*</code> 配置</li>
+<li><code>composer.json</code> 及实际 Composer 依赖</li>
+</ul>
+<p>gtcuser：</p>
+<ul>
+<li><code>config/autoload/member_sensitive.php</code></li>
+<li><code>.env</code> 中 3 个 <code>CRM_MEMBER_SENSITIVE_*</code> 配置</li>
+</ul>
+<p>特别注意：真实 <code>.env</code> 不在 Git 提交中，必须通过测试环境配置发布流程单独下发。</p>
+<h2 id="三执行测试数据库结构变更">三、执行测试数据库结构变更</h2>
+<h3 id="8-先检查测试库现状">8. 先检查测试库现状</h3>
+<p>在执行 SQL 前检查：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="ln">1</span><span class="cl"><span class="k">SHOW</span><span class="w"> </span><span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">t_member</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="w"></span><span class="k">SHOW</span><span class="w"> </span><span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">t_member_other</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="w"></span><span class="k">SHOW</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">t_member_other</span><span class="p">;</span><span class="w">
+</span></span></span></code></pre></div><p>确认：</p>
+<ul>
+<li><code>t_member.phone</code> 和 <code>t_member.identity</code> 仍然存在。</li>
+<li><code>t_member</code> 不做任何结构修改。</li>
+<li><code>t_member_other</code> 是否已经存在目标字段。</li>
+<li>是否已经存在同名索引。</li>
+</ul>
+<h3 id="9-执行影子字段-sql">9. 执行影子字段 SQL</h3>
+<p>执行：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">/Users/jalen/www/local/local.gtctrader1203.com/update/20260828_member_sensitive_shadow_fields.sql
+</span></span></code></pre></div><p>该 SQL 只应修改 <code>t_member_other</code>，新增：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">phone_ciphertext
+</span></span><span class="line"><span class="ln">2</span><span class="cl">identity_ciphertext
+</span></span><span class="line"><span class="ln">3</span><span class="cl">phone_hmac_index
+</span></span><span class="line"><span class="ln">4</span><span class="cl">identity_hmac_index
+</span></span></code></pre></div><p>并建立 phone、identity HMAC 普通索引，不能建立唯一索引。</p>
+<p>执行后再次检查：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="ln">1</span><span class="cl"><span class="k">SHOW</span><span class="w"> </span><span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">t_member_other</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="w"></span><span class="k">SHOW</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">t_member_other</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="w"></span><span class="k">SHOW</span><span class="w"> </span><span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">t_member</span><span class="p">;</span><span class="w">
+</span></span></span></code></pre></div><p>确认没有误改 <code>t_member</code>。</p>
+<h2 id="四发布-crm">四、发布 CRM</h2>
+<h3 id="10-发布-crm-代码">10. 发布 CRM 代码</h3>
+<p>发布 CRM <code>staging</code> 分支代码，至少包括：</p>
+<ul>
+<li>敏感字段适配层。</li>
+<li><code>BaseController</code> 会员整行数据整合逻辑。</li>
+<li>会员创建、编辑、KYC、详情和查询入口。</li>
+<li><code>member_other</code> 安全写入逻辑。</li>
+<li>内部敏感接口。</li>
+<li><code>member-sensitive:migrate</code> CLI。</li>
+<li>相关测试和配置。</li>
+</ul>
+<h3 id="11-重载-crm-进程">11. 重载 CRM 进程</h3>
+<p>配置和代码发布后，按测试环境实际部署方式：</p>
+<ul>
+<li>重载 PHP-FPM。</li>
+<li>重启 CRM 队列进程。</li>
+<li>重启定时任务进程。</li>
+<li>清理或重载项目配置缓存。</li>
+</ul>
+<p>不能只重启 Web 进程而遗漏常驻队列和定时进程。</p>
+<h3 id="12-执行配置自检">12. 执行配置自检</h3>
+<p>在 CRM 目录运行：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">php think member-sensitive:migrate check
+</span></span></code></pre></div><p>必须确认：</p>
+<ul>
+<li>sodium 可用。</li>
+<li>current 版本正确。</li>
+<li>previous 为空。</li>
+<li>四把 current 密钥长度和编码正确。</li>
+<li>四把密钥没有复用。</li>
+<li><code>READ_MODE=legacy</code>。</li>
+<li><code>WRITE_MODE=dual_write</code>。</li>
+<li>内部 Token 已配置。</li>
+</ul>
+<p>任何密钥配置错误都应停止后续步骤。</p>
+<h2 id="五发布-gtcuser">五、发布 gtcuser</h2>
+<h3 id="13-发布-gtcuser-staging-代码">13. 发布 gtcuser <code>staging</code> 代码</h3>
+<p>发布 gtcuser 代码，重点确认：</p>
+<ul>
+<li>登录和注册通过 CRM 敏感字段接口处理。</li>
+<li>手机绑定和 KYC 通过 CRM 处理。</li>
+<li>现金转账收款人手机号查询改为 CRM 精确查询。</li>
+<li>CRM 故障时不回退到 <code>t_member.phone LIKE</code>。</li>
+<li>重复手机号可以返回全部会员 ID。</li>
+<li>gtcuser 不包含独立加密实现。</li>
+</ul>
+<h3 id="14-重启-gtcuser">14. 重启 gtcuser</h3>
+<p>重启全部 Hyperf/Swoole worker，确保新的配置和代码生效。</p>
+<p>检查启动日志时确认：</p>
+<ul>
+<li>CRM Gateway 地址可连接。</li>
+<li>Token 配置成功。</li>
+<li>没有打印 Token、密钥、密文或原始手机号。</li>
+<li>没有连接失败后回退旧手机号模糊查询的日志。</li>
+</ul>
+<h2 id="六首次链路验证">六、首次链路验证</h2>
+<h3 id="15-验证-crm-内部接口">15. 验证 CRM 内部接口</h3>
+<p>内部接口文档：</p>
+<p><a href="/Users/jalen/www/local/local.gtctrader1203.com/docs/apis/member-sensitive-internal.yaml:1">member-sensitive-internal.yaml</a></p>
+<h4 id="精确查询">精确查询</h4>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-http" data-lang="http"><span class="line"><span class="ln">1</span><span class="cl"><span class="err">POST /internal/member-sensitive/query
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="err">Token: &lt;测试环境Token&gt;
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="err">Content-Type: application/json
+</span></span></span></code></pre></div><p>手机号请求：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="ln">1</span><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl">  <span class="nt">&#34;field&#34;</span><span class="p">:</span> <span class="s2">&#34;phone&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">3</span><span class="cl">  <span class="nt">&#34;value&#34;</span><span class="p">:</span> <span class="s2">&#34;+8613800138000&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">4</span><span class="cl">  <span class="nt">&#34;d_code&#34;</span><span class="p">:</span> <span class="s2">&#34;86&#34;</span>
+</span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>证件号请求：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="ln">1</span><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl">  <span class="nt">&#34;field&#34;</span><span class="p">:</span> <span class="s2">&#34;identity&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">3</span><span class="cl">  <span class="nt">&#34;value&#34;</span><span class="p">:</span> <span class="s2">&#34;ab123456&#34;</span>
+</span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>预期：</p>
+<ul>
+<li>返回全部匹配会员 ID。</li>
+<li>结果按会员 ID 排序。</li>
+<li>不因为重复绑定只返回一条。</li>
+<li>手机号和证件号均为完整精确查询。</li>
+</ul>
+<h4 id="批量读取">批量读取</h4>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="ln">1</span><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl">  <span class="nt">&#34;member_ids&#34;</span><span class="p">:</span> <span class="p">[</span><span class="mi">10001</span><span class="p">,</span> <span class="mi">10002</span><span class="p">],</span>
+</span></span><span class="line"><span class="ln">3</span><span class="cl">  <span class="nt">&#34;fields&#34;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&#34;phone&#34;</span><span class="p">,</span> <span class="s2">&#34;identity&#34;</span><span class="p">]</span>
+</span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>预期：</p>
+<ul>
+<li>返回明文业务值。</li>
+<li>不返回密文、HMAC 或密钥。</li>
+<li>单条解密失败只返回稳定错误码，不泄露敏感内容。</li>
+</ul>
+<h4 id="写入">写入</h4>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl">  <span class="nt">&#34;member_id&#34;</span><span class="p">:</span> <span class="mi">10001</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl">  <span class="nt">&#34;changes&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl">    <span class="nt">&#34;phone&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl">      <span class="nt">&#34;value&#34;</span><span class="p">:</span> <span class="s2">&#34;+8613800138000&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">      <span class="nt">&#34;d_code&#34;</span><span class="p">:</span> <span class="s2">&#34;86&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl">      <span class="nt">&#34;country&#34;</span><span class="p">:</span> <span class="s2">&#34;CN&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl">      <span class="nt">&#34;sync_phone_verify&#34;</span><span class="p">:</span> <span class="kc">true</span>
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">    <span class="p">},</span>
+</span></span><span class="line"><span class="ln">10</span><span class="cl">    <span class="nt">&#34;identity&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">11</span><span class="cl">      <span class="nt">&#34;value&#34;</span><span class="p">:</span> <span class="s2">&#34;Ab123456&#34;</span>
+</span></span><span class="line"><span class="ln">12</span><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="ln">13</span><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="ln">14</span><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>验证结果必须同时满足：</p>
+<ul>
+<li><code>t_member.phone</code>、<code>t_member.identity</code> 仍保存规范化明文。</li>
+<li><code>t_member_other</code> 对应字段已写入密文和 HMAC。</li>
+<li>接口返回结构保持兼容。</li>
+<li>日志中没有原始手机号、证件号、密文或 HMAC。</li>
+</ul>
+<h2 id="七执行测试环境回填">七、执行测试环境回填</h2>
+<h3 id="16-先执行单批-dry-run">16. 先执行单批 dry-run</h3>
+<p>测试环境数据不完整，不需要把一次性全库质量盘点作为发布阻断条件。使用每批 dry-run 进行检查：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">php think member-sensitive:migrate backfill <span class="se">\
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="se"></span>  --cursor<span class="o">=</span><span class="m">0</span> <span class="se">\
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="se"></span>  --batch-size<span class="o">=</span><span class="m">200</span>
+</span></span></code></pre></div><p>检查输出：</p>
+<ul>
+<li><code>scanned</code></li>
+<li><code>planned_updates</code></li>
+<li><code>error_count</code></li>
+<li><code>next_cursor</code></li>
+<li>非法数据的 <code>member_id</code> 和错误分类</li>
+</ul>
+<p>输出中不能出现手机号、证件号、密文、HMAC 或密钥。</p>
+<h3 id="17-处理测试数据异常">17. 处理测试数据异常</h3>
+<p>以下情况按既定规则处理：</p>
+<ul>
+<li>空手机号或空证件号：允许，不作为错误。</li>
+<li><code>member_other</code> 缺失：有效数据回填时自动创建。</li>
+<li>两个字段都为空：不创建无意义的 <code>member_other</code> 行。</li>
+<li>非法手机号、国家缺失、区号冲突：默认阻断当前批次。</li>
+<li>非法证件号：默认阻断当前批次。</li>
+<li>重复手机号或重复证件号：允许，不阻断，不合并账号。</li>
+<li>大小写不同的证件号：HMAC 按大写生成，查询应视为同一值。</li>
+</ul>
+<h3 id="18-通过后执行真实回填">18. 通过后执行真实回填</h3>
+<p>确认 dry-run 结果后：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">php think member-sensitive:migrate backfill <span class="se">\
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="se"></span>  --cursor<span class="o">=</span><span class="m">0</span> <span class="se">\
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="se"></span>  --batch-size<span class="o">=</span><span class="m">200</span> <span class="se">\
+</span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="se"></span>  --execute
+</span></span></code></pre></div><p>记录返回的 <code>next_cursor</code>，继续下一批：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">php think member-sensitive:migrate backfill <span class="se">\
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="se"></span>  --cursor<span class="o">=</span>&lt;next_cursor&gt; <span class="se">\
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="se"></span>  --batch-size<span class="o">=</span><span class="m">200</span> <span class="se">\
+</span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="se"></span>  --execute
+</span></span></code></pre></div><p>每批必须保存发布记录。不能用 dry-run 的游标代替真实提交游标。</p>
+<p>如果测试数据中允许暂缓处理非法记录，经过业务确认后才使用：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">php think member-sensitive:migrate backfill <span class="se">\
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="se"></span>  --cursor<span class="o">=</span>&lt;cursor&gt; <span class="se">\
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="se"></span>  --batch-size<span class="o">=</span><span class="m">200</span> <span class="se">\
+</span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="se"></span>  --execute <span class="se">\
+</span></span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="se"></span>  --skip-invalid
+</span></span></code></pre></div><p>同时单独保存被跳过的 <code>member_id</code>，后续修复后重新回填。</p>
+<h2 id="八切换测试读取模式">八、切换测试读取模式</h2>
+<h3 id="19-首次发布保持-legacy">19. 首次发布保持 legacy</h3>
+<p>第一轮测试必须在：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="ln">1</span><span class="cl">CRM_SENSITIVE_READ_MODE=legacy
+</span></span><span class="line"><span class="ln">2</span><span class="cl">CRM_SENSITIVE_WRITE_MODE=dual_write
+</span></span></code></pre></div><p>下验证业务调用链，确认主表明文和影子字段都在持续同步。</p>
+<h3 id="20-回填并验证后测试-shadow-fallback">20. 回填并验证后测试 shadow fallback</h3>
+<p>全量回填后执行：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">php think member-sensitive:migrate verify <span class="se">\
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="se"></span>  --cursor<span class="o">=</span><span class="m">0</span> <span class="se">\
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="se"></span>  --batch-size<span class="o">=</span><span class="m">200</span>
+</span></span></code></pre></div><p>确认全量没有错误后，再将测试环境读取模式切换到：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="ln">1</span><span class="cl">CRM_SENSITIVE_READ_MODE=shadow_fallback
+</span></span><span class="line"><span class="ln">2</span><span class="cl">CRM_SENSITIVE_WRITE_MODE=dual_write
+</span></span></code></pre></div><p>重载 CRM 全部 PHP-FPM、队列和定时进程。</p>
+<p>第一版禁止：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="ln">1</span><span class="cl">CRM_SENSITIVE_READ_MODE=shadow_only
+</span></span></code></pre></div><p>也禁止清空或停止写入 <code>t_member.phone/identity</code>。</p>
+<h2 id="九测试部门回归范围">九、测试部门回归范围</h2>
+<p>测试人员应至少覆盖以下场景：</p>
+<ol>
+<li>会员新建、编辑、资料导入。</li>
+<li>会员列表、详情、整行数据读取。</li>
+<li>手机号脱敏、<code>hideListEmailPhone()</code>。</li>
+<li>KYC 列表、KYC 详情和审核保存。</li>
+<li>登录、注册、手机号校验。</li>
+<li>手机号绑定、换绑和验证码流程。</li>
+<li>证件号保存、读取和验证。</li>
+<li>完整手机号精确查询。</li>
+<li>完整证件号精确查询。</li>
+<li>手机号前缀查询应不再返回结果。</li>
+<li>证件号包含查询应不再返回结果。</li>
+<li>同一手机号绑定多个会员时，全部会员都能查询到。</li>
+<li>同一证件号绑定多个会员时，全部会员都能查询到。</li>
+<li>国际手机号带国家码、不带国家码、错误国家码。</li>
+<li>空手机号、非法手机号、缺少国家信息。</li>
+<li>证件号大小写冲突。</li>
+<li><code>member_other</code> 原有 KYC 写入和 <code>replace(true)-&gt;insert(...)</code> 相关流程。</li>
+<li>gtcuser 登录、注册、会员资料、KYC、手机号绑定。</li>
+<li>gtcuser <code>/api/cash/get_forward_list</code> 收款人搜索。</li>
+<li>CRM 内部接口超时、403、500、返回错误时的处理。</li>
+<li>CRM 内部接口故障时，gtcuser 不得回退到手机号模糊查询。</li>
+<li>外部接口返回路径、字段名、响应结构和权限保持不变。</li>
+</ol>
+<p>gtcuser 现金收款人接口文档：</p>
+<p><a href="/Users/jalen/www/local/gtcuser/docs/api/member-sensitive-cash-forward-list.openapi.json:1">member-sensitive-cash-forward-list.openapi.json</a></p>
+<h2 id="十回滚方案">十、回滚方案</h2>
+<h3 id="23-读取异常">23. 读取异常</h3>
+<p>把 CRM 配置恢复：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="ln">1</span><span class="cl">CRM_SENSITIVE_READ_MODE=legacy
+</span></span></code></pre></div><p>然后重载所有 CRM 进程。</p>
+<h3 id="24-影子写入导致业务失败">24. 影子写入导致业务失败</h3>
+<p>经审批后临时改为：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="ln">1</span><span class="cl">CRM_SENSITIVE_WRITE_MODE=legacy_only
+</span></span></code></pre></div><p>这只停止影子写入，<code>t_member.phone/identity</code> 仍必须继续写明文。</p>
+<h3 id="25-gtcuser-gateway-异常">25. gtcuser Gateway 异常</h3>
+<p>可以回滚 gtcuser 代码或恢复 CRM 内部接口，但不能恢复：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="ln">1</span><span class="cl"><span class="n">t_member</span><span class="p">.</span><span class="n">phone</span><span class="w"> </span><span class="k">LIKE</span><span class="w"> </span><span class="p">...</span><span class="w">
+</span></span></span></code></pre></div><p>这类手机号模糊查询逻辑。</p>
+<h3 id="26-数据库结构回滚">26. 数据库结构回滚</h3>
+<p>不要立即删除 <code>t_member_other</code> 新字段。只有在确认：</p>
+<ul>
+<li><code>shadow_fallback</code> 未启用。</li>
+<li>主表明文完整。</li>
+<li>没有业务依赖影子字段。</li>
+</ul>
+<p>并完成审批后，才执行 SQL 中的回滚段。</p>
+<h2 id="十一测试通过后的交付物">十一、测试通过后的交付物</h2>
+<p>测试部门验收完成后，应归档：</p>
+<ul>
+<li>三个仓库 <code>staging</code> commit。</li>
+<li>CRM 和 gtcuser 发布日志。</li>
+<li>SQL 执行记录。</li>
+<li><code>member-sensitive:migrate check</code> 输出。</li>
+<li>每批 backfill 的游标和统计。</li>
+<li>全量 verify 结果。</li>
+<li>Apifox 导入后的测试环境接口集合。</li>
+<li>测试报告和缺陷清单。</li>
+<li>测试环境实际配置版本，不记录真实密钥。</li>
+</ul>
+<p>本次测试发布只验证第一版双写和影子读取链路，不能在测试完成后直接进入停止 <code>t_member</code> 明文写入的第二版。</p>
 <hr>
 <hr>
 <hr>
