@@ -168,7 +168,7 @@
     <span class="post_date">
       2026-08-17	  
     </span>
-    <span class="post_time"> · 19 分钟阅读</span><span>&nbsp;· <a href='https://jianlin-li.github.io/tags/gtc/' title="gtc" class="post_tag button button_translucent">gtc
+    <span class="post_time"> · 25 分钟阅读</span><span>&nbsp;· <a href='https://jianlin-li.github.io/tags/gtc/' title="gtc" class="post_tag button button_translucent">gtc
         </a>
     </span>
     <span class="page_only">&nbsp;·
@@ -2173,6 +2173,676 @@
 <li>最后清空 t_member.phone、t_member.identity 的业务值。</li>
 </ol>
 <p>本方案中最关键的控制点是：先验证适配层和双写链路，再做历史回填，最后才清空 <code>t_member</code> 中的敏感值。否则一旦代码入口遗漏，旧业务会直接读取空手机号或空 identity。</p>
+<hr>
+<hr>
+<hr>
+
+<div class="notices tip">
+    <div class="label">历史回填</div>
+    <p>读取 t_member.phone、t_member.identity -&gt; 分别规范化 -&gt; 分别使用独立加密密钥生成密文 -&gt; 分别使用独立 HMAC 密钥生成精确查询索引 -&gt; 写入 t_member_other</p>
+
+  </div>
+
+<h1 id="一回填目标与边界">一、回填目标与边界</h1>
+<p>历史回填的目标是：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">读取 t_member.phone、t_member.identity
+</span></span><span class="line"><span class="ln">2</span><span class="cl">        ↓
+</span></span><span class="line"><span class="ln">3</span><span class="cl">分别规范化
+</span></span><span class="line"><span class="ln">4</span><span class="cl">        ↓
+</span></span><span class="line"><span class="ln">5</span><span class="cl">分别使用独立加密密钥生成密文
+</span></span><span class="line"><span class="ln">6</span><span class="cl">        ↓
+</span></span><span class="line"><span class="ln">7</span><span class="cl">分别使用独立 HMAC 密钥生成精确查询索引
+</span></span><span class="line"><span class="ln">8</span><span class="cl">        ↓
+</span></span><span class="line"><span class="ln">9</span><span class="cl">写入 t_member_other
+</span></span></code></pre></div><p>涉及的影子字段只有 4 个：</p>
+<table>
+  <thead>
+      <tr>
+          <th>原字段</th>
+          <th>密文列</th>
+          <th>HMAC 索引列</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>t_member.phone</code></td>
+          <td><code>t_member_other.phone_ciphertext</code></td>
+          <td><code>t_member_other.phone_hmac_index</code></td>
+      </tr>
+      <tr>
+          <td><code>t_member.identity</code></td>
+          <td><code>t_member_other.identity_ciphertext</code></td>
+          <td><code>t_member_other.identity_hmac_index</code></td>
+      </tr>
+  </tbody>
+</table>
+<p>严格边界：</p>
+<ul>
+<li><code>t_member.phone</code> 不删除、不清空、不修改历史值。</li>
+<li><code>t_member.identity</code> 不删除、不清空、不修改历史值。</li>
+<li>历史回填只维护 <code>t_member_other</code> 四个影子字段。</li>
+<li>不修改其他表中的 <code>phone</code>、<code>identity</code>。</li>
+<li>不要求历史 identity 符合字母数字格式。</li>
+<li>不因为手机号或 identity 重复而拒绝回填。</li>
+<li>同一手机号或 identity 可以绑定多个会员。</li>
+<li>不使用 <code>replace(true)</code>，避免覆盖 <code>member_other</code> 的其他业务字段。</li>
+</ul>
+<p>核心服务位于：</p>
+<p><a href="/Users/jalen/www/local/local.gtctrader1203.com/app/service/MemberSensitiveMigrationService.php:11">MemberSensitiveMigrationService.php</a></p>
+<p>命令入口位于：</p>
+<p><a href="/Users/jalen/www/local/local.gtctrader1203.com/app/command/MemberSensitiveMigrate.php:15">MemberSensitiveMigrate.php</a></p>
+<h1 id="二整体方法链">二、整体方法链</h1>
+<h2 id="1-回填方法链">1. 回填方法链</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln"> 1</span><span class="cl">php think member-sensitive:migrate backfill
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl">    ↓
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl">MemberSensitiveMigrate::execute()
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl">    ↓
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl">MemberSensitiveMigrationService::backfillBatch()
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">    ↓
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl">loadBackfillRows() / loadBackfillRowsForUpdate()
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl">    ↓
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">buildBackfillQuery()
+</span></span><span class="line"><span class="ln">10</span><span class="cl">    ↓
+</span></span><span class="line"><span class="ln">11</span><span class="cl">processBatch()
+</span></span><span class="line"><span class="ln">12</span><span class="cl">    ↓
+</span></span><span class="line"><span class="ln">13</span><span class="cl">buildBackfillPlan()
+</span></span><span class="line"><span class="ln">14</span><span class="cl">    ├── normalizePhone()
+</span></span><span class="line"><span class="ln">15</span><span class="cl">    └── normalizeIdentity()
+</span></span><span class="line"><span class="ln">16</span><span class="cl">    ↓
+</span></span><span class="line"><span class="ln">17</span><span class="cl">buildCurrentShadowFields()
+</span></span><span class="line"><span class="ln">18</span><span class="cl">或 buildEmptyShadowFields()
+</span></span><span class="line"><span class="ln">19</span><span class="cl">    ↓
+</span></span><span class="line"><span class="ln">20</span><span class="cl">persistShadowFields()
+</span></span><span class="line"><span class="ln">21</span><span class="cl">    ↓
+</span></span><span class="line"><span class="ln">22</span><span class="cl">MemberOther::upsertSensitiveShadowFields()
+</span></span></code></pre></div><h2 id="2-验证方法链">2. 验证方法链</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln"> 1</span><span class="cl">php think member-sensitive:migrate verify
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl">    ↓
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl">MemberSensitiveMigrate::execute()
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl">    ↓
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl">MemberSensitiveMigrationService::verifyBatch()
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">    ↓
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl">loadBackfillRows()
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl">    ↓
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">verifyShadowField()
+</span></span><span class="line"><span class="ln">10</span><span class="cl">    ├── 验证 phone
+</span></span><span class="line"><span class="ln">11</span><span class="cl">    └── 验证 identity
+</span></span></code></pre></div><h1 id="三回填前检查">三、回填前检查</h1>
+<h2 id="1-检查数据库结构">1. 检查数据库结构</h2>
+<p>确认 <code>t_member_other</code> 已有：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">phone_ciphertext
+</span></span><span class="line"><span class="ln">2</span><span class="cl">identity_ciphertext
+</span></span><span class="line"><span class="ln">3</span><span class="cl">phone_hmac_index
+</span></span><span class="line"><span class="ln">4</span><span class="cl">identity_hmac_index
+</span></span></code></pre></div><p>其中：</p>
+<ul>
+<li>密文列允许 <code>NULL</code>。</li>
+<li>HMAC 列允许 <code>NULL</code>。</li>
+<li>phone、identity 的 HMAC 索引都是普通非唯一索引。</li>
+<li><code>member_id</code> 仍然保持唯一。</li>
+</ul>
+<h2 id="2-检查-crm-配置">2. 检查 CRM 配置</h2>
+<p>执行：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">php think member-sensitive:migrate check
+</span></span></code></pre></div><p>检查内容：</p>
+<ul>
+<li>PHP sodium 扩展是否可用。</li>
+<li>当前协议版本是否正确。</li>
+<li>规范化版本是否正确。</li>
+<li>current 密钥版本是否完整。</li>
+<li>phone 加密密钥和 HMAC 密钥是否独立。</li>
+<li>identity 加密密钥和 HMAC 密钥是否独立。</li>
+<li>密钥是否满足长度和编码要求。</li>
+<li>当前版本和 previous 版本是否存在非法复用。</li>
+</ul>
+<p>不会输出：</p>
+<ul>
+<li>密钥原文。</li>
+<li>phone 明文。</li>
+<li>identity 明文。</li>
+<li>密文。</li>
+<li>HMAC 完整值。</li>
+</ul>
+<h2 id="3-确认双写模式">3. 确认双写模式</h2>
+<p>真实执行回填前，应确认：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="ln">1</span><span class="cl">CRM_SENSITIVE_WRITE_MODE=dual_write
+</span></span></code></pre></div><p>原因是：</p>
+<ul>
+<li>回填任务负责补历史影子。</li>
+<li>线上新注册、编辑、KYC 等业务同时可能继续写入。</li>
+<li>必须保证回填期间新增或修改的会员也持续写入 <code>t_member_other</code>。</li>
+<li>否则会出现“历史回填已完成，但新业务数据没有影子”的缺口。</li>
+</ul>
+<p>第一版仍保持：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">t_member.phone       持续写明文
+</span></span><span class="line"><span class="ln">2</span><span class="cl">t_member.identity    持续写明文
+</span></span><span class="line"><span class="ln">3</span><span class="cl">t_member_other       同时写密文和 HMAC
+</span></span></code></pre></div><h1 id="四批次扫描逻辑">四、批次扫描逻辑</h1>
+<p>回填按照 <code>t_member.id</code> 主键游标执行，不使用 offset。</p>
+<p>查询逻辑相当于：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">WHERE t_member.id &gt; cursor
+</span></span><span class="line"><span class="ln">2</span><span class="cl">ORDER BY t_member.id ASC
+</span></span><span class="line"><span class="ln">3</span><span class="cl">LIMIT batch_size
+</span></span></code></pre></div><p>每批参数：</p>
+<ul>
+<li>默认 <code>batch_size=200</code>。</li>
+<li>最大 <code>batch_size=500</code>。</li>
+<li><code>cursor</code> 默认从 <code>0</code> 开始。</li>
+<li>每批处理完返回 <code>next_cursor</code>。</li>
+<li>下一批使用上一批返回的 <code>next_cursor</code>。</li>
+</ul>
+<p>查询同时读取：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">t_member.id
+</span></span><span class="line"><span class="ln">2</span><span class="cl">t_member.phone
+</span></span><span class="line"><span class="ln">3</span><span class="cl">t_member.identity
+</span></span><span class="line"><span class="ln">4</span><span class="cl">t_member.d_code
+</span></span><span class="line"><span class="ln">5</span><span class="cl">t_member.country
+</span></span><span class="line"><span class="ln">6</span><span class="cl">t_member_other.phone_ciphertext
+</span></span><span class="line"><span class="ln">7</span><span class="cl">t_member_other.phone_hmac_index
+</span></span><span class="line"><span class="ln">8</span><span class="cl">t_member_other.identity_ciphertext
+</span></span><span class="line"><span class="ln">9</span><span class="cl">t_member_other.identity_hmac_index
+</span></span></code></pre></div><p>查询方法：</p>
+<ul>
+<li>dry-run：<code>loadBackfillRows()</code></li>
+<li>execute：<code>loadBackfillRowsForUpdate()</code></li>
+</ul>
+<p>真实执行时会：</p>
+<ol>
+<li>开启批次事务。</li>
+<li>按固定顺序锁定 <code>t_member</code> 行。</li>
+<li>锁定已有的 <code>t_member_other</code> 行。</li>
+<li>重新基于锁定后的数据生成回填计划。</li>
+<li>写入影子字段。</li>
+<li>提交事务。</li>
+</ol>
+<p>这样可以减少回填与业务双写同时修改同一会员时的覆盖风险。</p>
+<h1 id="五phone-历史回填逻辑">五、phone 历史回填逻辑</h1>
+<p>phone 的处理实现位于：</p>
+<p><a href="/Users/jalen/www/local/local.gtctrader1203.com/app/service/MemberSensitiveNormalizer.php:70">MemberSensitiveNormalizer.php</a></p>
+<h2 id="1-读取原始数据">1. 读取原始数据</h2>
+<p>读取：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">t_member.phone
+</span></span><span class="line"><span class="ln">2</span><span class="cl">t_member.d_code
+</span></span><span class="line"><span class="ln">3</span><span class="cl">t_member.country
+</span></span></code></pre></div><p>其中：</p>
+<ul>
+<li><code>phone</code> 是主要输入。</li>
+<li><code>d_code</code> 是区号上下文。</li>
+<li><code>country</code> 是国家名称上下文。</li>
+</ul>
+<h2 id="2-首尾空白处理">2. 首尾空白处理</h2>
+<p>首先对以下字段执行 trim：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">phone
+</span></span><span class="line"><span class="ln">2</span><span class="cl">d_code
+</span></span><span class="line"><span class="ln">3</span><span class="cl">country
+</span></span></code></pre></div><p>如果 trim 后 phone 为空：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">phone_ciphertext = NULL
+</span></span><span class="line"><span class="ln">2</span><span class="cl">phone_hmac_index = NULL
+</span></span></code></pre></div><p>不会生成空字符串密文或空 HMAC。</p>
+<h2 id="3-输入长度处理">3. 输入长度处理</h2>
+<p>phone 原始值超过 64 字节时，当前实现将其标记为 invalid：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">reason = invalid_characters
+</span></span></code></pre></div><p>该限制是安全输入长度限制，不代表手机号必须是真实有效号码。</p>
+<h2 id="4-删除展示分隔符">4. 删除展示分隔符</h2>
+<p>只删除以下展示分隔符：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">空格
+</span></span><span class="line"><span class="ln">2</span><span class="cl">点号
+</span></span><span class="line"><span class="ln">3</span><span class="cl">圆括号
+</span></span><span class="line"><span class="ln">4</span><span class="cl">短横线
+</span></span></code></pre></div><p>例如：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">+86 138-0013-8000
+</span></span></code></pre></div><p>会先转换为：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">+8613800138000
+</span></span></code></pre></div><p>但是不会简单地“只保留数字”，因为历史或测试数据可能包含：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">TEST
+</span></span><span class="line"><span class="ln">2</span><span class="cl">undefined
+</span></span><span class="line"><span class="ln">3</span><span class="cl">其他占位值
+</span></span></code></pre></div><p>这些值不能被静默改写。</p>
+<h2 id="5-标准国际号码解析">5. 标准国际号码解析</h2>
+<p>如果处理后的 phone：</p>
+<ul>
+<li>以 <code>+</code> 开头，按国际号码解析。</li>
+<li>以 <code>00</code> 开头，按国际号码转换后解析。</li>
+<li>是本地号码，则结合 <code>d_code</code> 和 <code>country</code> 解析。</li>
+</ul>
+<p>解析时：</p>
+<ol>
+<li>优先使用可信的国家区域码。</li>
+<li><code>d_code</code> 可以用于选择解析区域。</li>
+<li><code>country</code> 可以提供辅助区域信息。</li>
+<li><code>d_code</code> 与 <code>country</code> 不一致时，不直接判定冲突。</li>
+<li>不调用真实号码有效性判断。</li>
+<li>不要求号码一定能接收短信。</li>
+<li>不要求号码一定属于真实运营商。</li>
+</ol>
+<p>解析成功后，统一保存为 E.164 格式，例如：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">+8613800138000
+</span></span></code></pre></div><p>此时：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">phone display_value = +8613800138000
+</span></span><span class="line"><span class="ln">2</span><span class="cl">phone index_value   = +8613800138000
+</span></span></code></pre></div><h2 id="6-无法解析时的兜底处理">6. 无法解析时的兜底处理</h2>
+<p>如果号码库无法解析，当前实现不会直接阻止加密，而是生成稳定的兜底值。</p>
+<p>规则：</p>
+<h3 id="phone-自身带国际前缀">phone 自身带国际前缀</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">phone = +8613800138000
+</span></span><span class="line"><span class="ln">2</span><span class="cl">结果 = +8613800138000
+</span></span></code></pre></div><h3 id="phone-使用-00-国际格式">phone 使用 <code>00</code> 国际格式</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">phone = 008613800138000
+</span></span><span class="line"><span class="ln">2</span><span class="cl">结果 = +8613800138000
+</span></span></code></pre></div><h3 id="本地号码且存在-d_code">本地号码且存在 d_code</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">phone = 13800138000
+</span></span><span class="line"><span class="ln">2</span><span class="cl">d_code = +86
+</span></span><span class="line"><span class="ln">3</span><span class="cl">结果 = +8613800138000
+</span></span></code></pre></div><h3 id="本地号码且没有国家或区号">本地号码且没有国家或区号</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">phone = 13800138000
+</span></span><span class="line"><span class="ln">2</span><span class="cl">结果 = 13800138000
+</span></span></code></pre></div><p>这里不会猜测国家，也不会凭空补充区号。</p>
+<p>最终兜底值同时作为：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">phone display_value
+</span></span><span class="line"><span class="ln">2</span><span class="cl">phone index_value
+</span></span></code></pre></div><p>因此可以继续完成：</p>
+<ul>
+<li>可逆加密。</li>
+<li>解密还原。</li>
+<li>HMAC 精确查询。</li>
+</ul>
+<h2 id="7-phone-密文和-hmac">7. phone 密文和 HMAC</h2>
+<p>phone 非空时：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">phone_ciphertext = Encrypt(trim/规范化后的 phone)
+</span></span><span class="line"><span class="ln">2</span><span class="cl">phone_hmac_index = HMAC(phone 规范化后的 index_value)
+</span></span></code></pre></div><p>使用：</p>
+<ul>
+<li>phone 独立加密密钥。</li>
+<li>phone 独立 HMAC 密钥。</li>
+<li>current 密钥版本。</li>
+<li>XChaCha20-Poly1305-IETF 可逆加密。</li>
+</ul>
+<p>密文 AAD 绑定：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">member_id
+</span></span><span class="line"><span class="ln">2</span><span class="cl">field=phone
+</span></span><span class="line"><span class="ln">3</span><span class="cl">key_version
+</span></span></code></pre></div><p>因此不能把一个会员的 phone 密文直接复制到另一个会员使用。</p>
+<h1 id="六identity-历史回填逻辑">六、identity 历史回填逻辑</h1>
+<p>identity 的处理规则非常简单，不执行国家或证件格式判断。</p>
+<h2 id="1-首尾-trim">1. 首尾 trim</h2>
+<p>例如：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">t_member.identity = &#34;  Y341393(2)  &#34;
+</span></span></code></pre></div><p>回填输入值为：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">Y341393(2)
+</span></span></code></pre></div><p>但是：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">t_member.identity
+</span></span></code></pre></div><p>仍保持：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">  Y341393(2)  
+</span></span></code></pre></div><p>历史回填不修改主表。</p>
+<h2 id="2-不执行格式清洗">2. 不执行格式清洗</h2>
+<p>以下 identity 均允许进入回填：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">AB-123
+</span></span><span class="line"><span class="ln">2</span><span class="cl">Y341393(2)
+</span></span><span class="line"><span class="ln">3</span><span class="cl">A B.12_+3
+</span></span><span class="line"><span class="ln">4</span><span class="cl">لايوجد
+</span></span></code></pre></div><p>不会：</p>
+<ul>
+<li>删除短横线。</li>
+<li>删除括号。</li>
+<li>删除内部空格。</li>
+<li>转换大小写。</li>
+<li>执行 ASCII 字母数字正则。</li>
+<li>截断超过业务入口限制的历史值。</li>
+</ul>
+<p>统一适配层只负责：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">trim(identity)
+</span></span></code></pre></div><p>后台会员编辑、注册、KYC 入口的原有正则仍由原入口负责，历史回填不复用这些入口正则。</p>
+<h2 id="3-identity-非空处理">3. identity 非空处理</h2>
+<p>非空 identity：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">identity_plaintext = trim(t_member.identity)
+</span></span><span class="line"><span class="ln">2</span><span class="cl">identity_ciphertext = Encrypt(identity_plaintext)
+</span></span><span class="line"><span class="ln">3</span><span class="cl">identity_hmac_index = HMAC(identity_plaintext)
+</span></span></code></pre></div><p>identity 的密文和 HMAC 使用完全相同的 trim 后值。</p>
+<p>大小写保持原样：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">AbC123456
+</span></span></code></pre></div><p>与：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">abc123456
+</span></span></code></pre></div><p>会生成不同 HMAC，也不会自动合并。</p>
+<h2 id="4-identity-空值处理">4. identity 空值处理</h2>
+<p>以下情况视为空值：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">NULL
+</span></span><span class="line"><span class="ln">2</span><span class="cl">&#34;&#34;
+</span></span><span class="line"><span class="ln">3</span><span class="cl">&#34;   &#34;
+</span></span></code></pre></div><p>处理结果：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">identity_ciphertext = NULL
+</span></span><span class="line"><span class="ln">2</span><span class="cl">identity_hmac_index = NULL
+</span></span></code></pre></div><p>如果当前影子也为空，则不创建无意义的 <code>member_other</code> 行。</p>
+<p>如果当前影子存在残留，则把两个 identity 影子字段成对清空。</p>
+<h1 id="七单会员回填计划生成">七、单会员回填计划生成</h1>
+<p>方法：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">buildBackfillPlan()
+</span></span></code></pre></div><p>该方法同时处理 phone 和 identity：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">phone    -&gt; normalizePhone()
+</span></span><span class="line"><span class="ln">2</span><span class="cl">identity -&gt; normalizeIdentity()
+</span></span></code></pre></div><p>然后分别判断：</p>
+<ul>
+<li><code>empty</code></li>
+<li><code>valid</code></li>
+<li><code>invalid</code></li>
+</ul>
+<h2 id="1-两个字段都正常">1. 两个字段都正常</h2>
+<p>生成最多四个字段：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">phone_ciphertext
+</span></span><span class="line"><span class="ln">2</span><span class="cl">phone_hmac_index
+</span></span><span class="line"><span class="ln">3</span><span class="cl">identity_ciphertext
+</span></span><span class="line"><span class="ln">4</span><span class="cl">identity_hmac_index
+</span></span></code></pre></div><h2 id="2-只有-phone-有值">2. 只有 phone 有值</h2>
+<p>只生成：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">phone_ciphertext
+</span></span><span class="line"><span class="ln">2</span><span class="cl">phone_hmac_index
+</span></span></code></pre></div><p>identity 保持现有影子状态。</p>
+<h2 id="3-只有-identity-有值">3. 只有 identity 有值</h2>
+<p>只生成：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">identity_ciphertext
+</span></span><span class="line"><span class="ln">2</span><span class="cl">identity_hmac_index
+</span></span></code></pre></div><p>phone 保持现有影子状态。</p>
+<h2 id="4-一个字段为空另一个字段有值">4. 一个字段为空、另一个字段有值</h2>
+<p>空字段不会影响另一个字段回填。</p>
+<p>例如：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">phone = &#34;&#34;
+</span></span><span class="line"><span class="ln">2</span><span class="cl">identity = &#34;AbC123456&#34;
+</span></span></code></pre></div><p>结果：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">phone_ciphertext = NULL
+</span></span><span class="line"><span class="ln">2</span><span class="cl">phone_hmac_index = NULL
+</span></span><span class="line"><span class="ln">3</span><span class="cl">identity_ciphertext = 生成
+</span></span><span class="line"><span class="ln">4</span><span class="cl">identity_hmac_index = 生成
+</span></span></code></pre></div><h2 id="5-一个字段异常">5. 一个字段异常</h2>
+<p>当前会员的整条回填计划会进入错误列表。</p>
+<p>默认情况下：</p>
+<ul>
+<li>当前批次阻断。</li>
+<li>当前批次不推进游标。</li>
+<li>当前批次不提交任何影子更新。</li>
+</ul>
+<p>只有明确批准使用：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">--skip-invalid
+</span></span></code></pre></div><p>时，才会：</p>
+<ul>
+<li>跳过当前异常会员。</li>
+<li>提交同批其他有效会员。</li>
+<li>推进游标。</li>
+<li>输出该会员 ID 和稳定错误分类。</li>
+</ul>
+<p>错误输出不得包含：</p>
+<ul>
+<li>phone 明文。</li>
+<li>identity 明文。</li>
+<li>密文。</li>
+<li>HMAC。</li>
+<li>密钥。</li>
+</ul>
+<h1 id="八影子字段幂等处理">八、影子字段幂等处理</h1>
+<p>方法：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">buildCurrentShadowFields()
+</span></span></code></pre></div><p>对于 phone 和 identity 分别执行。</p>
+<p>如果现有影子同时满足：</p>
+<ol>
+<li>密文存在。</li>
+<li>HMAC 存在。</li>
+<li>密文是 current 版本。</li>
+<li>HMAC 与当前值一致。</li>
+<li>解密后的明文与本次规范化值一致。</li>
+</ol>
+<p>则：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">不更新
+</span></span><span class="line"><span class="ln">2</span><span class="cl">计入 unchanged
+</span></span></code></pre></div><p>如果出现以下任意情况：</p>
+<ul>
+<li>密文损坏。</li>
+<li>解密失败。</li>
+<li>HMAC 不一致。</li>
+<li>密文使用旧版本。</li>
+<li>密文与主表明文不一致。</li>
+<li>只存在密文、不存在 HMAC。</li>
+<li>只存在 HMAC、不存在密文。</li>
+</ul>
+<p>则以 <code>t_member</code> 当前明文为权威源，重新生成当前版本的：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">ciphertext
+</span></span><span class="line"><span class="ln">2</span><span class="cl">hmac_index
+</span></span></code></pre></div><h1 id="九写入-t_member_other-的逻辑">九、写入 t_member_other 的逻辑</h1>
+<p>方法：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">persistShadowFields()
+</span></span></code></pre></div><p>最终调用：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">MemberOther::upsertSensitiveShadowFields()
+</span></span></code></pre></div><p>该方法只允许写：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">phone_ciphertext
+</span></span><span class="line"><span class="ln">2</span><span class="cl">phone_hmac_index
+</span></span><span class="line"><span class="ln">3</span><span class="cl">identity_ciphertext
+</span></span><span class="line"><span class="ln">4</span><span class="cl">identity_hmac_index
+</span></span></code></pre></div><h2 id="1-member_other-行存在">1. <code>member_other</code> 行存在</h2>
+<p>使用 duplicate update，仅更新本次明确生成的影子字段。</p>
+<p>不会覆盖：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">front
+</span></span><span class="line"><span class="ln">2</span><span class="cl">back
+</span></span><span class="line"><span class="ln">3</span><span class="cl">allow_share_group
+</span></span><span class="line"><span class="ln">4</span><span class="cl">kyc_profile_snapshot
+</span></span><span class="line"><span class="ln">5</span><span class="cl">其他业务字段
+</span></span></code></pre></div><h2 id="2-member_other-行不存在">2. <code>member_other</code> 行不存在</h2>
+<p>按需插入，并补齐该表已有的必填字段默认值。</p>
+<p>只有在确实需要保存影子数据时才创建行。</p>
+<p>如果 phone 和 identity 都为空，并且不存在需要清理的影子字段，则不创建无意义行。</p>
+<h2 id="3-成对写入">3. 成对写入</h2>
+<p>每个字段必须成对处理：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">phone_ciphertext + phone_hmac_index
+</span></span><span class="line"><span class="ln">2</span><span class="cl">identity_ciphertext + identity_hmac_index
+</span></span></code></pre></div><p>不允许只写其中一个。</p>
+<p>空值也必须成对清空：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">phone_ciphertext = NULL
+</span></span><span class="line"><span class="ln">2</span><span class="cl">phone_hmac_index = NULL
+</span></span></code></pre></div><p>或者：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">identity_ciphertext = NULL
+</span></span><span class="line"><span class="ln">2</span><span class="cl">identity_hmac_index = NULL
+</span></span></code></pre></div><h1 id="十dry-run-阶段">十、dry-run 阶段</h1>
+<p>先执行一批 dry-run：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">php think member-sensitive:migrate backfill <span class="se">\
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="se"></span>  --cursor<span class="o">=</span><span class="m">0</span> <span class="se">\
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="se"></span>  --batch-size<span class="o">=</span><span class="m">200</span> <span class="se">\
+</span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="se"></span>  --max-batches<span class="o">=</span><span class="m">1</span>
+</span></span></code></pre></div><p>dry-run：</p>
+<ul>
+<li>读取真实数据。</li>
+<li>执行 phone 规范化。</li>
+<li>执行 identity trim。</li>
+<li>生成加密和 HMAC 计划。</li>
+<li>不执行数据库写入。</li>
+<li>不修改 <code>t_member</code>。</li>
+<li>不修改 <code>t_member_other</code>。</li>
+</ul>
+<p>需要记录：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">scanned
+</span></span><span class="line"><span class="ln">2</span><span class="cl">planned_updates
+</span></span><span class="line"><span class="ln">3</span><span class="cl">committed_updates
+</span></span><span class="line"><span class="ln">4</span><span class="cl">unchanged
+</span></span><span class="line"><span class="ln">5</span><span class="cl">empty_fields
+</span></span><span class="line"><span class="ln">6</span><span class="cl">error_count
+</span></span><span class="line"><span class="ln">7</span><span class="cl">errors
+</span></span><span class="line"><span class="ln">8</span><span class="cl">next_cursor
+</span></span><span class="line"><span class="ln">9</span><span class="cl">has_more
+</span></span></code></pre></div><p>dry-run 的 <code>committed_updates</code> 应为：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">0
+</span></span></code></pre></div><h1 id="十一真实回填阶段">十一、真实回填阶段</h1>
+<p>确认 dry-run 无配置错误后执行：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">php think member-sensitive:migrate backfill <span class="se">\
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="se"></span>  --cursor<span class="o">=</span><span class="m">0</span> <span class="se">\
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="se"></span>  --batch-size<span class="o">=</span><span class="m">200</span> <span class="se">\
+</span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="se"></span>  --max-batches<span class="o">=</span><span class="m">1</span> <span class="se">\
+</span></span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="se"></span>  --execute
+</span></span></code></pre></div><p>每批执行逻辑：</p>
+<ol>
+<li>打开 MySQL 事务。</li>
+<li>按主键游标读取一批 <code>t_member</code>。</li>
+<li>锁定当前会员行及已有 <code>member_other</code> 行。</li>
+<li>重新生成 phone 和 identity 回填计划。</li>
+<li>对有效会员生成影子字段。</li>
+<li>使用白名单 upsert 写入 <code>t_member_other</code>。</li>
+<li>任一写入失败，整批回滚。</li>
+<li>成功后提交整批事务。</li>
+<li>返回 <code>next_cursor</code>。</li>
+</ol>
+<p>如果返回：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">completed=no
+</span></span></code></pre></div><p>表示还有下一批。</p>
+<p>使用上一次返回的游标继续：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">php think member-sensitive:migrate backfill <span class="se">\
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="se"></span>  --cursor<span class="o">=</span>&lt;next_cursor&gt; <span class="se">\
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="se"></span>  --batch-size<span class="o">=</span><span class="m">200</span> <span class="se">\
+</span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="se"></span>  --max-batches<span class="o">=</span><span class="m">1</span> <span class="se">\
+</span></span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="se"></span>  --execute
+</span></span></code></pre></div><p>直到返回：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">completed=yes
+</span></span></code></pre></div><h1 id="十二错误和事务处理">十二、错误和事务处理</h1>
+<h2 id="默认模式">默认模式</h2>
+<p>默认不使用 <code>--skip-invalid</code>：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">任何会员发生回填错误
+</span></span><span class="line"><span class="ln">2</span><span class="cl">    ↓
+</span></span><span class="line"><span class="ln">3</span><span class="cl">当前批次 aborted=true
+</span></span><span class="line"><span class="ln">4</span><span class="cl">    ↓
+</span></span><span class="line"><span class="ln">5</span><span class="cl">next_cursor 保持当前 cursor
+</span></span><span class="line"><span class="ln">6</span><span class="cl">    ↓
+</span></span><span class="line"><span class="ln">7</span><span class="cl">当前批次不提交任何写入
+</span></span></code></pre></div><p>这样可以避免批次部分成功后难以追踪。</p>
+<h2 id="跳过异常模式">跳过异常模式</h2>
+<p>只有负责人批准后才允许：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">--skip-invalid
+</span></span></code></pre></div><p>此时：</p>
+<ul>
+<li>正常会员继续回填。</li>
+<li>异常会员不写入。</li>
+<li>游标正常推进。</li>
+<li>错误会员 ID 和错误分类必须单独记录。</li>
+<li>后续必须单独处理这些会员。</li>
+<li>不允许因为命令返回 0 就认为全部数据已完成。</li>
+</ul>
+<h1 id="十三全量-verify">十三、全量 verify</h1>
+<p>全部回填完成后，从游标 0 重新执行：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">php think member-sensitive:migrate verify <span class="se">\
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="se"></span>  --cursor<span class="o">=</span><span class="m">0</span> <span class="se">\
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="se"></span>  --batch-size<span class="o">=</span><span class="m">200</span> <span class="se">\
+</span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="se"></span>  --max-batches<span class="o">=</span><span class="m">1</span>
+</span></span></code></pre></div><p>verify 也要按 <code>next_cursor</code> 分批执行到 <code>completed=yes</code>。</p>
+<p>verify 只读：</p>
+<ul>
+<li>不允许 <code>--execute</code>。</li>
+<li>不允许 <code>--skip-invalid</code>。</li>
+<li>不修复数据。</li>
+<li>不修改 <code>t_member</code>。</li>
+<li>不修改 <code>t_member_other</code>。</li>
+</ul>
+<h2 id="phone-verify">phone verify</h2>
+<p>对每个 phone 检查：</p>
+<ol>
+<li>主表 phone 为空时，两个 phone 影子必须都是 <code>NULL</code>。</li>
+<li>主表 phone 非空时，密文和 HMAC 必须成对存在。</li>
+<li>密文 envelope 格式正确。</li>
+<li>能用 current 或 previous 密钥解密。</li>
+<li>解密结果经过当前 phone 规则处理后，与主表 phone 规范化值一致。</li>
+<li>phone HMAC 与解密值、字段名、密钥版本一致。</li>
+<li>不允许密文和 HMAC 指向不同 phone 值。</li>
+<li>不允许只存在一列影子数据。</li>
+</ol>
+<h2 id="identity-verify">identity verify</h2>
+<p>对每个 identity 检查：</p>
+<ol>
+<li>主表 identity 为 <code>NULL</code>、空字符串或 trim 后为空时，两个影子必须都是 <code>NULL</code>。</li>
+<li>主表 identity 非空时，密文和 HMAC 必须成对存在。</li>
+<li>解密结果必须等于 <code>trim(t_member.identity)</code>。</li>
+<li>HMAC 必须基于同一个 trim 后 identity 生成。</li>
+<li>大小写不同的 identity 不得被错误合并。</li>
+<li>历史首尾空格差异不得报 <code>DATA_MISMATCH</code>。</li>
+<li>非 ASCII、短横线、括号、内部空格不作为错误。</li>
+<li>不执行后台编辑和 KYC 的原有正则判断。</li>
+</ol>
+<h2 id="verify-输出指标">verify 输出指标</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln"> 1</span><span class="cl">scanned
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl">verified_members
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl">verified_fields
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl">current_fields
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl">previous_fields
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">empty_fields
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl">error_count
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl">errors
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">next_cursor
+</span></span><span class="line"><span class="ln">10</span><span class="cl">has_more
+</span></span></code></pre></div><p>最终要求：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">completed=yes
+</span></span><span class="line"><span class="ln">2</span><span class="cl">error_count=0
+</span></span><span class="line"><span class="ln">3</span><span class="cl">previous_fields=0
+</span></span></code></pre></div><p>其中：</p>
+<ul>
+<li><code>current_fields</code>：使用当前密钥版本的有效字段数量。</li>
+<li><code>previous_fields</code>：仍使用旧密钥版本的字段数量。</li>
+<li><code>empty_fields</code>：合法空字段数量。</li>
+<li><code>error_count</code>：真实异常数量。</li>
+</ul>
+<h1 id="十四phone-和-identity-的最终结果示例">十四、phone 和 identity 的最终结果示例</h1>
+<p>假设主表数据：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">member_id = 10001
+</span></span><span class="line"><span class="ln">2</span><span class="cl">phone     = &#34;13800138000&#34;
+</span></span><span class="line"><span class="ln">3</span><span class="cl">d_code    = &#34;+86&#34;
+</span></span><span class="line"><span class="ln">4</span><span class="cl">country   = &#34;China&#34;
+</span></span><span class="line"><span class="ln">5</span><span class="cl">identity  = &#34;  Y341393(2)  &#34;
+</span></span></code></pre></div><p>回填后：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">t_member.phone
+</span></span><span class="line"><span class="ln">2</span><span class="cl">= &#34;13800138000&#34;
+</span></span><span class="line"><span class="ln">3</span><span class="cl">
+</span></span><span class="line"><span class="ln">4</span><span class="cl">t_member.identity
+</span></span><span class="line"><span class="ln">5</span><span class="cl">= &#34;  Y341393(2)  &#34;
+</span></span></code></pre></div><p>影子解密结果：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">phone_ciphertext    -&gt; &#34;+8613800138000&#34;
+</span></span><span class="line"><span class="ln">2</span><span class="cl">identity_ciphertext -&gt; &#34;Y341393(2)&#34;
+</span></span></code></pre></div><p>HMAC 输入：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">phone_hmac_index    -&gt; HMAC(&#34;+8613800138000&#34;)
+</span></span><span class="line"><span class="ln">2</span><span class="cl">identity_hmac_index -&gt; HMAC(&#34;Y341393(2)&#34;)
+</span></span></code></pre></div><p>注意：</p>
+<ul>
+<li>phone 的解密值可能是标准 E.164 值。</li>
+<li>identity 的解密值是 trim 后原始值。</li>
+<li>主表历史 identity 首尾空格不修改。</li>
+<li>主表与影子之间的 identity 首尾空格差异属于允许差异。</li>
+</ul>
+<h1 id="十五回填完成后的业务验证">十五、回填完成后的业务验证</h1>
+<p>全量 verify 通过后，还要验证业务链路：</p>
+<ol>
+<li>会员详情读取 phone 和 identity。</li>
+<li>会员列表读取和脱敏。</li>
+<li>手机号完整精确查询。</li>
+<li>identity 完整精确查询。</li>
+<li>相同 phone 绑定多个会员。</li>
+<li>相同 identity 绑定多个会员。</li>
+<li>大小写不同 identity 不互相命中。</li>
+<li>注册流程。</li>
+<li>会员编辑流程。</li>
+<li>KYC 保存和审核。</li>
+<li>登录、短信、安全验证。</li>
+<li>外部接口获取明文业务值。</li>
+<li>gtcuser 只能通过 CRM 接口读取和写入。</li>
+<li>CRM 继续同步写入 <code>t_member.phone/identity</code> 明文。</li>
+<li><code>t_member_other</code> 的密文和 HMAC 与主表值一致。</li>
+</ol>
+<h1 id="十六最终执行顺序">十六、最终执行顺序</h1>
+<p>建议严格按照以下顺序：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln"> 1</span><span class="cl">1. 检查数据库结构
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl">2. 发布 CRM .env 密钥和敏感配置
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl">3. 执行 member-sensitive:migrate check
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl">4. 确认 CRM_SENSITIVE_WRITE_MODE=dual_write
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl">5. 执行 phone + identity dry-run
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">6. 检查错误分类和计划数量
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl">7. 执行小批量 phone + identity execute
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl">8. 检查 t_member 未被修改
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">9. 检查 t_member_other 四个影子字段
+</span></span><span class="line"><span class="ln">10</span><span class="cl">10. 按 next_cursor 继续全量回填
+</span></span><span class="line"><span class="ln">11</span><span class="cl">11. 从 cursor=0 全量 verify
+</span></span><span class="line"><span class="ln">12</span><span class="cl">12. 修复 error_count 中的异常会员
+</span></span><span class="line"><span class="ln">13</span><span class="cl">13. 重新执行 verify
+</span></span><span class="line"><span class="ln">14</span><span class="cl">14. 执行业务接口回归
+</span></span><span class="line"><span class="ln">15</span><span class="cl">15. 保持 t_member.phone/identity 持续明文双写
+</span></span><span class="line"><span class="ln">16</span><span class="cl">16. 经过稳定运行后，再单独规划停止主表写入的第二版需求
+</span></span></code></pre></div><p>整个过程中，phone 和 identity 是同一套批处理、同一套事务和同一套游标推进逻辑，但各自使用独立的规范化规则、加密密钥和 HMAC 密钥。</p>
 <hr>
 
 <div class="notices tip">
