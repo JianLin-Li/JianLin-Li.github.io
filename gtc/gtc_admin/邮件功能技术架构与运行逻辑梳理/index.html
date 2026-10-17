@@ -1,0 +1,1498 @@
+
+<!DOCTYPE html>
+<html
+  lang="zh-cn"
+  data-figures=""
+  
+    class="page"
+  
+  
+  >
+  <head>
+<title>邮件功能技术架构与运行逻辑梳理 | 李建林个人知识库</title>
+<meta charset="utf-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+
+
+
+
+<meta property="og:locale" content="zh-cn" />
+
+<meta property="og:type" content="article">
+<meta name="description" content="邮件功能技术架构与运行逻辑梳理
+1. 文档范围与结论
+本文基于 gtc_admin、gtc_admin_vue、gtcuser 当前源码、Composer/NPM 依赖、邮件相关数据字典和配置进行梳理，重点回答以下问题：
+
+邮件功能使用了哪些技术栈；
+邮件是否使用队列，队列如何分流；
+定时发送、延迟发送和批量发送分别如 …" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:creator" content="">
+<meta name="twitter:title" content="" />
+<meta name="twitter:image" content="https://jianlin-li.github.io/images/thumbnail.png"/>
+<meta property="og:url" content="https://jianlin-li.github.io/gtc/gtc_admin/%E9%82%AE%E4%BB%B6%E5%8A%9F%E8%83%BD%E6%8A%80%E6%9C%AF%E6%9E%B6%E6%9E%84%E4%B8%8E%E8%BF%90%E8%A1%8C%E9%80%BB%E8%BE%91%E6%A2%B3%E7%90%86/" />
+<meta property="og:title" content="" />
+<meta property="og:description" content="邮件功能技术架构与运行逻辑梳理
+1. 文档范围与结论
+本文基于 gtc_admin、gtc_admin_vue、gtcuser 当前源码、Composer/NPM 依赖、邮件相关数据字典和配置进行梳理，重点回答以下问题：
+
+邮件功能使用了哪些技术栈；
+邮件是否使用队列，队列如何分流；
+定时发送、延迟发送和批量发送分别如 …" />
+<meta property="og:image" content="https://jianlin-li.github.io/images/thumbnail.png" />
+
+<link rel="apple-touch-icon" sizes="180x180" href="https://jianlin-li.github.io/icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://jianlin-li.github.io/icons/favicon-32x32.png">
+<link rel="manifest" href="https://jianlin-li.github.io/icons/site.webmanifest">
+
+<link rel="canonical" href="https://jianlin-li.github.io/gtc/gtc_admin/%E9%82%AE%E4%BB%B6%E5%8A%9F%E8%83%BD%E6%8A%80%E6%9C%AF%E6%9E%B6%E6%9E%84%E4%B8%8E%E8%BF%90%E8%A1%8C%E9%80%BB%E8%BE%91%E6%A2%B3%E7%90%86/">
+
+
+
+<link rel="preload" href="https://jianlin-li.github.io/css/styles.dc38388a8f0b890e788bd3a99b7495d14e7d5ac4359ed3b49abeb778497863b284ad4cc7e496ef58c84139295f9bafed82f5a41345eda86bd2d429cccb7c2596.css" integrity = "sha512-3Dg4io8LiQ54i9Opm3SV0U59WsQ1ntO0mr63eEl4Y7KErUzH5JbvWMhBOSlfm6/tgvWkE0XtqGvS1CnMy3wllg==" as="style" crossorigin="anonymous">
+
+
+
+<link rel="preload" href="https://jianlin-li.github.io/zh-cn/js/bundle.e4e0e4fbe8acb50d7f973828f4138cdbea727800047fc93f9abbd6751e8f3422d6ef193f98da36fdb8488219c25692d73da89480f46abc8421a4ee3526dd6c23.js" as="script" integrity=
+"sha512-5ODk&#43;&#43;istQ1/lzgo9BOM2&#43;pyeAAEf8k/mrvWdR6PNCLW7xk/mNo2/bhIghnCVpLXPaiUgPRqvIQhpO41Jt1sIw==" crossorigin="anonymous">
+
+
+<link rel="stylesheet" type="text/css" href="https://jianlin-li.github.io/css/styles.dc38388a8f0b890e788bd3a99b7495d14e7d5ac4359ed3b49abeb778497863b284ad4cc7e496ef58c84139295f9bafed82f5a41345eda86bd2d429cccb7c2596.css" integrity="sha512-3Dg4io8LiQ54i9Opm3SV0U59WsQ1ntO0mr63eEl4Y7KErUzH5JbvWMhBOSlfm6/tgvWkE0XtqGvS1CnMy3wllg==" crossorigin="anonymous">
+
+
+  </head>
+  <body
+    data-code="7"
+    data-lines="true"
+    id="documentTop"
+    data-lang="zh-cn"
+  >
+
+<header class="nav_header" >
+  <nav class="nav"><a href='https://jianlin-li.github.io/' class="nav_brand nav_item" title="李建林个人知识库">
+  <img src="https://jianlin-li.github.io/logos/logo.png" class="logo" alt="李建林个人知识库">
+  <div class="nav_close">
+    <div><svg class="icon">
+  <title>open-menu</title>
+  <use xlink:href="#open-menu"></use>
+</svg>
+<svg class="icon">
+  <title>closeme</title>
+  <use xlink:href="#closeme"></use>
+</svg>
+</div>
+  </div>
+</a>
+
+    <div class='nav_body nav_body_left'>
+      
+      
+      
+        
+
+  <div class="nav_parent">
+    <a href="https://jianlin-li.github.io/" class="nav_item" title="首页">首页 </a>
+  </div>
+  <div class="nav_parent">
+    <a href="https://jianlin-li.github.io/archives/" class="nav_item" title="归档">归档 </a>
+  </div>
+  <div class="nav_parent">
+    <a href="https://jianlin-li.github.io/gtc/" class="nav_item" title="GTC 文档">GTC 文档 </a>
+  </div>
+  <div class="nav_parent">
+    <a href="https://jianlin-li.github.io/categories/" class="nav_item" title="分类">分类 </a>
+  </div>
+  <div class="nav_parent">
+    <a href="https://jianlin-li.github.io/tags/" class="nav_item" title="标签">标签 </a>
+  </div>
+  <div class="nav_parent">
+    <a href="https://jianlin-li.github.io/about/" class="nav_item" title="关于">关于 </a>
+  </div>
+      
+<div class='follow'>
+  <a href="https://github.com/JianLin-Li">
+    <svg class="icon">
+  <title>github</title>
+  <use xlink:href="#github"></use>
+</svg>
+
+  </a>
+  <a href="http://local.gitlab.com">
+    <svg class="icon">
+  <title>gitlab</title>
+  <use xlink:href="#gitlab"></use>
+</svg>
+
+  </a>
+<div class="color_mode">
+  <input type="checkbox" class="color_choice" id="mode">
+</div>
+
+</div>
+
+    </div>
+  </nav>
+</header>
+
+    <main><div class="grid-inverse wrap content">
+  <article class="post_content">
+    <p class="gtc-breadcrumb"><a href="/gtc/">GTC 文档归档</a> / gtc_admin</p>
+    <h1 class="post_title">邮件功能技术架构与运行逻辑梳理</h1>
+    <div class="post_meta gtc-meta">
+      <span class="post_date">
+        2026-10-17
+      </span>
+      <span>项目：gtc_admin</span>
+    </div>
+    
+    <div class="post_body">
+      <h1 id="邮件功能技术架构与运行逻辑梳理">邮件功能技术架构与运行逻辑梳理</h1>
+<h2 id="1-文档范围与结论">1. 文档范围与结论</h2>
+<p>本文基于 <code>gtc_admin</code>、<code>gtc_admin_vue</code>、<code>gtcuser</code> 当前源码、Composer/NPM 依赖、邮件相关数据字典和配置进行梳理，重点回答以下问题：</p>
+<ul>
+<li>邮件功能使用了哪些技术栈；</li>
+<li>邮件是否使用队列，队列如何分流；</li>
+<li>定时发送、延迟发送和批量发送分别如何触发；</li>
+<li>模板、语言、SMTP、日志和失败处理如何串联；</li>
+<li>三个项目在邮件功能中的边界是什么。</li>
+</ul>
+<p>本次只新增分析文档，未修改业务代码，也未输出任何 SMTP 密码、Token、密钥或 <code>.env</code> 敏感值。</p>
+<h3 id="11-核心结论">1.1 核心结论</h3>
+<ol>
+<li>系统存在两套后端邮件实现：
+<ul>
+<li><code>gtc_admin</code>：ThinkPHP 8 + <code>yzh52521/think-mail</code>，底层由后台服务调用 SMTP；异步主要使用 <code>topthink/think-queue</code> 的 Redis 驱动，队列名为 <code>Jobs</code>。</li>
+<li><code>gtcuser</code>：Hyperf 3.1 + Swoole 常驻进程，业务发送主链路由自定义 <code>EmailService</code> 直接构造 Symfony Mailer；投递使用 Hyperf AsyncQueue + Redis，并按通知类型拆分 <code>notify_normal</code>、<code>notify_all</code>、<code>fast</code> 等队列。</li>
+</ul>
+</li>
+<li><code>gtc_admin_vue</code> 只负责邮件配置、模板、批量任务、会员手工发送和日志等管理页面，不直接连接 SMTP，也不执行队列消费或定时任务。</li>
+<li>会员业务通知的推荐主链路是：业务代码构造 <code>EventTrackEvent</code> -&gt; <code>NotificationListener</code> -&gt; <code>SendMemberEmailJob</code> -&gt; <code>EmailService</code> -&gt; SMTP -&gt; <code>mail_log</code>。</li>
+<li>全员通知不是一次 SMTP 群发，而是先写 <code>mail_batch_send</code>，再按会员拆成单会员任务，批量投递到 <code>notify_all</code> 队列。</li>
+<li><code>gtc_admin</code> 的延迟邮件使用 Think Queue 的 <code>Queue::later</code>；<code>gtcuser</code> 支持 AsyncQueue 的 delay，但当前发现的主要业务定时邮件是 Crontab 触发后立即入队，未发现业务代码直接调用 Mailable 的 <code>later()</code>。</li>
+<li><code>gtc_admin</code> 的队列失败持久化配置为 <code>none</code>，多个 Job 在异常后直接删除任务；批量发送代码中 <code>fail_num</code> 的增加条件与变量语义疑似相反，需在生产环境核对。</li>
+<li><code>gtcuser</code> 的邮件任务默认重试次数较少：<code>SendMemberEmailJob</code> 为 <code>maxAttempts=1</code>，<code>NotifyAgentJob</code> 为 2；发送异常通过异常传播交给 AsyncQueue，但失败补偿、死信和幂等策略仍需单独建设。</li>
+</ol>
+<h2 id="2-三项目职责与运行形态">2. 三项目职责与运行形态</h2>
+<table>
+  <thead>
+      <tr>
+          <th>项目</th>
+          <th>运行形态</th>
+          <th>邮件职责</th>
+          <th>是否发送 SMTP</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>gtc_admin</code></td>
+          <td>ThinkPHP 8、PHP 8.0 兼容的 Web/FPM；另有 Think Queue Worker 和历史 Timer/Workerman 代码</td>
+          <td>后台邮件管理、旧业务邮件、后台手工发送、批量任务、跨项目远程通知投递</td>
+          <td>是，<code>InformationService</code> 同步执行时连接 SMTP；默认业务调用通常先入 <code>Jobs</code> 队列</td>
+      </tr>
+      <tr>
+          <td><code>gtcuser</code></td>
+          <td>Hyperf 3.1、Swoole 常驻进程</td>
+          <td>会员事件通知、全员通知、代理通知、密码通知、IB 定时通知、模板渲染和邮件日志</td>
+          <td>是，<code>EmailService</code> 直接使用 Symfony Mailer；SMTP 发送在 AsyncQueue Consumer 中执行</td>
+      </tr>
+      <tr>
+          <td><code>gtc_admin_vue</code></td>
+          <td>Vue 3 + Vite 的 SPA，Ant Design Vue、Axios、TinyMCE</td>
+          <td>管理配置、模板、导入包、批量发送任务、手工发送和日志查询</td>
+          <td>否，只调用后台 HTTP API</td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="21-代码位置索引">2.1 代码位置索引</h3>
+<p><strong><code>gtc_admin</code></strong></p>
+<ul>
+<li>通用发送与旧模板：<code>/Users/lijianlin/www/local/gtc_admin/app/service/InformationService.php</code></li>
+<li>队列 Job：<code>/Users/lijianlin/www/local/gtc_admin/app/jobs/controller/MailJobs.php</code></li>
+<li>模板、批量任务控制器：<code>/Users/lijianlin/www/local/gtc_admin/app/admin/controller/Mail.php</code></li>
+<li>SMTP 配置控制器：<code>/Users/lijianlin/www/local/gtc_admin/app/admin/controller/Mail/MailConfig.php</code></li>
+<li>日志和手工发送：<code>/Users/lijianlin/www/local/gtc_admin/app/admin/controller/Logger.php</code></li>
+<li>队列配置：<code>/Users/lijianlin/www/local/gtc_admin/config/queue.php</code></li>
+</ul>
+<p><strong><code>gtcuser</code></strong></p>
+<ul>
+<li>主邮件服务：<code>/Users/lijianlin/www/local/gtcuser/app/Service/Common/EmailService.php</code></li>
+<li>单会员邮件 Job：<code>/Users/lijianlin/www/local/gtcuser/app/Jobs/EmailSend/SendMemberEmailJob.php</code></li>
+<li>系统级邮件 Job：<code>/Users/lijianlin/www/local/gtcuser/app/Jobs/EmailSend/SendSystemEmailJob.php</code></li>
+<li>代理通知 Job：<code>/Users/lijianlin/www/local/gtcuser/app/Jobs/EmailSend/NotifyAgentJob.php</code></li>
+<li>事件通知编排：<code>/Users/lijianlin/www/local/gtcuser/app/Service/Notification/EmailNotificationEventService.php</code></li>
+<li>事件转邮件队列监听器：<code>/Users/lijianlin/www/local/gtcuser/app/Http/Api/Listeners/NotificationListener.php</code></li>
+<li>队列配置：<code>/Users/lijianlin/www/local/gtcuser/config/autoload/async_queue.php</code></li>
+<li>常驻进程注册：<code>/Users/lijianlin/www/local/gtcuser/config/autoload/processes.php</code></li>
+<li>Crontab 开关：<code>/Users/lijianlin/www/local/gtcuser/config/autoload/crontab.php</code></li>
+</ul>
+<p><strong><code>gtc_admin_vue</code></strong></p>
+<ul>
+<li>新邮件模板管理：<code>/Users/lijianlin/www/local/gtc_admin_vue/src/views/system/newmessagetemplate/index.vue</code></li>
+<li>旧/兼容模板页面：<code>/Users/lijianlin/www/local/gtc_admin_vue/src/views/system/messagemanagement/messagetemplate/index.vue</code></li>
+<li>邮件任务页面：<code>/Users/lijianlin/www/local/gtc_admin_vue/src/views/sendemail/sendemail/index.vue</code></li>
+<li>会员手工发送组件：<code>/Users/lijianlin/www/local/gtc_admin_vue/src/components/member/sendemail.vue</code></li>
+<li>模板 API：<code>/Users/lijianlin/www/local/gtc_admin_vue/src/api/system/messagemanagement/messagetemplate/index.js</code></li>
+<li>SMTP 配置 API：<code>/Users/lijianlin/www/local/gtc_admin_vue/src/api/system/emailservice/sendService.js</code></li>
+<li>批量任务 API：<code>/Users/lijianlin/www/local/gtc_admin_vue/src/api/sendemail/index.js</code></li>
+</ul>
+<h2 id="3-技术栈与配置体系">3. 技术栈与配置体系</h2>
+<h3 id="31-gtc_admin-技术栈">3.1 <code>gtc_admin</code> 技术栈</h3>
+<p><code>composer.json</code> 声明：</p>
+<ul>
+<li>PHP <code>&gt;=8.0.0</code>；</li>
+<li>ThinkPHP <code>^8.0</code>、Think ORM；</li>
+<li><code>yzh52521/think-mail ^3.2</code>；</li>
+<li><code>topthink/think-queue ^3.0</code>；</li>
+<li>Redis Queue 连接；</li>
+<li>本地 <code>ykd/framework</code> 扩展。</li>
+</ul>
+<p>邮件基础配置文件为 <code>config/mailer.php</code>，而 <code>InformationService</code> 构造时会按照 <code>server_id</code> 从 <code>config_server</code> 读取 SMTP 主机、账号、密码、端口和发件人名称，然后动态覆盖 <code>mailer</code> 配置。因此，旧业务链路的实际配置来源主要是 <code>config_server</code>，不能只看静态 <code>config/mailer.php</code> 判断线上配置。</p>
+<p>队列配置文件 <code>config/queue.php</code>：</p>
+<ul>
+<li>默认驱动为 Redis；</li>
+<li>Redis 队列默认名为 <code>default</code>；</li>
+<li>邮件 Job 在代码中显式使用 <code>Jobs</code> 队列名；</li>
+<li><code>failed.type=none</code>，没有可靠的失败任务持久化表。</li>
+</ul>
+<h3 id="32-gtcuser-技术栈">3.2 <code>gtcuser</code> 技术栈</h3>
+<p><code>composer.json</code> 声明：</p>
+<ul>
+<li>PHP <code>&gt;=8.1</code>；</li>
+<li>Hyperf <code>3.1.*</code>、Swoole <code>&gt;=5.0</code>；</li>
+<li><code>hyperf/async-queue 3.1.*</code>、<code>hyperf/crontab ^3.1</code>、<code>hyperf/event 3.1.*</code>；</li>
+<li><code>hyperf-ext/mail</code> 本地包 <code>packages/mail-master</code>；</li>
+<li>Symfony Mailer 由本地邮件包依赖和业务代码直接使用。</li>
+</ul>
+<p><code>config/autoload/mail.php</code> 支持 SMTP、AWS SES、Mandrill、Mailgun、Postmark、sendmail 和 log transport；全局配置由 <code>MAIL_MAILER</code>、<code>MAIL_SMTP_DSN</code>、<code>MAIL_FROM_ADDRESS</code>、<code>MAIL_FROM_NAME</code> 等环境变量提供。需要区分两条实现：</p>
+<ol>
+<li>本地 <code>hyperf-ext/mail</code> 提供 Laravel 风格的 Mailable/F facade，并支持 <code>ShouldQueue</code>、<code>queue()</code>、<code>later()</code>；</li>
+<li>当前核心业务使用的 <code>App\Service\Common\EmailService</code> 绕过该 Facade，直接通过 <code>Transport::fromDsn()</code>、<code>Symfony\Component\Mailer\Mailer</code>、<code>Email</code> 发送，并自行写日志。</li>
+</ol>
+<p>AsyncQueue 配置为 RedisDriver。邮件相关队列主要有：</p>
+<table>
+  <thead>
+      <tr>
+          <th>队列</th>
+          <th>典型用途</th>
+          <th>当前配置特征</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>notify_normal</code></td>
+          <td>普通业务通知、密码通知、代理通知、IB 通知</td>
+          <td>5 个进程、并发上限 10、消费超时 10 秒</td>
+      </tr>
+      <tr>
+          <td><code>notify_all</code></td>
+          <td>全员通知逐会员投递</td>
+          <td>3 个进程、并发上限 5、消费超时 10 秒</td>
+      </tr>
+      <tr>
+          <td><code>fast</code></td>
+          <td>快速通知；部分验证码/首笔入金通知</td>
+          <td>5 个进程、并发上限 10、消费超时 10 秒</td>
+      </tr>
+      <tr>
+          <td><code>default</code></td>
+          <td>其他耗时任务</td>
+          <td>不是邮件专用队列</td>
+      </tr>
+  </tbody>
+</table>
+<p><code>config/autoload/processes.php</code> 注册 <code>ConsumerProcess</code>，所以队列消费者是 Hyperf 常驻进程的一部分；<code>CrontabDispatcherProcess</code> 同时负责扫描 Attribute 定义的定时任务。</p>
+<h3 id="33-gtc_admin_vue-技术栈">3.3 <code>gtc_admin_vue</code> 技术栈</h3>
+<p>前端为 Vue 3 + Vite，主要依赖 Vue Router、Pinia、Axios、Ant Design Vue、TinyMCE、XLSX/JSZip。邮件页面只封装 HTTP API，例如：</p>
+<ul>
+<li><code>/admin/Mail.MailConfig/*</code>：SMTP 配置列表、增改删、启停、连接测试；</li>
+<li><code>/admin/mail/*</code>：模板、批量任务、批量发送、批次详情；</li>
+<li><code>/admin/Mail.TemplateImport/*</code>：模板 ZIP 预览、确认、导入记录；</li>
+<li><code>/admin/Logger/mail</code> 或兼容日志接口：邮件发送日志；</li>
+<li><code>/admin/Member/sendMail</code>：会员详情页手工发送。</li>
+</ul>
+<h2 id="4-数据模型">4. 数据模型</h2>
+<h3 id="41-gtc_admin-数据表">4.1 <code>gtc_admin</code> 数据表</h3>
+<p>表定义位于 <code>gtc_admin/docs/数据字典.sql</code>：</p>
+<table>
+  <thead>
+      <tr>
+          <th>表</th>
+          <th>作用</th>
+          <th>关键字段/状态</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>t_mail_config</code></td>
+          <td>新邮件配置表</td>
+          <td><code>type</code>：<code>verification_code</code>、<code>system_notification</code>、<code>marketing</code>、<code>all</code>；<code>status</code>：1 启用、0 停用、-1 删除；<code>is_default</code> 默认配置</td>
+      </tr>
+      <tr>
+          <td><code>t_mail_template</code></td>
+          <td>模板主表</td>
+          <td><code>name</code>、<code>title</code>、<code>content</code>、<code>type</code>、<code>mail_config_type</code>、<code>is_must_open</code>；<code>status</code>：0 禁用、1 启用、-1 删除</td>
+      </tr>
+      <tr>
+          <td><code>t_mail_template_lang</code></td>
+          <td>模板语言内容</td>
+          <td><code>(template_id, lang)</code> 唯一；<code>default</code> 作为默认语言</td>
+      </tr>
+      <tr>
+          <td><code>t_mail_log</code></td>
+          <td>发送日志</td>
+          <td>收件人、发件人、模板、正文、<code>server_id</code>、<code>status</code>、<code>error_info</code></td>
+      </tr>
+      <tr>
+          <td><code>t_mail_batch_send</code></td>
+          <td>批量发送主任务</td>
+          <td><code>status</code>：0 待推送、1 推送完成、2 推送失败、3 手动中断；<code>send_num</code>、<code>fail_num</code></td>
+      </tr>
+      <tr>
+          <td><code>t_mail_batch_send_user</code></td>
+          <td>批次的会员明细</td>
+          <td><code>batch_id</code>、<code>member_id</code>、<code>email</code>、<code>send_time</code>、<code>status</code></td>
+      </tr>
+      <tr>
+          <td><code>t_mail_template_import_batch</code></td>
+          <td>模板导入批次</td>
+          <td>0 待确认、1 已导入、2 失败</td>
+      </tr>
+      <tr>
+          <td><code>t_mail_template_import_detail</code></td>
+          <td>导入逐行明细</td>
+          <td>新增/覆盖动作、语言 JSON、变量 JSON、错误 JSON</td>
+      </tr>
+  </tbody>
+</table>
+<p>邮件日志所在数据库连接由后台日志控制器决定，当前 <code>Logger::mail()</code> 从 <code>database.bigdata</code> 连接读取 <code>t_mail_log</code>，不是简单地默认读取业务主库。</p>
+<h3 id="42-gtcuser-数据模型">4.2 <code>gtcuser</code> 数据模型</h3>
+<p><code>gtcuser</code> 的模型使用无前缀表名，例如 <code>mail_template</code>、<code>mail_template_lang</code>、<code>mail_log</code>、<code>mail_batch_send</code>；实际物理表名和前缀由数据库连接配置决定。主要模型为：</p>
+<ul>
+<li><code>App\Model\crm\MailTemplate</code>：启用状态的模板主记录；</li>
+<li><code>App\Model\MailTemplateLang</code>：多语言标题和正文；</li>
+<li><code>App\Model\MailBatchSend</code>：全员通知/批量通知任务和状态；</li>
+<li><code>App\Model\crm\MailLog</code>、<code>MailLogRepository</code>：成功和失败日志；</li>
+<li><code>MailConfigRepository</code>：按模板 <code>mail_config_type</code> 和权重选取邮件配置。</li>
+</ul>
+<p>两个后端项目都出现邮件模板、批次和日志模型，实际部署时应确认它们是否共享同一 CRM 数据库、是否由数据库前缀映射到同一物理表，以及哪个项目负责写入哪类记录。</p>
+<h2 id="5-gtc_admin-邮件功能逻辑">5. <code>gtc_admin</code> 邮件功能逻辑</h2>
+<h3 id="51-通用发送入口">5.1 通用发送入口</h3>
+<p><code>app/service/InformationService.php::send()</code> 接受收件人、主题、HTML 正文、SMTP 元数据和 <code>$queue</code> 开关：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">queue=true  -&gt; Queue::push(MailJobs@send, ..., &#39;Jobs&#39;) -&gt; MailJobs::send -&gt; send(..., false)
+</span></span><span class="line"><span class="ln">2</span><span class="cl">queue=false -&gt; 直接调用 yzh52521/think-mail 的 Mailer facade -&gt; SMTP -&gt; 写 t_mail_log
+</span></span></code></pre></div><p>队列模式只表示“发送请求已入队”，不会在当前 HTTP 请求内确认 SMTP 已成功。同步模式会：</p>
+<ol>
+<li>校验收件人；</li>
+<li>解码 HTML entity；</li>
+<li>调用 Mailer Facade 发送；</li>
+<li>写入 <code>t_mail_log</code>，成功 <code>status=1</code>，失败 <code>status=0</code> 并记录 <code>error_info</code>；</li>
+<li>返回发送结果。</li>
+</ol>
+<p><code>sendMailByTemplate()</code> 的流程为：</p>
+<ol>
+<li>根据会员 ID 或邮箱定位会员；</li>
+<li><code>getUserLang()</code> 从启用模板和语言表中选出语言内容，找不到指定语言时回退默认模板；</li>
+<li><code>replace_variable()</code> 使用 <code>$variable</code> 形式的占位符进行字符串替换；</li>
+<li>生成 SMTP 日志元数据，例如模板名、业务表名、业务 ID、服务器 ID；</li>
+<li>调用 <code>send()</code>，默认仍为队列模式。</li>
+</ol>
+<h3 id="52-模板与语言">5.2 模板与语言</h3>
+<p>后台模板控制器 <code>app/admin/controller/Mail.php</code> 提供模板列表、新增、编辑、删除、启用/停用和详情；支持验证码、系统通知、营销等推送类型。<code>is_must_open=1</code> 的模板不能被停用。</p>
+<p>模板导入由 <code>MailTemplateImportService</code>、<code>MailTemplateImportParser</code> 和 <code>TemplateImport</code> 控制器完成：</p>
+<ol>
+<li>上传 ZIP；</li>
+<li>读取 <code>templates.xlsx</code> 和对应 HTML 文件；</li>
+<li>预览并生成导入批次、逐行明细；</li>
+<li>确认后新增或覆盖主模板及 <code>t_mail_template_lang</code> 内容；</li>
+<li>在导入记录中保留新增、覆盖、缺语言和错误信息。</li>
+</ol>
+<h3 id="53-smtp-配置选择">5.3 SMTP 配置选择</h3>
+<p>后台 <code>MailConfig</code> 控制器维护 <code>t_mail_config</code>，允许按验证码、系统通知、营销和全部类型配置 SMTP，并限制只能有一个默认 <code>all</code> 配置。<code>testConnection()</code> 用原生 socket 测试主机和端口，465 端口按 SSL 连接，其他端口按普通 TCP 连接测试。</p>
+<p>需要注意配置存在两个来源：</p>
+<ul>
+<li>旧 <code>InformationService</code> 的发送实现主要从 <code>config_server</code> 读取按 <code>server_id</code> 的 SMTP 参数；</li>
+<li>新 <code>t_mail_config</code> 的类型化配置主要由新模板/邮件服务体系使用，<code>gtcuser::EmailService</code> 会根据模板 <code>mail_config_type</code> 通过 <code>MailConfigRepository</code> 选择配置。</li>
+</ul>
+<p>这意味着新增或修改配置时必须确认调用方使用的是哪一条链路，不能假定所有邮件都读取 <code>t_mail_config</code>。</p>
+<h3 id="54-普通业务邮件">5.4 普通业务邮件</h3>
+<p><code>gtc_admin</code> 中有大量旧式直接调用，典型场景包括：</p>
+<ul>
+<li>注册激活、注册成功、忘记密码；</li>
+<li>登录验证码、修改登录/资金密码、提现验证码、Google 验证码；</li>
+<li>入金成功/驳回、出金、KYC 审核、MT 开户；</li>
+<li>跟单、活动、课程、文章、工单和代理相关通知。</li>
+</ul>
+<p>这些调用大致分为两种：</p>
+<ol>
+<li>直接 <code>new InformationService(...)-&gt;sendMailByTemplate(...)</code>，默认进入 <code>Jobs</code> 队列；</li>
+<li>调用 <code>remoteOption('option/memberAuditNotify', $data)</code>，由 <code>gtc_admin</code> 通过跨项目接口把通知转给 <code>gtcuser</code>。</li>
+</ol>
+<p>后台审核类、课程类和活动类代码中同时存在这两种方式，必须以具体调用点为准。</p>
+<h3 id="55-批量邮件">5.5 批量邮件</h3>
+<p>后台页面 <code>sendemail/sendemail/index.vue</code> 调用：</p>
+<ul>
+<li><code>POST /admin/mail/batch_add</code> 创建批次；</li>
+<li><code>POST /admin/mail/batch_send</code> 推送批次；</li>
+<li><code>POST /admin/mail/batch_info</code> 查看会员级明细；</li>
+<li><code>POST /admin/mail/batch_delete</code> 删除尚未推送的批次。</li>
+</ul>
+<p><code>batch_add</code> 支持全部客户、标签客户、指定客户和国家客户等筛选条件。<code>batch_send</code> 先查询收件人并把主批次从状态 0 改为状态 1，再为每个会员构造 Job：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">Mail::batch_send
+</span></span><span class="line"><span class="ln">2</span><span class="cl">  -&gt; 逐会员 Queue::push(MailJobs@fire, ..., &#39;Jobs&#39;)
+</span></span><span class="line"><span class="ln">3</span><span class="cl">  -&gt; MailJobs::fire
+</span></span><span class="line"><span class="ln">4</span><span class="cl">  -&gt; InformationService::send(..., queue=false)
+</span></span><span class="line"><span class="ln">5</span><span class="cl">  -&gt; SMTP
+</span></span><span class="line"><span class="ln">6</span><span class="cl">  -&gt; t_mail_batch_send_user + t_mail_log
+</span></span></code></pre></div><p><code>MailJobs::fire</code> 会增加 <code>send_num</code> 并写入会员明细；源码中 <code>if ($res === true) { fail_num+1 }</code> 与 <code>status=$res===true?1:0</code> 同时存在，前者看起来把成功结果记成失败数量，需核对 <code>InformationService::send()</code> 的真实返回约定后修正统计口径。</p>
+<h3 id="56-手工发送与日志">5.6 手工发送与日志</h3>
+<p>会员详情页的 <code>src/components/member/sendemail.vue</code> 调用后台 <code>/admin/Member/sendMail</code>。<code>Logger::sendMail()</code> 当前调用 <code>InformationService::send()</code> 时没有传 <code>$queue=false</code>，所以后台手工发送也会先进入 <code>Jobs</code> 队列，接口返回的是“已提交/已入队”语义，不能等同于 SMTP 已投递。</p>
+<p><code>Logger::mail()</code> 支持按邮箱和会员 ID 查询邮件日志，分页返回，并对验证码、密码和邮箱做脱敏。日志可用于判断 SMTP 阶段是否执行，但不能单独证明收件方已阅读邮件。</p>
+<h3 id="57-gtc_admin-job-行为">5.7 <code>gtc_admin</code> Job 行为</h3>
+<p><code>app/jobs/controller/MailJobs.php</code> 有三个入口：</p>
+<ul>
+<li><code>fire()</code>：批量逐会员发送，同步调用 Mailer，更新批次和批次明细；</li>
+<li><code>send()</code>：普通邮件，同步调用 Mailer，异常时打印并删除 Job；</li>
+<li><code>sendOfRemote()</code>：调用 <code>remoteOption('option/memberAuditNotify', $data)</code>，最多检查两次尝试后删除。</li>
+</ul>
+<p>大多数异常分支直接 <code>$job-&gt;delete()</code>，<code>failed()</code> 只保留调试输出，且 <code>config/queue.php</code> 的 failed driver 为 <code>none</code>。因此当前链路没有可靠的死信表、自动补偿或人工重放机制。</p>
+<h2 id="6-gtcuser-邮件功能逻辑">6. <code>gtcuser</code> 邮件功能逻辑</h2>
+<h3 id="61-主发送服务">6.1 主发送服务</h3>
+<p><code>App\Service\Common\EmailService::send()</code> 的流程如下：</p>
+<ol>
+<li>收件地址为空时直接记录警告并返回；</li>
+<li>未指定 <code>serverId</code> 时使用默认 MT Server；</li>
+<li>标准化模板语言代码，例如 <code>zhCn -&gt; cn</code>、<code>zhTw -&gt; tw</code>、<code>india -&gt; in</code>；</li>
+<li>查询启用的 <code>mail_template</code>；</li>
+<li>优先使用指定语言的 <code>mail_template_lang</code>，没有有效内容时回退 <code>default</code>；</li>
+<li>根据模板的 <code>mail_config_type</code> 和配置权重选择 SMTP，找不到时回退 <code>all</code>，再回退按服务器读取的旧配置；</li>
+<li>注入 <code>webname</code>、收件邮箱等通用变量；</li>
+<li>用 <code>$key</code> 形式替换模板标题和 HTML 正文；</li>
+<li>对 <code>user_reset_mt4_pwd</code> 等历史模板执行 HTML entity 兼容解码；</li>
+<li>对日志变量和正文中的密码字段做脱敏；</li>
+<li>构造 Symfony <code>Transport</code>、<code>Mailer</code> 和 <code>Email</code>，设置发件人、收件人、标题和正文；</li>
+<li>成功写 <code>mail_log.status=1</code>，异常写 <code>status=0</code> 和截断的错误信息，并重新抛出异常。</li>
+</ol>
+<p><code>createTransport()</code> 对 SMTP socket 设置 8 秒超时，避免常驻 Worker 因连接长期阻塞。源码中 <code>executeSend()</code> 的日志 <code>server_id</code> 从邮件配置数组读取，而邮件配置选择前同时保留了 SMTP <code>server_id</code> 元数据，当前字段映射需要继续核对，存在日志服务器 ID 为空的风险。</p>
+<h3 id="62-事件通知主链路">6.2 事件通知主链路</h3>
+<p>大部分会员通知由 <code>EmailNotificationEventService</code> 构造 <code>EventTrackEvent</code>，事件由 <code>NotificationListener</code> 接收。监听器校验 <code>member_id</code>、<code>templateDataMap</code> 后创建 <code>SendMemberEmailJob</code>，再投递到 <code>notify_normal</code>：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln"> 1</span><span class="cl">注册/登录/KYC/资金/MT/跟单等业务
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl">  -&gt; EmailNotificationEventService::commonNotification()
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl">  -&gt; dispatchEvent(EventTrackEvent)
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl">  -&gt; NotificationListener::process()/execute()
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl">  -&gt; AgentEmailIsolationService 入队前过滤
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">  -&gt; pushQueue(SendMemberEmailJob, 0, notify_normal)
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl">  -&gt; ConsumerProcess
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl">  -&gt; SendMemberEmailJob::handle()
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">  -&gt; 发送前再次检查隔离状态
+</span></span><span class="line"><span class="ln">10</span><span class="cl">  -&gt; 查询会员、邮箱和语言偏好
+</span></span><span class="line"><span class="ln">11</span><span class="cl">  -&gt; EmailService::send()
+</span></span><span class="line"><span class="ln">12</span><span class="cl">  -&gt; Symfony Mailer -&gt; SMTP -&gt; mail_log
+</span></span></code></pre></div><p>会员 Job 在执行时重新查询会员，因此邮箱、国家、首选邮件语言和代理隔离模式均可能以执行时的最新状态为准。不存在会员或邮箱时，若 Job 未显式设置备用邮箱，则跳过发送。</p>
+<p><code>AgentEmailIsolationService</code> 在入队前和发送前各检查一次，用于避免代理应用模式变化后仍发送被隔离的代理类邮件。</p>
+<h3 id="63-全员通知">6.3 全员通知</h3>
+<p><code>approvedNotification()</code> 对公告、直播、课程发布、活动和直播即将开始等枚举走全员通知：</p>
+<ol>
+<li>查询启用会员数量；</li>
+<li>写入 <code>mail_batch_send</code>，记录标题、事件值、人数和开始时间；</li>
+<li>获取 <code>notify_all</code> Driver；</li>
+<li>以 5000 条为查询块，逐会员创建 <code>SendMemberEmailJob</code>，通过 <code>mailTaskId</code> 关联批次；</li>
+<li>Job 执行时从 <code>mail_batch_send.event_value</code> 重新确定模板名，若批次状态为 3 则跳过；</li>
+<li>全部 Job 推送完成后将批次状态写为 1，异常写为 2。</li>
+</ol>
+<p>开发环境和本地环境对全员发送限制为固定会员 ID 列表，避免测试环境误发全量客户。</p>
+<p>这里的批次状态“1”表示推送任务已完成，不表示每封邮件 SMTP 均成功；单封成功/失败仍应以 <code>mail_log</code> 为准。<code>mail_batch_send</code> 当前没有与每个 AsyncQueue Job 的最终结果自动回写的完整闭环，运维统计时需要同时查看批次和日志。</p>
+<h3 id="64-代理通知">6.4 代理通知</h3>
+<p>代理设置相关场景通过 <code>pushNotifyAgentJob()</code> 投递 <code>NotifyAgentJob</code> 到 <code>notify_normal</code>。Job 执行时：</p>
+<ol>
+<li>查询下级会员是否已配置规则；</li>
+<li>查询其上级代理和邮箱；</li>
+<li>再次执行代理邮件隔离检查；</li>
+<li>向上级代理发送 <code>SetRuleSuperiorAgent</code> 模板；</li>
+<li>向客服配置中的 <code>NOTIFY_EMAIL</code> 地址发送客服模板。</li>
+</ol>
+<p><code>NotifyAgentJob::$maxAttempts=2</code>，但客服地址是循环发送，部分成功/部分失败时没有独立的每个客服收件人的状态表。</p>
+<h3 id="65-后台密码通知和验证码">6.5 后台密码通知和验证码</h3>
+<ul>
+<li><code>AdminMtPasswordEmailService</code> 创建 <code>SendMemberEmailJob</code>，模板为 <code>user_reset_mt4_pwd</code>，投递 <code>notify_normal</code>；</li>
+<li>登录密码重置、MT 密码重置会把密码作为 Job 数据传递，但 <code>EmailService</code> 会对日志变量和正文做密码脱敏；</li>
+<li>邮箱验证码任务由 <code>TMemberService</code> 构造 Job，可指定新邮箱和无会员时的回退语言；</li>
+<li>首笔入金通知的部分路径使用 <code>fast</code> 队列，以降低验证码/关键通知等待时间。</li>
+</ul>
+<h3 id="66-远程通知入口">6.6 远程通知入口</h3>
+<p><code>gtc_admin</code> 的课程、文章、活动、审核等部分代码调用 <code>remoteOption('option/memberAuditNotify', $data)</code>；<code>gtc_admin</code> 也会把这个调用放入 <code>MailJobs::sendOfRemote</code> 延迟 Job 中。该接口将事件数据交给 <code>gtcuser</code> 的远程业务入口，再由 <code>EmailNotificationEventService</code> 或相应通知服务转成邮件 Job。</p>
+<p>因此，看到 <code>gtc_admin</code> 代码没有直接 SMTP 调用并不代表没有邮件发送；需要继续沿 <code>remoteOption</code> 的接口路由、HTTP 客户端和 <code>gtcuser</code> 接收端核对实际部署地址与认证配置。</p>
+<h3 id="67-历史备用实现">6.7 历史/备用实现</h3>
+<p>以下代码存在，但当前主业务是否仍使用需要通过调用关系和部署版本确认：</p>
+<ul>
+<li><code>app/Repository/Remote/EmailRepository.php::_sendEmail()</code> 标记了 <code>#[AsyncQueueMessage(pool: 'fast')]</code>，直接使用 Symfony Mailer 并写 <code>MailLogRepository</code>；它与 <code>EmailService</code> 的发送逻辑重复，疑似遗留或特定远程场景实现；</li>
+<li><code>SendSystemEmailJob</code> 已定义 <code>maxAttempts=2</code>，但 <code>handle()</code> 的实际发送代码整体注释，当前不能视为可用系统级邮件入口；</li>
+<li><code>packages/mail-master</code> 的 <code>Mailable</code> 支持 <code>ShouldQueue</code>、<code>queue()</code> 和 <code>later()</code>，但当前发现的业务邮件主要使用自定义 <code>SendMemberEmailJob</code>，不应把框架能力误写成业务已经使用。</li>
+</ul>
+<h2 id="7-队列使用与定时延迟发送">7. 队列使用与定时/延迟发送</h2>
+<h3 id="71-队列总表">7.1 队列总表</h3>
+<table>
+  <thead>
+      <tr>
+          <th>项目</th>
+          <th>队列组件</th>
+          <th>Redis</th>
+          <th>邮件队列</th>
+          <th>消费形态</th>
+          <th>失败持久化</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>gtc_admin</code></td>
+          <td>Think Queue 3</td>
+          <td>是</td>
+          <td><code>Jobs</code>（代码显式传入）</td>
+          <td>独立 Queue Worker</td>
+          <td><code>failed=none</code>，无可靠 failed 表</td>
+      </tr>
+      <tr>
+          <td><code>gtcuser</code></td>
+          <td>Hyperf AsyncQueue 3.1</td>
+          <td>是</td>
+          <td><code>notify_normal</code>、<code>notify_all</code>、<code>fast</code></td>
+          <td>Swoole 常驻 <code>ConsumerProcess</code></td>
+          <td>依赖 Driver 重试与 Job <code>maxAttempts</code>，未见完整死信/补偿闭环</td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="72-gtc_admin-延迟发送">7.2 <code>gtc_admin</code> 延迟发送</h3>
+<h4 id="课程直播提醒">课程直播提醒</h4>
+<p><code>app/admin/controller/Course/ZoomMeeting.php::scheduleLiveReminder()</code> 根据直播开始时间和提前量计算 delay：</p>
+<ul>
+<li><code>delay &gt; 0</code>：<code>Queue::later(delay, MailJobs@sendOfRemote, ..., 'Jobs')</code>；</li>
+<li>已过提醒点但直播尚未开始：立即 <code>Queue::push</code>；</li>
+<li>直播已经开始：不再发送。</li>
+</ul>
+<p>课程通常会分别安排提前 1 小时和 24 小时的通知，最终通过 <code>sendOfRemote</code> 将通知交给远程 <code>gtcuser</code>。</p>
+<h4 id="代理审核后的延迟提醒">代理审核后的延迟提醒</h4>
+<p><code>app/admin/controller/Agent.php</code> 中安排了 24 小时和 48 小时的 <code>Queue::later</code>，数据类型为 <code>set_rule_superior_agent</code>，最终也进入 <code>sendOfRemote</code>。该逻辑需要结合接收端幂等和业务状态判断，避免重复提醒。</p>
+<h4 id="跟单过期检查">跟单过期检查</h4>
+<p><code>app/admin/controller/Timer.php::check_follow_exprie()</code> 扫描过期跟单配置并调用 <code>sendMailByTemplate()</code>。由于该方法默认 <code>$queue=true</code>，Timer 只负责发现到期记录，实际 SMTP 仍由 <code>Jobs</code> 队列完成。Timer 本身更像被外部计划任务或白名单 CLI 调用的控制器入口，不是 ThinkPHP Queue 的定时调度器。</p>
+<h3 id="73-gtcuser-crontab-定时邮件">7.3 <code>gtcuser</code> Crontab 定时邮件</h3>
+<p>Hyperf 的 Crontab 总开关在 <code>config/autoload/crontab.php</code>，具体任务通过 <code>#[Crontab]</code> Attribute 注册，并由 <code>CrontabDispatcherProcess</code> 调度。邮件相关任务包括：</p>
+<table>
+  <thead>
+      <tr>
+          <th>任务</th>
+          <th>Cron</th>
+          <th>实际动作</th>
+          <th>邮件队列</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>app/Task/MailTask/IbSignTask.php</code></td>
+          <td><code>0 12 * * *</code></td>
+          <td>调用 <code>IbService::unSignIbEmail()</code>，按 500 条块扫描未签署 IB 协议的客户并创建通知 Job</td>
+          <td><code>notify_normal</code></td>
+      </tr>
+      <tr>
+          <td><code>app/Task/MailTask/IbCommissionTask.php</code></td>
+          <td><code>0 12 * * *</code></td>
+          <td>调用 <code>IbService::unCommissionIbEmail()</code>，找出未配置佣金规则的代理及其上级并创建通知 Job</td>
+          <td><code>notify_normal</code></td>
+      </tr>
+      <tr>
+          <td><code>app/Task/InvestorReportTask.php</code></td>
+          <td><code>20 0 * * *</code></td>
+          <td>主要计算投资者日报；当前源码未见直接发送邮件，不能归类为邮件发送任务</td>
+          <td>不适用</td>
+      </tr>
+      <tr>
+          <td><code>app/Task/CommonOptTask.php</code></td>
+          <td>每 60 秒</td>
+          <td>公共定时操作；是否间接触发邮件需按其具体分支和运行配置确认</td>
+          <td>视分支而定</td>
+      </tr>
+  </tbody>
+</table>
+<p><code>IbSignTask</code> 和 <code>IbCommissionTask</code> 的 <code>isEnable()</code> 依赖 <code>BASE_CRONTAB</code>；许多其他 Task 使用 <code>TaskTrait::isEnable()</code>，依赖 <code>APP_RUN_TASK</code>。当前 <code>.env</code>、<code>.env.test</code>、<code>.env.staging</code> 的开关值并不完全一致，生产是否真正执行必须以部署环境变量和进程启动参数为准。</p>
+<h3 id="74-延迟队列能力与实际使用边界">7.4 延迟队列能力与实际使用边界</h3>
+<p><code>gtcuser</code> 的 <code>pushQueue($job, $delay, $queue)</code> 支持传入延迟秒数；<code>EmailNotificationEventService::pushNotifyAgentJob()</code> 已保留 <code>$delay</code> 参数，具备延迟投递能力。框架邮件包的 <code>Mailable::later()</code> 也会把任务连同 delay 推入 AsyncQueue。</p>
+<p>当前已确认的业务延迟主要来自：</p>
+<ul>
+<li><code>gtc_admin</code> 的 <code>Queue::later</code> 课程/代理提醒；</li>
+<li><code>gtcuser</code> 的定时任务触发后立即投递通知 Job；</li>
+<li>个别服务通过 <code>pushQueue</code> 传入 delay。</li>
+</ul>
+<p>应以实际调用点为准，不能因为框架支持 <code>later()</code> 就推断所有模板邮件都按定时发送执行。</p>
+<h2 id="8-模板语言和变量渲染">8. 模板、语言和变量渲染</h2>
+<h3 id="81-模板选择">8.1 模板选择</h3>
+<p>两套后端都采用“模板主表 + 模板语言表”：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">template name/code
+</span></span><span class="line"><span class="ln">2</span><span class="cl">  -&gt; 主模板 status=1
+</span></span><span class="line"><span class="ln">3</span><span class="cl">  -&gt; 指定语言 mail_template_lang
+</span></span><span class="line"><span class="ln">4</span><span class="cl">  -&gt; 无内容时回退 default
+</span></span><span class="line"><span class="ln">5</span><span class="cl">  -&gt; 替换 $variable
+</span></span><span class="line"><span class="ln">6</span><span class="cl">  -&gt; 生成 HTML Subject/Body
+</span></span></code></pre></div><p><code>gtc_admin</code> 的旧逻辑通常先根据会员国家/语言调用 <code>getUserLang()</code>；<code>gtcuser</code> 的新逻辑在 Job 执行时调用 <code>translateDataMap()</code>，优先会员的邮件语言设置，其次按国家语言，最后回退英文/default。</p>
+<h3 id="82-变量与翻译">8.2 变量与翻译</h3>
+<p><code>gtcuser</code> 的 <code>translateDataMap()</code> 支持：</p>
+<ul>
+<li><code>['is_trans' =&gt; true, 'key' =&gt; '...']</code> 形式的业务翻译变量；</li>
+<li>对严格匹配的 <code>Y-m-d H:i:s</code> 时间追加服务器 UTC 偏移提示；</li>
+<li>注入会员 <code>username</code>、<code>nickname</code>、<code>realname</code> 等变量；</li>
+<li>对密码、只读密码、资金密码等日志变量替换为 <code>******</code>。</li>
+</ul>
+<p><code>gtc_admin</code> 的 <code>replace_variable()</code> 主要是简单字符串替换，业务代码通常先自行组装国家、时间、金额和链接等变量。</p>
+<h2 id="9-日志状态失败与幂等">9. 日志、状态、失败与幂等</h2>
+<h3 id="91-日志">9.1 日志</h3>
+<ul>
+<li><code>gtc_admin</code>：同步发送或 Queue Job 内部写 <code>t_mail_log</code>；后台日志接口分页查询并脱敏。</li>
+<li><code>gtcuser</code>：<code>EmailService::executeSend()</code> 成功/失败均通过 <code>MailLogRepository</code> 写 <code>mail_log</code>，同时写 <code>EmailService</code>、<code>email-send</code>、<code>email-notify</code> 等应用日志。</li>
+<li>日志记录的是 SMTP 客户端执行结果，通常不能证明远端邮箱服务商最终投递或用户打开。</li>
+</ul>
+<h3 id="92-失败处理">9.2 失败处理</h3>
+<p><strong><code>gtc_admin</code></strong></p>
+<ul>
+<li>队列配置未启用 failed job 存储；</li>
+<li><code>MailJobs::send()</code> 和 <code>fire()</code> 异常后直接删除 Job；</li>
+<li><code>sendOfRemote()</code> 最多尝试后删除；</li>
+<li><code>failed()</code> 没有业务补偿；</li>
+<li>批量明细会记录 0/1 状态，但统计条件疑似有误。</li>
+</ul>
+<p><strong><code>gtcuser</code></strong></p>
+<ul>
+<li><code>SendMemberEmailJob</code> 的 <code>maxAttempts=1</code>，发送异常会抛出；</li>
+<li><code>NotifyAgentJob</code> 的 <code>maxAttempts=2</code>；</li>
+<li><code>EmailService</code> 写失败日志后重新抛异常，让 AsyncQueue 决定重试；</li>
+<li>全员任务的“推送完成”只表示子 Job 已写入队列，不代表所有 SMTP 调用成功；</li>
+<li>未发现邮件专用死信表、失败重放命令和统一幂等键。</li>
+</ul>
+<h3 id="93-幂等风险">9.3 幂等风险</h3>
+<p>以下情况可能造成重复邮件或状态不一致：</p>
+<ul>
+<li>同一业务事件重复 dispatch；</li>
+<li><code>gtc_admin</code> 的 24/48 小时延迟 Job 与业务重试同时存在；</li>
+<li>AsyncQueue 重试发生在 SMTP 已接受但应用未及时收到响应之后；</li>
+<li>全员批次只记录任务级状态，单会员 Job 缺少业务事件唯一键；</li>
+<li><code>NotifyAgentJob</code> 的 <code>uniqueId</code> 只保证序列化字段唯一，不等于数据库幂等约束。</li>
+</ul>
+<h2 id="10-典型场景矩阵">10. 典型场景矩阵</h2>
+<table>
+  <thead>
+      <tr>
+          <th>场景</th>
+          <th>触发项目/入口</th>
+          <th>队列</th>
+          <th>真实发送组件</th>
+          <th>语言来源</th>
+          <th>日志</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>注册/登录/找回密码验证码</td>
+          <td>API 业务或事件服务</td>
+          <td><code>gtc_admin:Jobs</code> 或 <code>gtcuser:fast/notify_normal</code></td>
+          <td>对应项目 Mailer</td>
+          <td>会员语言/国家语言/回退语言</td>
+          <td><code>t_mail_log</code> 或 <code>mail_log</code></td>
+      </tr>
+      <tr>
+          <td>KYC、MT 开户、资金审核</td>
+          <td><code>gtc_admin</code> 旧服务或 <code>gtcuser</code> EventTrack</td>
+          <td>对应队列</td>
+          <td><code>InformationService</code> 或 <code>EmailService</code></td>
+          <td>会员语言</td>
+          <td>对应邮件日志</td>
+      </tr>
+      <tr>
+          <td>公告、活动、课程全员通知</td>
+          <td><code>gtcuser::approvedNotification</code></td>
+          <td><code>notify_all</code></td>
+          <td><code>SendMemberEmailJob</code> + <code>EmailService</code></td>
+          <td>每个会员执行时决定</td>
+          <td><code>mail_batch_send</code> + <code>mail_log</code></td>
+      </tr>
+      <tr>
+          <td>会员详情页手工发送</td>
+          <td><code>gtc_admin_vue</code> -&gt; <code>Logger::sendMail</code></td>
+          <td><code>Jobs</code></td>
+          <td><code>InformationService</code></td>
+          <td>直接正文，不经模板语言选择</td>
+          <td><code>t_mail_log</code></td>
+      </tr>
+      <tr>
+          <td>后台批量邮件</td>
+          <td><code>gtc_admin_vue</code> -&gt; <code>Mail::batch_send</code></td>
+          <td><code>Jobs</code></td>
+          <td><code>MailJobs::fire</code> + <code>InformationService</code></td>
+          <td>批次内容/旧模板变量</td>
+          <td><code>t_mail_batch_send_user</code> + <code>t_mail_log</code></td>
+      </tr>
+      <tr>
+          <td>课程直播提前 1/24 小时提醒</td>
+          <td><code>gtc_admin</code> <code>ZoomMeeting</code></td>
+          <td><code>Jobs</code> 延迟</td>
+          <td><code>sendOfRemote</code> -&gt; <code>gtcuser</code></td>
+          <td>接收端按模板处理</td>
+          <td>两端日志，需关联任务数据</td>
+      </tr>
+      <tr>
+          <td>代理配置提醒</td>
+          <td>Agent 审核或 <code>NotifyAgentJob</code></td>
+          <td><code>Jobs</code> 延迟或 <code>notify_normal</code></td>
+          <td>跨项目远程/<code>EmailService</code></td>
+          <td>代理偏好语言</td>
+          <td>对应邮件日志</td>
+      </tr>
+      <tr>
+          <td>IB 未签署协议提醒</td>
+          <td><code>gtcuser</code> <code>IbSignTask</code></td>
+          <td><code>notify_normal</code></td>
+          <td><code>SendMemberEmailJob</code></td>
+          <td>会员国家/偏好语言</td>
+          <td><code>mail_log</code></td>
+      </tr>
+      <tr>
+          <td>IB 未配置佣金提醒</td>
+          <td><code>gtcuser</code> <code>IbCommissionTask</code></td>
+          <td><code>notify_normal</code></td>
+          <td><code>SendMemberEmailJob</code></td>
+          <td>上级代理语言</td>
+          <td><code>mail_log</code></td>
+      </tr>
+  </tbody>
+</table>
+<h2 id="11-端到端流程图">11. 端到端流程图</h2>
+<h3 id="111-gtcuser-会员事件通知">11.1 <code>gtcuser</code> 会员事件通知</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="ln"> 1</span><span class="cl">flowchart LR
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl">    A[业务动作] --&gt; B[EmailNotificationEventService]
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl">    B --&gt; C[EventTrackEvent]
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl">    C --&gt; D[NotificationListener]
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl">    D --&gt; E{代理隔离检查}
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">    E -- 否 --&gt; X[记录隔离日志并结束]
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl">    E -- 是 --&gt; F[pushQueue notify_normal]
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl">    F --&gt; G[AsyncQueue ConsumerProcess]
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">    G --&gt; H[SendMemberEmailJob]
+</span></span><span class="line"><span class="ln">10</span><span class="cl">    H --&gt; I[查询会员/邮箱/国家/语言]
+</span></span><span class="line"><span class="ln">11</span><span class="cl">    I --&gt; J[EmailService]
+</span></span><span class="line"><span class="ln">12</span><span class="cl">    J --&gt; K[模板和语言回退]
+</span></span><span class="line"><span class="ln">13</span><span class="cl">    K --&gt; L[变量替换和脱敏日志]
+</span></span><span class="line"><span class="ln">14</span><span class="cl">    L --&gt; M[Symfony Mailer]
+</span></span><span class="line"><span class="ln">15</span><span class="cl">    M --&gt; N[SMTP]
+</span></span><span class="line"><span class="ln">16</span><span class="cl">    M --&gt; O[mail_log 成功/失败]
+</span></span></code></pre></div><h3 id="112-全员通知">11.2 全员通知</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="ln"> 1</span><span class="cl">flowchart LR
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl">    A[公告/活动/直播/课程事件] --&gt; B[approvedNotification]
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl">    B --&gt; C[统计 active member]
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl">    C --&gt; D[写 mail_batch_send]
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl">    D --&gt; E[按 5000 条 chunk 查询]
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">    E --&gt; F[每会员创建 SendMemberEmailJob]
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl">    F --&gt; G[notify_all Redis 队列]
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl">    G --&gt; H[Consumer 执行]
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">    H --&gt; I[mailTaskId 校验批次是否取消]
+</span></span><span class="line"><span class="ln">10</span><span class="cl">    I --&gt; J[EmailService -&gt; SMTP]
+</span></span><span class="line"><span class="ln">11</span><span class="cl">    J --&gt; K[mail_log]
+</span></span><span class="line"><span class="ln">12</span><span class="cl">    D --&gt; L[批次状态：推送完成/失败]
+</span></span></code></pre></div><h3 id="113-gtc_admin-延迟远程通知">11.3 <code>gtc_admin</code> 延迟远程通知</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="ln"> 1</span><span class="cl">flowchart LR
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl">    A[课程/代理业务操作] --&gt; B{目标时间}
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl">    B -- 未来 --&gt; C[Queue::later Jobs]
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl">    B -- 已到提醒点且未开始 --&gt; D[Queue::push Jobs]
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl">    B -- 已开始 --&gt; E[不发送]
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">    C --&gt; F[MailJobs::sendOfRemote]
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl">    D --&gt; F
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl">    F --&gt; G[remoteOption option/memberAuditNotify]
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">    G --&gt; H[gtcuser 接收端]
+</span></span><span class="line"><span class="ln">10</span><span class="cl">    H --&gt; I[通知服务/SendMemberEmailJob]
+</span></span><span class="line"><span class="ln">11</span><span class="cl">    I --&gt; J[EmailService -&gt; Symfony Mailer -&gt; SMTP]
+</span></span></code></pre></div><h2 id="12-当前风险与待核对项">12. 当前风险与待核对项</h2>
+<ol>
+<li><strong>配置来源并存</strong>：<code>gtc_admin</code> 旧 <code>config_server</code>、<code>t_mail_config</code> 和 <code>gtcuser</code> 环境变量/类型化配置同时存在，需要形成明确的模板到 SMTP 配置映射表。</li>
+<li><strong>批量失败统计疑似反向</strong>：<code>MailJobs::fire()</code> 中 <code>res===true</code> 时增加 <code>fail_num</code>，需要核对发送返回值后修正。</li>
+<li><strong>失败任务不可追踪</strong>：<code>gtc_admin</code> failed queue 为 <code>none</code>，Job 异常多直接删除；生产故障后缺少可靠重放入口。</li>
+<li><strong>批次状态语义不足</strong>：<code>gtcuser</code> 全员任务状态 1 表示“子任务已推送”，不是“全部邮件已成功”；前端若显示为已发送容易误导运营人员。</li>
+<li><strong>重试与幂等不足</strong>：SMTP 超时、进程重启、远端接口响应丢失时可能重复发送；建议引入业务事件 ID、模板名、会员 ID 的唯一键或发送去重表。</li>
+<li><strong>日志敏感信息边界</strong>：<code>gtcuser</code> 已对模板密码变量脱敏，但异常信息截取 500 字符，仍应确认 SMTP 异常不会带出账号、DSN 或认证信息。</li>
+<li><strong>日志 server_id 映射需核对</strong>：<code>EmailService::executeSend()</code> 从 <code>$config['serverId']</code> 读取日志字段，而类型化 <code>t_mail_config</code> 返回的 <code>serverId</code> 为 0，可能导致日志无法按 MT Server 追踪。</li>
+<li><strong>重复实现</strong>：<code>EmailRepository::_sendEmail()</code>、<code>SendSystemEmailJob</code> 和本地 Mailable 包能力与主 <code>EmailService</code> 并存，需通过生产调用链确认哪些仍在使用。</li>
+<li><strong>跨项目远程链路可观测性不足</strong>：<code>sendOfRemote</code>、<code>remoteOption</code> 和 <code>gtcuser</code> 接收端需要统一 request/task ID，否则很难关联后台操作、远程接口、邮件 Job 和 SMTP 日志。</li>
+<li><strong>定时任务环境开关不一致</strong>：<code>BASE_CRONTAB</code>、<code>APP_RUN_TASK</code> 在不同环境文件中取值不同，发布检查必须确认 Crontab Dispatcher、Consumer 和队列进程均已启动。</li>
+<li><strong>前端接口与旧页面并存</strong>：模板管理同时存在旧 <code>messagetemplate</code> 和新 <code>newmessagetemplate</code> 页面；批量邮件页和部分兼容 API 目录中存在历史页面，需在菜单权限中确认实际运营入口。</li>
+<li><strong>邮件内容和收件人缺少统一审计</strong>：直接正文发送、模板发送、远程通知分别写不同元数据，建议统一记录业务事件类型、任务 ID、来源项目和幂等键。</li>
+</ol>
+<h2 id="13-建议的验证顺序">13. 建议的验证顺序</h2>
+<p>按以下顺序做线上或测试环境验证，能最快确认邮件全链路：</p>
+<ol>
+<li>核对三个进程面：<code>gtc_admin</code> Queue Worker、<code>gtcuser</code> <code>ConsumerProcess</code>、<code>CrontabDispatcherProcess</code> 是否运行；</li>
+<li>用测试 SMTP 和单个测试会员验证 <code>notify_normal</code>：检查 Job 入队、模板语言、SMTP 结果和 <code>mail_log</code>；</li>
+<li>验证 <code>gtc_admin</code> <code>/admin/Member/sendMail</code>，确认接口返回与实际发送状态的时间差；</li>
+<li>创建 2~3 人批量任务，核对 <code>mail_batch_send</code>、<code>mail_batch_send_user</code>、<code>send_num</code>、<code>fail_num</code> 和 <code>t_mail_log</code>；</li>
+<li>在开发环境触发全员公告，确认固定测试会员限制、<code>notify_all</code> 投递和取消状态 3 的行为；</li>
+<li>创建课程直播，分别测试提前 24 小时、提前 1 小时和已经开始三种时间分支；</li>
+<li>手工执行或等待 <code>IbSignTask</code>、<code>IbCommissionTask</code>，确认 <code>BASE_CRONTAB</code> 开关、分块查询和 <code>notify_normal</code> 投递；</li>
+<li>制造 SMTP 超时/认证失败，确认失败日志、重试次数、批次状态和是否产生重复邮件；</li>
+<li>对 <code>remoteOption('option/memberAuditNotify')</code> 建立跨项目链路追踪，核实接收端、认证、模板枚举和日志关联；</li>
+<li>最后核对 <code>t_mail_config</code>、<code>config_server</code>、<code>MAIL_SMTP_DSN</code> 三套配置在同一模板上的实际优先级。</li>
+</ol>
+<h2 id="14-本次交付说明">14. 本次交付说明</h2>
+<ul>
+<li>新增本文档：<code>/Users/lijianlin/www/local/gtc_admin/docs/邮件功能技术架构与运行逻辑梳理.md</code>。</li>
+<li>未修改 PHP、Vue、配置或数据库结构。</li>
+<li>文档结论来自当前源码静态分析；没有连接生产 Redis、SMTP、数据库，也没有实际发送测试邮件。</li>
+<li>文档中已将历史实现、疑似统计 bug、日志字段风险和需要通过部署环境确认的内容单独标注。</li>
+</ul>
+
+    </div>
+  </article>
+  
+    
+<aside class="sidebar">
+  <section class="sidebar_inner">
+    <br>
+    
+  
+  <div class="search">
+    <input type="search" class="search_field form_field" placeholder='搜索内容...' id="find" autocomplete="off" data-scope='gtc'>
+    <label for="find" class="search_label"><svg class="icon">
+  <title>search</title>
+  <use xlink:href="#search"></use>
+</svg>
+
+    </label>
+    
+    <div class="search_results results"></div>
+  </div>
+
+        <div class="author_header">
+          <img src="https://jianlin-li.github.io/images/fish-head.png" alt="李建林 photo">
+          <h2>李建林</h2>
+        </div>
+      <div class="author_bio">
+        PHP, Go, MySQL, Redis, RabbitMQ, Elasticsearch, Docker, Kubernetes, Shell
+      </div>
+      <a href='https://jianlin-li.github.io/about/' class="button mt-1" role="button" title='阅读更多'>阅读更多</a>
+
+    
+    <h2 class="mt-4">精选文章</h2>
+    <ul>
+      <li>
+        <a href="https://jianlin-li.github.io/post/jiagou-elk-stack/" class="nav-link" title="架构-使用ELK Stack在本地Macbookpro搭建一套日志收集并且可视化系统">架构-使用ELK Stack在本地Macbookpro搭建一套日志收集并且可视化系统</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/jiagou-prometheus-grafana/" class="nav-link" title="架构-Prometheus&#43;Grafana">架构-Prometheus+Grafana</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/jiagou-cicd-jenkins-argo/" class="nav-link" title="架构-基于JenKins的CI/CD平台之Argo CD">架构-基于JenKins的CI/CD平台之Argo CD</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/jiagou-cicd-jenkins/" class="nav-link" title="架构-基于JenKins的CI/CD平台">架构-基于JenKins的CI/CD平台</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/k8s_review_12/" class="nav-link" title="Kubernetes的知识库-12">Kubernetes的知识库-12</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/k8s_review_11/" class="nav-link" title="Kubernetes的知识库-11">Kubernetes的知识库-11</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/k8s_review_10/" class="nav-link" title="Kubernetes的知识库-10">Kubernetes的知识库-10</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/k8s_review_9/" class="nav-link" title="Kubernetes的知识库-9">Kubernetes的知识库-9</a>
+      </li>
+    </ul>
+    <h2 class="mt-4">最新文章</h2>
+    <ul class="flex-column">
+      <li>
+        <a href="https://jianlin-li.github.io/post/k8s_review_8/" class="nav-link" title="Kubernetes的知识库-8">Kubernetes的知识库-8</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/k8s_review_7/" class="nav-link" title="Kubernetes的知识库-7">Kubernetes的知识库-7</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/k8s_review_6/" class="nav-link" title="Kubernetes的知识库-6">Kubernetes的知识库-6</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/k8s_review_5/" class="nav-link" title="Kubernetes的知识库-5">Kubernetes的知识库-5</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/k8s_review_4/" class="nav-link" title="Kubernetes的知识库-4">Kubernetes的知识库-4</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/k8s_review_3/" class="nav-link" title="Kubernetes的知识库-3">Kubernetes的知识库-3</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/k8s_review_2/" class="nav-link" title="Kubernetes的知识库-2">Kubernetes的知识库-2</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/k8s_review_1/" class="nav-link" title="Kubernetes的知识库-1">Kubernetes的知识库-1</a>
+      </li>
+    </ul>
+    <div>
+      <h2 class="mt-4 taxonomy" id="categories-section">分类</h2>
+      <nav class="tags_nav">
+        <a href='https://jianlin-li.github.io/categories/kubernetes/' class="post_tag button button_translucent" title="kubernetes">
+          KUBERNETES
+          <span class="button_tally">13</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/categories/php%E8%AF%AD%E8%A8%80/' class="post_tag button button_translucent" title="php语言">
+          PHP语言
+          <span class="button_tally">7</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/categories/%E6%9E%B6%E6%9E%84/' class="post_tag button button_translucent" title="架构">
+          架构
+          <span class="button_tally">7</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/categories/go%E8%AF%AD%E8%A8%80/' class="post_tag button button_translucent" title="go语言">
+          GO语言
+          <span class="button_tally">6</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/categories/elasticsearch/' class="post_tag button button_translucent" title="elasticsearch">
+          ELASTICSEARCH
+          <span class="button_tally">5</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/categories/redis/' class="post_tag button button_translucent" title="redis">
+          REDIS
+          <span class="button_tally">5</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/categories/mysql/' class="post_tag button button_translucent" title="mysql">
+          MYSQL
+          <span class="button_tally">4</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/categories/rabbitmq/' class="post_tag button button_translucent" title="rabbitmq">
+          RABBITMQ
+          <span class="button_tally">4</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/categories/ci/cd/' class="post_tag button button_translucent" title="ci/cd">
+          CI/CD
+          <span class="button_tally">2</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/categories/git/' class="post_tag button button_translucent" title="git">
+          GIT
+          <span class="button_tally">2</span>
+        </a>
+        
+        
+        <br>
+        <div class="post_tags_toggle button">所有分类</div>
+        <div class="post_tags">
+          <div class="tags_list">
+            
+            <a href='https://jianlin-li.github.io/categories/argo/' class=" post_tag button button_translucent" data-position=1 title="argo">ARGO<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/centos7/' class=" post_tag button button_translucent" data-position=1 title="centos7">CENTOS7<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/ci/cd/' class=" post_tag button button_translucent" data-position=2 title="ci/cd">CI/CD<span class="button_tally">2</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/c%E8%AF%AD%E8%A8%80/' class=" post_tag button button_translucent" data-position=1 title="c语言">C语言<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/devops/' class=" post_tag button button_translucent" data-position=1 title="devops">DEVOPS<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/docker/' class=" post_tag button button_translucent" data-position=1 title="docker">DOCKER<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/elasticsearch/' class=" post_tag button button_translucent" data-position=5 title="elasticsearch">ELASTICSEARCH<span class="button_tally">5</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/elk/' class=" post_tag button button_translucent" data-position=1 title="elk">ELK<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/git/' class=" post_tag button button_translucent" data-position=2 title="git">GIT<span class="button_tally">2</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/go%E8%AF%AD%E8%A8%80/' class=" post_tag button button_translucent" data-position=6 title="go语言">GO语言<span class="button_tally">6</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/grafana/' class=" post_tag button button_translucent" data-position=1 title="grafana">GRAFANA<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/gtc/' class=" post_tag button button_translucent" data-position=2 title="gtc">GTC<span class="button_tally">2</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/gtcadmin/' class=" post_tag button button_translucent" data-position=1 title="gtcadmin">GTCADMIN<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/gtcuser/' class=" post_tag button button_translucent" data-position=1 title="gtcuser">GTCUSER<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/hugo/' class=" post_tag button button_translucent" data-position=1 title="hugo">HUGO<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/jenkins/' class=" post_tag button button_translucent" data-position=2 title="jenkins">JENKINS<span class="button_tally">2</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/kubernetes/' class=" post_tag button button_translucent" data-position=13 title="kubernetes">KUBERNETES<span class="button_tally">13</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/mkcert/' class=" post_tag button button_translucent" data-position=1 title="mkcert">MKCERT<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/mysql/' class=" post_tag button button_translucent" data-position=4 title="mysql">MYSQL<span class="button_tally">4</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/nginx/' class=" post_tag button button_translucent" data-position=1 title="nginx">NGINX<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/php%E8%AF%AD%E8%A8%80/' class=" post_tag button button_translucent" data-position=7 title="php语言">PHP语言<span class="button_tally">7</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/prometheus/' class=" post_tag button button_translucent" data-position=1 title="prometheus">PROMETHEUS<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/rabbitmq/' class=" post_tag button button_translucent" data-position=4 title="rabbitmq">RABBITMQ<span class="button_tally">4</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/redis/' class=" post_tag button button_translucent" data-position=5 title="redis">REDIS<span class="button_tally">5</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/shell/' class=" post_tag button button_translucent" data-position=2 title="shell">SHELL<span class="button_tally">2</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/web%E6%9C%8D%E5%8A%A1%E5%99%A8/' class=" post_tag button button_translucent" data-position=1 title="web服务器">WEB服务器<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/%E6%9C%AC%E5%9C%B0%E7%8E%AF%E5%A2%83/' class=" post_tag button button_translucent" data-position=2 title="本地环境">本地环境<span class="button_tally">2</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/%E5%A4%8D%E4%B9%A0/' class=" post_tag button button_translucent" data-position=1 title="复习">复习<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/%E5%8D%8E%E5%BE%AE%E4%B8%96%E7%BA%AA/' class=" post_tag button button_translucent" data-position=1 title="华微世纪">华微世纪<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/%E6%9E%B6%E6%9E%84/' class=" post_tag button button_translucent" data-position=7 title="架构">架构<span class="button_tally">7</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/%E6%95%99%E7%A8%8B/' class=" post_tag button button_translucent" data-position=1 title="教程">教程<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/%E8%A7%86%E9%A2%91/' class=" post_tag button button_translucent" data-position=1 title="视频">视频<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/%E4%B9%A6%E7%B1%8D/' class=" post_tag button button_translucent" data-position=1 title="书籍">书籍<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/%E7%AE%97%E6%B3%95/' class=" post_tag button button_translucent" data-position=1 title="算法">算法<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/%E8%87%AA%E7%AD%BE%E5%90%8D%E8%AF%81%E4%B9%A6/' class=" post_tag button button_translucent" data-position=1 title="自签名证书">自签名证书<span class="button_tally">1</span>
+            </a>
+            
+            <div class="tags_sort"><span title="sort alphabetically">[A~Z]</span><span title="sort by count">[0~9]</span>
+            </div>
+            <span class="tags_hide"><svg class="icon">
+            <use xlink:href="#closeme"></use>
+          </svg></span>
+          </div>
+        </div>
+      </nav>
+    </div>
+    <div>
+      <h2 class="mt-4 taxonomy" id="tags-section">标签</h2>
+      <nav class="tags_nav">
+        <a href='https://jianlin-li.github.io/tags/kubernetes/' class="post_tag button button_translucent" title="kubernetes">
+          KUBERNETES
+          <span class="button_tally">13</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/tags/php/' class="post_tag button button_translucent" title="php">
+          PHP
+          <span class="button_tally">7</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/tags/go/' class="post_tag button button_translucent" title="go">
+          GO
+          <span class="button_tally">6</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/tags/elasticsearch/' class="post_tag button button_translucent" title="elasticsearch">
+          ELASTICSEARCH
+          <span class="button_tally">5</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/tags/redis/' class="post_tag button button_translucent" title="redis">
+          REDIS
+          <span class="button_tally">5</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/tags/mysql/' class="post_tag button button_translucent" title="mysql">
+          MYSQL
+          <span class="button_tally">4</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/tags/rabbitmq/' class="post_tag button button_translucent" title="rabbitmq">
+          RABBITMQ
+          <span class="button_tally">4</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/tags/devops/' class="post_tag button button_translucent" title="devops">
+          DEVOPS
+          <span class="button_tally">3</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/tags/ci/cd/' class="post_tag button button_translucent" title="ci/cd">
+          CI/CD
+          <span class="button_tally">2</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/tags/git/' class="post_tag button button_translucent" title="git">
+          GIT
+          <span class="button_tally">2</span>
+        </a>
+        
+        
+        <br>
+        <div class="post_tags_toggle button">所有标签</div>
+        <div class="post_tags">
+          <div class="tags_list">
+            
+            <a href='https://jianlin-li.github.io/tags/argo/' class=" post_tag button button_translucent" data-position=1 title="argo">ARGO<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/centos7/' class=" post_tag button button_translucent" data-position=1 title="centos7">CENTOS7<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/ci/cd/' class=" post_tag button button_translucent" data-position=2 title="ci/cd">CI/CD<span class="button_tally">2</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/c%E8%AF%AD%E8%A8%80/' class=" post_tag button button_translucent" data-position=1 title="c语言">C语言<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/devops/' class=" post_tag button button_translucent" data-position=3 title="devops">DEVOPS<span class="button_tally">3</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/docker/' class=" post_tag button button_translucent" data-position=1 title="docker">DOCKER<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/elasticsearch/' class=" post_tag button button_translucent" data-position=5 title="elasticsearch">ELASTICSEARCH<span class="button_tally">5</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/elk/' class=" post_tag button button_translucent" data-position=1 title="elk">ELK<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/emoji/' class=" post_tag button button_translucent" data-position=1 title="emoji">EMOJI<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/git/' class=" post_tag button button_translucent" data-position=2 title="git">GIT<span class="button_tally">2</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/go/' class=" post_tag button button_translucent" data-position=6 title="go">GO<span class="button_tally">6</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/grafana/' class=" post_tag button button_translucent" data-position=1 title="grafana">GRAFANA<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/gtc/' class=" post_tag button button_translucent" data-position=2 title="gtc">GTC<span class="button_tally">2</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/gtcadmin/' class=" post_tag button button_translucent" data-position=1 title="gtcadmin">GTCADMIN<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/gtcuser/' class=" post_tag button button_translucent" data-position=1 title="gtcuser">GTCUSER<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/hosts/' class=" post_tag button button_translucent" data-position=1 title="hosts">HOSTS<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/hugo/' class=" post_tag button button_translucent" data-position=1 title="hugo">HUGO<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/jenkins/' class=" post_tag button button_translucent" data-position=2 title="jenkins">JENKINS<span class="button_tally">2</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/kubernetes/' class=" post_tag button button_translucent" data-position=13 title="kubernetes">KUBERNETES<span class="button_tally">13</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/markdown/' class=" post_tag button button_translucent" data-position=1 title="markdown">MARKDOWN<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/math/' class=" post_tag button button_translucent" data-position=1 title="math">MATH<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/mkcert/' class=" post_tag button button_translucent" data-position=1 title="mkcert">MKCERT<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/mysql/' class=" post_tag button button_translucent" data-position=4 title="mysql">MYSQL<span class="button_tally">4</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/nginx/' class=" post_tag button button_translucent" data-position=1 title="nginx">NGINX<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/notices/' class=" post_tag button button_translucent" data-position=1 title="notices">NOTICES<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/openstreetmap/' class=" post_tag button button_translucent" data-position=1 title="openstreetmap">OPENSTREETMAP<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/php/' class=" post_tag button button_translucent" data-position=7 title="php">PHP<span class="button_tally">7</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/prometheus/' class=" post_tag button button_translucent" data-position=1 title="prometheus">PROMETHEUS<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/rabbitmq/' class=" post_tag button button_translucent" data-position=4 title="rabbitmq">RABBITMQ<span class="button_tally">4</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/redis/' class=" post_tag button button_translucent" data-position=5 title="redis">REDIS<span class="button_tally">5</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/shell/' class=" post_tag button button_translucent" data-position=2 title="shell">SHELL<span class="button_tally">2</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/sql/' class=" post_tag button button_translucent" data-position=1 title="sql">SQL<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/web%E6%9C%8D%E5%8A%A1%E5%99%A8/' class=" post_tag button button_translucent" data-position=1 title="web服务器">WEB服务器<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/%E6%9C%AC%E5%9C%B0%E7%8E%AF%E5%A2%83/' class=" post_tag button button_translucent" data-position=1 title="本地环境">本地环境<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/%E5%A4%8D%E4%B9%A0/' class=" post_tag button button_translucent" data-position=1 title="复习">复习<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/%E6%95%99%E7%A8%8B/' class=" post_tag button button_translucent" data-position=1 title="教程">教程<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/%E4%B9%B1%E7%A0%81/' class=" post_tag button button_translucent" data-position=1 title="乱码">乱码<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/%E8%A7%86%E9%A2%91/' class=" post_tag button button_translucent" data-position=1 title="视频">视频<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/%E4%B9%A6%E7%B1%8D/' class=" post_tag button button_translucent" data-position=1 title="书籍">书籍<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/%E7%AE%97%E6%B3%95/' class=" post_tag button button_translucent" data-position=1 title="算法">算法<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6/' class=" post_tag button button_translucent" data-position=1 title="主从复制">主从复制<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/%E8%87%AA%E7%AD%BE%E5%90%8D%E8%AF%81%E4%B9%A6/' class=" post_tag button button_translucent" data-position=1 title="自签名证书">自签名证书<span class="button_tally">1</span>
+            </a>
+            
+            <div class="tags_sort"><span title="sort alphabetically">[A~Z]</span><span title="sort by count">[0~9]</span>
+            </div>
+            <span class="tags_hide"><svg class="icon">
+            <use xlink:href="#closeme"></use>
+          </svg></span>
+          </div>
+        </div>
+      </nav>
+    </div>
+  </section>
+</aside>
+
+  
+</div>
+
+<style>
+  .gtc-breadcrumb {
+    margin-bottom: 12px;
+    font-size: 0.9em;
+    opacity: 0.75;
+  }
+
+  .gtc-meta {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+</style>
+    </main><svg width="0" height="0" class="hidden">
+  <symbol viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" id="facebook">
+    <path d="M437 0H75C33.648 0 0 33.648 0 75v362c0 41.352 33.648 75 75 75h151V331h-60v-90h60v-61c0-49.629 40.371-90 90-90h91v90h-91v61h91l-15 90h-76v181h121c41.352 0 75-33.648 75-75V75c0-41.352-33.648-75-75-75zm0 0"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18.001 18.001" id="twitter">
+    <path d="M15.891 4.013c.808-.496 1.343-1.173 1.605-2.034a8.68 8.68 0 0 1-2.351.861c-.703-.756-1.593-1.14-2.66-1.14-1.043 0-1.924.366-2.643 1.078a3.56 3.56 0 0 0-1.076 2.605c0 .309.039.585.117.819-3.076-.105-5.622-1.381-7.628-3.837-.34.601-.51 1.213-.51 1.846 0 1.301.549 2.332 1.645 3.089-.625-.053-1.176-.211-1.645-.47 0 .929.273 1.705.82 2.388a3.623 3.623 0 0 0 2.115 1.291c-.312.08-.641.118-.979.118-.312 0-.533-.026-.664-.083.23.757.664 1.371 1.291 1.841a3.652 3.652 0 0 0 2.152.743C4.148 14.173 2.625 14.69.902 14.69c-.422 0-.721-.006-.902-.038 1.697 1.102 3.586 1.649 5.676 1.649 2.139 0 4.029-.542 5.674-1.626 1.645-1.078 2.859-2.408 3.639-3.974a10.77 10.77 0 0 0 1.172-4.892v-.468a7.788 7.788 0 0 0 1.84-1.921 8.142 8.142 0 0 1-2.11.593z"
+      ></path>
+  </symbol>
+  <symbol aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" id="mail">
+    <path  d="M502.3 190.8c3.9-3.1 9.7-.2 9.7 4.7V400c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V195.6c0-5 5.7-7.8 9.7-4.7 22.4 17.4 52.1 39.5 154.1 113.6 21.1 15.4 56.7 47.8 92.2 47.6 35.7.3 72-32.8 92.3-47.6 102-74.1 131.6-96.3 154-113.7zM256 320c23.2.4 56.6-29.2 73.4-41.4 132.7-96.3 142.8-104.7 173.4-128.7 5.8-4.5 9.2-11.5 9.2-18.9v-19c0-26.5-21.5-48-48-48H48C21.5 64 0 85.5 0 112v19c0 7.4 3.4 14.3 9.2 18.9 30.6 23.9 40.7 32.4 173.4 128.7 16.8 12.2 50.2 41.8 73.4 41.4z"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" id="calendar">
+    <path d="M452 40h-24V0h-40v40H124V0H84v40H60C26.916 40 0 66.916 0 100v352c0 33.084 26.916 60 60 60h392c33.084 0 60-26.916 60-60V100c0-33.084-26.916-60-60-60zm20 412c0 11.028-8.972 20-20 20H60c-11.028 0-20-8.972-20-20V188h432v264zm0-304H40v-48c0-11.028 8.972-20 20-20h24v40h40V80h264v40h40V80h24c11.028 0 20 8.972 20 20v48z"></path>
+    <path d="M76 230h40v40H76zm80 0h40v40h-40zm80 0h40v40h-40zm80 0h40v40h-40zm80 0h40v40h-40zM76 310h40v40H76zm80 0h40v40h-40zm80 0h40v40h-40zm80 0h40v40h-40zM76 390h40v40H76zm80 0h40v40h-40zm80 0h40v40h-40zm80 0h40v40h-40zm80-80h40v40h-40z"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" id="github">
+    <path d="M255.968 5.329C114.624 5.329 0 120.401 0 262.353c0 113.536 73.344 209.856 175.104 243.872 12.8 2.368 17.472-5.568 17.472-12.384 0-6.112-.224-22.272-.352-43.712-71.2 15.52-86.24-34.464-86.24-34.464-11.616-29.696-28.416-37.6-28.416-37.6-23.264-15.936 1.728-15.616 1.728-15.616 25.696 1.824 39.2 26.496 39.2 26.496 22.848 39.264 59.936 27.936 74.528 21.344 2.304-16.608 8.928-27.936 16.256-34.368-56.832-6.496-116.608-28.544-116.608-127.008 0-28.064 9.984-51.008 26.368-68.992-2.656-6.496-11.424-32.64 2.496-68 0 0 21.504-6.912 70.4 26.336 20.416-5.696 42.304-8.544 64.096-8.64 21.728.128 43.648 2.944 64.096 8.672 48.864-33.248 70.336-26.336 70.336-26.336 13.952 35.392 5.184 61.504 2.56 68 16.416 17.984 26.304 40.928 26.304 68.992 0 98.72-59.84 120.448-116.864 126.816 9.184 7.936 17.376 23.616 17.376 47.584 0 34.368-.32 62.08-.32 70.496 0 6.88 4.608 14.88 17.6 12.352C438.72 472.145 512 375.857 512 262.353 512 120.401 397.376 5.329 255.968 5.329z"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 212 212" id="gitlab">
+    <path d="M12.3 74.7h54L43.3 3c-1-3.6-6.4-3.6-7.6 0L12.3 74.8z" />
+    <path d="M12.3 74.7L.5 111c-1 3.2 0 6.8 3 8.8l101.6 74-92.5-119z"/>
+    <path d="M105 193.7l-38.6-119h-54l92.7 119z"/>
+    <path d="M105 193.7l38.7-119H66.4l38.7 119z"/>
+    <path d="M105 193.7l38.7-119H198l-93 119z"/>
+    <path d="M198 74.7l11.6 36.2c1 3 0 6.6-3 8.6l-101.5 74 93-119z"/>
+    <path d="M198 74.7h-54.3L167 3c1.2-3.6 6.4-3.6 7.6 0L198 74.8z"/>
+  </symbol>
+  <symbol viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" id="rss">
+    <circle cx="3.429" cy="20.571" r="3.429"></circle>
+    <path d="M11.429 24h4.57C15.999 15.179 8.821 8.001 0 8v4.572c6.302.001 11.429 5.126 11.429 11.428z"></path>
+    <path d="M24 24C24 10.766 13.234 0 0 0v4.571c10.714 0 19.43 8.714 19.43 19.429z"></path>
+  </symbol>
+  <symbol viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" id="linkedin">
+    <path d="M437 0H75C33.648 0 0 33.648 0 75v362c0 41.352 33.648 75 75 75h362c41.352 0 75-33.648 75-75V75c0-41.352-33.648-75-75-75zM181 406h-60V196h60zm0-240h-60v-60h60zm210 240h-60V286c0-16.54-13.46-30-30-30s-30 13.46-30 30v120h-60V196h60v11.309C286.719 202.422 296.93 196 316 196c40.691.043 75 36.547 75 79.688zm0 0"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 612 612" id="to-top">
+    <path d="M604.501 440.509L325.398 134.956c-5.331-5.357-12.423-7.627-19.386-7.27-6.989-.357-14.056 1.913-19.387 7.27L7.499 440.509c-9.999 10.024-9.999 26.298 0 36.323s26.223 10.024 36.222 0l262.293-287.164L568.28 476.832c9.999 10.024 26.222 10.024 36.221 0 9.999-10.023 9.999-26.298 0-36.323z"></path>
+  </symbol>
+  <symbol viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" id="carly">
+    <path d="M504.971 239.029L448 182.059V84c0-46.317-37.682-84-84-84h-44c-13.255 0-24 10.745-24 24s10.745 24 24 24h44c19.851 0 36 16.149 36 36v108c0 6.365 2.529 12.47 7.029 16.971L454.059 256l-47.029 47.029A24.002 24.002 0 0 0 400 320v108c0 19.851-16.149 36-36 36h-44c-13.255 0-24 10.745-24 24s10.745 24 24 24h44c46.318 0 84-37.683 84-84v-98.059l56.971-56.971c9.372-9.372 9.372-24.568 0-33.941zM112 192V84c0-19.851 16.149-36 36-36h44c13.255 0 24-10.745 24-24S205.255 0 192 0h-44c-46.318 0-84 37.683-84 84v98.059l-56.971 56.97c-9.373 9.373-9.373 24.568 0 33.941L64 329.941V428c0 46.317 37.682 84 84 84h44c13.255 0 24-10.745 24-24s-10.745-24-24-24h-44c-19.851 0-36-16.149-36-36V320c0-6.365-2.529-12.47-7.029-16.971L57.941 256l47.029-47.029A24.002 24.002 0 0 0 112 192z"></path>
+  </symbol>
+  <symbol viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" id="copy">
+    <path d="M23 2.75A2.75 2.75 0 0 0 20.25 0H8.75A2.75 2.75 0 0 0 6 2.75v13.5A2.75 2.75 0 0 0 8.75 19h11.5A2.75 2.75 0 0 0 23 16.25zM18.25 14.5h-7.5a.75.75 0 0 1 0-1.5h7.5a.75.75 0 0 1 0 1.5zm0-3h-7.5a.75.75 0 0 1 0-1.5h7.5a.75.75 0 0 1 0 1.5zm0-3h-7.5a.75.75 0 0 1 0-1.5h7.5a.75.75 0 0 1 0 1.5z"></path>
+    <path d="M8.75 20.5a4.255 4.255 0 0 1-4.25-4.25V2.75c0-.086.02-.166.025-.25H3.75A2.752 2.752 0 0 0 1 5.25v16A2.752 2.752 0 0 0 3.75 24h12a2.752 2.752 0 0 0 2.75-2.75v-.75z"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512.001 512.001" id="closeme">
+    <path d="M284.286 256.002L506.143 34.144c7.811-7.811 7.811-20.475 0-28.285-7.811-7.81-20.475-7.811-28.285 0L256 227.717 34.143 5.859c-7.811-7.811-20.475-7.811-28.285 0-7.81 7.811-7.811 20.475 0 28.285l221.857 221.857L5.858 477.859c-7.811 7.811-7.811 20.475 0 28.285a19.938 19.938 0 0 0 14.143 5.857 19.94 19.94 0 0 0 14.143-5.857L256 284.287l221.857 221.857c3.905 3.905 9.024 5.857 14.143 5.857s10.237-1.952 14.143-5.857c7.811-7.811 7.811-20.475 0-28.285L284.286 256.002z"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" id="open-menu">
+    <path d="M492 236H20c-11.046 0-20 8.954-20 20s8.954 20 20 20h472c11.046 0 20-8.954 20-20s-8.954-20-20-20zm0-160H20C8.954 76 0 84.954 0 96s8.954 20 20 20h472c11.046 0 20-8.954 20-20s-8.954-20-20-20zm0 320H20c-11.046 0-20 8.954-20 20s8.954 20 20 20h472c11.046 0 20-8.954 20-20s-8.954-20-20-20z"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" id="instagram">
+    <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" id=youtube>
+    <path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" id="stackoverflow">
+    <path d="M21 27v-8h3v11H0V19h3v8h18z"></path><path d="M17.1.2L15 1.8l7.9 10.6 2.1-1.6L17.1.2zm3.7 14.7L10.6 6.4l1.7-2 10.2 8.5-1.7 2zM7.2 12.3l12 5.6 1.1-2.4-12-5.6-1.1 2.4zm-1.8 6.8l13.56 1.96.17-2.38-13.26-2.55-.47 2.97zM19 25H5v-3h14v3z"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" id="xing">
+    <path d="M18.188 0c-.517 0-.741.325-.927.66 0 0-7.455 13.224-7.702 13.657.015.024 4.919 9.023 4.919 9.023.17.308.436.66.967.66h3.454c.211 0 .375-.078.463-.22.089-.151.089-.346-.009-.536l-4.879-8.916c-.004-.006-.004-.016 0-.022L22.139.756c.095-.191.097-.387.006-.535C22.056.078 21.894 0 21.686 0h-3.498zM3.648 4.74c-.211 0-.385.074-.473.216-.09.149-.078.339.02.531l2.34 4.05c.004.01.004.016 0 .021L1.86 16.051c-.099.188-.093.381 0 .529.085.142.239.234.45.234h3.461c.518 0 .766-.348.945-.667l3.734-6.609-2.378-4.155c-.172-.315-.434-.659-.962-.659H3.648v.016z"/>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 71 55" id="discord">
+    <path d="M60.1045 4.8978C55.5792 2.8214 50.7265 1.2916 45.6527 0.41542C45.5603 0.39851 45.468 0.440769 45.4204 0.525289C44.7963 1.6353 44.105 3.0834 43.6209 4.2216C38.1637 3.4046 32.7345 3.4046 27.3892 4.2216C26.905 3.0581 26.1886 1.6353 25.5617 0.525289C25.5141 0.443589 25.4218 0.40133 25.3294 0.41542C20.2584 1.2888 15.4057 2.8186 10.8776 4.8978C10.8384 4.9147 10.8048 4.9429 10.7825 4.9795C1.57795 18.7309 -0.943561 32.1443 0.293408 45.3914C0.299005 45.4562 0.335386 45.5182 0.385761 45.5576C6.45866 50.0174 12.3413 52.7249 18.1147 54.5195C18.2071 54.5477 18.305 54.5139 18.3638 54.4378C19.7295 52.5728 20.9469 50.6063 21.9907 48.5383C22.0523 48.4172 21.9935 48.2735 21.8676 48.2256C19.9366 47.4931 18.0979 46.6 16.3292 45.5858C16.1893 45.5041 16.1781 45.304 16.3068 45.2082C16.679 44.9293 17.0513 44.6391 17.4067 44.3461C17.471 44.2926 17.5606 44.2813 17.6362 44.3151C29.2558 49.6202 41.8354 49.6202 53.3179 44.3151C53.3935 44.2785 53.4831 44.2898 53.5502 44.3433C53.9057 44.6363 54.2779 44.9293 54.6529 45.2082C54.7816 45.304 54.7732 45.5041 54.6333 45.5858C52.8646 46.6197 51.0259 47.4931 49.0921 48.2228C48.9662 48.2707 48.9102 48.4172 48.9718 48.5383C50.038 50.6034 51.2554 52.5699 52.5959 54.435C52.6519 54.5139 52.7526 54.5477 52.845 54.5195C58.6464 52.7249 64.529 50.0174 70.6019 45.5576C70.6551 45.5182 70.6887 45.459 70.6943 45.3942C72.1747 30.0791 68.2147 16.7757 60.1968 4.9823C60.1772 4.9429 60.1437 4.9147 60.1045 4.8978ZM23.7259 37.3253C20.2276 37.3253 17.3451 34.1136 17.3451 30.1693C17.3451 26.225 20.1717 23.0133 23.7259 23.0133C27.308 23.0133 30.1626 26.2532 30.1066 30.1693C30.1066 34.1136 27.28 37.3253 23.7259 37.3253ZM47.3178 37.3253C43.8196 37.3253 40.9371 34.1136 40.9371 30.1693C40.9371 26.225 43.7636 23.0133 47.3178 23.0133C50.9 23.0133 53.7545 26.2532 53.6986 30.1693C53.6986 34.1136 50.9 37.3253 47.3178 37.3253Z"/>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 17 18" id="mastodon">
+    <path
+    fill="#ffffff"
+    d="m 15.054695,9.8859583 c -0.22611,1.1632697 -2.02517,2.4363497 -4.09138,2.6830797 -1.0774504,0.12856 -2.1382704,0.24673 -3.2694704,0.19484 -1.84996,-0.0848 -3.30971,-0.44157 -3.30971,-0.44157 0,0.1801 0.0111,0.35157 0.0333,0.51194 0.24051,1.82571 1.81034,1.93508 3.29737,1.98607 1.50088,0.0514 2.8373104,-0.37004 2.8373104,-0.37004 l 0.0617,1.35686 c 0,0 -1.0498104,0.56374 -2.9199404,0.66742 -1.03124,0.0567 -2.3117,-0.0259 -3.80308,-0.42069 -3.23454998,-0.85613 -3.79081998,-4.304 -3.87592998,-7.8024197 -0.026,-1.03871 -0.01,-2.01815 -0.01,-2.83732 0,-3.57732 2.34385998,-4.62587996 2.34385998,-4.62587996 1.18184,-0.54277 3.20976,-0.77101 5.318,-0.7882499985409 h 0.0518 C 9.8267646,0.01719834 11.856025,0.24547834 13.037775,0.78824834 c 0,0 2.34377,1.04855996 2.34377,4.62587996 0,0 0.0294,2.63937 -0.32687,4.47183"/>
+ <path
+    fill="#000000"
+    d="m 12.616925,5.6916583 v 4.3315297 h -1.71607 V 5.8189683 c 0,-0.88624 -0.37289,-1.33607 -1.1187604,-1.33607 -0.82467,0 -1.23799,0.53361 -1.23799,1.58875 v 2.30122 h -1.70594 v -2.30122 c 0,-1.05514 -0.4134,-1.58875 -1.23808,-1.58875 -0.74587,0 -1.11876,0.44983 -1.11876,1.33607 v 4.2042197 h -1.71607 V 5.6916583 c 0,-0.88527 0.22541,-1.58876 0.67817,-2.10922 0.46689,-0.52047 1.07833,-0.78727 1.83735,-0.78727 0.87816,0 1.54317,0.33752 1.98288,1.01267 l 0.42744,0.71655 0.42753,-0.71655 c 0.43961,-0.67515 1.10463,-1.01267 1.9828704,-1.01267 0.75893,0 1.37037,0.2668 1.83735,0.78727 0.45268,0.52046 0.67808,1.22395 0.67808,2.10922"/>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 530" id="bluesky" >
+    <path d="m135.72 44.03c66.496 49.921 138.02 151.14 164.28 205.46 26.262-54.316 97.782-155.54 164.28-205.46 47.98-36.021 125.72-63.892 125.72 24.795 0 17.712-10.155 148.79-16.111 170.07-20.703 73.984-96.144 92.854-163.25 81.433 117.3 19.964 147.14 86.092 82.697 152.22-122.39 125.59-175.91-31.511-189.63-71.766-2.514-7.3797-3.6904-10.832-3.7077-7.8964-0.0174-2.9357-1.1937 0.51669-3.7077 7.8964-13.714 40.255-67.233 197.36-189.63 71.766-64.444-66.128-34.605-132.26 82.697-152.22-67.108 11.421-142.55-7.4491-163.25-81.433-5.9562-21.282-16.111-152.36-16.111-170.07 0-88.687 77.742-60.816 125.72-24.795z"/>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" id="ko-fi">
+    <path fill="#ffffff" d="M4.5,9.8527H32.7947a0,0,0,0,1,0,0v19.225a9.07,9.07,0,0,1-9.07,9.07H13.57a9.07,9.07,0,0,1-9.07-9.07V9.8527A0,0,0,0,1,4.5,9.8527Z"/>
+    <path fill="#000000" d="M12.197,25.9493l6.45,6.45,6.45-6.45a8.2,8.2,0,0,0,2.4016-5.798h0a4.5082,4.5082,0,0,0-4.212-4.5459,4.4262,4.4262,0,0,0-4.64,4.4209,4.4261,4.4261,0,0,0-4.64-4.4209,4.5082,4.5082,0,0,0-4.212,4.5459h0A8.2,8.2,0,0,0,12.197,25.9493Z"/>
+    <path fill="#ffffff" d="M32.7947,9.8527H35.73a7.77,7.77,0,0,1,0,15.5394H32.7947"/>
+  </svg>
+  </symbol>
+</svg>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha512-aOFyMMzZF7l7ei3vOKgQiRhZnYqk9YC/uMzl4T0j5N5D3Kul+QAFU8ssENDRMAqr/lxDOjMF69dSYJ8HYqY+WQ==" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" integrity="sha512-UPFOadao2nEorjtjl0xUTtN3w20Ja143UPEU6EyJ1mi5MB2bDtMkiWmqGDqi47xNLB5z1dy31GKJDEWhjUJFiQ==" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" integrity="sha512-YJVxTjqttjsU3cSvaTRqsSl0wbRgZUNF+NGGCgto/MUbIvaLdXQzGTCQu4CvyJZbZctgflVB0PXw9LLmTWm5/w==" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
+<footer class="footer">
+  <div class="footer_inner wrap pale">
+    <img src='https://jianlin-li.github.io/icons/apple-touch-icon.png' class="icon icon_2 transparent" alt="Copyright © 1989–2025, 李建林 ">
+    <p>Copyright&nbsp;1989-&nbsp;<span class="year"></span>&nbsp;COPYRIGHT © 1989–2025, 李建林 . All Rights Reserved</p><a class="to_top" href="#documentTop">
+  <svg class="icon">
+  <title>to-top</title>
+  <use xlink:href="#to-top"></use>
+</svg>
+
+</a>
+
+  </div>
+</footer>
+
+<script type="text/javascript" src="https://jianlin-li.github.io/zh-cn/js/bundle.e4e0e4fbe8acb50d7f973828f4138cdbea727800047fc93f9abbd6751e8f3422d6ef193f98da36fdb8488219c25692d73da89480f46abc8421a4ee3526dd6c23.js" integrity="sha512-5ODk&#43;&#43;istQ1/lzgo9BOM2&#43;pyeAAEf8k/mrvWdR6PNCLW7xk/mNo2/bhIghnCVpLXPaiUgPRqvIQhpO41Jt1sIw==" crossorigin="anonymous"></script>
+
+  <script src="https://jianlin-li.github.io/js/search.min.4c2b0421d128bbd7c43fc7d662fb5dfd8e439c60ee92c900a26d72d9c3271d2256f5bac9f6f919cddfd55101e9272898716cbb3381b4360bf43a66a5f7664f54.js"></script>
+
+  </body>
+</html>

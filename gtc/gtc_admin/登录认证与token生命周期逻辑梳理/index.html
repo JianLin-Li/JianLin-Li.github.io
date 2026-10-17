@@ -1,0 +1,1928 @@
+
+<!DOCTYPE html>
+<html
+  lang="zh-cn"
+  data-figures=""
+  
+    class="page"
+  
+  
+  >
+  <head>
+<title>登录认证与 token生命周期逻辑梳理 | 李建林个人知识库</title>
+<meta charset="utf-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+
+
+
+
+<meta property="og:locale" content="zh-cn" />
+
+<meta property="og:type" content="article">
+<meta name="description" content="登录认证与 Token 生命周期逻辑梳理
+
+梳理日期：2026-10-03。范围：当前本地 gtc_admin、gtcuser 源码及实际安装的相关依赖；补充 gtc_admin_vue 的后台凭证存储行为。
+本文是源码分析结果，未修改业务代码。未读取 .env、证书、实际部署密钥、真实 Token 或生产日志，也未连 …" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:creator" content="">
+<meta name="twitter:title" content="" />
+<meta name="twitter:image" content="https://jianlin-li.github.io/images/thumbnail.png"/>
+<meta property="og:url" content="https://jianlin-li.github.io/gtc/gtc_admin/%E7%99%BB%E5%BD%95%E8%AE%A4%E8%AF%81%E4%B8%8Etoken%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F%E9%80%BB%E8%BE%91%E6%A2%B3%E7%90%86/" />
+<meta property="og:title" content="" />
+<meta property="og:description" content="登录认证与 Token 生命周期逻辑梳理
+
+梳理日期：2026-10-03。范围：当前本地 gtc_admin、gtcuser 源码及实际安装的相关依赖；补充 gtc_admin_vue 的后台凭证存储行为。
+本文是源码分析结果，未修改业务代码。未读取 .env、证书、实际部署密钥、真实 Token 或生产日志，也未连 …" />
+<meta property="og:image" content="https://jianlin-li.github.io/images/thumbnail.png" />
+
+<link rel="apple-touch-icon" sizes="180x180" href="https://jianlin-li.github.io/icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://jianlin-li.github.io/icons/favicon-32x32.png">
+<link rel="manifest" href="https://jianlin-li.github.io/icons/site.webmanifest">
+
+<link rel="canonical" href="https://jianlin-li.github.io/gtc/gtc_admin/%E7%99%BB%E5%BD%95%E8%AE%A4%E8%AF%81%E4%B8%8Etoken%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F%E9%80%BB%E8%BE%91%E6%A2%B3%E7%90%86/">
+
+
+
+<link rel="preload" href="https://jianlin-li.github.io/css/styles.dc38388a8f0b890e788bd3a99b7495d14e7d5ac4359ed3b49abeb778497863b284ad4cc7e496ef58c84139295f9bafed82f5a41345eda86bd2d429cccb7c2596.css" integrity = "sha512-3Dg4io8LiQ54i9Opm3SV0U59WsQ1ntO0mr63eEl4Y7KErUzH5JbvWMhBOSlfm6/tgvWkE0XtqGvS1CnMy3wllg==" as="style" crossorigin="anonymous">
+
+
+
+<link rel="preload" href="https://jianlin-li.github.io/zh-cn/js/bundle.e4e0e4fbe8acb50d7f973828f4138cdbea727800047fc93f9abbd6751e8f3422d6ef193f98da36fdb8488219c25692d73da89480f46abc8421a4ee3526dd6c23.js" as="script" integrity=
+"sha512-5ODk&#43;&#43;istQ1/lzgo9BOM2&#43;pyeAAEf8k/mrvWdR6PNCLW7xk/mNo2/bhIghnCVpLXPaiUgPRqvIQhpO41Jt1sIw==" crossorigin="anonymous">
+
+
+<link rel="stylesheet" type="text/css" href="https://jianlin-li.github.io/css/styles.dc38388a8f0b890e788bd3a99b7495d14e7d5ac4359ed3b49abeb778497863b284ad4cc7e496ef58c84139295f9bafed82f5a41345eda86bd2d429cccb7c2596.css" integrity="sha512-3Dg4io8LiQ54i9Opm3SV0U59WsQ1ntO0mr63eEl4Y7KErUzH5JbvWMhBOSlfm6/tgvWkE0XtqGvS1CnMy3wllg==" crossorigin="anonymous">
+
+
+  </head>
+  <body
+    data-code="7"
+    data-lines="true"
+    id="documentTop"
+    data-lang="zh-cn"
+  >
+
+<header class="nav_header" >
+  <nav class="nav"><a href='https://jianlin-li.github.io/' class="nav_brand nav_item" title="李建林个人知识库">
+  <img src="https://jianlin-li.github.io/logos/logo.png" class="logo" alt="李建林个人知识库">
+  <div class="nav_close">
+    <div><svg class="icon">
+  <title>open-menu</title>
+  <use xlink:href="#open-menu"></use>
+</svg>
+<svg class="icon">
+  <title>closeme</title>
+  <use xlink:href="#closeme"></use>
+</svg>
+</div>
+  </div>
+</a>
+
+    <div class='nav_body nav_body_left'>
+      
+      
+      
+        
+
+  <div class="nav_parent">
+    <a href="https://jianlin-li.github.io/" class="nav_item" title="首页">首页 </a>
+  </div>
+  <div class="nav_parent">
+    <a href="https://jianlin-li.github.io/archives/" class="nav_item" title="归档">归档 </a>
+  </div>
+  <div class="nav_parent">
+    <a href="https://jianlin-li.github.io/gtc/" class="nav_item" title="GTC 文档">GTC 文档 </a>
+  </div>
+  <div class="nav_parent">
+    <a href="https://jianlin-li.github.io/categories/" class="nav_item" title="分类">分类 </a>
+  </div>
+  <div class="nav_parent">
+    <a href="https://jianlin-li.github.io/tags/" class="nav_item" title="标签">标签 </a>
+  </div>
+  <div class="nav_parent">
+    <a href="https://jianlin-li.github.io/about/" class="nav_item" title="关于">关于 </a>
+  </div>
+      
+<div class='follow'>
+  <a href="https://github.com/JianLin-Li">
+    <svg class="icon">
+  <title>github</title>
+  <use xlink:href="#github"></use>
+</svg>
+
+  </a>
+  <a href="http://local.gitlab.com">
+    <svg class="icon">
+  <title>gitlab</title>
+  <use xlink:href="#gitlab"></use>
+</svg>
+
+  </a>
+<div class="color_mode">
+  <input type="checkbox" class="color_choice" id="mode">
+</div>
+
+</div>
+
+    </div>
+  </nav>
+</header>
+
+    <main><div class="grid-inverse wrap content">
+  <article class="post_content">
+    <p class="gtc-breadcrumb"><a href="/gtc/">GTC 文档归档</a> / gtc_admin</p>
+    <h1 class="post_title">登录认证与 token生命周期逻辑梳理</h1>
+    <div class="post_meta gtc-meta">
+      <span class="post_date">
+        2026-10-17
+      </span>
+      <span>项目：gtc_admin</span>
+    </div>
+    
+    <div class="post_body">
+      <h1 id="登录认证与-token-生命周期逻辑梳理">登录认证与 Token 生命周期逻辑梳理</h1>
+<blockquote>
+<p>梳理日期：2026-10-03。范围：当前本地 <code>gtc_admin</code>、<code>gtcuser</code> 源码及实际安装的相关依赖；补充 <code>gtc_admin_vue</code> 的后台凭证存储行为。</p>
+<p>本文是源码分析结果，未修改业务代码。未读取 <code>.env</code>、证书、实际部署密钥、真实 Token 或生产日志，也未连接数据库、Redis 或外部认证服务。所有时间和用户数据示例均为虚构数据。文中默认值来自仓库配置，不能直接等同于线上运行值。</p>
+</blockquote>
+<h2 id="1-核心结论">1. 核心结论</h2>
+<p>系统中至少存在四条需要区分的认证链路：</p>
+<table>
+  <thead>
+      <tr>
+          <th>项目与认证域</th>
+          <th>主要入口</th>
+          <th>技术实现</th>
+          <th>访问令牌中用户 ID 的位置</th>
+          <th>刷新令牌形式</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>gtc_admin</code> 管理后台</td>
+          <td><code>/admin/pub/login</code></td>
+          <td>ThinkPHP、Tinywan think-jwt、Firebase PHP-JWT、HS256</td>
+          <td><code>extend.id</code></td>
+          <td>JWT，结构与访问令牌相同，无用途声明</td>
+      </tr>
+      <tr>
+          <td><code>gtcuser</code> CRM 客户登录</td>
+          <td><code>/api/pub/login</code>，注册自动登录、第三方登录等</td>
+          <td>Hyperf/MineAdmin、自定义 <code>Mine\Jwt\Jwt</code>、Lcobucci JWT、HS256</td>
+          <td><code>jti</code></td>
+          <td>JWT，通过 <code>sub=&quot;refresh&quot;</code> 标识用途</td>
+      </tr>
+      <tr>
+          <td><code>gtcuser</code> 自带管理端</td>
+          <td><code>/admin/passport/login</code></td>
+          <td>MineAdmin Passport、同一个自定义 JWT 类，<code>default</code> 场景</td>
+          <td><code>jti</code></td>
+          <td>JWT，通过 <code>sub=&quot;refresh&quot;</code> 标识用途</td>
+      </tr>
+      <tr>
+          <td><code>gtcuser</code> 独立 OAuth2 授权</td>
+          <td><code>/api/oauth2/token</code></td>
+          <td>League OAuth2 Server、RSA RS256、Defuse Crypto</td>
+          <td><code>sub</code>；<code>jti</code> 为随机令牌 ID</td>
+          <td>加密的 JSON，<strong>不是 JWT</strong></td>
+      </tr>
+  </tbody>
+</table>
+<p>最重要的区别如下：</p>
+<ol>
+<li><code>token_type</code> 是响应中固定的字符串 <code>Bearer</code>，用来提示客户端按 <code>Authorization: Bearer &lt;access_token&gt;</code> 携带凭证；它不是 Token 内部的随机字段，也不参与密码验证。</li>
+<li><code>gtc_admin</code> 返回 <code>expires_in</code>；CRM 客户登录返回 <code>expire_at</code> 和 <code>expire_time</code>。客户侧的 <code>expire_at</code> 实际表示有效期秒数，<code>expire_time</code> 才是绝对到期时间戳。</li>
+<li>后台有 JWT 固定截止时间和 Redis 滑动会话两套时钟。续 Redis TTL 不会改变已经签名的 JWT <code>exp</code>，并且当前滑动会话校验只覆盖数据库中 <code>admin</code> 或 <code>scope</code> 为真的账号及相关执行路径。</li>
+<li>客户侧正常新登录会生成随机 <code>sid</code>，访问和刷新令牌共享该会话；数据库保存会话截止时间和刷新版本 <code>version</code>，JWT 中的 <code>sv</code> 用于刷新时阻止旧凭证重复轮换。</li>
+<li>后台源码中 <code>access_secret_key</code>、<code>refresh_secret_key</code> 是相同的固定字符串默认值，默认有效期也相同。两种 JWT 没有用途声明：在生成的时间字段相同时，<code>access_token</code> 和 <code>refresh_token</code> 可以完全一致。本文不展示密钥内容。</li>
+<li>后台依赖库提供刷新方法，但当前应用代码未发现调用该方法的业务刷新入口；不能因为响应有 <code>refresh_token</code> 就认为前端已实现自动刷新。</li>
+</ol>
+<h2 id="2-统一理解字段和-jwt">2. 统一理解字段和 JWT</h2>
+<h3 id="21-响应字段与令牌内部字段">2.1 响应字段与令牌内部字段</h3>
+<table>
+  <thead>
+      <tr>
+          <th>字段</th>
+          <th>所在位置</th>
+          <th>单位或格式</th>
+          <th>作用</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>access_token</code></td>
+          <td>登录/刷新响应；客户端存储</td>
+          <td>字符串</td>
+          <td>后续资源请求的认证凭证</td>
+      </tr>
+      <tr>
+          <td><code>refresh_token</code></td>
+          <td>登录/刷新响应；客户端存储</td>
+          <td>JWT 或 OAuth2 加密字符串</td>
+          <td>获取新访问令牌；一般不用于普通业务请求</td>
+      </tr>
+      <tr>
+          <td><code>token_type</code></td>
+          <td>后台 Tinywan、OAuth2 响应</td>
+          <td>固定 <code>Bearer</code></td>
+          <td>指定请求头认证方案；CRM 普通登录不返回该字段</td>
+      </tr>
+      <tr>
+          <td><code>expires_in</code></td>
+          <td>后台 Tinywan、OAuth2 响应</td>
+          <td>秒数</td>
+          <td>后台为配置的访问有效期；OAuth2 为返回时剩余有效期</td>
+      </tr>
+      <tr>
+          <td><code>expire_at</code></td>
+          <td>CRM、MineAdmin Passport 响应</td>
+          <td><strong>有效期秒数</strong></td>
+          <td>虽名为 <code>at</code>，当前源码并未赋绝对时间</td>
+      </tr>
+      <tr>
+          <td><code>expire_time</code></td>
+          <td>CRM 登录/刷新响应</td>
+          <td>Unix 秒时间戳</td>
+          <td><code>time() + expire_at</code>，给客户端估计截止时间</td>
+      </tr>
+      <tr>
+          <td><code>exp</code></td>
+          <td>JWT 载荷</td>
+          <td>Unix 秒时间戳</td>
+          <td>服务端校验 Token 到期的核心标准声明</td>
+      </tr>
+      <tr>
+          <td><code>iat</code></td>
+          <td>JWT 载荷</td>
+          <td>Unix 秒时间戳</td>
+          <td>签发时间；客户侧还与会员失效水位比较</td>
+      </tr>
+      <tr>
+          <td><code>nbf</code></td>
+          <td>JWT 载荷</td>
+          <td>Unix 秒时间戳</td>
+          <td>最早可使用的时间</td>
+      </tr>
+      <tr>
+          <td><code>expires_at</code></td>
+          <td>客户会话表或 OAuth2 表</td>
+          <td>会话表为 Unix 秒；OAuth2 模型为日期时间</td>
+          <td>持久化生命周期截止时间，与响应 <code>expire_at</code> 不是同一字段</td>
+      </tr>
+      <tr>
+          <td><code>expires</code></td>
+          <td>客户 Redis Token 列表元素</td>
+          <td>Unix 秒时间戳</td>
+          <td>设备列表内某枚访问令牌的预计截止时间</td>
+      </tr>
+  </tbody>
+</table>
+<p>服务端不会相信客户端自行提交的 <code>expire_at</code>、<code>expire_time</code> 或 <code>expires_in</code> 来决定是否登录。客户端把这些值改大，不能延长签名 JWT 的寿命。</p>
+<h3 id="22-jwt-是怎样组合出来的">2.2 JWT 是怎样组合出来的</h3>
+<p>两项目的 HS256 JWT 都采用三段结构：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">base64url(JSON(header)) . base64url(JSON(payload)) . base64url(signature)
+</span></span><span class="line"><span class="ln">2</span><span class="cl">
+</span></span><span class="line"><span class="ln">3</span><span class="cl">signature = HMAC-SHA256(
+</span></span><span class="line"><span class="ln">4</span><span class="cl">    secret,
+</span></span><span class="line"><span class="ln">5</span><span class="cl">    base64url(JSON(header)) + &#34;.&#34; + base64url(JSON(payload))
+</span></span><span class="line"><span class="ln">6</span><span class="cl">)
+</span></span></code></pre></div><p>典型头部为 <code>{&quot;typ&quot;:&quot;JWT&quot;,&quot;alg&quot;:&quot;HS256&quot;}</code>。签名保护载荷不被篡改，<strong>不会加密载荷</strong>；拿到 Token 的人可以解码看到其中的邮箱、用户 ID 等字段。真正接受凭证前必须验证签名、有效期和业务失效状态。</p>
+<p>OAuth2 的访问 JWT 使用 RS256：私钥签名、公钥验证；它的刷新凭证则对 JSON 做加密，不能套用上述三段 JWT 解释。</p>
+<h3 id="23-默认时间配置对比">2.3 默认时间配置对比</h3>
+<table>
+  <thead>
+      <tr>
+          <th>认证链路</th>
+          <th>访问有效期</th>
+          <th>刷新有效期</th>
+          <th>额外时限</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>gtc_admin</code></td>
+          <td><code>JWT_TTL</code>，默认 <code>7200 * 8 = 57600</code> 秒，16 小时</td>
+          <td><code>JWT_REFRESH_TTL</code>，默认同为 57600 秒</td>
+          <td><code>SESSION_EXPIRE</code> 默认 3600 秒；JWT 时钟容差默认 60 秒</td>
+      </tr>
+      <tr>
+          <td><code>gtcuser</code> CRM</td>
+          <td><code>JWT_TTL</code>，默认 3600 秒</td>
+          <td><code>JWT_REFRESH_TTL</code>，默认 7200 秒</td>
+          <td>黑名单 <code>JWT_BLACKLIST_TTL</code> 默认 7201 秒；会话截止取刷新 JWT <code>exp</code></td>
+      </tr>
+      <tr>
+          <td><code>gtcuser</code> Passport</td>
+          <td>同上</td>
+          <td>同上</td>
+          <td>默认没有 CRM 的 <code>sid</code> 会话生命周期</td>
+      </tr>
+      <tr>
+          <td><code>gtcuser</code> OAuth2</td>
+          <td><code>OAUTH2_ACCESS_TOKEN_TTL</code> 默认 <code>PT1H</code></td>
+          <td><code>OAUTH2_REFRESH_TOKEN_TTL</code> 默认 <code>P1M</code></td>
+          <td>授权码默认 <code>PT10M</code>；静默登录票据默认 60 秒</td>
+      </tr>
+  </tbody>
+</table>
+<p><code>P1M</code> 是 PHP <code>DateInterval</code> 的一个日历月，不应直接解释为固定 30 天。CRM JWT 支持 <code>&lt;device&gt;_ttl</code>、<code>&lt;device&gt;_refresh_ttl</code> 覆盖，如 <code>pc_ttl</code>、<code>app_refresh_ttl</code>；当前仓库 JWT 配置未声明这些覆盖键，所以静态默认回退到通用 TTL。</p>
+<p>配置证据：<a href="/Users/lijianlin/www/local/gtc_admin/config/jwt.php:13">后台 JWT 配置</a>、<a href="/Users/lijianlin/www/local/gtcuser/config/autoload/jwt.php:19">客户 JWT 配置</a>、<a href="/Users/lijianlin/www/local/gtcuser/app/OAuth2/OAuth2ServerOptions.php:70">OAuth2 TTL 读取</a>。</p>
+<h2 id="3-gtc_admin管理后台登录">3. gtc_admin：管理后台登录</h2>
+<h3 id="31-入口与密码验证">3.1 入口与密码验证</h3>
+<p>入口为 <a href="/Users/lijianlin/www/local/gtc_admin/app/admin/controller/Pub.php:52">Pub::login()</a>。主要流程：</p>
+<ol>
+<li>读取登录参数；阿里验证码开关启用时，先验证 <code>captchaVerifyParam</code>。</li>
+<li>当前仅开放邮箱密码登录；<code>type == 1</code> 的手机号登录直接返回“暂未开放”。</li>
+<li>读取 <code>login_error_count + md5(email)</code>。失败次数达到 5 次拒绝登录；错误密码使计数增加并缓存 600 秒。</li>
+<li>密码经过 <code>encrpyt_password()</code> 后与会员表密码字段匹配。当前算法是 <code>md5(password + salt)</code>，默认使用固定盐；本文不展示盐值。</li>
+<li>检查账户状态、IP 白名单、<code>member_other.admin_banned_login</code>。超级管理员/范围管理员跳过普通角色限制；普通账号必须具有允许后台登录的角色。</li>
+<li>插入 <code>member_login_log</code>，认证来源 <code>auth_source = ADMIN</code>。</li>
+<li>启用 <code>app.admin_google_auth</code> 且账号为 <code>admin</code>/<code>scope</code> 时，校验 Google 验证码。</li>
+<li>签发 JWT，写 Redis 会话及可选终端集合，返回结果。</li>
+</ol>
+<p><strong>审计时序需要特别注意</strong>：登录日志插入在 Google 验证码校验之前，也在 Token 签发之前。因此这一条日志不能单独证明二次验证已完成或客户端已经取得 Token；该写入也没有保存随后生成的访问令牌。</p>
+<p>证据：<a href="/Users/lijianlin/www/local/gtc_admin/app/common.php:800">密码 helper</a>、<a href="/Users/lijianlin/www/local/gtc_admin/app/admin/controller/Pub.php:135">后台登录审计写入</a>、<a href="/Users/lijianlin/www/local/gtc_admin/app/admin/controller/Pub.php:164">Google 校验及签发</a>。</p>
+<h3 id="32-access_token-和-refresh_token-的实际字段">3.2 access_token 和 refresh_token 的实际字段</h3>
+<p>控制器构造如下业务数据，再交给 <code>tinywan\JWT::generateToken($user)</code>：</p>
+<table>
+  <thead>
+      <tr>
+          <th>字段</th>
+          <th>来源</th>
+          <th>在 JWT 中的位置</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>id</code></td>
+          <td>会员 ID</td>
+          <td><code>extend.id</code></td>
+      </tr>
+      <tr>
+          <td><code>name</code></td>
+          <td>会员 <code>nickname</code></td>
+          <td><code>extend.name</code></td>
+      </tr>
+      <tr>
+          <td><code>email</code></td>
+          <td>会员邮箱</td>
+          <td><code>extend.email</code></td>
+      </tr>
+      <tr>
+          <td><code>admin</code></td>
+          <td>`member.admin</td>
+          <td></td>
+      </tr>
+  </tbody>
+</table>
+<p>Tinywan 生成的公共载荷为：</p>
+<table>
+  <thead>
+      <tr>
+          <th>JWT 声明</th>
+          <th>访问令牌</th>
+          <th>刷新令牌</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>iss</code></td>
+          <td><code>config.jwt.iss</code>，默认 <code>think.tinywan.cn</code></td>
+          <td>相同</td>
+      </tr>
+      <tr>
+          <td><code>aud</code></td>
+          <td><strong>同样取 <code>config.jwt.iss</code></strong></td>
+          <td>相同</td>
+      </tr>
+      <tr>
+          <td><code>iat</code></td>
+          <td>生成时 <code>time()</code></td>
+          <td>复用公共载荷的值</td>
+      </tr>
+      <tr>
+          <td><code>nbf</code></td>
+          <td><code>time() + config.nbf</code>；仓库配置为 <code>-1</code></td>
+          <td>相同</td>
+      </tr>
+      <tr>
+          <td><code>exp</code></td>
+          <td><code>time() + access_exp</code></td>
+          <td>替换为 <code>time() + refresh_exp</code></td>
+      </tr>
+      <tr>
+          <td><code>extend</code></td>
+          <td>上表四个业务字段</td>
+          <td>相同</td>
+      </tr>
+  </tbody>
+</table>
+<p>这里没有 <code>jti</code>、<code>sid</code>、<code>sv</code>、<code>sub=&quot;refresh&quot;</code>、密码或设备指纹声明。<code>aud</code> 也不是请求域名自动生成的。</p>
+<p>虚构的访问 JWT 解码示例：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl">  <span class="nt">&#34;iss&#34;</span><span class="p">:</span> <span class="s2">&#34;think.tinywan.cn&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl">  <span class="nt">&#34;aud&#34;</span><span class="p">:</span> <span class="s2">&#34;think.tinywan.cn&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl">  <span class="nt">&#34;iat&#34;</span><span class="p">:</span> <span class="mi">1800000000</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl">  <span class="nt">&#34;nbf&#34;</span><span class="p">:</span> <span class="mi">1799999999</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">  <span class="nt">&#34;exp&#34;</span><span class="p">:</span> <span class="mi">1800057600</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl">  <span class="nt">&#34;extend&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl">    <span class="nt">&#34;id&#34;</span><span class="p">:</span> <span class="mi">123</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">    <span class="nt">&#34;name&#34;</span><span class="p">:</span> <span class="s2">&#34;Example Admin&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">10</span><span class="cl">    <span class="nt">&#34;email&#34;</span><span class="p">:</span> <span class="s2">&#34;admin@example.invalid&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">11</span><span class="cl">    <span class="nt">&#34;admin&#34;</span><span class="p">:</span> <span class="kc">true</span>
+</span></span><span class="line"><span class="ln">12</span><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="ln">13</span><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>访问签名读取 <code>access_secret_key</code>，刷新签名读取 <code>refresh_secret_key</code>。当前仓库两项是同一个固定字符串；在默认 TTL 相同且生成的 <code>exp</code> 相同时，两种令牌输入完全相同，签名也相同。若实际 TTL 被配置为不同值，或生成跨秒，则令牌字符串可能不同，但当前没有独立用途声明供解析器区分。</p>
+<p>证据：<a href="/Users/lijianlin/www/local/gtc_admin/app/admin/controller/Pub.php:176">业务字段</a>、<a href="/Users/lijianlin/www/local/gtc_admin/vendor/tinywan/think-jwt/src/JWT.php:143">generateToken</a>、<a href="/Users/lijianlin/www/local/gtc_admin/vendor/tinywan/think-jwt/src/JWT.php:292">generatePayload</a>。</p>
+<h3 id="33-响应与-token_typeexpires_in">3.3 响应与 token_type、expires_in</h3>
+<p>控制器将 Tinywan 返回数组放在业务响应的 <code>data</code> 中：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl">  <span class="nt">&#34;code&#34;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl">  <span class="nt">&#34;message&#34;</span><span class="p">:</span> <span class="s2">&#34;登录成功&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl">  <span class="nt">&#34;data&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl">    <span class="nt">&#34;token_type&#34;</span><span class="p">:</span> <span class="s2">&#34;Bearer&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">    <span class="nt">&#34;expires_in&#34;</span><span class="p">:</span> <span class="mi">57600</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl">    <span class="nt">&#34;access_token&#34;</span><span class="p">:</span> <span class="s2">&#34;&lt;访问凭证，占位符&gt;&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl">    <span class="nt">&#34;refresh_token&#34;</span><span class="p">:</span> <span class="s2">&#34;&lt;刷新凭证，占位符&gt;&#34;</span>
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><ul>
+<li><code>token_type</code> 为库代码固定赋值，不从数据库读取，不在载荷中。</li>
+<li><code>expires_in</code> 为 <code>access_exp</code> 的秒数，不反映 Redis 当前剩余 TTL，也不是刷新令牌寿命。</li>
+<li>此入口不返回 <code>expire_at</code>、<code>expire_time</code>。</li>
+<li><code>refresh_disable=false</code> 所以生成刷新令牌；<code>refresh_is_store=false</code> 所以默认不将完整刷新令牌存入 Tinywan 的 Redis 存储。</li>
+</ul>
+<h3 id="34-生成后服务端存在哪里">3.4 生成后服务端存在哪里</h3>
+<table>
+  <thead>
+      <tr>
+          <th>存储</th>
+          <th>逻辑键/表</th>
+          <th>内容</th>
+          <th>截止时间与用途</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>ThinkPHP 默认 Redis 缓存</td>
+          <td><code>admin_user_token + md5(access_token)</code></td>
+          <td>整数 <code>1</code>，不是原始 Token</td>
+          <td>TTL=<code>SESSION_EXPIRE</code>，默认 3600 秒；后台滑动会话存在标记</td>
+      </tr>
+      <tr>
+          <td>同一缓存</td>
+          <td><code>admin_member_login_device_set_{memberId}</code></td>
+          <td><code>fingerprint =&gt; {t: 登录时间, tk: md5(access_token)}</code></td>
+          <td>同为 <code>SESSION_EXPIRE</code>；限制终端数量、定位淘汰对象</td>
+      </tr>
+      <tr>
+          <td>MySQL 登录审计</td>
+          <td>逻辑表 <code>member_login_log</code>，数据字典为 <code>t_member_login_log</code></td>
+          <td>用户/IP/设备/地区、<code>auth_source=ADMIN</code> 等</td>
+          <td>本入口不写访问/刷新令牌，也不创建 CRM 的 <code>sid</code> 会话</td>
+      </tr>
+      <tr>
+          <td>Tinywan 可选刷新存储</td>
+          <td><code>JWT:REFRESH_TOKEN:{memberId}</code></td>
+          <td>完整刷新令牌</td>
+          <td>仅 <code>refresh_is_store=true</code> 时启用，TTL=<code>refresh_exp</code>；当前关闭</td>
+      </tr>
+      <tr>
+          <td>Tinywan 可选单设备存储</td>
+          <td><code>JWT:TOKEN:{memberId}:{ip}</code></td>
+          <td><code>extend</code> JSON</td>
+          <td>仅 <code>is_single_device=true</code> 时启用；当前关闭</td>
+      </tr>
+  </tbody>
+</table>
+<p>ThinkPHP 默认缓存选择 Redis，逻辑键还会叠加 <code>REDIS_PREFIX</code>，仓库默认值为 <code>max</code>。表名也由数据库前缀最终决定，不应将逻辑名直接当作部署中的完整物理名。</p>
+<p>启用 <code>CRM_MAX_USER_LOGIN_DEVICE &gt; 0</code> 后，指纹由 <code>md5(type + &quot;|&quot; + os + &quot;|&quot; + version + &quot;|&quot; + User-Agent)</code> 得到；同指纹重新登录清除其旧 <code>admin_user_token</code>，新指纹超限时按最早登录时间 <code>t</code> 淘汰。</p>
+<p>该终端集合在登录/退出时维护，不能等同于每次请求都同步刷新的完整在线设备表；普通访问续期的是 Token 标记，集合 TTL 并未随之统一更新。</p>
+<p>证据：<a href="/Users/lijianlin/www/local/gtc_admin/app/admin/controller/Pub.php:183">会话和终端缓存写入</a>、<a href="/Users/lijianlin/www/local/gtc_admin/config/cache.php:9">默认 Redis 缓存</a>、<a href="/Users/lijianlin/www/local/gtc_admin/vendor/tinywan/think-jwt/src/RedisHandler.php:23">Tinywan RedisHandler</a>。</p>
+<h3 id="35-后台客户端如何保存">3.5 后台客户端如何保存</h3>
+<p>已核对对应的 <code>gtc_admin_vue</code>：</p>
+<ol>
+<li><code>src/api/login/index.js</code> 调用 <code>/admin/pub/login</code>，成功后只将 <code>res.data.data.access_token</code> 交给 <code>setToken()</code>。</li>
+<li>当前 <code>setToken()</code> 将凭证写入 <code>localStorage.access_token</code>，移除旧的 <code>sessionStorage</code> 同名值；<code>getToken()</code> 优先本地存储，兼容会话存储。</li>
+<li>“记住我”另存为 <code>login_remember_persist</code> 标记，不决定 JWT 的 <code>exp</code>，也不改变后端 Redis TTL。</li>
+<li>多标签页模块维护页签登记和离开标记，下次加载可清理已关闭所有页签的登录态；浏览器存储本身没有后端 Token TTL。</li>
+<li>请求拦截器添加 <code>Authorization: Bearer &lt;access_token&gt;</code>。</li>
+<li>响应拦截器可以读取响应头 <code>authorization</code> 并替换本地凭证，但这仅代表前端有接收能力。本次后台登录/鉴权链路未发现常规请求自动签发新 JWT 并下发该响应头的实现。</li>
+<li>上述登录路径没有保存 <code>refresh_token</code>、<code>token_type</code> 或 <code>expires_in</code>，也未发现使用后台刷新令牌的调用。</li>
+</ol>
+<p>证据：<a href="/Users/lijianlin/www/local/gtc_admin_vue/src/api/login/index.js:8">前端登录</a>、<a href="/Users/lijianlin/www/local/gtc_admin_vue/src/utils/token-util.js:68">Token 存储</a>、<a href="/Users/lijianlin/www/local/gtc_admin_vue/src/utils/request.js:63">请求 Authorization</a>、<a href="/Users/lijianlin/www/local/gtc_admin_vue/src/utils/request.js:167">响应头替换能力</a>、<a href="/Users/lijianlin/www/local/gtc_admin_vue/src/utils/tab-session.js:141">页签生命周期</a>。</p>
+<h3 id="36-登录时和后续请求怎样验证-authorization">3.6 登录时和后续请求怎样验证 Authorization</h3>
+<p><strong>用户名密码登录时</strong>：<code>Pub</code> 是登录校验跳过的控制器。登录依赖密码、验证码、账户/角色/IP 等校验，不要求客户端先有有效 <code>Authorization</code>。因此不要把“密码登录验证”和“后续凭证校验”混为一件事。</p>
+<p><strong>受保护请求时</strong>：存在 <code>CheckLogin</code> 中间件和 <code>BaseController</code> 构造逻辑两处校验。控制器构造涉及框架创建时机，不应将它们画成所有路由都严格按同一顺序执行的一条流水线；它们共同构成认证检查。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="ln"> 1</span><span class="cl">flowchart TD
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl">  R[后台请求] --&gt; E{是否登录校验跳过路径}
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl">  E --&gt;|否| H[取得 Authorization]
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl">  H --&gt; J[校验 JWT 格式、算法、签名和时间]
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl">  J --&gt; U[读取 extend.id]
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">  U --&gt; M[查询当前会员状态、后台禁用、IP与权限]
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl">  M --&gt; A{当前数据库 admin 或 scope 为真}
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl">  A --&gt;|是且进入会话检查路径| C[校验 admin_user_token 标记并续 Redis TTL]
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">  A --&gt;|否| P[后续节点与数据权限判断]
+</span></span><span class="line"><span class="ln">10</span><span class="cl">  C --&gt; P
+</span></span><span class="line"><span class="ln">11</span><span class="cl">  E --&gt;|是| X[执行对应开放逻辑]
+</span></span></code></pre></div><p>具体行为：</p>
+<ul>
+<li><code>CheckLogin</code> 跳过 <code>Pub</code>、<code>Kchart</code> 以及其 <code>notauth</code> 中的 <code>index/groups</code>、<code>index/server_list</code>。<code>BaseController</code> 的跳过条件不同，不能由一个中间件的白名单推断接口最终完全免认证。</li>
+<li>受保护路径先要求请求头包含 <code>Bearer </code>；Tinywan 的解析更严格：整个字符串按空格拆分必须恰好两项，第一项必须是大小写精确的 <code>Bearer</code>，Token 必须非空，字符串必须有两个 <code>.</code>。</li>
+<li>Firebase 解码验证配置的算法和签名，以及时间声明；后台 <code>leeway=60</code> 为时间校验提供容差。<code>nbf</code> 配置为 <code>-1</code>，表示比签发时刻早一秒可用。</li>
+<li>Tinywan 从验证后的 <code>extend.id</code> 得到用户 ID。当前实现虽然写了 <code>iss/aud</code>，但没有额外约束要求它们等于预期签发者/受众。</li>
+<li><code>BaseController</code> 按用户 ID 查当前 <code>status=1</code> 的会员，检查 <code>admin_banned_login</code>、IP 白名单、节点和数据权限；角色权限不是单靠 JWT 的一个布尔字段决定。</li>
+<li>数据库中当前 <code>admin</code>/<code>scope</code> 为真时，<code>checkadmin()</code> 要求 <code>extend.admin</code> 为真。普通角色后台账号走不同权限分支，不能把全部后台用户都视为这个布尔分支。</li>
+<li><code>_logger()</code> 会调用 <code>refreshAdminTokenSession()</code>，要求会话标记存在并重置 TTL；全局搜索也有专门调用。该方法对 <code>admin=false</code> 直接返回；<code>_logger()</code> 对 URI 含 <code>get_notify</code> 的请求提前返回，跳过这一处会话检查与续期。</li>
+<li>解析失败在中间件可能返回业务 <code>code=401</code>；基类失效通常返回 <code>code=10002</code>。这些 JSON 业务码不能不加区分地当作 HTTP 状态码。</li>
+</ul>
+<p>证据：<a href="/Users/lijianlin/www/local/gtc_admin/app/admin/middleware/CheckLogin.php:28">CheckLogin</a>、<a href="/Users/lijianlin/www/local/gtc_admin/app/admin/controller/BaseController.php:76">基类会员与权限检查</a>、<a href="/Users/lijianlin/www/local/gtc_admin/vendor/tinywan/think-jwt/src/JWT.php:226">严格请求头解析</a>、<a href="/Users/lijianlin/www/local/gtc_admin/vendor/tinywan/think-jwt/src/JWT.php:263">签名验证</a>、<a href="/Users/lijianlin/www/local/gtc_admin/app/admin/controller/BaseController.php:405">会话检查入口</a>。</p>
+<h3 id="37-redis-续期与-jwt-到期的关系">3.7 Redis 续期与 JWT 到期的关系</h3>
+<p>以虚构登录时刻 <code>T</code> 和仓库默认值为例：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">JWT 访问令牌固定截止：T + 57600 秒
+</span></span><span class="line"><span class="ln">2</span><span class="cl">Redis 初始会话截止： T + 3600 秒
+</span></span><span class="line"><span class="ln">3</span><span class="cl">
+</span></span><span class="line"><span class="ln">4</span><span class="cl">若 T + 1800 秒的请求进入续期逻辑：
+</span></span><span class="line"><span class="ln">5</span><span class="cl">Redis 新截止 = T + 1800 + 3600
+</span></span><span class="line"><span class="ln">6</span><span class="cl">JWT exp 仍然 = T + 57600
+</span></span></code></pre></div><p>对执行会话检查的账号/路径，Redis 提前过期会导致 JWT 尚未到期也不能使用；持续访问最多维持缓存，无法跨越 JWT 固定截止时间。普通角色或跳过该检查的路径不具备完全相同的空闲过期行为。</p>
+<p>源码注释中的“加半小时”不是准确配置说明：实际使用 <code>(int) env('SESSION_EXPIRE', 3600)</code>，默认是一小时。</p>
+<p>证据：<a href="/Users/lijianlin/www/local/gtc_admin/app/admin/controller/BaseController.php:450">refreshAdminTokenSession</a>。</p>
+<h3 id="38-刷新退出与其他签发路径">3.8 刷新、退出与其他签发路径</h3>
+<p><strong>刷新能力</strong>：Tinywan 的 <code>JWT::refreshToken()</code> 从 <code>Authorization</code> 取刷新 JWT，使用刷新配置验证，可选比对 Redis 中保存的刷新令牌，然后替换 <code>exp</code> 并签发访问令牌。返回值只有 <code>access_token</code>，不会同时轮换刷新令牌，也不会自动写应用自己的 <code>admin_user_token</code> 标记。当前应用 <code>app/</code> 中未发现该方法的调用，所以这是依赖库能力，不是已确认上线的后台刷新流程。</p>
+<p><strong>退出</strong>：<code>Pub::logout()</code> 优先读输入 <code>token</code>，然后读 <code>Authorization</code> 的 Bearer 凭证，最后读输入 <code>access_token</code>；删除对应会话缓存。若 JWT 仍能验证则定位用户，并按当前设备指纹移除终端集合项。它不建立 JWT 黑名单，也不统一撤销刷新凭证。因缓存校验范围有限，不能断言后台退出后同一 JWT 在所有后台账号和路径上都立即失效。</p>
+<p><strong>IP 拒绝分支</strong>：<code>check_ip_list()</code> 调用 <code>JWT::deleteRefreshToken($token)</code>，传入的是令牌字符串；依赖库实际期望用户 ID 并删除 <code>JWT:REFRESH_TOKEN:{id}</code>。因此这段代码不能作为刷新凭证已正确撤销的证据，当前刷新存储又是关闭的。</p>
+<p><strong>后台模拟客户登录</strong>：<code>Role::demo_login()</code> 通过内部调用访问 <code>gtcuser</code> 的 <code>remoteDemoLogin</code>，取得的是客户侧 JWT，不是 Tinywan 后台 JWT，见 4.8。</p>
+<p><strong>后台注册代码中的签发</strong>：<code>Member.php</code> 有一处调用 <code>generateToken()</code>，随后马上把 <code>$token</code> 置为空数组，最终返回空数据；不能把这段当成已向客户端交付的自动登录凭证。</p>
+<p>证据：<a href="/Users/lijianlin/www/local/gtc_admin/vendor/tinywan/think-jwt/src/JWT.php:110">依赖库刷新方法</a>、<a href="/Users/lijianlin/www/local/gtc_admin/app/admin/controller/Pub.php:213">退出</a>、<a href="/Users/lijianlin/www/local/gtc_admin/app/admin/controller/BaseController.php:211">IP 拒绝分支</a>、<a href="/Users/lijianlin/www/local/gtc_admin/app/admin/controller/Role.php:237">模拟登录</a>、<a href="/Users/lijianlin/www/local/gtc_admin/app/admin/controller/Member.php:5365">注册签发后覆盖</a>。</p>
+<h2 id="4-gtcusercrm-客户登录">4. gtcuser：CRM 客户登录</h2>
+<h3 id="41-实际生效的技术实现">4.1 实际生效的技术实现</h3>
+<p>普通客户登录使用 <code>App\Http\Common\Lib\OAuth\OauthPassportService</code>，JWT 场景名为 <code>oauth</code>。它的名称含 OAuth，但这里是项目自己的密码/第三方登录 JWT 契约，不能直接等同于第 6 节的 League OAuth2 Server。</p>
+<p><code>config/autoload/annotations.php</code> 将 <code>Mine\Jwt\Jwt</code> 映射到 <code>app/Common/Lib/Jwt/Jwt.php</code>，所以梳理必须以这份覆盖实现为准。<code>Mine\Jwt\Factory</code> 根据场景加载配置，最终使用 Lcobucci 的 <code>JwtFacade</code> 和项目时钟签发/解析。</p>
+<p>签名算法为 HMAC SHA256（HS256）；密钥通过 <code>InMemory::base64Encoded(env('JWT_SECRET'))</code> 读取。同一仓库默认 <code>default</code> 和 <code>oauth</code> 场景使用同一个环境变量，客户访问和刷新令牌也使用同一个场景签名密钥。</p>
+<p>配置声明了 <code>claims.iss</code>，但当前覆盖实现的构建方法没有读取并添加这些默认声明。因此实际客户 JWT 不能凭该配置断言包含 <code>iss</code>。</p>
+<p>证据：<a href="/Users/lijianlin/www/local/gtcuser/config/autoload/annotations.php:37">类映射</a>、<a href="/Users/lijianlin/www/local/gtcuser/app/Common/Lib/Jwt/Jwt.php:29">实际 Jwt 实现</a>、<a href="/Users/lijianlin/www/local/gtcuser/vendor/mineadmin/jwt/Factory.php:1">场景工厂</a>、<a href="/Users/lijianlin/www/local/gtcuser/config/autoload/jwt.php:19">配置</a>。</p>
+<h3 id="42-密码登录完整调用链">4.2 密码登录完整调用链</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="ln"> 1</span><span class="cl">sequenceDiagram
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl">  participant C as 客户端
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl">  participant P as PubController
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl">  participant S as OauthPassportService
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl">  participant J as 自定义 JWT
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">  participant R as Redis
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl">  participant D as 登录日志/会话数据库
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl">  C-&gt;&gt;P: 邮箱或手机号、密码、设备信息
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">  P-&gt;&gt;P: IP、地区、撞库防护及参数校验
+</span></span><span class="line"><span class="ln">10</span><span class="cl">  P-&gt;&gt;S: 前置事件检查后调用 login
+</span></span><span class="line"><span class="ln">11</span><span class="cl">  S-&gt;&gt;S: 验证密码、检查设备数量
+</span></span><span class="line"><span class="ln">12</span><span class="cl">  S-&gt;&gt;J: 共享 email/sid/sv 签发 access 和 refresh
+</span></span><span class="line"><span class="ln">13</span><span class="cl">  S-&gt;&gt;R: 写 login_token 列表
+</span></span><span class="line"><span class="ln">14</span><span class="cl">  S-&gt;&gt;D: 登录后事件写日志和 sid 会话
+</span></span><span class="line"><span class="ln">15</span><span class="cl">  D--&gt;&gt;S: 同库事务成功
+</span></span><span class="line"><span class="ln">16</span><span class="cl">  S--&gt;&gt;P: Token 对、expire_at、expire_time
+</span></span><span class="line"><span class="ln">17</span><span class="cl">  P--&gt;&gt;C: 业务响应
+</span></span></code></pre></div><p>入口 <a href="/Users/lijianlin/www/local/gtcuser/app/Http/Api/Controller/V1/PubController.php:334">PubController::login()</a> 对应 <code>/api/pub/login</code>：</p>
+<ol>
+<li>检查客户端 IP、地区规则、登录参数和撞库防护。<code>type=0/1</code> 对应邮箱/手机号密码登录；手机号经敏感信息登录服务解析。</li>
+<li>查到用户后触发 <code>OAuthBeforeEvent</code>。监听器处理手机号验证状态、密码错误锁定及业务风控等。配置默认最大密码错误次数为 3 次，锁定时长 10 分钟，实际以运行配置为准。</li>
+<li><code>OauthPassportService::login()</code> 调用会员 <code>verifyPassword()</code>；其最终使用 <code>encryptPwd()</code>，当前也是 <code>md5(password + 固定盐)</code>。</li>
+<li>管理员重置的临时密码有单独分支：验证重置记录、状态和有效期，返回业务异常及 <code>reset_token</code> 要求改密，<strong>不会直接按普通登录返回访问/刷新 Token</strong>。</li>
+<li>正常密码通过后，执行设备数量限制 <code>loginSafe()</code>，生成会话声明，签发 Token 对，缓存访问 Token 列表。</li>
+<li>同步触发 <code>OAuthAfterEvent</code>，成功监听器将原始访问 Token 和 Token 对传给 <code>MemberLoginLogService::record()</code>。</li>
+<li><code>record()</code> 在数据库事务中锁会员行，复核 <code>status=1</code>、<code>banned_login!=1</code>，创建登录日志和会话记录；失败登录不会创建会话。</li>
+<li>返回 <code>expire_at</code> 和 <code>expire_time</code>。前置/密码/后置阶段的失败会按现有审计逻辑记录，不能把所有异常都理解为密码不正确。</li>
+</ol>
+<p>证据：<a href="/Users/lijianlin/www/local/gtcuser/app/Http/Api/Listeners/UserLoginBeforeListener.php:43">前置监听器</a>、<a href="/Users/lijianlin/www/local/gtcuser/app/Http/Common/Lib/OAuth/OauthPassportService.php:62">登录服务</a>、<a href="/Users/lijianlin/www/local/gtcuser/app/Model/member/TMember.php:412">会员密码验证</a>、<a href="/Users/lijianlin/www/local/gtcuser/common/crm.php:268">密码 helper</a>、<a href="/Users/lijianlin/www/local/gtcuser/app/Http/Api/Listeners/UserLoginAfterListener.php:236">登录后监听器</a>、<a href="/Users/lijianlin/www/local/gtcuser/app/Service/crm/MemberLoginLogService.php:43">同库写入</a>。</p>
+<h3 id="43-客户-token-精确载荷">4.3 客户 Token 精确载荷</h3>
+<p><code>MemberLoginSessionService::claims()</code> 每次正常新登录返回：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">email = 用户邮箱
+</span></span><span class="line"><span class="ln">2</span><span class="cl">sid   = bin2hex(random_bytes(16))，32 位十六进制随机字符串
+</span></span><span class="line"><span class="ln">3</span><span class="cl">sv    = 整数 0
+</span></span></code></pre></div><p>当前方法无条件添加 <code>sid/sv</code>。其旧注释“未开启时保留旧 Token 契约”与代码分支不一致，不能据注释推断正常登录缺少会话字段。</p>
+<table>
+  <thead>
+      <tr>
+          <th>声明</th>
+          <th>access_token</th>
+          <th>refresh_token</th>
+          <th>说明</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>iat</code></td>
+          <td>签发时间</td>
+          <td>各自签发时间</td>
+          <td>JwtFacade 自动补充，当前使用 Unix 秒序列化</td>
+      </tr>
+      <tr>
+          <td><code>nbf</code></td>
+          <td>各自签发时刻</td>
+          <td>各自签发时刻</td>
+          <td>默认没有后台那样的 <code>-1</code> 偏移</td>
+      </tr>
+      <tr>
+          <td><code>exp</code></td>
+          <td>签发时刻 + 设备访问 TTL</td>
+          <td>签发时刻 + 设备刷新 TTL</td>
+          <td>具体 TTL 由覆盖配置或通用配置取得</td>
+      </tr>
+      <tr>
+          <td><code>jti</code></td>
+          <td>字符串会员 ID</td>
+          <td>字符串会员 ID</td>
+          <td>当前把 ID 当用户 ID，<strong>不是随机唯一 Token ID</strong></td>
+      </tr>
+      <tr>
+          <td><code>aud</code></td>
+          <td><code>pc</code> 或 <code>app</code></td>
+          <td>同设备类型</td>
+          <td>用作设备类型；不是 OAuth2 的 client ID</td>
+      </tr>
+      <tr>
+          <td><code>email</code></td>
+          <td>用户邮箱</td>
+          <td>同邮箱</td>
+          <td>自定义字段在载荷根部</td>
+      </tr>
+      <tr>
+          <td><code>sid</code></td>
+          <td>本次登录的随机会话 ID</td>
+          <td>同一个 <code>sid</code></td>
+          <td>两枚令牌关联同一持久化会话</td>
+      </tr>
+      <tr>
+          <td><code>sv</code></td>
+          <td>初始 0，刷新后增加</td>
+          <td>同一版本</td>
+          <td>刷新校验使用；普通 HTTP 访问不比对该版本</td>
+      </tr>
+      <tr>
+          <td><code>sub</code></td>
+          <td>未设置</td>
+          <td>固定 <code>refresh</code></td>
+          <td>用途区别；这里不是用户 ID</td>
+      </tr>
+  </tbody>
+</table>
+<p>Lcobucci 构建/解析对象中 <code>aud</code> 为数组，单受众在 JWT JSON 编码时会统一成字符串。因此看到解码 JSON 的 <code>&quot;aud&quot;:&quot;pc&quot;</code>，和服务代码取 <code>claims()-&gt;get('aud')[0]</code> 并不矛盾。</p>
+<p>虚构访问 JWT 的载荷：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl">  <span class="nt">&#34;iat&#34;</span><span class="p">:</span> <span class="mi">1800000000</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl">  <span class="nt">&#34;nbf&#34;</span><span class="p">:</span> <span class="mi">1800000000</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl">  <span class="nt">&#34;exp&#34;</span><span class="p">:</span> <span class="mi">1800003600</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl">  <span class="nt">&#34;jti&#34;</span><span class="p">:</span> <span class="s2">&#34;123&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">  <span class="nt">&#34;aud&#34;</span><span class="p">:</span> <span class="s2">&#34;pc&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl">  <span class="nt">&#34;email&#34;</span><span class="p">:</span> <span class="s2">&#34;member@example.invalid&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl">  <span class="nt">&#34;sid&#34;</span><span class="p">:</span> <span class="s2">&#34;0123456789abcdef0123456789abcdef&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">  <span class="nt">&#34;sv&#34;</span><span class="p">:</span> <span class="mi">0</span>
+</span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>虚构刷新 JWT 在上述业务字段基础上，将 <code>exp</code> 改为 <code>1800007200</code> 并加入 <code>&quot;sub&quot;:&quot;refresh&quot;</code>。真实两次签发可能跨秒，不应假设两个 <code>iat</code> 永远完全一样。</p>
+<p>不在正常客户 JWT 中的字段包括密码、原始手机号、角色列表、IP、设备实例 ID、<code>auth_source</code>、<code>token_type</code>、响应 <code>expire_at/expire_time</code>。审计表中的认证来源和设备详情不等于 JWT 声明。</p>
+<p>证据：<a href="/Users/lijianlin/www/local/gtcuser/app/Service/member/MemberLoginSessionService.php:18">sid/sv 生成</a>、<a href="/Users/lijianlin/www/local/gtcuser/app/Common/Lib/Jwt/Jwt.php:116">访问构建</a>、<a href="/Users/lijianlin/www/local/gtcuser/app/Common/Lib/Jwt/Jwt.php:67">刷新构建</a>、<a href="/Users/lijianlin/www/local/gtcuser/vendor/lcobucci/jwt/src/JwtFacade.php:36">时间自动补充</a>、<a href="/Users/lijianlin/www/local/gtcuser/vendor/lcobucci/jwt/src/Encoding/UnifyAudience.php:13">单受众编码</a>。</p>
+<h3 id="44-expire_at-和-expire_time-的实际作用">4.4 expire_at 和 expire_time 的实际作用</h3>
+<p>普通客户登录和刷新结果的核心数据形态是：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="ln">1</span><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl">  <span class="nt">&#34;access_token&#34;</span><span class="p">:</span> <span class="s2">&#34;&lt;访问凭证，占位符&gt;&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">3</span><span class="cl">  <span class="nt">&#34;refresh_token&#34;</span><span class="p">:</span> <span class="s2">&#34;&lt;刷新凭证，占位符&gt;&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">4</span><span class="cl">  <span class="nt">&#34;expire_at&#34;</span><span class="p">:</span> <span class="mi">3600</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">5</span><span class="cl">  <span class="nt">&#34;expire_time&#34;</span><span class="p">:</span> <span class="mi">1800003600</span>
+</span></span><span class="line"><span class="ln">6</span><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>计算公式：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">expire_at   = jwt.getExpireTime(deviceType)       // TTL，秒
+</span></span><span class="line"><span class="ln">2</span><span class="cl">expire_time = 返回组装时的 time() + expire_at     // 绝对 Unix 秒
+</span></span><span class="line"><span class="ln">3</span><span class="cl">JWT exp     = JWT 签发时刻 + 对应 TTL             // 真正校验依据
+</span></span></code></pre></div><p><code>expire_time</code> 是返回组装时计算的，之前可能发生事件处理和数据库写入，所以它与 JWT <code>exp</code> 有小幅偏差的可能。客户端需要精确截止时间时，应以经过正确处理的 Token <code>exp</code> 为参照；服务端始终验证签名后的 <code>exp</code>。</p>
+<p>CRM 返回中没有 <code>token_type</code>、<code>expires_in</code>，但约定仍可按 Bearer 请求头发送访问令牌。该 <code>expire_time</code> 描述的是访问令牌，不是刷新令牌或整段可刷新会话的寿命。</p>
+<h3 id="45-服务端存储redis登录日志会话表">4.5 服务端存储：Redis、登录日志、会话表</h3>
+<table>
+  <thead>
+      <tr>
+          <th>位置</th>
+          <th>键/表</th>
+          <th>保存内容</th>
+          <th>用途与时限</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Hyperf 默认缓存</td>
+          <td><code>login_token{memberId}</code></td>
+          <td>原始访问 Token 列表，元素含 <code>token/device_type/expires</code></td>
+          <td>设备管理；整个列表 TTL 随缓存写入设置，不是每元素独立 Redis TTL</td>
+      </tr>
+      <tr>
+          <td>JWT 黑名单缓存</td>
+          <td>逻辑键为完整 Token 字符串</td>
+          <td>数值为配置黑名单 TTL</td>
+          <td>拉黑访问或刷新令牌；TTL 默认 7201 秒</td>
+      </tr>
+      <tr>
+          <td>会员失效水位缓存</td>
+          <td><code>member_token_invalid_before:{memberId}</code></td>
+          <td>Unix 秒截止水位</td>
+          <td>拒绝 <code>iat &lt;= 水位</code> 的客户 Token；TTL 最少 60 天</td>
+      </tr>
+      <tr>
+          <td>MySQL <code>member_login_log</code></td>
+          <td>字典 <code>t_member_login_log</code></td>
+          <td><strong>原始 access_token 存在 <code>token</code> 字段</strong>，以及 <code>session_id</code>、设备、认证和结束信息</td>
+          <td>登录审计、定位当前会话访问令牌；刷新可更新 <code>token</code></td>
+      </tr>
+      <tr>
+          <td>MySQL <code>member_login_session</code></td>
+          <td>字典 <code>t_member_login_session</code></td>
+          <td><code>session_id/member_id/login_log_id/auth_source/created_at/expires_at/ended_at/end_reason/version</code></td>
+          <td>持久化会话有效性和刷新并发版本</td>
+      </tr>
+  </tbody>
+</table>
+<h4 id="redis-列表">Redis 列表</h4>
+<p>列表元素是：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">{
+</span></span><span class="line"><span class="ln">2</span><span class="cl">  token: 完整访问令牌,
+</span></span><span class="line"><span class="ln">3</span><span class="cl">  device_type: pc 或 app,
+</span></span><span class="line"><span class="ln">4</span><span class="cl">  expires: 写入时刻 + 访问 TTL
+</span></span><span class="line"><span class="ln">5</span><span class="cl">}
+</span></span></code></pre></div><p><code>cacheTokenList()</code> 为整个列表设置本次访问 TTL；<code>saveTokens()</code> 使用 <code>jwt.oauth.ttl</code>。因此列表 TTL 不等于所有会话刷新期限，也不是万能在线状态判据。常规 <code>ApiTokenMiddleware</code> 不要求 Token 必须出现在这个列表中。</p>
+<p>公共 <code>setCache()</code> 先 <code>serialize()</code>，默认缓存驱动的 PHP packer 再打包；<code>getCache()</code> 对驱动返回值再 <code>unserialize()</code>。直接查看 Redis 原始值时不能简单假设是 JSON。</p>
+<p>默认 Hyperf 缓存前缀为 <code>MineAdmin:</code>，驱动直接拼接逻辑键。例如列表物理键为 <code>MineAdmin:login_token123</code>。JWT 配置虽写了 <code>blacklist.prefix = jwt_blacklist</code>，但覆盖实现写黑名单时并未拼该前缀，而是使用原始 Token 作为键，再由默认缓存加 <code>MineAdmin:</code>。排查时不应输出这些含完整凭证的键。</p>
+<h4 id="数据库会话">数据库会话</h4>
+<p>登录日志和会话同事务写入。正常登录同时传入 Token 对时，<code>session.expires_at</code> 从刷新 JWT 的 <code>exp</code> 取得，初始 <code>version=0</code>；数据库不需要保存完整刷新 JWT。若调用方未传刷新令牌，记录服务才回退使用访问令牌截止时间。</p>
+<p><code>session_id</code> 是会话表主键；登录日志有 <code>session_id</code> 唯一索引；日志 <code>token</code> 为 <code>varchar(2048)</code>，有前 191 字符前缀索引。会话表还有会员状态组合索引和到期扫描索引。部署后的实际库/表前缀由 <code>DB_PREFIX</code> 等运行配置决定；本文未核验生产物理表。</p>
+<p>证据：<a href="/Users/lijianlin/www/local/gtcuser/app/Http/Common/Lib/OAuth/OauthPassportService.php:244">缓存列表</a>、<a href="/Users/lijianlin/www/local/gtcuser/common/common.php:864">缓存 helper</a>、<a href="/Users/lijianlin/www/local/gtcuser/config/autoload/cache.php:16">缓存配置</a>、<a href="/Users/lijianlin/www/local/gtcuser/vendor/hyperf/cache/src/Driver/Driver.php:60">Redis 键拼接</a>、<a href="/Users/lijianlin/www/local/gtcuser/app/Common/Lib/Jwt/Jwt.php:187">黑名单写入</a>、<a href="/Users/lijianlin/www/local/gtcuser/docs/%E6%95%B0%E6%8D%AE%E5%AD%97%E5%85%B8.sql:3643">日志与会话结构</a>。</p>
+<h3 id="46-authorization-如何验证">4.6 Authorization 如何验证</h3>
+<p>全局 HTTP 中间件会先处理 <code>ApiTokenMiddleware</code>，再进入具体路由和其认证要求。密码登录本身不要求已有有效访问令牌。</p>
+<p>读取凭证优先级：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">Authorization 请求头
+</span></span><span class="line"><span class="ln">2</span><span class="cl">    -&gt; token 请求头
+</span></span><span class="line"><span class="ln">3</span><span class="cl">    -&gt; URL query 中的 token
+</span></span><span class="line"><span class="ln">4</span><span class="cl">    -&gt; 空字符串
+</span></span></code></pre></div><p>有 <code>Authorization</code> 头时不会再回退读取后两种来源。基础提取方法是删除字符串中的精确 <code>Bearer </code>，<strong>没有严格要求前缀一定存在</strong>：裸 JWT 放在 <code>Authorization</code> 也可能进入解析；小写 <code>bearer </code> 不会按同样规则被删除。推荐调用方统一发送标准格式，不能将当前宽松行为写成严格 Bearer 校验。</p>
+<p>校验分层如下：</p>
+<ol>
+<li><code>parserAccessToken()</code> 验证 HS256 签名、<code>iat/nbf/exp</code>（<code>StrictValidAt</code>，默认零时钟容差）、黑名单，并拒绝 <code>sub=&quot;refresh&quot;</code>。</li>
+<li><code>ApiTokenMiddleware</code> 对以上解析异常捕获后按匿名处理；签名解析得到用户 ID 后，再检查会员失效水位和持久化 <code>sid</code> 会话，这两项检查位于捕获块之外，失败会拒绝请求。</li>
+<li>水位校验要求 <code>iat</code> <strong>严格晚于</strong> <code>member_token_invalid_before:{id}</code>。</li>
+<li>有 <code>sid</code> 时要求会话存在、会员 ID 匹配、未结束、<code>expires_at &gt; now</code>。无 <code>sid</code> 的历史令牌走兼容分支，由原有签名、黑名单和水位约束处理。</li>
+<li>写入请求的 Token 属性、会员 ID 头及请求上下文用户信息。全局中间件会覆盖 <code>member_id</code>，不能靠客户端自报该头取得身份。</li>
+<li>受保护路由的 <code>TokenMiddleware</code> 要求 <code>member_id&gt;0</code>；其白名单仅在没有提交 Token 时允许匿名，提交无效 Token 会拒绝。</li>
+<li>后续 Service 再执行账户状态、业务权限等检查；全局 Token 解析自身没有对每个请求都查询完整会员状态。</li>
+</ol>
+<p><strong>普通 HTTP 会话校验不比较 <code>sv</code> 与数据库 <code>version</code></strong>。<code>sv</code> 防重放目前主要作用于刷新，不是每次访问都执行的版本失效机制。普通解析也未配置预期 <code>iss</code> 或设备/场景 <code>aud</code> 约束。</p>
+<p>开放 <code>Pub</code> 登录/刷新路由没有普遍要求旧 Authorization 有效，但仍经过全局中间件：提交过期/签名错误 Token 可能降为匿名，提交能解析但会话已结束或水位已撤销的 Token 则可能提前被拒绝。客户端应避免在重新登录时无条件附带已撤销的旧凭证。</p>
+<p>证据：<a href="/Users/lijianlin/www/local/gtcuser/config/autoload/middlewares.php:26">HTTP 中间件注册</a>、<a href="/Users/lijianlin/www/local/gtcuser/app/Http/Api/Middleware/ApiTokenMiddleware.php:46">ApiTokenMiddleware</a>、<a href="/Users/lijianlin/www/local/gtcuser/vendor/mineadmin/auth-jwt/Middleware/AbstractTokenMiddleware.php:59">凭证提取</a>、<a href="/Users/lijianlin/www/local/gtcuser/app/Common/Lib/Jwt/Jwt.php:164">访问解析约束</a>、<a href="/Users/lijianlin/www/local/gtcuser/app/Http/Api/Middleware/TokenMiddleware.php:78">受保护路由要求</a>、<a href="/Users/lijianlin/www/local/gtcuser/app/Service/member/MemberLoginSessionService.php:24">会话有效性</a>、<a href="/Users/lijianlin/www/local/gtcuser/app/Service/member/MemberTokenInvalidationService.php:53">失效水位</a>。</p>
+<h3 id="47-刷新两套入口必须分别看">4.7 刷新：两套入口必须分别看</h3>
+<h4 id="a-apipubrefresh_token开放刷新入口">A. <code>/api/pub/refresh_token</code>，开放刷新入口</h4>
+<p>请求体必须同时提供 <code>refresh_token</code> 和 <code>access_token</code>。适用于访问令牌已经到期、刷新令牌仍有效的情形。</p>
+<p>执行流程：</p>
+<ol>
+<li>解析刷新 JWT：签名、标准时间、黑名单。</li>
+<li>有 <code>sid</code> 时，按 <code>member_id + sid</code> 查询登录日志当前 <code>token</code>，用 <code>hash_equals()</code> 比对传入的旧访问令牌。这允许旧 access 已过期，但要求是当前这一会话的凭证。</li>
+<li>若旧访问令牌仍能解析，再校验它与刷新令牌的会员 ID 一致；解析旧 access 失败不会仅因过期直接禁止刷新。</li>
+<li>服务层检查会员失效水位，并显式要求 <code>sub === &quot;refresh&quot;</code>。</li>
+<li>有 <code>sid</code> 时，在数据库事务内锁会话行；检查未结束、未过期、会员匹配，并严格比较刷新 JWT 的 <code>sv</code> 和数据库 <code>version</code>。</li>
+<li>将旧刷新 JWT 拉黑，签发新 Token 对；保留原 <code>sid</code>、邮箱和设备类型，<code>sv</code> 更新为 <code>version+1</code>。</li>
+<li>更新会话 <code>version</code> 和 <code>expires_at</code>，新的截止时间取新刷新 JWT <code>exp</code>；把新 access 加入缓存列表。</li>
+<li>控制器调用 <code>removeTokenStr(oldAccess, false)</code>：移除旧 access 的缓存列表项，能解析时拉黑旧 access，<strong>不结束共享会话</strong>。</li>
+<li>更新登录日志 <code>token</code> 为新 access；迁移弹窗广告缓存；返回新凭证及 <code>expire_at/expire_time</code>。</li>
+</ol>
+<p>这是一种“刷新令牌轮换 + 持久化版本”的实现。旧刷新 Token 即使在 Redis 黑名单到期后仍有 JWT 剩余寿命，也会因版本落后而不能再次刷新。每次成功刷新都会把会话截止重新推到新刷新令牌的 <code>exp</code>；当前这段逻辑没有按最初 <code>created_at</code> 限制整段会话的最长总寿命。</p>
+<h4 id="b-apimemberrefresh_token会员受保护入口">B. <code>/api/member/refresh_token</code>，会员受保护入口</h4>
+<p>该控制器类注册了 <code>TokenMiddleware</code>，因此需要有效的当前访问认证；请求体只要求 <code>refresh_token</code>。它调用相同的服务层刷新逻辑，所以仍执行 <code>sub</code>、会话和版本检查，但控制器后处理不同：</p>
+<ul>
+<li>没有公开入口的“传入旧 access 必须等于该 sid 的当前日志 Token”的绑定检查。</li>
+<li>按刷新令牌会员 ID 和当前请求访问 Token 更新日志；两者不属于同一日志时更新可能为空。</li>
+<li>没有调用公开入口的 <code>removeTokenStr(oldAccess, false)</code>，旧 access 不在此处移出列表或拉黑。</li>
+<li>普通 HTTP 又不比较访问 Token 的 <code>sv</code>，所以这个入口刷新成功后，原 access 可能继续有效直至自身 <code>exp</code> 或其他撤销条件生效。</li>
+<li>这个入口不能用于“当前 access 已过期”的正常续签场景。</li>
+</ul>
+<p>不能用公开入口的行为描述覆盖全部刷新接口。</p>
+<h4 id="刷新中的事务边界">刷新中的事务边界</h4>
+<p>会话锁和版本更新在 MySQL 事务内，但 Redis 黑名单、列表写入发生在签发回调中，不随 MySQL 回滚；公开入口的登录日志 Token 替换又在服务层事务完成后执行。因此当前流程存在跨存储失败和并发窗口，应通过测试环境故障注入验证恢复能力，不能声称整个刷新过程在 Redis/MySQL 间完全原子。</p>
+<p>无 <code>sid</code> 的旧令牌不走持久化版本校验，主要依赖黑名单、时间和水位，长期 TTL 配置调整时要单独考虑旧刷新 Token 重放。</p>
+<p>证据：<a href="/Users/lijianlin/www/local/gtcuser/app/Http/Api/Controller/V1/PubController.php:415">开放刷新入口</a>、<a href="/Users/lijianlin/www/local/gtcuser/app/Http/Common/Lib/OAuth/OauthPassportService.php:419">服务层刷新</a>、<a href="/Users/lijianlin/www/local/gtcuser/app/Service/member/MemberLoginSessionService.php:35">行锁与版本</a>、<a href="/Users/lijianlin/www/local/gtcuser/app/Http/Api/Controller/V1/MemberController.php:1342">会员刷新入口</a>、<a href="/Users/lijianlin/www/local/gtcuser/app/Repository/crm/MemberLoginLogRepository.php:120">日志 Token 替换</a>。</p>
+<h3 id="48-其他客户签发场景">4.8 其他客户签发场景</h3>
+<table>
+  <thead>
+      <tr>
+          <th>场景</th>
+          <th>签发行为</th>
+          <th>存储/校验差异</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>注册自动登录</td>
+          <td><code>TMemberService</code> 生成同一 <code>email/sid/sv</code> 的 Token 对</td>
+          <td>直接写登录日志和会话，刷新截止时间用于持久化；注册返回也有 <code>member_id</code></td>
+      </tr>
+      <tr>
+          <td>第三方登录</td>
+          <td><code>MemberThirdAuthService::login()</code> 使用正常会话声明</td>
+          <td>设备限制、缓存和后置审计；响应附加 <code>email_sha256/deviceType</code>，这两项不是新增 JWT 声明</td>
+      </tr>
+      <tr>
+          <td>无密码登录</td>
+          <td><code>OauthPassportService::loginNoPwd()</code></td>
+          <td>由可信调用方先完成身份认证，按正常会话方式签发；审计认证方式由服务调用方传入</td>
+      </tr>
+      <tr>
+          <td>后台模拟客户登录</td>
+          <td><code>/api/internal/option/remoteDemoLogin</code>，由后台 <code>Role::demo_login</code> 远程调用</td>
+          <td>固定 <code>pc</code>，载荷附加 <code>email/demo=1</code>，当前没有 <code>sid/sv</code>，方法未走正常 Token 列表和成功会话审计流程</td>
+      </tr>
+      <tr>
+          <td>MT 安全码</td>
+          <td><code>TradeService::mtSafeCode()</code></td>
+          <td>JWT <code>aud=&quot;mt&quot;</code>，附加 <code>loginid/exchange_name</code>，之后再做 RSA 加密作为安全码；不是普通客户登录 Token 对</td>
+      </tr>
+  </tbody>
+</table>
+<p>内部模拟登录路由由 <code>InternalTokenMiddleware</code> 验证请求头 <code>Token</code> 与 <code>config('internal_token')</code>，要求双方非空并 <code>hash_equals()</code>；这个内部通信凭证与客户 JWT 的 Authorization 不同。</p>
+<p>MT 安全码复用相同 JWT 构建器/场景，而常规访问解析没有 <code>aud</code> 用途限制，后续应评估业务用途隔离，不能只因载荷中有 <code>aud</code> 就认为用途已经被验证。</p>
+<p>证据：<a href="/Users/lijianlin/www/local/gtcuser/app/Service/member/TMemberService.php:2180">注册签发</a>、<a href="/Users/lijianlin/www/local/gtcuser/app/Service/crm/MemberThirdAuthService.php:175">第三方签发</a>、<a href="/Users/lijianlin/www/local/gtcuser/app/Http/Common/Lib/OAuth/OauthPassportService.php:130">无密码签发</a>、<a href="/Users/lijianlin/www/local/gtcuser/app/Http/Api/Controller/Inner/OptionController.php:763">模拟签发</a>、<a href="/Users/lijianlin/www/local/gtcuser/app/Http/Api/Middleware/InternalTokenMiddleware.php:24">内部校验</a>、<a href="/Users/lijianlin/www/local/gtcuser/app/Service/Trade/TradeService.php:2212">MT 安全码</a>。</p>
+<p>客户 Web/App 前端源码不属于这两个后端项目，本次不能确认它们将 Token 存在 localStorage、Cookie、App 安全存储还是其他位置。后端能确认的是响应交付和服务端保存，不应把后台 Vue 的存储方式套到客户 App。</p>
+<h3 id="49-退出踢设备密码修改禁用和自然到期">4.9 退出、踢设备、密码修改、禁用和自然到期</h3>
+<table>
+  <thead>
+      <tr>
+          <th>触发行为</th>
+          <th>持久化会话</th>
+          <th>黑名单/水位</th>
+          <th>结果</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>主动退出</td>
+          <td><code>sid</code> 先结束为 <code>USER_LOGOUT</code></td>
+          <td>拉黑 access、移除列表项、清 socket 缓存</td>
+          <td>有 sid 的访问和刷新均因终态被拒绝；首次终态原因保留</td>
+      </tr>
+      <tr>
+          <td>设备数量超限</td>
+          <td>通过旧 access 对应日志定位 sid 并结束</td>
+          <td>旧 access 拉黑并移出列表</td>
+          <td>新会话同时撤销旧设备的刷新能力</td>
+      </tr>
+      <tr>
+          <td>踢其他设备</td>
+          <td>校验登录记录属于该会员后结束 sid</td>
+          <td>撤销对应 access</td>
+          <td>access 已过期也应结束其仍可刷新的会话</td>
+      </tr>
+      <tr>
+          <td>密码修改或全量退出</td>
+          <td><code>logoutAllToken()</code> 批量结束客户会话</td>
+          <td>写会员失效水位、拉黑可找到的旧 access、清列表</td>
+          <td>拒绝水位及之前签发的访问和刷新 Token</td>
+      </tr>
+      <tr>
+          <td>后台禁用客户登录</td>
+          <td><code>gtc_admin</code> 同事务更新 <code>banned_login</code> 并结束 CUSTOMER 会话</td>
+          <td>新方案依赖共享会话终态立即拒绝</td>
+          <td>不等于撤销 Tinywan 管理端 Token；后台禁用由 <code>admin_banned_login</code> 单独控制</td>
+      </tr>
+      <tr>
+          <td>访问 JWT 到期</td>
+          <td>会话可仍有效</td>
+          <td>access 解析失败</td>
+          <td>可通过公开刷新入口续签，只要 refresh 和会话仍有效</td>
+      </tr>
+      <tr>
+          <td>刷新族到期</td>
+          <td><code>expires_at &lt;= now</code> 即被实时校验拒绝</td>
+          <td>无需等待扫描</td>
+          <td>定时扫描补写自然结束日志</td>
+      </tr>
+  </tbody>
+</table>
+<p>会话定时扫描为每分钟一次，要求 <code>app_run_task</code> 和 <code>member_login_audit.expire_scan_enabled</code> 同时开启，后者仓库默认 <code>false</code>。每批默认 500，Service 限制最高 1000；自然结束记录采用真实 <code>expires_at</code>，不是任务运行时间。<strong>鉴权到期检查不依赖任务是否开启</strong>。</p>
+<p>Token 签发、上述登录会话记录和刷新核心流程在请求内完成；JWT 到期由请求时读取时间声明判断，不需要队列或定时任务来“删除 JWT”。定时扫描负责补记会话自然结束状态，不能代替实时鉴权。</p>
+<p>失效水位默认以当前秒写入，要求新 Token 的 <code>iat</code> 大于该秒。仓库提供 <code>waitUntilTokenCanBeIssued()</code> 方法，但本次搜索未发现实际调用；密码重置/全量撤销同秒重新签发的边界需要验证，不能仅因方法存在就断言已解决。</p>
+<h4 id="websocket-与-http-的差异">WebSocket 与 HTTP 的差异</h4>
+<p><code>socket-io</code> 注册 <code>WebSocketAuthMiddleware</code>。握手使用 query <code>token</code>，校验 JWT、会员失效水位、黑名单和当前会员状态；当前这份中间件未调用 <code>MemberLoginSessionService::assertValid()</code>。因此 HTTP 已依据 sid 拒绝的会话，不应推断 WebSocket 握手必然做了同样检查；已建立连接是否立即断开也不能从 HTTP 鉴权推导，应另行验证连接生命周期。</p>
+<p>证据：<a href="/Users/lijianlin/www/local/gtcuser/app/Http/Common/Lib/OAuth/OauthPassportService.php:400">客户退出</a>、<a href="/Users/lijianlin/www/local/gtcuser/app/Service/member/TMemberService.php:3666">批量撤销</a>、<a href="/Users/lijianlin/www/local/gtc_admin/app/admin/controller/Member.php:2698">后台禁用客户</a>、<a href="/Users/lijianlin/www/local/gtc_admin/app/service/MemberLoginSessionService.php:11">后台共享会话结束</a>、<a href="/Users/lijianlin/www/local/gtcuser/app/Task/MemberLoginSessionExpireTask.php:8">自然到期任务</a>、<a href="/Users/lijianlin/www/local/gtcuser/config/autoload/member_login_audit.php:8">扫描配置</a>、<a href="/Users/lijianlin/www/local/gtcuser/app/Http/Api/Middleware/WebSocketAuthMiddleware.php:30">WebSocket 鉴权</a>。</p>
+<h2 id="5-gtcusermineadmin-自带管理端-passport">5. gtcuser：MineAdmin 自带管理端 Passport</h2>
+<p>这套管理端位于 <code>gtcuser</code>，与 <code>gtc_admin</code> 的 <code>/admin/pub/login</code> 属于不同代码和用户认证入口。</p>
+<h3 id="51-登录与声明">5.1 登录与声明</h3>
+<p><code>/admin/passport/login</code> 使用 <code>username/password</code>，调用 <code>App\Service\PassportService</code>、<code>UserRepository</code> 和管理用户模型（<code>mine_user</code> 体系），选择 JWT <code>default</code> 场景。</p>
+<p>调用自定义 Jwt 的普通构建方法，字段比客户登录少：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">access:  typ/alg 头部；iat、nbf、exp、jti=用户ID
+</span></span><span class="line"><span class="ln">2</span><span class="cl">refresh: 同上，exp 使用 refresh_ttl，另有 sub=&#34;refresh&#34;
+</span></span></code></pre></div><p>默认没有 <code>email/aud/sid/sv</code>，也没有由覆盖实现加入的 <code>iss</code>。响应为 <code>access_token/refresh_token/expire_at</code>，<code>expire_at</code> 同样是 TTL 秒数；服务未返回 <code>expire_time/token_type/expires_in</code>。</p>
+<p>正常服务登录没有将原始 Token 对写入 CRM <code>member_login_session</code> 或客户 Token 列表；登录事件不能等同于客户 sid 会话。该服务还存在 <code>loginUser(TMember $user)</code> 方法，但本次未发现其调用，应视为已有能力而非已确认的业务入口。</p>
+<h3 id="52-authorization刷新和退出">5.2 Authorization、刷新和退出</h3>
+<ul>
+<li>普通管理端受保护路由使用 <code>AccessTokenMiddleware</code>，调用 <code>default</code> 场景解析器和 Passport 的 <code>checkJwt()</code>，核心为签名、时间、黑名单和拒绝刷新类型；用户/权限处理继续由管理端上下文及业务层执行。</li>
+<li><code>/admin/passport/refresh</code> 通过 <code>RefreshTokenMiddleware</code> 解析请求中的凭证，再调用 Passport <code>refreshToken()</code>，拉黑旧凭证并返回新 Token 对。</li>
+<li><strong>当前刷新解析器只校验签名、时间和黑名单，没有要求 <code>sub=&quot;refresh&quot;</code>；Passport 服务也没有补这个要求。</strong> 因访问和刷新使用同一密钥，有效访问 JWT 在实现层面也可能被当成刷新凭证接受。CRM 服务则有显式用途检查，两者不能混淆。</li>
+<li><code>/admin/passport/logout</code> 仅拉黑本次访问 JWT，不结束 sid 会话，也不关联撤销已经签发的 refresh。持有未过期刷新令牌仍可能获取新 access。</li>
+<li><code>default/oauth</code> 使用同一个签名密钥，解析器没有场景/预期受众约束；两个认证域都将用户 ID 放在 <code>jti</code>。跨场景误用的影响需结合用户存在性和权限中间件验证，不能宣称已完成利用验证，但应优先评估。</li>
+</ul>
+<p>证据：<a href="/Users/lijianlin/www/local/gtcuser/app/Http/Admin/Controller/PassportController.php:65">管理登录入口</a>、<a href="/Users/lijianlin/www/local/gtcuser/app/Service/PassportService.php:46">Passport 签发与退出</a>、<a href="/Users/lijianlin/www/local/gtcuser/app/Service/PassportService.php:95">Passport 刷新</a>、<a href="/Users/lijianlin/www/local/gtcuser/app/Http/Common/Middleware/RefreshTokenMiddleware.php:25">刷新中间件</a>、<a href="/Users/lijianlin/www/local/gtcuser/app/Common/Lib/Jwt/Jwt.php:143">刷新解析器</a>。</p>
+<h2 id="6-gtcuser独立-league-oauth2-授权">6. gtcuser：独立 League OAuth2 授权</h2>
+<p>本节解释客户项目中另一组 <code>token_type/expires_in/expire_time</code> 来源，避免将它们错误归到 <code>/api/pub/login</code>。</p>
+<h3 id="61-授权入口与技术栈">6.1 授权入口与技术栈</h3>
+<p>主要入口：</p>
+<table>
+  <thead>
+      <tr>
+          <th>入口</th>
+          <th>用途</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>/api/oauth2/login_ticket</code></td>
+          <td>已登录 CRM 用户申请绑定 client 的一次性静默授权票据</td>
+      </tr>
+      <tr>
+          <td><code>/api/oauth2/authorize</code>、<code>/api/oauth2/silent_authorize</code></td>
+          <td>授权流程，形成授权码/静默授权结果</td>
+      </tr>
+      <tr>
+          <td><code>/api/oauth2/token</code></td>
+          <td><code>authorization_code</code> 或 <code>refresh_token</code> grant 换取凭证</td>
+      </tr>
+      <tr>
+          <td><code>/api/oauth2/refresh_token</code></td>
+          <td>兼容入口，内部设 <code>grant_type=refresh_token</code> 后复用 token 入口</td>
+      </tr>
+      <tr>
+          <td><code>/api/oauth2/user</code></td>
+          <td>由 <code>OAuth2Middleware</code> 验证 OAuth2 access 并取得用户信息</td>
+      </tr>
+  </tbody>
+</table>
+<p>工厂启用的是授权码 grant 和带会员状态复核的刷新 grant（各有启用配置），不能因为依赖包包含 PasswordGrant 文件，就认为系统通过 OAuth2 密码 grant 登录。</p>
+<p>静默 <code>login_ticket</code> 为 <code>lt_ + bin2hex(random_bytes(24))</code>，缓存绑定用户和 client，默认 TTL 60 秒，消费时使用锁并删除。票据响应字段是 <strong><code>expire_in</code></strong>，既不是 <code>expires_in</code> 也不是客户登录的 <code>expire_at</code>；它不是最终访问 JWT。</p>
+<p>证据：<a href="/Users/lijianlin/www/local/gtcuser/app/Http/Api/Controller/OAuth2/OAuth2Controller.php:37">OAuth2 控制器</a>、<a href="/Users/lijianlin/www/local/gtcuser/app/OAuth2/AuthorizationServerFactory.php:66">服务器工厂</a>、<a href="/Users/lijianlin/www/local/gtcuser/app/Service/OAuth2/LoginTicketService.php:31">票据服务</a>。</p>
+<h3 id="62-access_tokenrs256-jwt">6.2 access_token：RS256 JWT</h3>
+<p>库为令牌生成随机 ID，默认 <code>bin2hex(random_bytes(40))</code>，即 80 位十六进制字符串。访问 JWT 使用 RSA 私钥签名，声明如下：</p>
+<table>
+  <thead>
+      <tr>
+          <th>声明</th>
+          <th>来源</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>jti</code></td>
+          <td>随机访问 Token ID，不是会员 ID</td>
+      </tr>
+      <tr>
+          <td><code>sub</code></td>
+          <td>用户 ID 字符串</td>
+      </tr>
+      <tr>
+          <td><code>aud</code></td>
+          <td>OAuth2 client ID</td>
+      </tr>
+      <tr>
+          <td><code>iat/nbf</code></td>
+          <td>构建 Token 的时间</td>
+      </tr>
+      <tr>
+          <td><code>exp</code></td>
+          <td>访问实体的截止日期</td>
+      </tr>
+      <tr>
+          <td><code>scopes</code></td>
+          <td>获得的 scope 标识列表</td>
+      </tr>
+  </tbody>
+</table>
+<p>头部为 <code>typ=JWT/alg=RS256</code>。这里没有 CRM 的 <code>email/sid/sv</code>。签名使用 <code>OAuth2ServerOptions</code> 指定的私钥，资源服务器读取公钥；不得与 <code>JWT_SECRET</code> 的 HS256 处理混用。</p>
+<p>证据：<a href="/Users/lijianlin/www/local/gtcuser/packages/league-oauth2-server/src/Grant/AbstractGrant.php:569">随机 ID 生成</a>、<a href="/Users/lijianlin/www/local/gtcuser/packages/league-oauth2-server/src/Entities/Traits/AccessTokenTrait.php:64">访问 JWT 构建</a>。</p>
+<h3 id="63-refresh_token加密-json">6.3 refresh_token：加密 JSON</h3>
+<p>BearerTokenResponse 先构造：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="ln">1</span><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl">  <span class="nt">&#34;client_id&#34;</span><span class="p">:</span> <span class="s2">&#34;example-client&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">3</span><span class="cl">  <span class="nt">&#34;refresh_token_id&#34;</span><span class="p">:</span> <span class="s2">&#34;&lt;随机刷新令牌ID&gt;&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">4</span><span class="cl">  <span class="nt">&#34;access_token_id&#34;</span><span class="p">:</span> <span class="s2">&#34;&lt;关联访问令牌ID&gt;&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">5</span><span class="cl">  <span class="nt">&#34;scopes&#34;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&#34;example-scope&#34;</span><span class="p">],</span>
+</span></span><span class="line"><span class="ln">6</span><span class="cl">  <span class="nt">&#34;user_id&#34;</span><span class="p">:</span> <span class="mi">123</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">7</span><span class="cl">  <span class="nt">&#34;expire_time&#34;</span><span class="p">:</span> <span class="mi">1800007200</span>
+</span></span><span class="line"><span class="ln">8</span><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>随后调用 <code>CryptTrait::encrypt()</code>。根据 encryption key 的类型，使用 Defuse Crypto 的 <code>encrypt()</code> 或 <code>encryptWithPassword()</code>；最终给客户端的是加密字符串。</p>
+<p>这里的 <code>expire_time</code> 在<strong>加密刷新载荷内部</strong>，是刷新令牌的绝对截止 Unix 秒，与 <code>/api/pub/login</code> 响应中访问令牌的 <code>expire_time</code> 作用不同。这个刷新 Token 不能当 JWT 解码或用 HS256 parser 验证。</p>
+<p>证据：<a href="/Users/lijianlin/www/local/gtcuser/packages/league-oauth2-server/src/ResponseTypes/BearerTokenResponse.php:24">响应及刷新载荷</a>、<a href="/Users/lijianlin/www/local/gtcuser/packages/league-oauth2-server/src/CryptTrait.php:36">Defuse 加解密</a>。</p>
+<h3 id="64-响应与存储">6.4 响应与存储</h3>
+<p>OAuth2 成功结果是协议 JSON，并非普通 CRM 的同一 <code>data</code> 结构：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="ln">1</span><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl">  <span class="nt">&#34;token_type&#34;</span><span class="p">:</span> <span class="s2">&#34;Bearer&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">3</span><span class="cl">  <span class="nt">&#34;expires_in&#34;</span><span class="p">:</span> <span class="mi">3600</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">4</span><span class="cl">  <span class="nt">&#34;access_token&#34;</span><span class="p">:</span> <span class="s2">&#34;&lt;RS256访问JWT&gt;&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">5</span><span class="cl">  <span class="nt">&#34;refresh_token&#34;</span><span class="p">:</span> <span class="s2">&#34;&lt;加密刷新字符串&gt;&#34;</span>
+</span></span><span class="line"><span class="ln">6</span><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p><code>expires_in = access_expiry_timestamp - time()</code>，是输出时剩余秒数，可能略小于配置 TTL。库同时设置 <code>Cache-Control: no-store</code> 和 <code>Pragma: no-cache</code>。</p>
+<table>
+  <thead>
+      <tr>
+          <th>模型逻辑表</th>
+          <th>保存内容</th>
+          <th>是否保存客户端收到的完整凭证</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>oauth2_access_tokens</code></td>
+          <td>随机 <code>id</code>、client/user、scopes JSON、revoked、expires_at</td>
+          <td>不保存完整访问 JWT</td>
+      </tr>
+      <tr>
+          <td><code>oauth2_refresh_tokens</code></td>
+          <td>随机 <code>id</code>、关联 access ID、revoked、expires_at</td>
+          <td>不保存完整加密刷新字符串</td>
+      </tr>
+  </tbody>
+</table>
+<p>模型使用日期时间字段 <code>expires_at</code>，不是客户会话的 Unix 秒字段。实际物理前缀随 DB 配置；本次在当前数据字典中未定位到这两表定义，能确认的是模型和仓储契约，不能据此确认线上表、索引或迁移已部署。</p>
+<p>证据：<a href="/Users/lijianlin/www/local/gtcuser/app/OAuth2/Repository/AccessTokenRepository.php:44">访问仓储</a>、<a href="/Users/lijianlin/www/local/gtcuser/app/OAuth2/Repository/RefreshTokenRepository.php:31">刷新仓储</a>、<a href="/Users/lijianlin/www/local/gtcuser/app/Model/OAuth2/AccessToken.php:24">访问模型</a>。</p>
+<h3 id="65-authorization-与刷新验证">6.5 Authorization 与刷新验证</h3>
+<p>资源请求由 <code>ResourceServer + BearerTokenValidator</code> 处理：</p>
+<ol>
+<li>要求存在 <code>Authorization</code> 请求头；删除匹配的 <code>Bearer</code> 前缀后解析 JWT。实现没有单独对“缺少 Bearer 前缀但提供裸 JWT”做严格拒绝分支。</li>
+<li>公钥验证 RS256 签名，<code>LooseValidAt</code> 检查提供的时间声明。</li>
+<li>取 <code>jti</code> 查访问仓储，令牌不存在或 <code>revoked=true</code> 则拒绝。</li>
+<li>将访问 ID、client ID、用户 ID、scopes 放入 request 属性和 OAuth2 上下文；这不是 CRM 的 <code>jti</code> 用户上下文。</li>
+</ol>
+<p>JWT 中写了 <code>aud=clientId</code>，当前基础 validator 没有独立配置的预期 audience 约束；scope 信息被注入也不等于所有业务接口自动执行了所需 scope 判断。</p>
+<p>刷新流程会验证 client、解密刷新字符串、检查 client 绑定、内部 <code>expire_time</code>、数据库刷新撤销状态；项目覆盖 grant 还复核会员当前是否允许 OAuth2 登录。新 scopes 不能比原 scopes 扩大。正常轮换撤销旧访问 ID 和旧刷新 ID，再写新实体并返回凭证。</p>
+<p>这里没有 CRM 的 <code>sid/sv</code> 行锁机制；当前仓储方法展示的是逐条写入/更新，不能认定并发刷新天然等价于客户持久化版本保护，应单独验证。</p>
+<p>全局 <code>ApiTokenMiddleware</code> 可能先尝试以 HS256 解析这个 RS256 Token 并降为匿名，OAuth2 路由随后用自己的中间件完成认证。所以不能把“CRM parser 不识别”理解为 OAuth2 请求必然非法，也不能把这两套 Token 任意替换。</p>
+<p>证据：<a href="/Users/lijianlin/www/local/gtcuser/packages/league-oauth2-server/src/AuthorizationValidators/BearerTokenValidator.php:90">OAuth2 Bearer 验证</a>、<a href="/Users/lijianlin/www/local/gtcuser/app/Http/Api/Middleware/OAuth2Middleware.php:34">路由 OAuth2 中间件</a>、<a href="/Users/lijianlin/www/local/gtcuser/packages/league-oauth2-server/src/Grant/RefreshTokenGrant.php:99">刷新 grant</a>、<a href="/Users/lijianlin/www/local/gtcuser/app/OAuth2/Grant/MemberAwareRefreshTokenGrant.php:43">会员状态复核</a>。</p>
+<h2 id="7-跨项目生命周期对照">7. 跨项目生命周期对照</h2>
+<table>
+  <thead>
+      <tr>
+          <th>问题</th>
+          <th>gtc_admin 后台</th>
+          <th>gtcuser CRM</th>
+          <th>gtcuser Passport</th>
+          <th>gtcuser OAuth2</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>登录是否必须先有 Authorization</td>
+          <td>否</td>
+          <td>否，但经过全局可选解析</td>
+          <td>否</td>
+          <td>Token grant 依赖 client/授权码或 refresh，不是先提交资源 access</td>
+      </tr>
+      <tr>
+          <td>身份从哪里取</td>
+          <td><code>extend.id</code></td>
+          <td><code>jti</code></td>
+          <td><code>jti</code></td>
+          <td><code>sub</code></td>
+      </tr>
+      <tr>
+          <td>响应有效期</td>
+          <td><code>expires_in</code></td>
+          <td><code>expire_at + expire_time</code></td>
+          <td><code>expire_at</code></td>
+          <td><code>expires_in</code></td>
+      </tr>
+      <tr>
+          <td>Token 用途怎样区分</td>
+          <td>默认相同 key、无用途声明，隔离不足</td>
+          <td>refresh 的 <code>sub=refresh</code>；CRM 服务显式检查</td>
+          <td>access 拒绝 refresh，但刷新端缺少用途要求</td>
+          <td>RS256 access 与加密 refresh 的不同协议</td>
+      </tr>
+      <tr>
+          <td>每个正常登录是否有随机会话</td>
+          <td>无</td>
+          <td>有 <code>sid</code></td>
+          <td>无</td>
+          <td>有随机令牌 ID，非 CRM sid</td>
+      </tr>
+      <tr>
+          <td>普通请求是否查持久化会话</td>
+          <td>部分分支查 Redis 标记；基类查会员</td>
+          <td>有 sid 查 MySQL 会话</td>
+          <td>无 CRM sid 校验</td>
+          <td>按 access ID 查撤销状态</td>
+      </tr>
+      <tr>
+          <td>普通请求是否续 JWT exp</td>
+          <td>否</td>
+          <td>否</td>
+          <td>否</td>
+          <td>否</td>
+      </tr>
+      <tr>
+          <td>刷新是否签发新一对</td>
+          <td>当前未发现业务刷新入口</td>
+          <td>是</td>
+          <td>是</td>
+          <td>是，按 grant 轮换</td>
+      </tr>
+      <tr>
+          <td>旧 refresh 防重用</td>
+          <td>当前未形成已确认业务轮换</td>
+          <td>黑名单 + 持久化 sv/version；旧无 sid 例外</td>
+          <td>主要黑名单</td>
+          <td>数据库 revoked，需验证并发</td>
+      </tr>
+      <tr>
+          <td>退出是否撤销同族 refresh</td>
+          <td>未统一实现</td>
+          <td>正常 sid 会话终态使 refresh 失效</td>
+          <td>未关联撤销</td>
+          <td>依 OAuth2 独立撤销实现，不能由 CRM 退出直接推断</td>
+      </tr>
+      <tr>
+          <td>原始 access 是否服务端保存</td>
+          <td>主要仅哈希缓存；普通登录审计不存</td>
+          <td>Redis 列表和登录日志存完整值</td>
+          <td>此登录服务未见完整 Token 持久化</td>
+          <td>数据库仅存随机 ID 和元数据</td>
+      </tr>
+  </tbody>
+</table>
+<h2 id="8-已确认的差异风险与处理顺序">8. 已确认的差异、风险与处理顺序</h2>
+<p>以下是源码支持的关注点，并非本次已实施的修复或已验证的线上漏洞结论。</p>
+<h3 id="81-优先核实并处理认证边界">8.1 优先核实并处理认证边界</h3>
+<ol>
+<li><strong>后台 access/refresh 缺少隔离</strong>：当前固定密钥默认值相同、TTL 默认相同、无用途声明。先在隔离环境确认相同 Token 条件，再设计不同用途/密钥和存量兼容策略。没有随机声明还可能导致同用户同秒登录得到相同 access；同设备重登逻辑先写新标记再清旧标记，键相同时应验证是否误清本次会话。后续改变配置必须评估历史 Token 立即失效的影响。</li>
+<li><strong>Passport 刷新端缺少 refresh 用途检查</strong>：为刷新明确要求 <code>sub=refresh</code>，并验证 <code>default/oauth</code> 域之间的凭证误用；仅靠同一 HS256 密钥验证不足以区分账户体系。</li>
+<li><strong>后台退出和设备淘汰覆盖不一致</strong>：Redis 会话检查对普通角色及部分请求路径没有同等覆盖。先统一期望的后台认证边界，再验证所有账号类型的退出/空闲过期/终端淘汰行为。</li>
+<li><strong>客户两套刷新入口行为不一致</strong>：公开入口撤销旧 access，会员入口没有同样后处理。先确定刷新后旧 access 是否必须立即失效，并统一会话绑定和列表/审计更新规则。</li>
+<li><strong>WebSocket 未同步 sid 校验</strong>：验证 access 已过期但 refresh 仍有效的设备被踢之后，旧握手 Token 的行为；同时明确已连接用户的撤销策略。</li>
+</ol>
+<h3 id="82-再完善故障到期与存储">8.2 再完善故障、到期与存储</h3>
+<ol start="6">
+<li><strong>MySQL/Redis 非同一原子事务</strong>：为登录、刷新持久化失败建立可复现测试，关注新 access 已缓存但会话未落库、旧 refresh 已拉黑但数据库回滚、日志 Token 未替换导致下次公开刷新匹配失败。</li>
+<li><strong>失效水位同秒签发</strong>：<code>iat &lt;= cutoff</code> 会拒绝新 Token，等待方法尚未发现调用。测试密码修改后立即重新登录和批量退出后同秒重新签发。</li>
+<li><strong>原始凭证存储范围较大</strong>：客户登录日志、Redis 列表和黑名单键都包含可用原始凭证。明确必要性、访问控制、保留期限和脱敏方案；需要日志匹配时可评估哈希关联，但不能在本次分析中直接改契约。</li>
+<li><strong>JWT 声明与配置不一致</strong>：客户 <code>claims.iss</code> 未加入、黑名单配置前缀未使用；后台 <code>aud</code> 复用 <code>iss</code>；设备 audience 未作为用途校验。统一文档和代码前需明确兼容范围。</li>
+<li><strong>旧/模拟令牌兼容路径</strong>：无 sid 的历史、模拟、MT 用途 Token 与正常客户会话的生命周期不同，不能只修正常新登录就宣称覆盖所有 Token。</li>
+<li><strong>审计口径</strong>：后台日志在 MFA 前写；客户会话到期扫描默认关闭。后台登录成功统计、客户“在线”展示应明确取哪一层事实。</li>
+<li><strong>密码存储</strong>：两项目客户/后台历史密码路径使用 MD5 加固定盐，需独立规划现代密码哈希兼容迁移；这不影响本文对当前 JWT 字段的判断。</li>
+</ol>
+<h3 id="83-查询与容量核验范围">8.3 查询与容量核验范围</h3>
+<p>本文没有新增 SQL，也未执行查询。现有登录核心查询多为用户 ID、sid 或 Token 的单对象定位；客户 session 查询有主键/唯一索引，到期扫描有 <code>(ended_at, expires_at, session_id)</code>，且批次有上限。</p>
+<p>登录日志按原始 Token 查找有前缀索引，不能未经执行计划验证就认定对任意数量日志都高效；sid 定位有唯一索引，更明确。全量撤销按会员和批次执行；会话索引对排序/截止条件的具体覆盖以及 OAuth2 表结构仍需真实测试库 <code>EXPLAIN</code>、数据规模和运行配置核验。文档未对这些查询做性能修改。</p>
+<h2 id="9-可执行的验证清单">9. 可执行的验证清单</h2>
+<p>应在隔离测试环境和专用测试账号上执行，禁止打印或提交实际凭证、密钥、密码。</p>
+<table>
+  <thead>
+      <tr>
+          <th>验证项</th>
+          <th>操作</th>
+          <th>应观察的事实</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>后台 Token 组成</td>
+          <td>邮箱登录后本地解码载荷，仅观察字段名/类型</td>
+          <td><code>extend.id/name/email/admin</code>，<code>iss/aud/iat/nbf/exp</code>；不含 sid</td>
+      </tr>
+      <tr>
+          <td>后台访问/刷新一致性</td>
+          <td>使用仓库默认非生产配置，同秒签发</td>
+          <td>默认同 key/TTL 下可能得到同字符串；不向日志输出凭证</td>
+      </tr>
+      <tr>
+          <td>后台空闲过期</td>
+          <td>JWT TTL 大于会话 TTL，等待会话 TTL 后请求</td>
+          <td><code>admin/scope</code> 与普通角色、通知路径行为是否一致</td>
+      </tr>
+      <tr>
+          <td>后台续期上限</td>
+          <td>持续访问超过 JWT 截止</td>
+          <td>Redis TTL 可续，但 JWT 到期仍拒绝</td>
+      </tr>
+      <tr>
+          <td>后台退出/终端淘汰</td>
+          <td>不同角色、同设备重登和超限设备访问</td>
+          <td>验证所有预期路径是否立即拒绝旧 access</td>
+      </tr>
+      <tr>
+          <td>客户新登录会话</td>
+          <td>登录后观察数据库字段和匿名化键名</td>
+          <td>同一 sid 关联日志与会话；会话截止取 refresh exp</td>
+      </tr>
+      <tr>
+          <td>客户时间字段</td>
+          <td>对比响应 TTL、绝对时间和 JWT exp</td>
+          <td><code>expire_at</code> 为秒数；<code>expire_time</code> 可能比 exp 略晚</td>
+      </tr>
+      <tr>
+          <td>公开刷新</td>
+          <td>access 过期，refresh 有效，提交原配 Token 对</td>
+          <td>能刷新；sv/version 加一；旧 refresh 被拒绝</td>
+      </tr>
+      <tr>
+          <td>公开刷新绑定</td>
+          <td>同一用户两设备，将 A refresh 与 B access 配对</td>
+          <td>有 sid 时被日志当前 Token 校验拒绝</td>
+      </tr>
+      <tr>
+          <td>会员刷新</td>
+          <td>当前 access 有效，调用会员刷新入口</td>
+          <td>核实旧 access 仍可用、列表是否保留旧项的差异</td>
+      </tr>
+      <tr>
+          <td>并发/失败刷新</td>
+          <td>同一 refresh 并发提交；模拟 DB 或 Redis 写失败</td>
+          <td>sid 行锁/版本阻止重用，跨存储失败是否可恢复</td>
+      </tr>
+      <tr>
+          <td>退出与禁用</td>
+          <td>主动退出、踢设备、后台禁用后分别发 HTTP/WS 请求</td>
+          <td>HTTP sid 终态立即拒绝；WS 差异需单独记录</td>
+      </tr>
+      <tr>
+          <td>密码修改水位</td>
+          <td>改密后立即登录；复用修改前 access/refresh</td>
+          <td>旧凭证拒绝；同秒新凭证不会被错误撤销</td>
+      </tr>
+      <tr>
+          <td>Passport 用途</td>
+          <td>向 Passport 刷新端分别提交 access/refresh</td>
+          <td>验证当前缺少 refresh 用途约束的行为</td>
+      </tr>
+      <tr>
+          <td>OAuth2</td>
+          <td>code 换 Token、携带 RS256 请求 user、轮换 refresh</td>
+          <td>客户 HS256 与 OAuth2 凭证分开；撤销 ID 被拒绝</td>
+      </tr>
+      <tr>
+          <td>自然到期扫描</td>
+          <td>测试开启扫描，观察会话结束字段</td>
+          <td>记录真实 expires_at；不开扫描也必须拒绝已到期会话</td>
+      </tr>
+  </tbody>
+</table>
+<h2 id="10-本次交付与证据边界">10. 本次交付与证据边界</h2>
+<ul>
+<li>仅新增本分析文档，未修改业务代码、SQL、配置、接口或现有文档。</li>
+<li>已核对两项目登录入口、签发构建器、实际依赖解析器、刷新/退出、缓存 helper、会话仓储与表结构，并补充后台 Vue 存储与请求拦截器。</li>
+<li>已以不输出密钥内容的方式比较后台两项签名配置源表达式，确认仓库中固定字符串表达式相同；未读取实际部署覆盖配置。</li>
+<li>未运行真实登录、刷新、数据库/Redis查询、队列或定时任务；文中默认 TTL、表前缀、任务启用状态和并发/故障恢复结论仍需按上表做环境验证。</li>
+<li>本文代码链接使用本地绝对路径，指向本次梳理的源码位置；部署状态、外部客户前端存储、实际密钥管理和 OAuth2 表索引不在本次已验证范围内。</li>
+</ul>
+
+    </div>
+  </article>
+  
+    
+<aside class="sidebar">
+  <section class="sidebar_inner">
+    <br>
+    
+  
+  <div class="search">
+    <input type="search" class="search_field form_field" placeholder='搜索内容...' id="find" autocomplete="off" data-scope='gtc'>
+    <label for="find" class="search_label"><svg class="icon">
+  <title>search</title>
+  <use xlink:href="#search"></use>
+</svg>
+
+    </label>
+    
+    <div class="search_results results"></div>
+  </div>
+
+        <div class="author_header">
+          <img src="https://jianlin-li.github.io/images/fish-head.png" alt="李建林 photo">
+          <h2>李建林</h2>
+        </div>
+      <div class="author_bio">
+        PHP, Go, MySQL, Redis, RabbitMQ, Elasticsearch, Docker, Kubernetes, Shell
+      </div>
+      <a href='https://jianlin-li.github.io/about/' class="button mt-1" role="button" title='阅读更多'>阅读更多</a>
+
+    
+    <h2 class="mt-4">精选文章</h2>
+    <ul>
+      <li>
+        <a href="https://jianlin-li.github.io/post/jiagou-elk-stack/" class="nav-link" title="架构-使用ELK Stack在本地Macbookpro搭建一套日志收集并且可视化系统">架构-使用ELK Stack在本地Macbookpro搭建一套日志收集并且可视化系统</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/jiagou-prometheus-grafana/" class="nav-link" title="架构-Prometheus&#43;Grafana">架构-Prometheus+Grafana</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/jiagou-cicd-jenkins-argo/" class="nav-link" title="架构-基于JenKins的CI/CD平台之Argo CD">架构-基于JenKins的CI/CD平台之Argo CD</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/jiagou-cicd-jenkins/" class="nav-link" title="架构-基于JenKins的CI/CD平台">架构-基于JenKins的CI/CD平台</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/k8s_review_12/" class="nav-link" title="Kubernetes的知识库-12">Kubernetes的知识库-12</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/k8s_review_11/" class="nav-link" title="Kubernetes的知识库-11">Kubernetes的知识库-11</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/k8s_review_10/" class="nav-link" title="Kubernetes的知识库-10">Kubernetes的知识库-10</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/k8s_review_9/" class="nav-link" title="Kubernetes的知识库-9">Kubernetes的知识库-9</a>
+      </li>
+    </ul>
+    <h2 class="mt-4">最新文章</h2>
+    <ul class="flex-column">
+      <li>
+        <a href="https://jianlin-li.github.io/post/k8s_review_8/" class="nav-link" title="Kubernetes的知识库-8">Kubernetes的知识库-8</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/k8s_review_7/" class="nav-link" title="Kubernetes的知识库-7">Kubernetes的知识库-7</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/k8s_review_6/" class="nav-link" title="Kubernetes的知识库-6">Kubernetes的知识库-6</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/k8s_review_5/" class="nav-link" title="Kubernetes的知识库-5">Kubernetes的知识库-5</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/k8s_review_4/" class="nav-link" title="Kubernetes的知识库-4">Kubernetes的知识库-4</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/k8s_review_3/" class="nav-link" title="Kubernetes的知识库-3">Kubernetes的知识库-3</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/k8s_review_2/" class="nav-link" title="Kubernetes的知识库-2">Kubernetes的知识库-2</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/k8s_review_1/" class="nav-link" title="Kubernetes的知识库-1">Kubernetes的知识库-1</a>
+      </li>
+    </ul>
+    <div>
+      <h2 class="mt-4 taxonomy" id="categories-section">分类</h2>
+      <nav class="tags_nav">
+        <a href='https://jianlin-li.github.io/categories/kubernetes/' class="post_tag button button_translucent" title="kubernetes">
+          KUBERNETES
+          <span class="button_tally">13</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/categories/php%E8%AF%AD%E8%A8%80/' class="post_tag button button_translucent" title="php语言">
+          PHP语言
+          <span class="button_tally">7</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/categories/%E6%9E%B6%E6%9E%84/' class="post_tag button button_translucent" title="架构">
+          架构
+          <span class="button_tally">7</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/categories/go%E8%AF%AD%E8%A8%80/' class="post_tag button button_translucent" title="go语言">
+          GO语言
+          <span class="button_tally">6</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/categories/elasticsearch/' class="post_tag button button_translucent" title="elasticsearch">
+          ELASTICSEARCH
+          <span class="button_tally">5</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/categories/redis/' class="post_tag button button_translucent" title="redis">
+          REDIS
+          <span class="button_tally">5</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/categories/mysql/' class="post_tag button button_translucent" title="mysql">
+          MYSQL
+          <span class="button_tally">4</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/categories/rabbitmq/' class="post_tag button button_translucent" title="rabbitmq">
+          RABBITMQ
+          <span class="button_tally">4</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/categories/ci/cd/' class="post_tag button button_translucent" title="ci/cd">
+          CI/CD
+          <span class="button_tally">2</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/categories/git/' class="post_tag button button_translucent" title="git">
+          GIT
+          <span class="button_tally">2</span>
+        </a>
+        
+        
+        <br>
+        <div class="post_tags_toggle button">所有分类</div>
+        <div class="post_tags">
+          <div class="tags_list">
+            
+            <a href='https://jianlin-li.github.io/categories/argo/' class=" post_tag button button_translucent" data-position=1 title="argo">ARGO<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/centos7/' class=" post_tag button button_translucent" data-position=1 title="centos7">CENTOS7<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/ci/cd/' class=" post_tag button button_translucent" data-position=2 title="ci/cd">CI/CD<span class="button_tally">2</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/c%E8%AF%AD%E8%A8%80/' class=" post_tag button button_translucent" data-position=1 title="c语言">C语言<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/devops/' class=" post_tag button button_translucent" data-position=1 title="devops">DEVOPS<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/docker/' class=" post_tag button button_translucent" data-position=1 title="docker">DOCKER<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/elasticsearch/' class=" post_tag button button_translucent" data-position=5 title="elasticsearch">ELASTICSEARCH<span class="button_tally">5</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/elk/' class=" post_tag button button_translucent" data-position=1 title="elk">ELK<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/git/' class=" post_tag button button_translucent" data-position=2 title="git">GIT<span class="button_tally">2</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/go%E8%AF%AD%E8%A8%80/' class=" post_tag button button_translucent" data-position=6 title="go语言">GO语言<span class="button_tally">6</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/grafana/' class=" post_tag button button_translucent" data-position=1 title="grafana">GRAFANA<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/gtc/' class=" post_tag button button_translucent" data-position=2 title="gtc">GTC<span class="button_tally">2</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/gtcadmin/' class=" post_tag button button_translucent" data-position=1 title="gtcadmin">GTCADMIN<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/gtcuser/' class=" post_tag button button_translucent" data-position=1 title="gtcuser">GTCUSER<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/hugo/' class=" post_tag button button_translucent" data-position=1 title="hugo">HUGO<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/jenkins/' class=" post_tag button button_translucent" data-position=2 title="jenkins">JENKINS<span class="button_tally">2</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/kubernetes/' class=" post_tag button button_translucent" data-position=13 title="kubernetes">KUBERNETES<span class="button_tally">13</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/mkcert/' class=" post_tag button button_translucent" data-position=1 title="mkcert">MKCERT<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/mysql/' class=" post_tag button button_translucent" data-position=4 title="mysql">MYSQL<span class="button_tally">4</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/nginx/' class=" post_tag button button_translucent" data-position=1 title="nginx">NGINX<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/php%E8%AF%AD%E8%A8%80/' class=" post_tag button button_translucent" data-position=7 title="php语言">PHP语言<span class="button_tally">7</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/prometheus/' class=" post_tag button button_translucent" data-position=1 title="prometheus">PROMETHEUS<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/rabbitmq/' class=" post_tag button button_translucent" data-position=4 title="rabbitmq">RABBITMQ<span class="button_tally">4</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/redis/' class=" post_tag button button_translucent" data-position=5 title="redis">REDIS<span class="button_tally">5</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/shell/' class=" post_tag button button_translucent" data-position=2 title="shell">SHELL<span class="button_tally">2</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/web%E6%9C%8D%E5%8A%A1%E5%99%A8/' class=" post_tag button button_translucent" data-position=1 title="web服务器">WEB服务器<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/%E6%9C%AC%E5%9C%B0%E7%8E%AF%E5%A2%83/' class=" post_tag button button_translucent" data-position=2 title="本地环境">本地环境<span class="button_tally">2</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/%E5%A4%8D%E4%B9%A0/' class=" post_tag button button_translucent" data-position=1 title="复习">复习<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/%E5%8D%8E%E5%BE%AE%E4%B8%96%E7%BA%AA/' class=" post_tag button button_translucent" data-position=1 title="华微世纪">华微世纪<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/%E6%9E%B6%E6%9E%84/' class=" post_tag button button_translucent" data-position=7 title="架构">架构<span class="button_tally">7</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/%E6%95%99%E7%A8%8B/' class=" post_tag button button_translucent" data-position=1 title="教程">教程<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/%E8%A7%86%E9%A2%91/' class=" post_tag button button_translucent" data-position=1 title="视频">视频<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/%E4%B9%A6%E7%B1%8D/' class=" post_tag button button_translucent" data-position=1 title="书籍">书籍<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/%E7%AE%97%E6%B3%95/' class=" post_tag button button_translucent" data-position=1 title="算法">算法<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/%E8%87%AA%E7%AD%BE%E5%90%8D%E8%AF%81%E4%B9%A6/' class=" post_tag button button_translucent" data-position=1 title="自签名证书">自签名证书<span class="button_tally">1</span>
+            </a>
+            
+            <div class="tags_sort"><span title="sort alphabetically">[A~Z]</span><span title="sort by count">[0~9]</span>
+            </div>
+            <span class="tags_hide"><svg class="icon">
+            <use xlink:href="#closeme"></use>
+          </svg></span>
+          </div>
+        </div>
+      </nav>
+    </div>
+    <div>
+      <h2 class="mt-4 taxonomy" id="tags-section">标签</h2>
+      <nav class="tags_nav">
+        <a href='https://jianlin-li.github.io/tags/kubernetes/' class="post_tag button button_translucent" title="kubernetes">
+          KUBERNETES
+          <span class="button_tally">13</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/tags/php/' class="post_tag button button_translucent" title="php">
+          PHP
+          <span class="button_tally">7</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/tags/go/' class="post_tag button button_translucent" title="go">
+          GO
+          <span class="button_tally">6</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/tags/elasticsearch/' class="post_tag button button_translucent" title="elasticsearch">
+          ELASTICSEARCH
+          <span class="button_tally">5</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/tags/redis/' class="post_tag button button_translucent" title="redis">
+          REDIS
+          <span class="button_tally">5</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/tags/mysql/' class="post_tag button button_translucent" title="mysql">
+          MYSQL
+          <span class="button_tally">4</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/tags/rabbitmq/' class="post_tag button button_translucent" title="rabbitmq">
+          RABBITMQ
+          <span class="button_tally">4</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/tags/devops/' class="post_tag button button_translucent" title="devops">
+          DEVOPS
+          <span class="button_tally">3</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/tags/ci/cd/' class="post_tag button button_translucent" title="ci/cd">
+          CI/CD
+          <span class="button_tally">2</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/tags/git/' class="post_tag button button_translucent" title="git">
+          GIT
+          <span class="button_tally">2</span>
+        </a>
+        
+        
+        <br>
+        <div class="post_tags_toggle button">所有标签</div>
+        <div class="post_tags">
+          <div class="tags_list">
+            
+            <a href='https://jianlin-li.github.io/tags/argo/' class=" post_tag button button_translucent" data-position=1 title="argo">ARGO<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/centos7/' class=" post_tag button button_translucent" data-position=1 title="centos7">CENTOS7<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/ci/cd/' class=" post_tag button button_translucent" data-position=2 title="ci/cd">CI/CD<span class="button_tally">2</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/c%E8%AF%AD%E8%A8%80/' class=" post_tag button button_translucent" data-position=1 title="c语言">C语言<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/devops/' class=" post_tag button button_translucent" data-position=3 title="devops">DEVOPS<span class="button_tally">3</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/docker/' class=" post_tag button button_translucent" data-position=1 title="docker">DOCKER<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/elasticsearch/' class=" post_tag button button_translucent" data-position=5 title="elasticsearch">ELASTICSEARCH<span class="button_tally">5</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/elk/' class=" post_tag button button_translucent" data-position=1 title="elk">ELK<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/emoji/' class=" post_tag button button_translucent" data-position=1 title="emoji">EMOJI<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/git/' class=" post_tag button button_translucent" data-position=2 title="git">GIT<span class="button_tally">2</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/go/' class=" post_tag button button_translucent" data-position=6 title="go">GO<span class="button_tally">6</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/grafana/' class=" post_tag button button_translucent" data-position=1 title="grafana">GRAFANA<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/gtc/' class=" post_tag button button_translucent" data-position=2 title="gtc">GTC<span class="button_tally">2</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/gtcadmin/' class=" post_tag button button_translucent" data-position=1 title="gtcadmin">GTCADMIN<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/gtcuser/' class=" post_tag button button_translucent" data-position=1 title="gtcuser">GTCUSER<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/hosts/' class=" post_tag button button_translucent" data-position=1 title="hosts">HOSTS<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/hugo/' class=" post_tag button button_translucent" data-position=1 title="hugo">HUGO<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/jenkins/' class=" post_tag button button_translucent" data-position=2 title="jenkins">JENKINS<span class="button_tally">2</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/kubernetes/' class=" post_tag button button_translucent" data-position=13 title="kubernetes">KUBERNETES<span class="button_tally">13</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/markdown/' class=" post_tag button button_translucent" data-position=1 title="markdown">MARKDOWN<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/math/' class=" post_tag button button_translucent" data-position=1 title="math">MATH<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/mkcert/' class=" post_tag button button_translucent" data-position=1 title="mkcert">MKCERT<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/mysql/' class=" post_tag button button_translucent" data-position=4 title="mysql">MYSQL<span class="button_tally">4</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/nginx/' class=" post_tag button button_translucent" data-position=1 title="nginx">NGINX<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/notices/' class=" post_tag button button_translucent" data-position=1 title="notices">NOTICES<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/openstreetmap/' class=" post_tag button button_translucent" data-position=1 title="openstreetmap">OPENSTREETMAP<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/php/' class=" post_tag button button_translucent" data-position=7 title="php">PHP<span class="button_tally">7</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/prometheus/' class=" post_tag button button_translucent" data-position=1 title="prometheus">PROMETHEUS<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/rabbitmq/' class=" post_tag button button_translucent" data-position=4 title="rabbitmq">RABBITMQ<span class="button_tally">4</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/redis/' class=" post_tag button button_translucent" data-position=5 title="redis">REDIS<span class="button_tally">5</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/shell/' class=" post_tag button button_translucent" data-position=2 title="shell">SHELL<span class="button_tally">2</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/sql/' class=" post_tag button button_translucent" data-position=1 title="sql">SQL<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/web%E6%9C%8D%E5%8A%A1%E5%99%A8/' class=" post_tag button button_translucent" data-position=1 title="web服务器">WEB服务器<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/%E6%9C%AC%E5%9C%B0%E7%8E%AF%E5%A2%83/' class=" post_tag button button_translucent" data-position=1 title="本地环境">本地环境<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/%E5%A4%8D%E4%B9%A0/' class=" post_tag button button_translucent" data-position=1 title="复习">复习<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/%E6%95%99%E7%A8%8B/' class=" post_tag button button_translucent" data-position=1 title="教程">教程<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/%E4%B9%B1%E7%A0%81/' class=" post_tag button button_translucent" data-position=1 title="乱码">乱码<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/%E8%A7%86%E9%A2%91/' class=" post_tag button button_translucent" data-position=1 title="视频">视频<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/%E4%B9%A6%E7%B1%8D/' class=" post_tag button button_translucent" data-position=1 title="书籍">书籍<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/%E7%AE%97%E6%B3%95/' class=" post_tag button button_translucent" data-position=1 title="算法">算法<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6/' class=" post_tag button button_translucent" data-position=1 title="主从复制">主从复制<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/%E8%87%AA%E7%AD%BE%E5%90%8D%E8%AF%81%E4%B9%A6/' class=" post_tag button button_translucent" data-position=1 title="自签名证书">自签名证书<span class="button_tally">1</span>
+            </a>
+            
+            <div class="tags_sort"><span title="sort alphabetically">[A~Z]</span><span title="sort by count">[0~9]</span>
+            </div>
+            <span class="tags_hide"><svg class="icon">
+            <use xlink:href="#closeme"></use>
+          </svg></span>
+          </div>
+        </div>
+      </nav>
+    </div>
+  </section>
+</aside>
+
+  
+</div>
+
+<style>
+  .gtc-breadcrumb {
+    margin-bottom: 12px;
+    font-size: 0.9em;
+    opacity: 0.75;
+  }
+
+  .gtc-meta {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+</style>
+    </main><svg width="0" height="0" class="hidden">
+  <symbol viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" id="facebook">
+    <path d="M437 0H75C33.648 0 0 33.648 0 75v362c0 41.352 33.648 75 75 75h151V331h-60v-90h60v-61c0-49.629 40.371-90 90-90h91v90h-91v61h91l-15 90h-76v181h121c41.352 0 75-33.648 75-75V75c0-41.352-33.648-75-75-75zm0 0"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18.001 18.001" id="twitter">
+    <path d="M15.891 4.013c.808-.496 1.343-1.173 1.605-2.034a8.68 8.68 0 0 1-2.351.861c-.703-.756-1.593-1.14-2.66-1.14-1.043 0-1.924.366-2.643 1.078a3.56 3.56 0 0 0-1.076 2.605c0 .309.039.585.117.819-3.076-.105-5.622-1.381-7.628-3.837-.34.601-.51 1.213-.51 1.846 0 1.301.549 2.332 1.645 3.089-.625-.053-1.176-.211-1.645-.47 0 .929.273 1.705.82 2.388a3.623 3.623 0 0 0 2.115 1.291c-.312.08-.641.118-.979.118-.312 0-.533-.026-.664-.083.23.757.664 1.371 1.291 1.841a3.652 3.652 0 0 0 2.152.743C4.148 14.173 2.625 14.69.902 14.69c-.422 0-.721-.006-.902-.038 1.697 1.102 3.586 1.649 5.676 1.649 2.139 0 4.029-.542 5.674-1.626 1.645-1.078 2.859-2.408 3.639-3.974a10.77 10.77 0 0 0 1.172-4.892v-.468a7.788 7.788 0 0 0 1.84-1.921 8.142 8.142 0 0 1-2.11.593z"
+      ></path>
+  </symbol>
+  <symbol aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" id="mail">
+    <path  d="M502.3 190.8c3.9-3.1 9.7-.2 9.7 4.7V400c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V195.6c0-5 5.7-7.8 9.7-4.7 22.4 17.4 52.1 39.5 154.1 113.6 21.1 15.4 56.7 47.8 92.2 47.6 35.7.3 72-32.8 92.3-47.6 102-74.1 131.6-96.3 154-113.7zM256 320c23.2.4 56.6-29.2 73.4-41.4 132.7-96.3 142.8-104.7 173.4-128.7 5.8-4.5 9.2-11.5 9.2-18.9v-19c0-26.5-21.5-48-48-48H48C21.5 64 0 85.5 0 112v19c0 7.4 3.4 14.3 9.2 18.9 30.6 23.9 40.7 32.4 173.4 128.7 16.8 12.2 50.2 41.8 73.4 41.4z"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" id="calendar">
+    <path d="M452 40h-24V0h-40v40H124V0H84v40H60C26.916 40 0 66.916 0 100v352c0 33.084 26.916 60 60 60h392c33.084 0 60-26.916 60-60V100c0-33.084-26.916-60-60-60zm20 412c0 11.028-8.972 20-20 20H60c-11.028 0-20-8.972-20-20V188h432v264zm0-304H40v-48c0-11.028 8.972-20 20-20h24v40h40V80h264v40h40V80h24c11.028 0 20 8.972 20 20v48z"></path>
+    <path d="M76 230h40v40H76zm80 0h40v40h-40zm80 0h40v40h-40zm80 0h40v40h-40zm80 0h40v40h-40zM76 310h40v40H76zm80 0h40v40h-40zm80 0h40v40h-40zm80 0h40v40h-40zM76 390h40v40H76zm80 0h40v40h-40zm80 0h40v40h-40zm80 0h40v40h-40zm80-80h40v40h-40z"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" id="github">
+    <path d="M255.968 5.329C114.624 5.329 0 120.401 0 262.353c0 113.536 73.344 209.856 175.104 243.872 12.8 2.368 17.472-5.568 17.472-12.384 0-6.112-.224-22.272-.352-43.712-71.2 15.52-86.24-34.464-86.24-34.464-11.616-29.696-28.416-37.6-28.416-37.6-23.264-15.936 1.728-15.616 1.728-15.616 25.696 1.824 39.2 26.496 39.2 26.496 22.848 39.264 59.936 27.936 74.528 21.344 2.304-16.608 8.928-27.936 16.256-34.368-56.832-6.496-116.608-28.544-116.608-127.008 0-28.064 9.984-51.008 26.368-68.992-2.656-6.496-11.424-32.64 2.496-68 0 0 21.504-6.912 70.4 26.336 20.416-5.696 42.304-8.544 64.096-8.64 21.728.128 43.648 2.944 64.096 8.672 48.864-33.248 70.336-26.336 70.336-26.336 13.952 35.392 5.184 61.504 2.56 68 16.416 17.984 26.304 40.928 26.304 68.992 0 98.72-59.84 120.448-116.864 126.816 9.184 7.936 17.376 23.616 17.376 47.584 0 34.368-.32 62.08-.32 70.496 0 6.88 4.608 14.88 17.6 12.352C438.72 472.145 512 375.857 512 262.353 512 120.401 397.376 5.329 255.968 5.329z"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 212 212" id="gitlab">
+    <path d="M12.3 74.7h54L43.3 3c-1-3.6-6.4-3.6-7.6 0L12.3 74.8z" />
+    <path d="M12.3 74.7L.5 111c-1 3.2 0 6.8 3 8.8l101.6 74-92.5-119z"/>
+    <path d="M105 193.7l-38.6-119h-54l92.7 119z"/>
+    <path d="M105 193.7l38.7-119H66.4l38.7 119z"/>
+    <path d="M105 193.7l38.7-119H198l-93 119z"/>
+    <path d="M198 74.7l11.6 36.2c1 3 0 6.6-3 8.6l-101.5 74 93-119z"/>
+    <path d="M198 74.7h-54.3L167 3c1.2-3.6 6.4-3.6 7.6 0L198 74.8z"/>
+  </symbol>
+  <symbol viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" id="rss">
+    <circle cx="3.429" cy="20.571" r="3.429"></circle>
+    <path d="M11.429 24h4.57C15.999 15.179 8.821 8.001 0 8v4.572c6.302.001 11.429 5.126 11.429 11.428z"></path>
+    <path d="M24 24C24 10.766 13.234 0 0 0v4.571c10.714 0 19.43 8.714 19.43 19.429z"></path>
+  </symbol>
+  <symbol viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" id="linkedin">
+    <path d="M437 0H75C33.648 0 0 33.648 0 75v362c0 41.352 33.648 75 75 75h362c41.352 0 75-33.648 75-75V75c0-41.352-33.648-75-75-75zM181 406h-60V196h60zm0-240h-60v-60h60zm210 240h-60V286c0-16.54-13.46-30-30-30s-30 13.46-30 30v120h-60V196h60v11.309C286.719 202.422 296.93 196 316 196c40.691.043 75 36.547 75 79.688zm0 0"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 612 612" id="to-top">
+    <path d="M604.501 440.509L325.398 134.956c-5.331-5.357-12.423-7.627-19.386-7.27-6.989-.357-14.056 1.913-19.387 7.27L7.499 440.509c-9.999 10.024-9.999 26.298 0 36.323s26.223 10.024 36.222 0l262.293-287.164L568.28 476.832c9.999 10.024 26.222 10.024 36.221 0 9.999-10.023 9.999-26.298 0-36.323z"></path>
+  </symbol>
+  <symbol viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" id="carly">
+    <path d="M504.971 239.029L448 182.059V84c0-46.317-37.682-84-84-84h-44c-13.255 0-24 10.745-24 24s10.745 24 24 24h44c19.851 0 36 16.149 36 36v108c0 6.365 2.529 12.47 7.029 16.971L454.059 256l-47.029 47.029A24.002 24.002 0 0 0 400 320v108c0 19.851-16.149 36-36 36h-44c-13.255 0-24 10.745-24 24s10.745 24 24 24h44c46.318 0 84-37.683 84-84v-98.059l56.971-56.971c9.372-9.372 9.372-24.568 0-33.941zM112 192V84c0-19.851 16.149-36 36-36h44c13.255 0 24-10.745 24-24S205.255 0 192 0h-44c-46.318 0-84 37.683-84 84v98.059l-56.971 56.97c-9.373 9.373-9.373 24.568 0 33.941L64 329.941V428c0 46.317 37.682 84 84 84h44c13.255 0 24-10.745 24-24s-10.745-24-24-24h-44c-19.851 0-36-16.149-36-36V320c0-6.365-2.529-12.47-7.029-16.971L57.941 256l47.029-47.029A24.002 24.002 0 0 0 112 192z"></path>
+  </symbol>
+  <symbol viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" id="copy">
+    <path d="M23 2.75A2.75 2.75 0 0 0 20.25 0H8.75A2.75 2.75 0 0 0 6 2.75v13.5A2.75 2.75 0 0 0 8.75 19h11.5A2.75 2.75 0 0 0 23 16.25zM18.25 14.5h-7.5a.75.75 0 0 1 0-1.5h7.5a.75.75 0 0 1 0 1.5zm0-3h-7.5a.75.75 0 0 1 0-1.5h7.5a.75.75 0 0 1 0 1.5zm0-3h-7.5a.75.75 0 0 1 0-1.5h7.5a.75.75 0 0 1 0 1.5z"></path>
+    <path d="M8.75 20.5a4.255 4.255 0 0 1-4.25-4.25V2.75c0-.086.02-.166.025-.25H3.75A2.752 2.752 0 0 0 1 5.25v16A2.752 2.752 0 0 0 3.75 24h12a2.752 2.752 0 0 0 2.75-2.75v-.75z"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512.001 512.001" id="closeme">
+    <path d="M284.286 256.002L506.143 34.144c7.811-7.811 7.811-20.475 0-28.285-7.811-7.81-20.475-7.811-28.285 0L256 227.717 34.143 5.859c-7.811-7.811-20.475-7.811-28.285 0-7.81 7.811-7.811 20.475 0 28.285l221.857 221.857L5.858 477.859c-7.811 7.811-7.811 20.475 0 28.285a19.938 19.938 0 0 0 14.143 5.857 19.94 19.94 0 0 0 14.143-5.857L256 284.287l221.857 221.857c3.905 3.905 9.024 5.857 14.143 5.857s10.237-1.952 14.143-5.857c7.811-7.811 7.811-20.475 0-28.285L284.286 256.002z"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" id="open-menu">
+    <path d="M492 236H20c-11.046 0-20 8.954-20 20s8.954 20 20 20h472c11.046 0 20-8.954 20-20s-8.954-20-20-20zm0-160H20C8.954 76 0 84.954 0 96s8.954 20 20 20h472c11.046 0 20-8.954 20-20s-8.954-20-20-20zm0 320H20c-11.046 0-20 8.954-20 20s8.954 20 20 20h472c11.046 0 20-8.954 20-20s-8.954-20-20-20z"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" id="instagram">
+    <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" id=youtube>
+    <path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" id="stackoverflow">
+    <path d="M21 27v-8h3v11H0V19h3v8h18z"></path><path d="M17.1.2L15 1.8l7.9 10.6 2.1-1.6L17.1.2zm3.7 14.7L10.6 6.4l1.7-2 10.2 8.5-1.7 2zM7.2 12.3l12 5.6 1.1-2.4-12-5.6-1.1 2.4zm-1.8 6.8l13.56 1.96.17-2.38-13.26-2.55-.47 2.97zM19 25H5v-3h14v3z"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" id="xing">
+    <path d="M18.188 0c-.517 0-.741.325-.927.66 0 0-7.455 13.224-7.702 13.657.015.024 4.919 9.023 4.919 9.023.17.308.436.66.967.66h3.454c.211 0 .375-.078.463-.22.089-.151.089-.346-.009-.536l-4.879-8.916c-.004-.006-.004-.016 0-.022L22.139.756c.095-.191.097-.387.006-.535C22.056.078 21.894 0 21.686 0h-3.498zM3.648 4.74c-.211 0-.385.074-.473.216-.09.149-.078.339.02.531l2.34 4.05c.004.01.004.016 0 .021L1.86 16.051c-.099.188-.093.381 0 .529.085.142.239.234.45.234h3.461c.518 0 .766-.348.945-.667l3.734-6.609-2.378-4.155c-.172-.315-.434-.659-.962-.659H3.648v.016z"/>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 71 55" id="discord">
+    <path d="M60.1045 4.8978C55.5792 2.8214 50.7265 1.2916 45.6527 0.41542C45.5603 0.39851 45.468 0.440769 45.4204 0.525289C44.7963 1.6353 44.105 3.0834 43.6209 4.2216C38.1637 3.4046 32.7345 3.4046 27.3892 4.2216C26.905 3.0581 26.1886 1.6353 25.5617 0.525289C25.5141 0.443589 25.4218 0.40133 25.3294 0.41542C20.2584 1.2888 15.4057 2.8186 10.8776 4.8978C10.8384 4.9147 10.8048 4.9429 10.7825 4.9795C1.57795 18.7309 -0.943561 32.1443 0.293408 45.3914C0.299005 45.4562 0.335386 45.5182 0.385761 45.5576C6.45866 50.0174 12.3413 52.7249 18.1147 54.5195C18.2071 54.5477 18.305 54.5139 18.3638 54.4378C19.7295 52.5728 20.9469 50.6063 21.9907 48.5383C22.0523 48.4172 21.9935 48.2735 21.8676 48.2256C19.9366 47.4931 18.0979 46.6 16.3292 45.5858C16.1893 45.5041 16.1781 45.304 16.3068 45.2082C16.679 44.9293 17.0513 44.6391 17.4067 44.3461C17.471 44.2926 17.5606 44.2813 17.6362 44.3151C29.2558 49.6202 41.8354 49.6202 53.3179 44.3151C53.3935 44.2785 53.4831 44.2898 53.5502 44.3433C53.9057 44.6363 54.2779 44.9293 54.6529 45.2082C54.7816 45.304 54.7732 45.5041 54.6333 45.5858C52.8646 46.6197 51.0259 47.4931 49.0921 48.2228C48.9662 48.2707 48.9102 48.4172 48.9718 48.5383C50.038 50.6034 51.2554 52.5699 52.5959 54.435C52.6519 54.5139 52.7526 54.5477 52.845 54.5195C58.6464 52.7249 64.529 50.0174 70.6019 45.5576C70.6551 45.5182 70.6887 45.459 70.6943 45.3942C72.1747 30.0791 68.2147 16.7757 60.1968 4.9823C60.1772 4.9429 60.1437 4.9147 60.1045 4.8978ZM23.7259 37.3253C20.2276 37.3253 17.3451 34.1136 17.3451 30.1693C17.3451 26.225 20.1717 23.0133 23.7259 23.0133C27.308 23.0133 30.1626 26.2532 30.1066 30.1693C30.1066 34.1136 27.28 37.3253 23.7259 37.3253ZM47.3178 37.3253C43.8196 37.3253 40.9371 34.1136 40.9371 30.1693C40.9371 26.225 43.7636 23.0133 47.3178 23.0133C50.9 23.0133 53.7545 26.2532 53.6986 30.1693C53.6986 34.1136 50.9 37.3253 47.3178 37.3253Z"/>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 17 18" id="mastodon">
+    <path
+    fill="#ffffff"
+    d="m 15.054695,9.8859583 c -0.22611,1.1632697 -2.02517,2.4363497 -4.09138,2.6830797 -1.0774504,0.12856 -2.1382704,0.24673 -3.2694704,0.19484 -1.84996,-0.0848 -3.30971,-0.44157 -3.30971,-0.44157 0,0.1801 0.0111,0.35157 0.0333,0.51194 0.24051,1.82571 1.81034,1.93508 3.29737,1.98607 1.50088,0.0514 2.8373104,-0.37004 2.8373104,-0.37004 l 0.0617,1.35686 c 0,0 -1.0498104,0.56374 -2.9199404,0.66742 -1.03124,0.0567 -2.3117,-0.0259 -3.80308,-0.42069 -3.23454998,-0.85613 -3.79081998,-4.304 -3.87592998,-7.8024197 -0.026,-1.03871 -0.01,-2.01815 -0.01,-2.83732 0,-3.57732 2.34385998,-4.62587996 2.34385998,-4.62587996 1.18184,-0.54277 3.20976,-0.77101 5.318,-0.7882499985409 h 0.0518 C 9.8267646,0.01719834 11.856025,0.24547834 13.037775,0.78824834 c 0,0 2.34377,1.04855996 2.34377,4.62587996 0,0 0.0294,2.63937 -0.32687,4.47183"/>
+ <path
+    fill="#000000"
+    d="m 12.616925,5.6916583 v 4.3315297 h -1.71607 V 5.8189683 c 0,-0.88624 -0.37289,-1.33607 -1.1187604,-1.33607 -0.82467,0 -1.23799,0.53361 -1.23799,1.58875 v 2.30122 h -1.70594 v -2.30122 c 0,-1.05514 -0.4134,-1.58875 -1.23808,-1.58875 -0.74587,0 -1.11876,0.44983 -1.11876,1.33607 v 4.2042197 h -1.71607 V 5.6916583 c 0,-0.88527 0.22541,-1.58876 0.67817,-2.10922 0.46689,-0.52047 1.07833,-0.78727 1.83735,-0.78727 0.87816,0 1.54317,0.33752 1.98288,1.01267 l 0.42744,0.71655 0.42753,-0.71655 c 0.43961,-0.67515 1.10463,-1.01267 1.9828704,-1.01267 0.75893,0 1.37037,0.2668 1.83735,0.78727 0.45268,0.52046 0.67808,1.22395 0.67808,2.10922"/>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 530" id="bluesky" >
+    <path d="m135.72 44.03c66.496 49.921 138.02 151.14 164.28 205.46 26.262-54.316 97.782-155.54 164.28-205.46 47.98-36.021 125.72-63.892 125.72 24.795 0 17.712-10.155 148.79-16.111 170.07-20.703 73.984-96.144 92.854-163.25 81.433 117.3 19.964 147.14 86.092 82.697 152.22-122.39 125.59-175.91-31.511-189.63-71.766-2.514-7.3797-3.6904-10.832-3.7077-7.8964-0.0174-2.9357-1.1937 0.51669-3.7077 7.8964-13.714 40.255-67.233 197.36-189.63 71.766-64.444-66.128-34.605-132.26 82.697-152.22-67.108 11.421-142.55-7.4491-163.25-81.433-5.9562-21.282-16.111-152.36-16.111-170.07 0-88.687 77.742-60.816 125.72-24.795z"/>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" id="ko-fi">
+    <path fill="#ffffff" d="M4.5,9.8527H32.7947a0,0,0,0,1,0,0v19.225a9.07,9.07,0,0,1-9.07,9.07H13.57a9.07,9.07,0,0,1-9.07-9.07V9.8527A0,0,0,0,1,4.5,9.8527Z"/>
+    <path fill="#000000" d="M12.197,25.9493l6.45,6.45,6.45-6.45a8.2,8.2,0,0,0,2.4016-5.798h0a4.5082,4.5082,0,0,0-4.212-4.5459,4.4262,4.4262,0,0,0-4.64,4.4209,4.4261,4.4261,0,0,0-4.64-4.4209,4.5082,4.5082,0,0,0-4.212,4.5459h0A8.2,8.2,0,0,0,12.197,25.9493Z"/>
+    <path fill="#ffffff" d="M32.7947,9.8527H35.73a7.77,7.77,0,0,1,0,15.5394H32.7947"/>
+  </svg>
+  </symbol>
+</svg>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha512-aOFyMMzZF7l7ei3vOKgQiRhZnYqk9YC/uMzl4T0j5N5D3Kul+QAFU8ssENDRMAqr/lxDOjMF69dSYJ8HYqY+WQ==" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" integrity="sha512-UPFOadao2nEorjtjl0xUTtN3w20Ja143UPEU6EyJ1mi5MB2bDtMkiWmqGDqi47xNLB5z1dy31GKJDEWhjUJFiQ==" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" integrity="sha512-YJVxTjqttjsU3cSvaTRqsSl0wbRgZUNF+NGGCgto/MUbIvaLdXQzGTCQu4CvyJZbZctgflVB0PXw9LLmTWm5/w==" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
+<footer class="footer">
+  <div class="footer_inner wrap pale">
+    <img src='https://jianlin-li.github.io/icons/apple-touch-icon.png' class="icon icon_2 transparent" alt="Copyright © 1989–2025, 李建林 ">
+    <p>Copyright&nbsp;1989-&nbsp;<span class="year"></span>&nbsp;COPYRIGHT © 1989–2025, 李建林 . All Rights Reserved</p><a class="to_top" href="#documentTop">
+  <svg class="icon">
+  <title>to-top</title>
+  <use xlink:href="#to-top"></use>
+</svg>
+
+</a>
+
+  </div>
+</footer>
+
+<script type="text/javascript" src="https://jianlin-li.github.io/zh-cn/js/bundle.e4e0e4fbe8acb50d7f973828f4138cdbea727800047fc93f9abbd6751e8f3422d6ef193f98da36fdb8488219c25692d73da89480f46abc8421a4ee3526dd6c23.js" integrity="sha512-5ODk&#43;&#43;istQ1/lzgo9BOM2&#43;pyeAAEf8k/mrvWdR6PNCLW7xk/mNo2/bhIghnCVpLXPaiUgPRqvIQhpO41Jt1sIw==" crossorigin="anonymous"></script>
+
+  <script src="https://jianlin-li.github.io/js/search.min.4c2b0421d128bbd7c43fc7d662fb5dfd8e439c60ee92c900a26d72d9c3271d2256f5bac9f6f919cddfd55101e9272898716cbb3381b4360bf43a66a5f7664f54.js"></script>
+
+  </body>
+</html>

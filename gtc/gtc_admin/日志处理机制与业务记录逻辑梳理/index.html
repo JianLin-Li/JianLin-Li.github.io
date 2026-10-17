@@ -1,0 +1,1394 @@
+
+<!DOCTYPE html>
+<html
+  lang="zh-cn"
+  data-figures=""
+  
+    class="page"
+  
+  
+  >
+  <head>
+<title>日志处理机制与业务记录逻辑梳理 | 李建林个人知识库</title>
+<meta charset="utf-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+
+
+
+
+<meta property="og:locale" content="zh-cn" />
+
+<meta property="og:type" content="article">
+<meta name="description" content="日志处理机制与业务记录逻辑梳理
+
+梳理范围：gtc_admin、gtcuser 两个项目。
+结论依据：当前工作区源码、配置文件、模型/Repository、队列与定时任务定义、两项目 docs/数据字典.sql。
+本文只描述源码中的现状，不读取生产日志、不连接生产数据库，也不把配置注释当作已发生的运行事实。
+
+1. 先 …" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:creator" content="">
+<meta name="twitter:title" content="" />
+<meta name="twitter:image" content="https://jianlin-li.github.io/images/thumbnail.png"/>
+<meta property="og:url" content="https://jianlin-li.github.io/gtc/gtc_admin/%E6%97%A5%E5%BF%97%E5%A4%84%E7%90%86%E6%9C%BA%E5%88%B6%E4%B8%8E%E4%B8%9A%E5%8A%A1%E8%AE%B0%E5%BD%95%E9%80%BB%E8%BE%91%E6%A2%B3%E7%90%86/" />
+<meta property="og:title" content="" />
+<meta property="og:description" content="日志处理机制与业务记录逻辑梳理
+
+梳理范围：gtc_admin、gtcuser 两个项目。
+结论依据：当前工作区源码、配置文件、模型/Repository、队列与定时任务定义、两项目 docs/数据字典.sql。
+本文只描述源码中的现状，不读取生产日志、不连接生产数据库，也不把配置注释当作已发生的运行事实。
+
+1. 先 …" />
+<meta property="og:image" content="https://jianlin-li.github.io/images/thumbnail.png" />
+
+<link rel="apple-touch-icon" sizes="180x180" href="https://jianlin-li.github.io/icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://jianlin-li.github.io/icons/favicon-32x32.png">
+<link rel="manifest" href="https://jianlin-li.github.io/icons/site.webmanifest">
+
+<link rel="canonical" href="https://jianlin-li.github.io/gtc/gtc_admin/%E6%97%A5%E5%BF%97%E5%A4%84%E7%90%86%E6%9C%BA%E5%88%B6%E4%B8%8E%E4%B8%9A%E5%8A%A1%E8%AE%B0%E5%BD%95%E9%80%BB%E8%BE%91%E6%A2%B3%E7%90%86/">
+
+
+
+<link rel="preload" href="https://jianlin-li.github.io/css/styles.dc38388a8f0b890e788bd3a99b7495d14e7d5ac4359ed3b49abeb778497863b284ad4cc7e496ef58c84139295f9bafed82f5a41345eda86bd2d429cccb7c2596.css" integrity = "sha512-3Dg4io8LiQ54i9Opm3SV0U59WsQ1ntO0mr63eEl4Y7KErUzH5JbvWMhBOSlfm6/tgvWkE0XtqGvS1CnMy3wllg==" as="style" crossorigin="anonymous">
+
+
+
+<link rel="preload" href="https://jianlin-li.github.io/zh-cn/js/bundle.e4e0e4fbe8acb50d7f973828f4138cdbea727800047fc93f9abbd6751e8f3422d6ef193f98da36fdb8488219c25692d73da89480f46abc8421a4ee3526dd6c23.js" as="script" integrity=
+"sha512-5ODk&#43;&#43;istQ1/lzgo9BOM2&#43;pyeAAEf8k/mrvWdR6PNCLW7xk/mNo2/bhIghnCVpLXPaiUgPRqvIQhpO41Jt1sIw==" crossorigin="anonymous">
+
+
+<link rel="stylesheet" type="text/css" href="https://jianlin-li.github.io/css/styles.dc38388a8f0b890e788bd3a99b7495d14e7d5ac4359ed3b49abeb778497863b284ad4cc7e496ef58c84139295f9bafed82f5a41345eda86bd2d429cccb7c2596.css" integrity="sha512-3Dg4io8LiQ54i9Opm3SV0U59WsQ1ntO0mr63eEl4Y7KErUzH5JbvWMhBOSlfm6/tgvWkE0XtqGvS1CnMy3wllg==" crossorigin="anonymous">
+
+
+  </head>
+  <body
+    data-code="7"
+    data-lines="true"
+    id="documentTop"
+    data-lang="zh-cn"
+  >
+
+<header class="nav_header" >
+  <nav class="nav"><a href='https://jianlin-li.github.io/' class="nav_brand nav_item" title="李建林个人知识库">
+  <img src="https://jianlin-li.github.io/logos/logo.png" class="logo" alt="李建林个人知识库">
+  <div class="nav_close">
+    <div><svg class="icon">
+  <title>open-menu</title>
+  <use xlink:href="#open-menu"></use>
+</svg>
+<svg class="icon">
+  <title>closeme</title>
+  <use xlink:href="#closeme"></use>
+</svg>
+</div>
+  </div>
+</a>
+
+    <div class='nav_body nav_body_left'>
+      
+      
+      
+        
+
+  <div class="nav_parent">
+    <a href="https://jianlin-li.github.io/" class="nav_item" title="首页">首页 </a>
+  </div>
+  <div class="nav_parent">
+    <a href="https://jianlin-li.github.io/archives/" class="nav_item" title="归档">归档 </a>
+  </div>
+  <div class="nav_parent">
+    <a href="https://jianlin-li.github.io/gtc/" class="nav_item" title="GTC 文档">GTC 文档 </a>
+  </div>
+  <div class="nav_parent">
+    <a href="https://jianlin-li.github.io/categories/" class="nav_item" title="分类">分类 </a>
+  </div>
+  <div class="nav_parent">
+    <a href="https://jianlin-li.github.io/tags/" class="nav_item" title="标签">标签 </a>
+  </div>
+  <div class="nav_parent">
+    <a href="https://jianlin-li.github.io/about/" class="nav_item" title="关于">关于 </a>
+  </div>
+      
+<div class='follow'>
+  <a href="https://github.com/JianLin-Li">
+    <svg class="icon">
+  <title>github</title>
+  <use xlink:href="#github"></use>
+</svg>
+
+  </a>
+  <a href="http://local.gitlab.com">
+    <svg class="icon">
+  <title>gitlab</title>
+  <use xlink:href="#gitlab"></use>
+</svg>
+
+  </a>
+<div class="color_mode">
+  <input type="checkbox" class="color_choice" id="mode">
+</div>
+
+</div>
+
+    </div>
+  </nav>
+</header>
+
+    <main><div class="grid-inverse wrap content">
+  <article class="post_content">
+    <p class="gtc-breadcrumb"><a href="/gtc/">GTC 文档归档</a> / gtc_admin</p>
+    <h1 class="post_title">日志处理机制与业务记录逻辑梳理</h1>
+    <div class="post_meta gtc-meta">
+      <span class="post_date">
+        2026-10-17
+      </span>
+      <span>项目：gtc_admin</span>
+    </div>
+    
+    <div class="post_body">
+      <h1 id="日志处理机制与业务记录逻辑梳理">日志处理机制与业务记录逻辑梳理</h1>
+<blockquote>
+<p>梳理范围：<code>gtc_admin</code>、<code>gtcuser</code> 两个项目。
+结论依据：当前工作区源码、配置文件、模型/Repository、队列与定时任务定义、两项目 <code>docs/数据字典.sql</code>。
+本文只描述源码中的现状，不读取生产日志、不连接生产数据库，也不把配置注释当作已发生的运行事实。</p>
+</blockquote>
+<h2 id="1-先区分四类日志">1. 先区分四类“日志”</h2>
+<p>系统中的“日志”实际上有四种用途，存储和可靠性不能混为一谈。</p>
+<table>
+  <thead>
+      <tr>
+          <th>类型</th>
+          <th>目的</th>
+          <th>典型落点</th>
+          <th>是否业务事实</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>运行诊断日志</td>
+          <td>排查异常、接口调用、任务进度、外部服务返回</td>
+          <td>本地文件、Swoole 文件、Lark</td>
+          <td>否，可能丢失或被轮转</td>
+      </tr>
+      <tr>
+          <td>管理操作审计</td>
+          <td>记录后台谁在什么时间调用了什么操作</td>
+          <td><code>t_operation_log</code>、<code>t_system_operation_logs</code>、<code>t_modify_operation_logs</code>、MineAdmin 两张日志表</td>
+          <td>是，但覆盖范围取决于注解/中间件</td>
+      </tr>
+      <tr>
+          <td>客户安全审计</td>
+          <td>登录、登出、入金、出金、转账、修改安全设置等</td>
+          <td><code>t_member_login_log</code>、<code>t_member_login_session</code>、<code>t_member_security_activity</code></td>
+          <td>是，通常与客户或会话关联</td>
+      </tr>
+      <tr>
+          <td>资金/交易业务流水</td>
+          <td>记录金额、资金方向、订单和结算结果</td>
+          <td><code>t_member_amount_log</code>、<code>t_fund_detail</code>、<code>t_member_forword_log</code>、返佣/结算表</td>
+          <td>是，属于账务或交易数据，不应仅依赖文本日志</td>
+      </tr>
+  </tbody>
+</table>
+<p>因此，<code>Log::error()</code>、<code>logger()-&gt;error()</code> 只能作为诊断证据；提现、入金、转账、余额变更等结果必须以对应业务表为准。</p>
+<hr>
+<h2 id="2-gtc_admin">2. <code>gtc_admin</code></h2>
+<h3 id="21-技术栈与总链路">2.1 技术栈与总链路</h3>
+<p><code>gtc_admin</code> 是 ThinkPHP 应用，使用 <code>think\\facade\\Log</code>/PSR-3 风格 API，默认 <code>file</code> 通道；后台中间件、Service、Model 和部分旧控制器还会直接写数据库或 <code>./logs</code> 文件。整体链路如下：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln"> 1</span><span class="cl">Controller / Service / Task
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl">        |
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl">        +-- think\\facade\\Log::record|info|error|write
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl">        |       -&gt; think\\Log -&gt; think\\log\\Channel -&gt; File driver
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl">        |       -&gt; runtime/&lt;app&gt;/log/YYYYMM/DD.log（默认）
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">        |
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl">        +-- #[LogOperation]
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl">        |       -&gt; LogOperationMiddleware（请求成功返回后）
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">        |       -&gt; t_operation_log
+</span></span><span class="line"><span class="ln">10</span><span class="cl">        |
+</span></span><span class="line"><span class="ln">11</span><span class="cl">        +-- #[SystemOperation]
+</span></span><span class="line"><span class="ln">12</span><span class="cl">        |       -&gt; SystemOperationMiddleware（前置校验、执行后记录）
+</span></span><span class="line"><span class="ln">13</span><span class="cl">        |       -&gt; t_system_operation_logs
+</span></span><span class="line"><span class="ln">14</span><span class="cl">        |
+</span></span><span class="line"><span class="ln">15</span><span class="cl">        +-- #[ModifyReason]
+</span></span><span class="line"><span class="ln">16</span><span class="cl">        |       -&gt; ModifyReasonMiddleware（成功且有变更）
+</span></span><span class="line"><span class="ln">17</span><span class="cl">        |       -&gt; t_modify_operation_logs
+</span></span><span class="line"><span class="ln">18</span><span class="cl">        |
+</span></span><span class="line"><span class="ln">19</span><span class="cl">        +-- 登录/会员/资金业务服务
+</span></span><span class="line"><span class="ln">20</span><span class="cl">                -&gt; t_member_login_log / t_member_login_session
+</span></span><span class="line"><span class="ln">21</span><span class="cl">                -&gt; t_member_detail_log / t_member_amount_log / t_fund_detail
+</span></span></code></pre></div><h3 id="22-thinkphp-文件日志">2.2 ThinkPHP 文件日志</h3>
+<p>配置在 <code>config/log.php</code>：</p>
+<ul>
+<li>默认通道是 <code>file</code>，全局 <code>close=false</code>，没有配置级别白名单。</li>
+<li><code>file.path</code> 为空，由 <code>localPackage/framework/src/think/log/driver/File.php</code> 解析为 <code>$app-&gt;getRuntimePath() . 'log'</code>。</li>
+<li><code>single=false</code> 且 <code>max_files=0</code> 时，主文件名是 <code>runtime/&lt;应用运行目录&gt;/log/YYYYMM/DD.log</code>；月份目录和日期文件由框架创建。</li>
+<li>单文件达到 <code>file_size</code>（驱动默认 2 MB）时改名为带 Unix 时间戳的备份文件。<code>max_files=0</code> 表示不按数量清理，因此实际保留量取决于外部日志清理策略和磁盘空间。</li>
+<li>文本格式默认是 <code>[%s][%s] %s</code>，分别为时间、级别、消息；<code>json=false</code>。</li>
+<li><code>zoloz</code> 是独立 File 通道，路径为 <code>app()-&gt;getRuntimePath().'logs/zoloz'</code>，调用方式是 <code>Log::channel('zoloz')</code>。</li>
+</ul>
+<p>写入时机由 <code>localPackage/framework/src/think/Log.php</code> 与 <code>Channel.php</code> 决定：</p>
+<ol>
+<li><code>Log::record()</code> 把消息先放入当前 Channel 的内存数组。</li>
+<li>Web 请求下 <code>realtime_write=false</code> 会使 Channel 默认延迟写入；请求结束或框架保存日志时批量调用 <code>save()</code>。</li>
+<li><code>Log::write()</code> 调用 <code>record(..., lazy=false)</code>，立即调用 File driver 的 <code>save()</code>。</li>
+<li>File driver 最终通过 <code>error_log($message, 3, $destination)</code> 追加写文件。</li>
+</ol>
+<p>这意味着普通 <code>record/info/error</code> 在请求中途进程异常时可能尚未落盘，而 <code>write</code> 更适合需要立即看到的任务进度；二者都不是消息队列，也没有跨进程重试。</p>
+<p><code>config/trace.php</code> 只配置控制台 Trace，服务于调试输出，不是持久化业务审计。<code>app/ExceptionHandle.php</code> 继承 ThinkPHP <code>Handle</code>，业务异常、数据库异常和未捕获异常最终由框架报告逻辑写入错误日志；它对 <code>BusinessException</code> 和 <code>DbException</code> 主要负责响应格式，不负责建立业务审计记录。</p>
+<h3 id="23-普通业务诊断日志">2.3 普通业务诊断日志</h3>
+<p>代码中常见形式包括：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln">1</span><span class="cl"><span class="nx">Log</span><span class="o">::</span><span class="na">info</span><span class="p">(</span><span class="s1">&#39;业务阶段完成&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;member_id&#39;</span> <span class="o">=&gt;</span> <span class="nv">$memberId</span><span class="p">]);</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="nx">Log</span><span class="o">::</span><span class="na">error</span><span class="p">(</span><span class="s1">&#39;外部服务调用失败: &#39;</span> <span class="o">.</span> <span class="nv">$e</span><span class="o">-&gt;</span><span class="na">getMessage</span><span class="p">(),</span> <span class="p">[</span><span class="s1">&#39;order_id&#39;</span> <span class="o">=&gt;</span> <span class="nv">$orderId</span><span class="p">]);</span>
+</span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="nx">Log</span><span class="o">::</span><span class="na">write</span><span class="p">(</span><span class="s1">&#39;定时任务进入下一阶段&#39;</span><span class="p">);</span>
+</span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="nx">Log</span><span class="o">::</span><span class="na">record</span><span class="p">(</span><span class="nx">json_encode</span><span class="p">(</span><span class="nv">$payload</span><span class="p">),</span> <span class="s1">&#39;error&#39;</span><span class="p">);</span>
+</span></span></code></pre></div><p>典型来源：KYC、MT API、Saleforce、支付/提现、跟单、返佣、静态报表、风险策略、MQ 消费等。消息内容通常是中文描述加会员 ID、订单号、MT 登录号、返回码和异常消息；并非所有调用都带结构化上下文，也不是所有调用都做敏感字段脱敏。</p>
+<h3 id="24-旧式手写文件日志">2.4 旧式手写文件日志</h3>
+<p>历史代码绕过 ThinkPHP Logger，直接使用 <code>file_put_contents(..., FILE_APPEND)</code>。已确认的落点如下：</p>
+<table>
+  <thead>
+      <tr>
+          <th>来源</th>
+          <th>路径模式</th>
+          <th>内容/用途</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>app/risk/controller/CommissionWalletSettlement.php</code></td>
+          <td><code>./logs/commission/YYYY-MM-DD-wallet.log</code></td>
+          <td>钱包返佣结算进度和上下文</td>
+      </tr>
+      <tr>
+          <td><code>CopyCommission.php</code></td>
+          <td><code>./logs/commission/YYYY-MM-DD-gtc-init.log</code></td>
+          <td>GTC 跟单/返佣初始化</td>
+      </tr>
+      <tr>
+          <td><code>PammCommission.php</code></td>
+          <td><code>./logs/commission/YYYY-MM-DD-Pamm-init.log</code></td>
+          <td>PAMM 初始化</td>
+      </tr>
+      <tr>
+          <td><code>TradeCommissionV2.php</code></td>
+          <td><code>./logs/commission/YYYY-MM-DD-init.log</code></td>
+          <td>返佣初始化</td>
+      </tr>
+      <tr>
+          <td><code>Member.php</code>、<code>CreditService.php</code>、<code>Credit.php</code></td>
+          <td><code>./logs/commission/YYYY-MM-DD-credit.log</code></td>
+          <td>赠金处理</td>
+      </tr>
+      <tr>
+          <td><code>app/risk/controller/Mt.php</code></td>
+          <td><code>./logs/leavger/YYYY-MM-DD.log</code></td>
+          <td>杠杆处理任务</td>
+      </tr>
+      <tr>
+          <td><code>app/api/model/MtApi.php</code></td>
+          <td><code>./logs/mt/YYYY-MM-DD-dllapi.log</code></td>
+          <td>MT DLL API 调用</td>
+      </tr>
+      <tr>
+          <td><code>app/admin/controller/Timer.php</code></td>
+          <td><code>./logs/timer/YYYY-MM-DD.log</code></td>
+          <td>定时任务输出；同时 <code>echo</code> 到 CLI</td>
+      </tr>
+      <tr>
+          <td><code>app/service/InformationService.php</code></td>
+          <td><code>./logs/mail/YYYY-MM-DD-mail.log</code></td>
+          <td>邮件/短信发送流程参数和返回结果</td>
+      </tr>
+      <tr>
+          <td><code>app/api/controller/Notify.php</code></td>
+          <td><code>./logs/pay/YYYY-MM-DD.log</code></td>
+          <td>支付通知处理</td>
+      </tr>
+      <tr>
+          <td><code>app/service/XiaoTechService.php</code></td>
+          <td><code>./logs/xiaoe_tech/YYYY-MM-DD.log</code></td>
+          <td>外部服务调用</td>
+      </tr>
+  </tbody>
+</table>
+<p>这些路径以 <code>./</code> 开头，依赖启动工作目录，和框架的 runtime 日志不是同一目录；文件创建权限、轮转、保留期和并发写入均由各方法自行承担。手写日志中可能出现完整请求参数、邮箱、订单或外部响应，不能按框架日志的脱敏能力推断其安全性。</p>
+<h3 id="25-后台通用操作审计t_operation_log">2.5 后台通用操作审计：<code>t_operation_log</code></h3>
+<p>注册顺序见 <code>app/admin/middleware.php</code>，<code>LogOperationMiddleware</code> 位于登录 IP 中间件之后。控制器方法使用 PHP 8 Attribute：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln">1</span><span class="cl"><span class="c1">#[LogOperation(
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="c1"></span>    <span class="nx">title</span><span class="o">:</span> <span class="s1">&#39;业务名称&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">3</span><span class="cl">    <span class="nx">logParams</span><span class="o">:</span> <span class="k">true</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">4</span><span class="cl">    <span class="nx">logResult</span><span class="o">:</span> <span class="k">false</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">5</span><span class="cl">    <span class="nx">recordIp</span><span class="o">:</span> <span class="k">true</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">6</span><span class="cl">    <span class="nx">recordDevice</span><span class="o">:</span> <span class="k">true</span>
+</span></span><span class="line"><span class="ln">7</span><span class="cl"><span class="p">)]</span>
+</span></span></code></pre></div><p>实际逻辑：</p>
+<ol>
+<li>先执行 <code>$next($request)</code>，拿到响应后才反射控制器方法上的 <code>LogOperation</code>。</li>
+<li>没有注解直接返回，不产生记录。</li>
+<li>通过 <code>tinywan\\JWT::getCurrentId()</code> 获取管理员 ID；取 ID 失败时回退为 <code>1</code>，这会造成审计归属风险。</li>
+<li>读取管理员昵称、HTTP method、<code>/admin/{controller}/{action}</code>、反射缓存键、注解 title。</li>
+<li><code>logParams=true</code> 时记录 <code>$request-&gt;all()</code>，仅对顶层 <code>password</code>、<code>pay_password</code>、<code>token</code>、卡号、CVV、有效期和 Google 验证码替换为 <code>******</code>。</li>
+<li><code>logResult=true</code> 时把 ThinkPHP Response 内容规范化为 JSON；非 JSON 响应会放入截断到 2000 字符的 <code>_non_json_response</code>。</li>
+<li><code>recordIp/recordDevice</code> 打开时记录 IP、User-Agent、OS、浏览器、版本、设备类型和 IP 地区。</li>
+<li><code>OperationLog::create()</code> 同步写 <code>t_operation_log</code>；写入失败只调用 <code>Log::error()</code>，不回滚业务响应。</li>
+</ol>
+<p>数据字典中的 <code>t_operation_log</code> 字段包括 <code>member_id</code>、<code>nickname</code>、<code>method</code>、<code>api</code>、<code>router</code>、<code>title</code>、IP/设备字段、JSON 类型 <code>request_params</code>/<code>response_params</code>、<code>remark</code> 和时间戳。</p>
+<p>边界：</p>
+<ul>
+<li>因为 <code>$next</code> 在前，业务抛异常时普通操作日志的保存代码不会执行；它不是完整的请求访问日志。</li>
+<li>它不记录所有接口，只记录加了 Attribute 的方法。</li>
+<li>脱敏只处理顶层键，嵌套数组、响应内容和字符串化 JSON 可能含敏感信息。</li>
+<li>当前实现计算执行耗时的起点在 <code>$next</code> 返回后，记录值接近零，不能作为真实接口耗时。</li>
+<li>模型字段白名单没有 <code>remark</code>，但中间件准备了 <code>remark</code>，需要以 ORM 实际行为和数据库结果继续核对。</li>
+<li><code>operator()</code> 关系使用 <code>from_member_id</code>，而数据字典字段是 <code>member_id</code>，列表关联可能不正确。</li>
+</ul>
+<h3 id="26-系统配置操作审计t_system_operation_logs">2.6 系统配置操作审计：<code>t_system_operation_logs</code></h3>
+<p><code>SystemOperationMiddleware</code> 处理 <code>#[SystemOperation]</code>：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="ln">1</span><span class="cl"><span class="c1">#[SystemOperation(
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="c1"></span>    <span class="nx">operationType</span><span class="o">:</span> <span class="s1">&#39;风控&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">3</span><span class="cl">    <span class="nx">configParam</span><span class="o">:</span> <span class="s1">&#39;动态杠杆&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">4</span><span class="cl">    <span class="nx">actionType</span><span class="o">:</span> <span class="s1">&#39;update&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">5</span><span class="cl">    <span class="nx">remarkKey</span><span class="o">:</span> <span class="s1">&#39;remark&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">6</span><span class="cl">    <span class="nx">recordResult</span><span class="o">:</span> <span class="k">true</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">7</span><span class="cl">    <span class="nx">requireGoogleCode</span><span class="o">:</span> <span class="k">true</span>
+</span></span><span class="line"><span class="ln">8</span><span class="cl"><span class="p">)]</span>
+</span></span></code></pre></div><p>链路：</p>
+<ol>
+<li>解析控制器和方法，读取 Attribute；没有 Attribute 时放行。</li>
+<li>前置读取 <code>remark</code>，但当前 <code>remark === ''</code> 校验代码已注释，所以备注并非强制；<code>requireGoogleCode=true</code> 时仍强制校验 6 位 Google 验证码。</li>
+<li>通过 <code>SystemOperationLogService::captureBeforeSnapshot()</code> 读取变更前快照。支持的快照对象包括角色、风险策略、自定义风控参数、提现限额规则、提现规则和登录 IP 访问规则。</li>
+<li>执行真实业务。正常返回由 <code>record()</code> 写成功/失败结果；异常路径由 <code>recordFailByException()</code> 写失败记录后重新抛出原异常。</li>
+<li>结果码严格为 <code>0</code> 或 <code>999</code> 才记成功 <code>9</code>，否则记失败 <code>-1</code>。</li>
+<li><code>change_data</code> 优先读取响应中的 <code>data.changed_fields</code>；没有时比较前后快照。差异项包含字段、国际化键、旧值、新值，并递归排序 JSON 后比较。</li>
+<li>去除请求中的 <code>googleCode</code>，补充 <code>operation_type</code>、配置项、动作、操作人、IP、UTC 操作时间、备注、扩展信息。</li>
+<li><code>SystemOperationLog::onBeforeInsert()</code> 生成 <code>SOL-YYYYMMDD-雪花ID</code>，通过唯一索引保证唯一性。</li>
+</ol>
+<p>表 <code>t_system_operation_logs</code> 有 <code>uk_log_id</code>、操作时间、操作人和操作类型索引。该表是配置变更审计，不应替代普通运行日志。</p>
+<p>代码中还存在 Service 直接调用 <code>SystemOperationLog::create()</code> 的路径，例如支付状态、KYC 设置、国家配置、MT 服务器权限、风险组和 IB 邀请链接等；这些路径可能绕过统一中间件，但仍写同一张表。</p>
+<h3 id="27-账户风控修改审计t_modify_operation_logs">2.7 账户风控修改审计：<code>t_modify_operation_logs</code></h3>
+<p><code>ModifyReasonMiddleware</code> 针对带修改原因 Attribute 的后台方法：</p>
+<ul>
+<li>前置校验管理员 Google 验证码，读取目标会员、MT 登录号、钱包余额和 MT 余额。</li>
+<li>业务成功后检查响应中的 <code>changed_fields</code>；为空时不写日志。</li>
+<li>记录操作人、会员 ID、MT 登录号、操作前钱包/MT 余额、IP、原因、UTC 操作时间、变更 JSON 和关联 ID。</li>
+<li><code>ModifyOperationLog</code> 自动生成 <code>AOL-YYYYMMDD-雪花ID</code>，并在 <code>uk_log_id</code> 冲突时最多重试三次；该 Trait 只解决编号碰撞，不是异步队列。</li>
+</ul>
+<p>部分业务也会直接保存该模型，例如提现控制器和客户注册风险服务。数据字典说明该表用于账户风控项操作记录，索引覆盖操作时间、操作人、操作类型、会员 ID、MT 登录号。</p>
+<h3 id="28-登录与会话审计">2.8 登录与会话审计</h3>
+<p>后台登录入口 <code>app/admin/controller/Pub.php::login()</code> 在账号、角色、IP 白名单和 Google 验证器校验通过后写入 <code>t_member_login_log</code>，关键字段包括：</p>
+<ul>
+<li><code>auth_source=ADMIN</code>、会员/管理员 ID、Unix 时间、客户端 IP、完整 User-Agent、设备类型、OS/版本；</li>
+<li>国家、城市、国家代码、请求 URL；</li>
+<li>成功登录后生成会话/设备限制相关缓存，禁用会员时由 <code>MemberLoginSessionService</code> 批量锁定最多 500 条活动客户会话，并同步更新 <code>member_login_log.logout_time</code> 与结束原因。</li>
+</ul>
+<p>共享表 <code>t_member_login_log</code> 同时服务 CUSTOMER 和 ADMIN。数据字典增加了 <code>auth_source</code>、<code>channel</code>、<code>auth_method</code>、<code>failure_code</code>、<code>session_id</code>、<code>logout_time</code> 等字段；<code>session_id</code> 有唯一索引，<code>member_id/login_status</code>、<code>member_id/device_id/login_status</code> 等索引支持审计查询。表中存在 <code>token</code> 字段，文档和接口应避免输出原始凭证。</p>
+<p><code>MemberLoginLogService</code> 主要负责分页筛选和展示 DTO，不在查询时补写日志；登录失败、成功和会话结束由实际认证/禁用流程写入。</p>
+<h3 id="29-会员详情与资金交易日志">2.9 会员详情与资金/交易日志</h3>
+<p>会员资料、状态、安全状态变更通过 <code>Member::MemberDetailLog()</code>/<code>MemberService::memberDetailLog()</code> 写 <code>member_detail_log</code>，内容包括：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">admin_id, member_id, before, after, func, type, field, status, created_at, updated_at
+</span></span></code></pre></div><p><code>MemberDetailLogConstants</code> 负责把状态值和字段名翻译为展示文本。它是字段变更事实，不是诊断文本。</p>
+<p>资金与交易相关记录分为：</p>
+<ul>
+<li><code>t_member_amount_log</code>：会员钱包金额变更，通常和余额更新在同一业务事务/流程中写入；属于余额流水大表。</li>
+<li><code>t_fund_detail</code>：入金、出金、赠金、转账、返佣等资金明细，带类型、订单/会员、金额、币种、状态及 MT 去向。</li>
+<li><code>t_member_forword_log</code> 等转账表：记录内部/外部转账申请和状态；<code>t_member_security_activity</code> 或 <code>OperationLogAspect</code> 记录安全操作视角。</li>
+<li><code>t_system_money_log</code>：按业务类型汇总系统入/出及 MT 前后金额，不是逐笔审计表。</li>
+<li><code>t_t_credit_record_log</code>：用订单号+规则唯一键避免重复赠金，是幂等/处理证据。</li>
+</ul>
+<p>后台提现、赠金、返佣控制器会同时写业务流水和 <code>Log::write/error</code>；发生冲突时应以业务流水、状态和幂等键核对，不能只查文本日志。</p>
+<h3 id="210-队列mq定时任务与日志">2.10 队列、MQ、定时任务与日志</h3>
+<p><code>gtc_admin</code> 既有 ThinkPHP Queue，也有独立 RabbitMQ 消费入口：</p>
+<ul>
+<li><code>app/service/InformationService.php::send()</code> 默认 <code>$queue=true</code>，把邮件任务推到 <code>\\app\\jobs\\controller\\MailJobs@send</code> 的 <code>Jobs</code> 队列；写邮件过程还会写 <code>./logs/mail/YYYY-MM-DD-mail.log</code>。</li>
+<li><code>app/mq/controller/notify.php</code> 声明 RabbitMQ direct queue 并消费消息，调用 <code>Log::write()</code> 记录消费者状态和消息体摘要。</li>
+<li><code>app/admin/controller/Timer.php</code> 是旧式 URL/CLI 定时控制器，白名单校验通过后执行统计、跟单、过期邮件等操作，并把进度写 <code>./logs/timer</code>；它不是持久化调度器本身，实际触发依赖外部 cron、HTTP 或进程管理配置。</li>
+<li>风控返佣模块中的 <code>sale_commission_wallet_queue</code> 等数据库队列表是业务处理队列，带锁、重试、阶段和失败信息；这些是可查询的处理状态，不等同于 <code>Log::info</code> 文件日志。</li>
+</ul>
+<p>队列任务应该把“投递、消费、成功、失败、重试”分别作为状态/日志记录；现有旧代码在不同模块的完整度不一致。</p>
+<h3 id="211-gtc_admin-日志风险与核对建议">2.11 <code>gtc_admin</code> 日志风险与核对建议</h3>
+<ol>
+<li>框架延迟写日志和手写文件都可能在进程异常、磁盘满、权限错误时丢失；应确认生产 logrotate、备份和告警。</li>
+<li><code>./logs</code> 依赖工作目录，容器或 Supervisor 切换 cwd 后可能写到意外位置。</li>
+<li>运行日志、审计表和资金流水混用名称，运维查询时容易误把诊断日志当成账务凭证。</li>
+<li>普通操作审计在异常时不落库，成功/失败覆盖范围依赖 Attribute；高风险接口应优先使用系统操作/账户修改审计或明确的业务状态表。</li>
+<li>参数脱敏不递归，手写日志和 <code>Log::write(json_encode(...))</code> 可能泄露 token、密码、完整支付报文或第三方密钥。</li>
+<li><code>t_logger</code> 当前只看到后台列表读取：<code>Logger</code> 通过 <code>database.bigdata</code> 查询 <code>t_logger</code>，按用户 ID、自然日、菜单 action_name 分页，页大小上限 100；在当前源码扫描中未找到明确写入入口，需继续向历史部署包/其他服务追溯，不能把它和 <code>t_operation_log</code> 视为同一张表。</li>
+</ol>
+<hr>
+<h2 id="3-gtcuser">3. <code>gtcuser</code></h2>
+<h3 id="31-技术栈与总链路">3.1 技术栈与总链路</h3>
+<p><code>gtcuser</code> 是 Hyperf + Swoole/Swow 风格常驻进程应用，使用 Monolog、Hyperf AsyncQueue、Hyperf Crontab、MineAdmin JWT/权限和 ORM。日志链路分为四层：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln"> 1</span><span class="cl">Controller / Service / Job / Task
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl">        |
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl">        +-- logger(&#39;channel&#39;)-&gt;info|warning|error
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl">        |       -&gt; LoggerFactory::get($name, $group=&#39;default&#39;)
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl">        |       -&gt; Monolog handler
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">        |       -&gt; runtime/logs/debug-YYYY-MM-DD.log（default）
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl">        |
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl">        +-- 异常 Handler
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">        |       -&gt; LoggerFactory::get(&#39;error&#39;)-&gt;error(...)
+</span></span><span class="line"><span class="ln">10</span><span class="cl">        |       -&gt; 默认 group 的 handler（除非显式传 group=&#39;error&#39;）
+</span></span><span class="line"><span class="ln">11</span><span class="cl">        |
+</span></span><span class="line"><span class="ln">12</span><span class="cl">        +-- 管理端注解/事件
+</span></span><span class="line"><span class="ln">13</span><span class="cl">        |       -&gt; mine_user_operation_log / mine_user_login_log
+</span></span><span class="line"><span class="ln">14</span><span class="cl">        |
+</span></span><span class="line"><span class="ln">15</span><span class="cl">        +-- 客户接口注解/登录服务
+</span></span><span class="line"><span class="ln">16</span><span class="cl">                -&gt; member_security_activity
+</span></span><span class="line"><span class="ln">17</span><span class="cl">                -&gt; member_login_log / member_login_session
+</span></span><span class="line"><span class="ln">18</span><span class="cl">                -&gt; member_detail_log / modify_operation_logs / 资金流水
+</span></span></code></pre></div><h3 id="32-hyperfmonolog-文件日志">3.2 Hyperf/Monolog 文件日志</h3>
+<p>配置在 <code>config/autoload/logger.php</code>，格式为：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">%datetime%||%channel%||%level_name%||%message%||%context%||%extra%\n
+</span></span></code></pre></div><p>已配置的 Logger group 和实际 handler：</p>
+<table>
+  <thead>
+      <tr>
+          <th>group</th>
+          <th>文件 handler</th>
+          <th>级别</th>
+          <th>Processor/Lark</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>default</code></td>
+          <td><code>runtime/logs/debug.log</code>，RotatingFileHandler</td>
+          <td>DEBUG 及以上</td>
+          <td><code>LogProcess</code>；ERROR/WARNING/EMERGENCY 同步 Lark handler</td>
+      </tr>
+      <tr>
+          <td><code>error</code></td>
+          <td><code>runtime/logs/error.log</code>，RotatingFileHandler</td>
+          <td>ERROR 及以上</td>
+          <td><code>LogProcess</code>；同 Lark handler</td>
+      </tr>
+      <tr>
+          <td><code>sql</code></td>
+          <td><code>runtime/logs/sql.log</code></td>
+          <td>配置为 ERROR，但查询订阅者调用 info，实际需以 Monolog 级别行为复核</td>
+          <td>无 processor</td>
+      </tr>
+      <tr>
+          <td><code>mt</code></td>
+          <td><code>runtime/logs/mt.log</code></td>
+          <td>DEBUG 及以上</td>
+          <td>无 processor</td>
+      </tr>
+      <tr>
+          <td><code>mt_lark</code></td>
+          <td><code>runtime/logs/mt_lark.log</code></td>
+          <td>DEBUG 及以上</td>
+          <td>无 processor；名称本身不代表发送 Lark</td>
+      </tr>
+      <tr>
+          <td><code>msg</code></td>
+          <td><code>runtime/logs/msg.log</code></td>
+          <td>DEBUG 及以上</td>
+          <td>无 processor</td>
+      </tr>
+      <tr>
+          <td><code>lark</code></td>
+          <td><code>runtime/logs/lark.log</code></td>
+          <td>INFO 及以上</td>
+          <td>用于 LarkWebhookService 自身 logger</td>
+      </tr>
+  </tbody>
+</table>
+<p>RotatingFileHandler 按日期生成 <code>debug-YYYY-MM-DD.log</code> 等文件；配置没有明确 <code>maxFiles</code> 保留数量，长期保留仍依赖 Monolog 默认值和外部清理策略。Swoole 原生错误日志另由 <code>config/autoload/server.php</code> 的 <code>OPTION_LOG_FILE</code> 写入 <code>runtime/logs/swoole.log</code>，级别为 <code>SWOOLE_LOG_WARNING</code>。</p>
+<p>关键语义来自 <code>vendor/hyperf/logger/src/LoggerFactory.php</code> 和 <code>vendor/mineadmin/helpers/src/functions.php</code>：</p>
+<ul>
+<li><code>logger('pay')</code> 调用 <code>LoggerFactory-&gt;get('pay')</code>，参数 <code>$name='pay'</code>、<code>$group='default'</code>；<code>pay</code> 是 Monolog channel 名，不会自动选择 <code>pay.log</code>。</li>
+<li>只有 <code>LoggerFactory-&gt;get('sql', 'sql')</code> 这种显式传第二个参数才会读取 <code>sql</code> group。</li>
+<li><code>logger('error')</code> 仍然默认使用 <code>default</code> group，所以异常处理器中的 <code>get('error')</code> 按当前源码会写 default handler 的 <code>debug-日期.log</code>，同时执行 default 的 Lark handler；它不会仅凭名字进入 <code>error-日期.log</code>。若生产有包装或覆盖 LoggerFactory，需要现场配置确认。</li>
+<li><code>LogProcess</code> 只在 default/error group 配置，<code>sql</code>、<code>mt</code>、<code>msg</code> 等专用 group 不经过该脱敏 Processor。</li>
+</ul>
+<h3 id="33-logprocess-上下文和脱敏">3.3 <code>LogProcess</code> 上下文和脱敏</h3>
+<p><code>app/Process/LogProcess.php</code> 是 Monolog <code>ProcessorInterface</code>，不是 Hyperf Process，也不负责消费日志或写 Elasticsearch。它在 default/error group 中：</p>
+<ol>
+<li>从 <code>Context</code> 读取 <code>userInfo</code>、headers、serverInfo。</li>
+<li>从请求上下文读取 POST 数据。</li>
+<li>计算客户端 IP，优先 <code>X-Forwarded-For</code> 首个值，其次 <code>X-Real-IP</code>，最后 <code>remote_addr</code>。</li>
+<li>把 headers、client_ip、serverInfo、request、email、user_id 合并到 context，并把 serverInfo 放入 extra。</li>
+<li>对 password、password_confirmation、fund_password、旧/新密码、authorization、cookie、set-cookie、x-api-key 做递归字段脱敏；敏感请求头直接删除。</li>
+<li>数字索引 context 改名 <code>p0/p1</code>，数组/对象 JSON 字符串化，避免 Monolog/下游字段类型混乱。</li>
+</ol>
+<p><code>AbstractController</code> 会设置 <code>headers</code> 和 <code>serverInfo</code>；<code>ApiTokenMiddleware</code> 在 token 成功解析后设置 <code>userInfo</code>。Processor 不能保证对已经拼接到 message 字符串中的敏感值进行脱敏，专用 group 也没有 Processor；异常时 Processor 捕获错误并使用 PHP <code>error_log()</code> 后返回原记录。</p>
+<h3 id="34-lark-告警链路">3.4 Lark 告警链路</h3>
+<p><code>default</code> 和 <code>error</code> group 注册 <code>LarkWebhookHandler</code>，只处理 ERROR/WARNING/EMERGENCY（具体还受 <code>LARK_LOG_LEVELS</code> 环境配置影响）：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">logger(...)-&gt;error()
+</span></span><span class="line"><span class="ln">2</span><span class="cl">  -&gt; Monolog LarkWebhookHandler
+</span></span><span class="line"><span class="ln">3</span><span class="cl">  -&gt; LarkWebhookService::pushLog()
+</span></span><span class="line"><span class="ln">4</span><span class="cl">  -&gt; Guzzle HTTP POST 到配置的 Lark webhook
+</span></span></code></pre></div><p><code>LarkWebhookService</code> 使用 10 秒 HTTP 超时，webhook 为空或请求失败时返回 <code>false</code>，不会抛出影响原业务的异常。它会调用 <code>LoggerFactory-&gt;get('lark')</code> 记录自身日志，正常落到 <code>lark</code> group 的文件 handler。</p>
+<p>源码中还存在 <code>app/Jobs/Security/SiteVisitLarkNoticeJob.php</code> 等 AsyncQueue Lark 任务；这些是显式异步通知。<code>LarkWebhookHandler</code> 本身是同步 Monolog Handler，不是队列消费者，告警服务不可用时不能依靠该 handler 自动重试。</p>
+<h3 id="35-异常和-sql-日志">3.5 异常和 SQL 日志</h3>
+<p><code>app/Exception/Handler/AbstractHandler.php</code> 的异常流程：</p>
+<ol>
+<li><code>handle()</code> 先调用 <code>report()</code>，再生成业务响应。</li>
+<li>Debug 模式把格式化异常打印到 <code>StdoutLoggerInterface</code>，并把文件、行号、trace 放入调试响应上下文。</li>
+<li>所有异常调用 <code>LoggerFactory-&gt;get('error')-&gt;error($message, ['exception' =&gt; $throwable])</code>。</li>
+<li>响应统一补 <code>Request-Id</code>，便于用请求 ID 关联文件日志和安全审计。</li>
+</ol>
+<p><code>config/autoload/listeners.php</code> 注册 MineAdmin <code>DbQueryExecutedSubscriber</code>。它仅在 <code>APP_DEBUG=true</code> 时监听 <code>QueryExecuted</code>，把连接名、SQL 执行耗时和绑定值替换后的 SQL 写入 <code>loggerFactory-&gt;get('sql')</code>。绑定值被简单拼到 SQL 文本中，调试环境仍可能出现个人信息或敏感参数；生产关闭 APP_DEBUG 才不会记录全部 SQL。</p>
+<h3 id="36-mineadmin-管理端操作日志">3.6 MineAdmin 管理端操作日志</h3>
+<p><code>OperationMiddleware</code> 不是全量 HTTP access log。它只对能从控制器方法解析到 Swagger <code>Get/Post/Delete/Patch/Put</code> Attribute 的接口，在真正 handler 执行前派发 <code>RequestOperationEvent</code>，字段为：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">userId, operation(summary), path, client IP, HTTP method
+</span></span></code></pre></div><p><code>UserOperationSubscriber</code> 收到事件后查管理员，再用 <code>Coroutine::create()</code> 调用 <code>UserOperationLogService-&gt;save()</code> 写 <code>mine_user_operation_log</code>，字段包括 username、method、router、service_name、ip、remark。<code>Coroutine::create()</code> 只是当前进程中的协程调度，不是 Redis 队列；进程崩溃时可能丢失，且中间件在业务执行前派发，所以不能证明请求最终成功。</p>
+<p>管理员登录由 JWT <code>UserLoginEvent</code> 触发 <code>UserLoginSubscriber</code>，协程写 <code>mine_user_login_log</code>：username、IP、OS、browser、status（1 成功、2 失败），模型创建事件补 <code>login_time</code>。Repository 和管理控制器提供筛选、列表、删除接口。</p>
+<p>表结构见 <code>gtcuser/docs/数据字典.sql</code>：</p>
+<ul>
+<li><code>t_mine_user_login_log</code> 有 username 索引，字段是管理员登录诊断/审计信息。</li>
+<li><code>t_mine_user_operation_log</code> 有 username 索引，保存后台操作路由和业务名称。</li>
+<li>Namespace/Service 名称含 <code>Logstash</code>，但当前 Model/Repository 使用 Hyperf ORM 直接写关系型表，没有看到 Elasticsearch 客户端；不能据此认定已经写入 ES。</li>
+</ul>
+<h3 id="37-客户安全活动与-aop-操作日志">3.7 客户安全活动与 AOP 操作日志</h3>
+<p><code>OperationLogAspect</code> 由 <code>#[OperationLog]</code> 方法 Attribute 触发，当前明确使用在：</p>
+<ul>
+<li><code>PayController</code> 入金、出金；</li>
+<li><code>CashController</code> 转账，按 <code>type</code> 区分内部/外部转账；</li>
+<li><code>SocialTradingController</code>、<code>SecurityPolicyController</code> 的若干客户安全/社交交易操作。</li>
+</ul>
+<p>处理逻辑：</p>
+<ol>
+<li>读取请求 body 和 <code>member_id</code> header，默认状态为失败 <code>2</code>。</li>
+<li>调用真实方法；结果码为成功时状态改为 <code>1</code>，并从结果的 <code>idField</code> 提取关联业务 ID；非成功响应把 message 写入 remarks。</li>
+<li>抛出异常时，业务异常写真实 message，普通异常写 <code>System Error</code>；错误码 <code>10001</code> 会抑制写入。</li>
+<li><code>finally</code> 补 activity_type，并调用 <code>MemberSecurityActivityService::createRecord()</code>。</li>
+<li>Service 补充 IP、device-id、User-Agent；Repository 解析 IP 地区、OS、浏览器、版本后保存 <code>t_member_security_activity</code>。</li>
+</ol>
+<p>该表字段包括会员、关联业务 ID/UUID、操作类型、终端、IP、国家城市、OS、设备、状态、浏览器、备注和时间，并有会员、创建时间、业务 ID/类型等索引。该日志是客户安全审计，不是通用请求日志。</p>
+<p>注意：<code>finally</code> 中 transfer 缺少 <code>type</code> 时直接 return 一个失败 Result，可能影响原始返回/异常传播；这属于实现风险，应单独测试。</p>
+<h3 id="38-客户登录会话和会员安全记录">3.8 客户登录、会话和会员安全记录</h3>
+<p><code>MemberLoginLogService</code> 是客户登录审计的核心：</p>
+<ul>
+<li><code>UserLoginBeforeListener</code> 识别密码认证、用户不存在/手机未验证/设备和 IP 风控等前置失败；已识别会员被锁定时写失败日志。</li>
+<li><code>UserLoginAfterListener</code> 处理密码错误、登录失败次数、锁定风控证据和成功/失败登录记录。</li>
+<li><code>MemberLoginLogService::record()</code> 统一补 <code>auth_source=CUSTOMER</code>、APP/WEB、客户端名称/版本、OS、设备展示值、设备标识哈希、认证方式、标准失败码等字段。</li>
+<li>成功登录时在同一数据库事务中锁定会员、解析 JWT 的 <code>sid</code>、写 <code>member_login_log</code> 和 <code>member_login_session</code>；账号被禁用或状态无效时抛出异常，不建立会话。</li>
+<li><code>MemberLoginSessionService</code> 负责刷新/结束客户会话，管理端禁用客户时使用共享表的行锁和有界批次同步结束日志。</li>
+</ul>
+<p>数据字典中的 <code>t_member_login_log</code> 有 <code>session_id</code> 唯一键、IP/时间/会员+状态/设备索引；<code>t_member_login_session</code> 以 session_id 为主键，并有 <code>(member_id, auth_source, ended_at)</code> 索引。登录日志中的 token 只用于历史兼容/认证流程，管理接口展示层应避免返回原始 token。</p>
+<h3 id="39-会员资料资金和交易业务记录">3.9 会员资料、资金和交易业务记录</h3>
+<p><code>gtcuser</code> 与 <code>gtc_admin</code> 共用多类业务表和数据库连接，写入点主要在 Service/Repository：</p>
+<ul>
+<li><code>member_detail_log</code>：会员资料、安全开关、代理关系等字段的 before/after；由 <code>MemberDetailLog</code> Model 或批量插入写入。</li>
+<li><code>modify_operation_logs</code>：账户风控、MT 账户修改原因和变更字段；<code>App\\Model\\member\\ModifyOperationLog</code> 与管理端使用同表。</li>
+<li><code>member_amount_log</code>：钱包金额变化；是大表，应按会员、时间、流水类型和主键范围查询。</li>
+<li><code>fund_detail</code>：入金、出金、赠金、转账、返佣资金去向及状态；<code>FundChangesHistoryService</code> 等服务用它生成资金历史。</li>
+<li><code>member_forword_log</code>、<code>withdraw_refund_op_log</code> 等：转账/退款/出金处理步骤和关联 ID。</li>
+<li><code>mail_log</code>、<code>msg_log</code>：通知发送结果，属于发送事实/供应商回执记录；详细邮件链路见已有《邮件功能技术架构与运行逻辑梳理》文档。</li>
+</ul>
+<p>资金表、交易表和文本日志的职责不同：文本日志用于定位调用阶段，业务表用于重放状态、对账和审计；任何补偿任务都应以业务表状态和幂等键为准。</p>
+<h3 id="310-asyncqueue协程与定时任务中的日志">3.10 AsyncQueue、协程与定时任务中的日志</h3>
+<p><code>config/autoload/async_queue.php</code> 配置 Hyperf AsyncQueue RedisDriver，主要 pool 包括 <code>default</code>、<code>fast</code>、<code>height</code>、<code>security_event</code>、<code>lark</code> 等；队列开关由 <code>ASYNC_QUEUE_ENABLED</code> 控制，各 pool 有进程数、并发数、超时和重试间隔。</p>
+<p>当前日志相关行为：</p>
+<ul>
+<li>邮件、Lark 通知、风控事件、报表和外部同步等大量 Listener 使用 <code>#[AsyncQueueMessage(pool: 'fast' 或其他)]</code>，或者显式 <code>pushQueue(new Job(...), ..., 'pool')</code>。</li>
+<li>Job 的发送前、成功、失败、跳过和重试通常用 <code>logger('业务名')</code> 写文件；邮件 Job 还更新邮件发送记录。</li>
+<li>管理端审计 Subscriber 使用 <code>Coroutine::create()</code>，不经过 AsyncQueue。</li>
+<li><code>Hyperf\\Crontab\\Annotation\\Crontab</code> 标记的 <code>app/Task</code> 由常驻进程定时触发，常见任务在开始、完成、跳过、异常、锁失败等阶段调用 <code>logger('TaskName')</code>。<code>singleton=true</code>、<code>mutexExpires</code> 用于单例/互斥，不等同于队列。</li>
+<li>例如返佣异常检测、短信滥用检测、MT 登录归档、转账待处理检查、PAMM/交易历史同步、佣金结算等 Task 都有独立 channel 名，但因未配置同名 logger group，通常仍落 default debug 文件；只有显式 <code>LoggerFactory-&gt;get('mt')</code> 等才会落到专用文件。</li>
+</ul>
+<p>队列具备 Redis 持久化、重试与多进程消费能力；定时任务是触发器，通常在任务内查询业务表并更新状态。日志本身没有统一的任务执行表，需结合 Job 状态、业务表和对应 channel 文件排查。</p>
+<h3 id="311-gtcuser-日志风险与核对建议">3.11 <code>gtcuser</code> 日志风险与核对建议</h3>
+<ol>
+<li><code>logger('error')</code> 的 group/name 语义容易误判，实际文件落点必须按 <code>LoggerFactory::get($name, $group)</code> 核对。</li>
+<li>只有 default/error group 使用 <code>LogProcess</code>；专用 group、直接拼接 message、Job/Task 参数可能绕过统一脱敏。</li>
+<li>Lark handler 是同步 HTTP 推送，失败仅返回 false；需要告警重试时应使用 <code>lark</code> AsyncQueue Job，并记录投递状态。</li>
+<li>MineAdmin 管理操作日志在业务 handler 前写入，且用协程直接 ORM 保存，无法证明业务成功，存在进程退出丢记录的窗口。</li>
+<li>客户安全 AOP 只覆盖声明了 <code>OperationLog</code> 的接口；未加 Attribute 的入金、出金、转账或安全操作不会自动生成该表记录。</li>
+<li>SQL 日志仅在 Debug 开启，且把绑定值替换进文本；生产排查不能依赖 SQL 文件，开发环境也要避免使用真实敏感数据。</li>
+<li>常驻 Swoole/队列/定时任务需要分别设置文件采集、轮转、保留和磁盘告警；Monolog 的日期轮转不等同于删除旧文件。</li>
+</ol>
+<hr>
+<h2 id="4-两项目落点对照">4. 两项目落点对照</h2>
+<table>
+  <thead>
+      <tr>
+          <th>关注点</th>
+          <th><code>gtc_admin</code></th>
+          <th><code>gtcuser</code></th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>框架运行日志</td>
+          <td>ThinkPHP File driver，默认 <code>runtime/.../log/YYYYMM/DD.log</code></td>
+          <td>Monolog RotatingFileHandler，默认 <code>runtime/logs/debug-YYYY-MM-DD.log</code></td>
+      </tr>
+      <tr>
+          <td>错误日志</td>
+          <td>异常由 ThinkPHP Handle 报告；普通 error 通常仍进默认 file 通道</td>
+          <td>异常 Handler 调 <code>get('error')</code>，按当前代码默认 group 仍可能进入 debug 文件</td>
+      </tr>
+      <tr>
+          <td>日志 API</td>
+          <td><code>think\\facade\\Log::record/info/error/write</code></td>
+          <td><code>logger('name')-&gt;info/warning/error</code>、LoggerFactory</td>
+      </tr>
+      <tr>
+          <td>请求/后台审计</td>
+          <td><code>LogOperationMiddleware</code>，同步 <code>t_operation_log</code></td>
+          <td><code>OperationMiddleware</code> + Event Subscriber，协程写 <code>mine_user_operation_log</code></td>
+      </tr>
+      <tr>
+          <td>系统配置变更</td>
+          <td><code>SystemOperationMiddleware/Service</code>，<code>t_system_operation_logs</code></td>
+          <td>没有等价的通用系统配置表链路，部分共享 Service 仍写 admin 表</td>
+      </tr>
+      <tr>
+          <td>账户风控变更</td>
+          <td><code>ModifyReasonMiddleware</code>，<code>t_modify_operation_logs</code></td>
+          <td>共享 <code>modify_operation_logs</code>，客户安全操作另写 <code>member_security_activity</code></td>
+      </tr>
+      <tr>
+          <td>管理登录审计</td>
+          <td><code>t_member_login_log</code>，<code>auth_source=ADMIN</code></td>
+          <td><code>mine_user_login_log</code>（MineAdmin 管理员登录）</td>
+      </tr>
+      <tr>
+          <td>客户登录审计</td>
+          <td>共享 <code>t_member_login_log</code>/session 的管理侧写入和查询</td>
+          <td>Customer 登录 Service 在事务内写 <code>member_login_log</code>/session</td>
+      </tr>
+      <tr>
+          <td>客户安全活动</td>
+          <td>主要由共享表/后台服务维护</td>
+          <td><code>OperationLogAspect</code> -&gt; <code>member_security_activity</code></td>
+      </tr>
+      <tr>
+          <td>资金事实</td>
+          <td><code>member_amount_log</code>、<code>fund_detail</code>、返佣和交易表</td>
+          <td>共用/读取同一批业务表，Service/Repository 写入</td>
+      </tr>
+      <tr>
+          <td>外部告警</td>
+          <td>代码中主要是文件日志和业务通知；未发现统一 Logger Lark handler</td>
+          <td>default/error Monolog handler 同步 Lark；部分 Job 异步 Lark</td>
+      </tr>
+      <tr>
+          <td>队列</td>
+          <td>ThinkPHP Queue、RabbitMQ 消费、数据库业务队列表并存</td>
+          <td>Hyperf AsyncQueue + RedisDriver，多 pool、多进程、重试</td>
+      </tr>
+      <tr>
+          <td>定时任务</td>
+          <td>旧式 Timer 控制器，触发依赖外部 cron/HTTP/CLI</td>
+          <td>Hyperf Crontab Attribute，常驻进程调度，singleton/mutex</td>
+      </tr>
+      <tr>
+          <td>统一脱敏</td>
+          <td>LogOperation 仅顶层字段；手写文件绕过</td>
+          <td>LogProcess 仅 default/error group；message 与专用 group 仍需治理</td>
+      </tr>
+  </tbody>
+</table>
+<hr>
+<h2 id="5-建议的日志关联查询路径">5. 建议的日志关联查询路径</h2>
+<h3 id="51-请求后台操作">5.1 请求/后台操作</h3>
+<ol>
+<li>先用请求时间、管理员 ID、IP、路由在 <code>t_operation_log</code> 或 <code>mine_user_operation_log</code> 查审计记录。</li>
+<li>用同一时间窗口、请求 ID（<code>gtcuser</code>）或业务订单/会员 ID筛查文件日志。</li>
+<li>若是配置变更，优先查 <code>t_system_operation_logs</code> 的 <code>log_id</code>、操作人和 <code>change_data</code>。</li>
+<li>若是会员账户修改，查 <code>t_modify_operation_logs</code>、<code>member_detail_log</code> 以及业务主表最终状态。</li>
+</ol>
+<h3 id="52-登录安全">5.2 登录/安全</h3>
+<ol>
+<li><code>member_login_log</code> 先按 <code>member_id + create_time</code> 或 <code>session_id</code> 查，区分 <code>CUSTOMER/ADMIN</code>。</li>
+<li>再关联 <code>member_login_session</code> 的 <code>ended_at/end_reason</code>，确认是否真实建立和结束会话。</li>
+<li>安全操作查 <code>member_security_activity</code> 的 <code>activity_type + activity_id</code>，再回到入金、出金、转账主表。</li>
+<li>管理员登录单独查 <code>mine_user_login_log</code>，不要把客户失败登录和后台账号失败登录混在一起。</li>
+</ol>
+<h3 id="53-资金交易">5.3 资金/交易</h3>
+<ol>
+<li>以订单号、会员 ID、MT login、时间范围和状态缩小 <code>member_amount_log</code>/<code>fund_detail</code> 大表范围。</li>
+<li>以 <code>fund_detail.type/type_id</code>、转账单 ID、提现单 ID 关联业务状态。</li>
+<li>文本日志只用于定位外部调用、重试和错误阶段；最终金额、状态和幂等结果以数据库事实为准。</li>
+</ol>
+<hr>
+<h2 id="6-优先级改进建议">6. 优先级改进建议</h2>
+<h3 id="p0先解决审计完整性和敏感信息">P0：先解决审计完整性和敏感信息</h3>
+<ol>
+<li>建立统一日志分类规范：诊断、审计、资金流水、通知回执分别定义字段和查询入口。</li>
+<li>禁止在诊断日志中写原始 token、密码、支付卡信息和完整第三方报文；对手写文件和字符串化 JSON 做递归脱敏。</li>
+<li>修正 <code>gtc_admin</code> 普通操作日志异常不落库、管理员 ID 回退 1、执行耗时计算位置和模型字段/关联字段问题。</li>
+<li>核对 <code>gtcuser</code> <code>logger('error')</code> 的真实文件落点，必要时显式使用 <code>get('error', 'error')</code>，避免错误分流不符合预期。</li>
+</ol>
+<h3 id="p1提高可检索性和可靠性">P1：提高可检索性和可靠性</h3>
+<ol>
+<li>给每条请求、Job、Task、MQ 消息补统一 request_id/job_id/order_id/member_id，并在文件、Lark、业务审计表中保持同名字段。</li>
+<li>管理操作审计改为业务成功后写入，或至少增加 <code>started/succeeded/failed</code> 状态和异常原因；协程写入改为可靠队列或事务外盒表。</li>
+<li>对 Lark 同步 Handler 增加失败重试/降级计数，使用 AsyncQueue 发送告警；记录 HTTP 状态、重试次数和最终结果。</li>
+<li>明确所有日志目录的容器挂载、权限、轮转、保留期、备份和磁盘告警，不依赖 <code>max_files=0</code> 或 Monolog 默认值。</li>
+</ol>
+<h3 id="p2性能与运营">P2：性能与运营</h3>
+<ol>
+<li>大表审计查询强制时间范围、会员/订单高选择性条件和分页；禁止全表 count/sum。</li>
+<li>对 <code>t_logger</code> 的写入来源、库连接和保留策略做一次全链路追溯；确认它是否由其他服务/历史部署包写入。</li>
+<li>统一 Task/Job 日志格式，至少包含开始、结束、处理数量、跳过数量、失败数量、耗时、游标和重试原因。</li>
+<li>建立脱敏回归测试和日志落点检查，覆盖 default/error/sql/mt/msg/lark 等 Monolog group 以及两个项目的共享业务表。</li>
+</ol>
+<hr>
+<h2 id="7-本次梳理的边界与验证方式">7. 本次梳理的边界与验证方式</h2>
+<ul>
+<li>本次未修改业务代码，只新增本文档。</li>
+<li>已静态阅读日志配置、ThinkPHP/Hyperf 日志驱动、异常 Handler、中间件、Attribute、Service、Model、Repository、队列/定时任务定义和数据字典关键表结构。</li>
+<li>未连接生产数据库、Redis、RabbitMQ、Lark、SMTP 或 MT 服务，因此没有验证生产环境实际目录、环境变量值、队列积压和日志保留天数。</li>
+<li>生产上线前应使用合成数据做一次验证：普通 <code>record</code>/<code>write</code> 落点、异常落点、注解成功/失败路径、客户登录会话事务、AsyncQueue 重试、Crontab singleton、Lark 失败降级和敏感字段脱敏。</li>
+</ul>
+
+    </div>
+  </article>
+  
+    
+<aside class="sidebar">
+  <section class="sidebar_inner">
+    <br>
+    
+  
+  <div class="search">
+    <input type="search" class="search_field form_field" placeholder='搜索内容...' id="find" autocomplete="off" data-scope='gtc'>
+    <label for="find" class="search_label"><svg class="icon">
+  <title>search</title>
+  <use xlink:href="#search"></use>
+</svg>
+
+    </label>
+    
+    <div class="search_results results"></div>
+  </div>
+
+        <div class="author_header">
+          <img src="https://jianlin-li.github.io/images/fish-head.png" alt="李建林 photo">
+          <h2>李建林</h2>
+        </div>
+      <div class="author_bio">
+        PHP, Go, MySQL, Redis, RabbitMQ, Elasticsearch, Docker, Kubernetes, Shell
+      </div>
+      <a href='https://jianlin-li.github.io/about/' class="button mt-1" role="button" title='阅读更多'>阅读更多</a>
+
+    
+    <h2 class="mt-4">精选文章</h2>
+    <ul>
+      <li>
+        <a href="https://jianlin-li.github.io/post/jiagou-elk-stack/" class="nav-link" title="架构-使用ELK Stack在本地Macbookpro搭建一套日志收集并且可视化系统">架构-使用ELK Stack在本地Macbookpro搭建一套日志收集并且可视化系统</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/jiagou-prometheus-grafana/" class="nav-link" title="架构-Prometheus&#43;Grafana">架构-Prometheus+Grafana</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/jiagou-cicd-jenkins-argo/" class="nav-link" title="架构-基于JenKins的CI/CD平台之Argo CD">架构-基于JenKins的CI/CD平台之Argo CD</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/jiagou-cicd-jenkins/" class="nav-link" title="架构-基于JenKins的CI/CD平台">架构-基于JenKins的CI/CD平台</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/k8s_review_12/" class="nav-link" title="Kubernetes的知识库-12">Kubernetes的知识库-12</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/k8s_review_11/" class="nav-link" title="Kubernetes的知识库-11">Kubernetes的知识库-11</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/k8s_review_10/" class="nav-link" title="Kubernetes的知识库-10">Kubernetes的知识库-10</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/k8s_review_9/" class="nav-link" title="Kubernetes的知识库-9">Kubernetes的知识库-9</a>
+      </li>
+    </ul>
+    <h2 class="mt-4">最新文章</h2>
+    <ul class="flex-column">
+      <li>
+        <a href="https://jianlin-li.github.io/post/k8s_review_8/" class="nav-link" title="Kubernetes的知识库-8">Kubernetes的知识库-8</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/k8s_review_7/" class="nav-link" title="Kubernetes的知识库-7">Kubernetes的知识库-7</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/k8s_review_6/" class="nav-link" title="Kubernetes的知识库-6">Kubernetes的知识库-6</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/k8s_review_5/" class="nav-link" title="Kubernetes的知识库-5">Kubernetes的知识库-5</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/k8s_review_4/" class="nav-link" title="Kubernetes的知识库-4">Kubernetes的知识库-4</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/k8s_review_3/" class="nav-link" title="Kubernetes的知识库-3">Kubernetes的知识库-3</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/k8s_review_2/" class="nav-link" title="Kubernetes的知识库-2">Kubernetes的知识库-2</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/k8s_review_1/" class="nav-link" title="Kubernetes的知识库-1">Kubernetes的知识库-1</a>
+      </li>
+    </ul>
+    <div>
+      <h2 class="mt-4 taxonomy" id="categories-section">分类</h2>
+      <nav class="tags_nav">
+        <a href='https://jianlin-li.github.io/categories/kubernetes/' class="post_tag button button_translucent" title="kubernetes">
+          KUBERNETES
+          <span class="button_tally">13</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/categories/php%E8%AF%AD%E8%A8%80/' class="post_tag button button_translucent" title="php语言">
+          PHP语言
+          <span class="button_tally">7</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/categories/%E6%9E%B6%E6%9E%84/' class="post_tag button button_translucent" title="架构">
+          架构
+          <span class="button_tally">7</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/categories/go%E8%AF%AD%E8%A8%80/' class="post_tag button button_translucent" title="go语言">
+          GO语言
+          <span class="button_tally">6</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/categories/elasticsearch/' class="post_tag button button_translucent" title="elasticsearch">
+          ELASTICSEARCH
+          <span class="button_tally">5</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/categories/redis/' class="post_tag button button_translucent" title="redis">
+          REDIS
+          <span class="button_tally">5</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/categories/mysql/' class="post_tag button button_translucent" title="mysql">
+          MYSQL
+          <span class="button_tally">4</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/categories/rabbitmq/' class="post_tag button button_translucent" title="rabbitmq">
+          RABBITMQ
+          <span class="button_tally">4</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/categories/ci/cd/' class="post_tag button button_translucent" title="ci/cd">
+          CI/CD
+          <span class="button_tally">2</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/categories/git/' class="post_tag button button_translucent" title="git">
+          GIT
+          <span class="button_tally">2</span>
+        </a>
+        
+        
+        <br>
+        <div class="post_tags_toggle button">所有分类</div>
+        <div class="post_tags">
+          <div class="tags_list">
+            
+            <a href='https://jianlin-li.github.io/categories/argo/' class=" post_tag button button_translucent" data-position=1 title="argo">ARGO<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/centos7/' class=" post_tag button button_translucent" data-position=1 title="centos7">CENTOS7<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/ci/cd/' class=" post_tag button button_translucent" data-position=2 title="ci/cd">CI/CD<span class="button_tally">2</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/c%E8%AF%AD%E8%A8%80/' class=" post_tag button button_translucent" data-position=1 title="c语言">C语言<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/devops/' class=" post_tag button button_translucent" data-position=1 title="devops">DEVOPS<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/docker/' class=" post_tag button button_translucent" data-position=1 title="docker">DOCKER<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/elasticsearch/' class=" post_tag button button_translucent" data-position=5 title="elasticsearch">ELASTICSEARCH<span class="button_tally">5</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/elk/' class=" post_tag button button_translucent" data-position=1 title="elk">ELK<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/git/' class=" post_tag button button_translucent" data-position=2 title="git">GIT<span class="button_tally">2</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/go%E8%AF%AD%E8%A8%80/' class=" post_tag button button_translucent" data-position=6 title="go语言">GO语言<span class="button_tally">6</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/grafana/' class=" post_tag button button_translucent" data-position=1 title="grafana">GRAFANA<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/gtc/' class=" post_tag button button_translucent" data-position=2 title="gtc">GTC<span class="button_tally">2</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/gtcadmin/' class=" post_tag button button_translucent" data-position=1 title="gtcadmin">GTCADMIN<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/gtcuser/' class=" post_tag button button_translucent" data-position=1 title="gtcuser">GTCUSER<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/hugo/' class=" post_tag button button_translucent" data-position=1 title="hugo">HUGO<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/jenkins/' class=" post_tag button button_translucent" data-position=2 title="jenkins">JENKINS<span class="button_tally">2</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/kubernetes/' class=" post_tag button button_translucent" data-position=13 title="kubernetes">KUBERNETES<span class="button_tally">13</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/mkcert/' class=" post_tag button button_translucent" data-position=1 title="mkcert">MKCERT<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/mysql/' class=" post_tag button button_translucent" data-position=4 title="mysql">MYSQL<span class="button_tally">4</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/nginx/' class=" post_tag button button_translucent" data-position=1 title="nginx">NGINX<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/php%E8%AF%AD%E8%A8%80/' class=" post_tag button button_translucent" data-position=7 title="php语言">PHP语言<span class="button_tally">7</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/prometheus/' class=" post_tag button button_translucent" data-position=1 title="prometheus">PROMETHEUS<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/rabbitmq/' class=" post_tag button button_translucent" data-position=4 title="rabbitmq">RABBITMQ<span class="button_tally">4</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/redis/' class=" post_tag button button_translucent" data-position=5 title="redis">REDIS<span class="button_tally">5</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/shell/' class=" post_tag button button_translucent" data-position=2 title="shell">SHELL<span class="button_tally">2</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/web%E6%9C%8D%E5%8A%A1%E5%99%A8/' class=" post_tag button button_translucent" data-position=1 title="web服务器">WEB服务器<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/%E6%9C%AC%E5%9C%B0%E7%8E%AF%E5%A2%83/' class=" post_tag button button_translucent" data-position=2 title="本地环境">本地环境<span class="button_tally">2</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/%E5%A4%8D%E4%B9%A0/' class=" post_tag button button_translucent" data-position=1 title="复习">复习<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/%E5%8D%8E%E5%BE%AE%E4%B8%96%E7%BA%AA/' class=" post_tag button button_translucent" data-position=1 title="华微世纪">华微世纪<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/%E6%9E%B6%E6%9E%84/' class=" post_tag button button_translucent" data-position=7 title="架构">架构<span class="button_tally">7</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/%E6%95%99%E7%A8%8B/' class=" post_tag button button_translucent" data-position=1 title="教程">教程<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/%E8%A7%86%E9%A2%91/' class=" post_tag button button_translucent" data-position=1 title="视频">视频<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/%E4%B9%A6%E7%B1%8D/' class=" post_tag button button_translucent" data-position=1 title="书籍">书籍<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/%E7%AE%97%E6%B3%95/' class=" post_tag button button_translucent" data-position=1 title="算法">算法<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/%E8%87%AA%E7%AD%BE%E5%90%8D%E8%AF%81%E4%B9%A6/' class=" post_tag button button_translucent" data-position=1 title="自签名证书">自签名证书<span class="button_tally">1</span>
+            </a>
+            
+            <div class="tags_sort"><span title="sort alphabetically">[A~Z]</span><span title="sort by count">[0~9]</span>
+            </div>
+            <span class="tags_hide"><svg class="icon">
+            <use xlink:href="#closeme"></use>
+          </svg></span>
+          </div>
+        </div>
+      </nav>
+    </div>
+    <div>
+      <h2 class="mt-4 taxonomy" id="tags-section">标签</h2>
+      <nav class="tags_nav">
+        <a href='https://jianlin-li.github.io/tags/kubernetes/' class="post_tag button button_translucent" title="kubernetes">
+          KUBERNETES
+          <span class="button_tally">13</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/tags/php/' class="post_tag button button_translucent" title="php">
+          PHP
+          <span class="button_tally">7</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/tags/go/' class="post_tag button button_translucent" title="go">
+          GO
+          <span class="button_tally">6</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/tags/elasticsearch/' class="post_tag button button_translucent" title="elasticsearch">
+          ELASTICSEARCH
+          <span class="button_tally">5</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/tags/redis/' class="post_tag button button_translucent" title="redis">
+          REDIS
+          <span class="button_tally">5</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/tags/mysql/' class="post_tag button button_translucent" title="mysql">
+          MYSQL
+          <span class="button_tally">4</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/tags/rabbitmq/' class="post_tag button button_translucent" title="rabbitmq">
+          RABBITMQ
+          <span class="button_tally">4</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/tags/devops/' class="post_tag button button_translucent" title="devops">
+          DEVOPS
+          <span class="button_tally">3</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/tags/ci/cd/' class="post_tag button button_translucent" title="ci/cd">
+          CI/CD
+          <span class="button_tally">2</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/tags/git/' class="post_tag button button_translucent" title="git">
+          GIT
+          <span class="button_tally">2</span>
+        </a>
+        
+        
+        <br>
+        <div class="post_tags_toggle button">所有标签</div>
+        <div class="post_tags">
+          <div class="tags_list">
+            
+            <a href='https://jianlin-li.github.io/tags/argo/' class=" post_tag button button_translucent" data-position=1 title="argo">ARGO<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/centos7/' class=" post_tag button button_translucent" data-position=1 title="centos7">CENTOS7<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/ci/cd/' class=" post_tag button button_translucent" data-position=2 title="ci/cd">CI/CD<span class="button_tally">2</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/c%E8%AF%AD%E8%A8%80/' class=" post_tag button button_translucent" data-position=1 title="c语言">C语言<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/devops/' class=" post_tag button button_translucent" data-position=3 title="devops">DEVOPS<span class="button_tally">3</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/docker/' class=" post_tag button button_translucent" data-position=1 title="docker">DOCKER<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/elasticsearch/' class=" post_tag button button_translucent" data-position=5 title="elasticsearch">ELASTICSEARCH<span class="button_tally">5</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/elk/' class=" post_tag button button_translucent" data-position=1 title="elk">ELK<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/emoji/' class=" post_tag button button_translucent" data-position=1 title="emoji">EMOJI<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/git/' class=" post_tag button button_translucent" data-position=2 title="git">GIT<span class="button_tally">2</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/go/' class=" post_tag button button_translucent" data-position=6 title="go">GO<span class="button_tally">6</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/grafana/' class=" post_tag button button_translucent" data-position=1 title="grafana">GRAFANA<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/gtc/' class=" post_tag button button_translucent" data-position=2 title="gtc">GTC<span class="button_tally">2</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/gtcadmin/' class=" post_tag button button_translucent" data-position=1 title="gtcadmin">GTCADMIN<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/gtcuser/' class=" post_tag button button_translucent" data-position=1 title="gtcuser">GTCUSER<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/hosts/' class=" post_tag button button_translucent" data-position=1 title="hosts">HOSTS<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/hugo/' class=" post_tag button button_translucent" data-position=1 title="hugo">HUGO<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/jenkins/' class=" post_tag button button_translucent" data-position=2 title="jenkins">JENKINS<span class="button_tally">2</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/kubernetes/' class=" post_tag button button_translucent" data-position=13 title="kubernetes">KUBERNETES<span class="button_tally">13</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/markdown/' class=" post_tag button button_translucent" data-position=1 title="markdown">MARKDOWN<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/math/' class=" post_tag button button_translucent" data-position=1 title="math">MATH<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/mkcert/' class=" post_tag button button_translucent" data-position=1 title="mkcert">MKCERT<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/mysql/' class=" post_tag button button_translucent" data-position=4 title="mysql">MYSQL<span class="button_tally">4</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/nginx/' class=" post_tag button button_translucent" data-position=1 title="nginx">NGINX<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/notices/' class=" post_tag button button_translucent" data-position=1 title="notices">NOTICES<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/openstreetmap/' class=" post_tag button button_translucent" data-position=1 title="openstreetmap">OPENSTREETMAP<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/php/' class=" post_tag button button_translucent" data-position=7 title="php">PHP<span class="button_tally">7</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/prometheus/' class=" post_tag button button_translucent" data-position=1 title="prometheus">PROMETHEUS<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/rabbitmq/' class=" post_tag button button_translucent" data-position=4 title="rabbitmq">RABBITMQ<span class="button_tally">4</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/redis/' class=" post_tag button button_translucent" data-position=5 title="redis">REDIS<span class="button_tally">5</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/shell/' class=" post_tag button button_translucent" data-position=2 title="shell">SHELL<span class="button_tally">2</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/sql/' class=" post_tag button button_translucent" data-position=1 title="sql">SQL<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/web%E6%9C%8D%E5%8A%A1%E5%99%A8/' class=" post_tag button button_translucent" data-position=1 title="web服务器">WEB服务器<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/%E6%9C%AC%E5%9C%B0%E7%8E%AF%E5%A2%83/' class=" post_tag button button_translucent" data-position=1 title="本地环境">本地环境<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/%E5%A4%8D%E4%B9%A0/' class=" post_tag button button_translucent" data-position=1 title="复习">复习<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/%E6%95%99%E7%A8%8B/' class=" post_tag button button_translucent" data-position=1 title="教程">教程<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/%E4%B9%B1%E7%A0%81/' class=" post_tag button button_translucent" data-position=1 title="乱码">乱码<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/%E8%A7%86%E9%A2%91/' class=" post_tag button button_translucent" data-position=1 title="视频">视频<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/%E4%B9%A6%E7%B1%8D/' class=" post_tag button button_translucent" data-position=1 title="书籍">书籍<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/%E7%AE%97%E6%B3%95/' class=" post_tag button button_translucent" data-position=1 title="算法">算法<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6/' class=" post_tag button button_translucent" data-position=1 title="主从复制">主从复制<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/%E8%87%AA%E7%AD%BE%E5%90%8D%E8%AF%81%E4%B9%A6/' class=" post_tag button button_translucent" data-position=1 title="自签名证书">自签名证书<span class="button_tally">1</span>
+            </a>
+            
+            <div class="tags_sort"><span title="sort alphabetically">[A~Z]</span><span title="sort by count">[0~9]</span>
+            </div>
+            <span class="tags_hide"><svg class="icon">
+            <use xlink:href="#closeme"></use>
+          </svg></span>
+          </div>
+        </div>
+      </nav>
+    </div>
+  </section>
+</aside>
+
+  
+</div>
+
+<style>
+  .gtc-breadcrumb {
+    margin-bottom: 12px;
+    font-size: 0.9em;
+    opacity: 0.75;
+  }
+
+  .gtc-meta {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+</style>
+    </main><svg width="0" height="0" class="hidden">
+  <symbol viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" id="facebook">
+    <path d="M437 0H75C33.648 0 0 33.648 0 75v362c0 41.352 33.648 75 75 75h151V331h-60v-90h60v-61c0-49.629 40.371-90 90-90h91v90h-91v61h91l-15 90h-76v181h121c41.352 0 75-33.648 75-75V75c0-41.352-33.648-75-75-75zm0 0"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18.001 18.001" id="twitter">
+    <path d="M15.891 4.013c.808-.496 1.343-1.173 1.605-2.034a8.68 8.68 0 0 1-2.351.861c-.703-.756-1.593-1.14-2.66-1.14-1.043 0-1.924.366-2.643 1.078a3.56 3.56 0 0 0-1.076 2.605c0 .309.039.585.117.819-3.076-.105-5.622-1.381-7.628-3.837-.34.601-.51 1.213-.51 1.846 0 1.301.549 2.332 1.645 3.089-.625-.053-1.176-.211-1.645-.47 0 .929.273 1.705.82 2.388a3.623 3.623 0 0 0 2.115 1.291c-.312.08-.641.118-.979.118-.312 0-.533-.026-.664-.083.23.757.664 1.371 1.291 1.841a3.652 3.652 0 0 0 2.152.743C4.148 14.173 2.625 14.69.902 14.69c-.422 0-.721-.006-.902-.038 1.697 1.102 3.586 1.649 5.676 1.649 2.139 0 4.029-.542 5.674-1.626 1.645-1.078 2.859-2.408 3.639-3.974a10.77 10.77 0 0 0 1.172-4.892v-.468a7.788 7.788 0 0 0 1.84-1.921 8.142 8.142 0 0 1-2.11.593z"
+      ></path>
+  </symbol>
+  <symbol aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" id="mail">
+    <path  d="M502.3 190.8c3.9-3.1 9.7-.2 9.7 4.7V400c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V195.6c0-5 5.7-7.8 9.7-4.7 22.4 17.4 52.1 39.5 154.1 113.6 21.1 15.4 56.7 47.8 92.2 47.6 35.7.3 72-32.8 92.3-47.6 102-74.1 131.6-96.3 154-113.7zM256 320c23.2.4 56.6-29.2 73.4-41.4 132.7-96.3 142.8-104.7 173.4-128.7 5.8-4.5 9.2-11.5 9.2-18.9v-19c0-26.5-21.5-48-48-48H48C21.5 64 0 85.5 0 112v19c0 7.4 3.4 14.3 9.2 18.9 30.6 23.9 40.7 32.4 173.4 128.7 16.8 12.2 50.2 41.8 73.4 41.4z"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" id="calendar">
+    <path d="M452 40h-24V0h-40v40H124V0H84v40H60C26.916 40 0 66.916 0 100v352c0 33.084 26.916 60 60 60h392c33.084 0 60-26.916 60-60V100c0-33.084-26.916-60-60-60zm20 412c0 11.028-8.972 20-20 20H60c-11.028 0-20-8.972-20-20V188h432v264zm0-304H40v-48c0-11.028 8.972-20 20-20h24v40h40V80h264v40h40V80h24c11.028 0 20 8.972 20 20v48z"></path>
+    <path d="M76 230h40v40H76zm80 0h40v40h-40zm80 0h40v40h-40zm80 0h40v40h-40zm80 0h40v40h-40zM76 310h40v40H76zm80 0h40v40h-40zm80 0h40v40h-40zm80 0h40v40h-40zM76 390h40v40H76zm80 0h40v40h-40zm80 0h40v40h-40zm80 0h40v40h-40zm80-80h40v40h-40z"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" id="github">
+    <path d="M255.968 5.329C114.624 5.329 0 120.401 0 262.353c0 113.536 73.344 209.856 175.104 243.872 12.8 2.368 17.472-5.568 17.472-12.384 0-6.112-.224-22.272-.352-43.712-71.2 15.52-86.24-34.464-86.24-34.464-11.616-29.696-28.416-37.6-28.416-37.6-23.264-15.936 1.728-15.616 1.728-15.616 25.696 1.824 39.2 26.496 39.2 26.496 22.848 39.264 59.936 27.936 74.528 21.344 2.304-16.608 8.928-27.936 16.256-34.368-56.832-6.496-116.608-28.544-116.608-127.008 0-28.064 9.984-51.008 26.368-68.992-2.656-6.496-11.424-32.64 2.496-68 0 0 21.504-6.912 70.4 26.336 20.416-5.696 42.304-8.544 64.096-8.64 21.728.128 43.648 2.944 64.096 8.672 48.864-33.248 70.336-26.336 70.336-26.336 13.952 35.392 5.184 61.504 2.56 68 16.416 17.984 26.304 40.928 26.304 68.992 0 98.72-59.84 120.448-116.864 126.816 9.184 7.936 17.376 23.616 17.376 47.584 0 34.368-.32 62.08-.32 70.496 0 6.88 4.608 14.88 17.6 12.352C438.72 472.145 512 375.857 512 262.353 512 120.401 397.376 5.329 255.968 5.329z"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 212 212" id="gitlab">
+    <path d="M12.3 74.7h54L43.3 3c-1-3.6-6.4-3.6-7.6 0L12.3 74.8z" />
+    <path d="M12.3 74.7L.5 111c-1 3.2 0 6.8 3 8.8l101.6 74-92.5-119z"/>
+    <path d="M105 193.7l-38.6-119h-54l92.7 119z"/>
+    <path d="M105 193.7l38.7-119H66.4l38.7 119z"/>
+    <path d="M105 193.7l38.7-119H198l-93 119z"/>
+    <path d="M198 74.7l11.6 36.2c1 3 0 6.6-3 8.6l-101.5 74 93-119z"/>
+    <path d="M198 74.7h-54.3L167 3c1.2-3.6 6.4-3.6 7.6 0L198 74.8z"/>
+  </symbol>
+  <symbol viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" id="rss">
+    <circle cx="3.429" cy="20.571" r="3.429"></circle>
+    <path d="M11.429 24h4.57C15.999 15.179 8.821 8.001 0 8v4.572c6.302.001 11.429 5.126 11.429 11.428z"></path>
+    <path d="M24 24C24 10.766 13.234 0 0 0v4.571c10.714 0 19.43 8.714 19.43 19.429z"></path>
+  </symbol>
+  <symbol viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" id="linkedin">
+    <path d="M437 0H75C33.648 0 0 33.648 0 75v362c0 41.352 33.648 75 75 75h362c41.352 0 75-33.648 75-75V75c0-41.352-33.648-75-75-75zM181 406h-60V196h60zm0-240h-60v-60h60zm210 240h-60V286c0-16.54-13.46-30-30-30s-30 13.46-30 30v120h-60V196h60v11.309C286.719 202.422 296.93 196 316 196c40.691.043 75 36.547 75 79.688zm0 0"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 612 612" id="to-top">
+    <path d="M604.501 440.509L325.398 134.956c-5.331-5.357-12.423-7.627-19.386-7.27-6.989-.357-14.056 1.913-19.387 7.27L7.499 440.509c-9.999 10.024-9.999 26.298 0 36.323s26.223 10.024 36.222 0l262.293-287.164L568.28 476.832c9.999 10.024 26.222 10.024 36.221 0 9.999-10.023 9.999-26.298 0-36.323z"></path>
+  </symbol>
+  <symbol viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" id="carly">
+    <path d="M504.971 239.029L448 182.059V84c0-46.317-37.682-84-84-84h-44c-13.255 0-24 10.745-24 24s10.745 24 24 24h44c19.851 0 36 16.149 36 36v108c0 6.365 2.529 12.47 7.029 16.971L454.059 256l-47.029 47.029A24.002 24.002 0 0 0 400 320v108c0 19.851-16.149 36-36 36h-44c-13.255 0-24 10.745-24 24s10.745 24 24 24h44c46.318 0 84-37.683 84-84v-98.059l56.971-56.971c9.372-9.372 9.372-24.568 0-33.941zM112 192V84c0-19.851 16.149-36 36-36h44c13.255 0 24-10.745 24-24S205.255 0 192 0h-44c-46.318 0-84 37.683-84 84v98.059l-56.971 56.97c-9.373 9.373-9.373 24.568 0 33.941L64 329.941V428c0 46.317 37.682 84 84 84h44c13.255 0 24-10.745 24-24s-10.745-24-24-24h-44c-19.851 0-36-16.149-36-36V320c0-6.365-2.529-12.47-7.029-16.971L57.941 256l47.029-47.029A24.002 24.002 0 0 0 112 192z"></path>
+  </symbol>
+  <symbol viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" id="copy">
+    <path d="M23 2.75A2.75 2.75 0 0 0 20.25 0H8.75A2.75 2.75 0 0 0 6 2.75v13.5A2.75 2.75 0 0 0 8.75 19h11.5A2.75 2.75 0 0 0 23 16.25zM18.25 14.5h-7.5a.75.75 0 0 1 0-1.5h7.5a.75.75 0 0 1 0 1.5zm0-3h-7.5a.75.75 0 0 1 0-1.5h7.5a.75.75 0 0 1 0 1.5zm0-3h-7.5a.75.75 0 0 1 0-1.5h7.5a.75.75 0 0 1 0 1.5z"></path>
+    <path d="M8.75 20.5a4.255 4.255 0 0 1-4.25-4.25V2.75c0-.086.02-.166.025-.25H3.75A2.752 2.752 0 0 0 1 5.25v16A2.752 2.752 0 0 0 3.75 24h12a2.752 2.752 0 0 0 2.75-2.75v-.75z"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512.001 512.001" id="closeme">
+    <path d="M284.286 256.002L506.143 34.144c7.811-7.811 7.811-20.475 0-28.285-7.811-7.81-20.475-7.811-28.285 0L256 227.717 34.143 5.859c-7.811-7.811-20.475-7.811-28.285 0-7.81 7.811-7.811 20.475 0 28.285l221.857 221.857L5.858 477.859c-7.811 7.811-7.811 20.475 0 28.285a19.938 19.938 0 0 0 14.143 5.857 19.94 19.94 0 0 0 14.143-5.857L256 284.287l221.857 221.857c3.905 3.905 9.024 5.857 14.143 5.857s10.237-1.952 14.143-5.857c7.811-7.811 7.811-20.475 0-28.285L284.286 256.002z"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" id="open-menu">
+    <path d="M492 236H20c-11.046 0-20 8.954-20 20s8.954 20 20 20h472c11.046 0 20-8.954 20-20s-8.954-20-20-20zm0-160H20C8.954 76 0 84.954 0 96s8.954 20 20 20h472c11.046 0 20-8.954 20-20s-8.954-20-20-20zm0 320H20c-11.046 0-20 8.954-20 20s8.954 20 20 20h472c11.046 0 20-8.954 20-20s-8.954-20-20-20z"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" id="instagram">
+    <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" id=youtube>
+    <path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" id="stackoverflow">
+    <path d="M21 27v-8h3v11H0V19h3v8h18z"></path><path d="M17.1.2L15 1.8l7.9 10.6 2.1-1.6L17.1.2zm3.7 14.7L10.6 6.4l1.7-2 10.2 8.5-1.7 2zM7.2 12.3l12 5.6 1.1-2.4-12-5.6-1.1 2.4zm-1.8 6.8l13.56 1.96.17-2.38-13.26-2.55-.47 2.97zM19 25H5v-3h14v3z"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" id="xing">
+    <path d="M18.188 0c-.517 0-.741.325-.927.66 0 0-7.455 13.224-7.702 13.657.015.024 4.919 9.023 4.919 9.023.17.308.436.66.967.66h3.454c.211 0 .375-.078.463-.22.089-.151.089-.346-.009-.536l-4.879-8.916c-.004-.006-.004-.016 0-.022L22.139.756c.095-.191.097-.387.006-.535C22.056.078 21.894 0 21.686 0h-3.498zM3.648 4.74c-.211 0-.385.074-.473.216-.09.149-.078.339.02.531l2.34 4.05c.004.01.004.016 0 .021L1.86 16.051c-.099.188-.093.381 0 .529.085.142.239.234.45.234h3.461c.518 0 .766-.348.945-.667l3.734-6.609-2.378-4.155c-.172-.315-.434-.659-.962-.659H3.648v.016z"/>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 71 55" id="discord">
+    <path d="M60.1045 4.8978C55.5792 2.8214 50.7265 1.2916 45.6527 0.41542C45.5603 0.39851 45.468 0.440769 45.4204 0.525289C44.7963 1.6353 44.105 3.0834 43.6209 4.2216C38.1637 3.4046 32.7345 3.4046 27.3892 4.2216C26.905 3.0581 26.1886 1.6353 25.5617 0.525289C25.5141 0.443589 25.4218 0.40133 25.3294 0.41542C20.2584 1.2888 15.4057 2.8186 10.8776 4.8978C10.8384 4.9147 10.8048 4.9429 10.7825 4.9795C1.57795 18.7309 -0.943561 32.1443 0.293408 45.3914C0.299005 45.4562 0.335386 45.5182 0.385761 45.5576C6.45866 50.0174 12.3413 52.7249 18.1147 54.5195C18.2071 54.5477 18.305 54.5139 18.3638 54.4378C19.7295 52.5728 20.9469 50.6063 21.9907 48.5383C22.0523 48.4172 21.9935 48.2735 21.8676 48.2256C19.9366 47.4931 18.0979 46.6 16.3292 45.5858C16.1893 45.5041 16.1781 45.304 16.3068 45.2082C16.679 44.9293 17.0513 44.6391 17.4067 44.3461C17.471 44.2926 17.5606 44.2813 17.6362 44.3151C29.2558 49.6202 41.8354 49.6202 53.3179 44.3151C53.3935 44.2785 53.4831 44.2898 53.5502 44.3433C53.9057 44.6363 54.2779 44.9293 54.6529 45.2082C54.7816 45.304 54.7732 45.5041 54.6333 45.5858C52.8646 46.6197 51.0259 47.4931 49.0921 48.2228C48.9662 48.2707 48.9102 48.4172 48.9718 48.5383C50.038 50.6034 51.2554 52.5699 52.5959 54.435C52.6519 54.5139 52.7526 54.5477 52.845 54.5195C58.6464 52.7249 64.529 50.0174 70.6019 45.5576C70.6551 45.5182 70.6887 45.459 70.6943 45.3942C72.1747 30.0791 68.2147 16.7757 60.1968 4.9823C60.1772 4.9429 60.1437 4.9147 60.1045 4.8978ZM23.7259 37.3253C20.2276 37.3253 17.3451 34.1136 17.3451 30.1693C17.3451 26.225 20.1717 23.0133 23.7259 23.0133C27.308 23.0133 30.1626 26.2532 30.1066 30.1693C30.1066 34.1136 27.28 37.3253 23.7259 37.3253ZM47.3178 37.3253C43.8196 37.3253 40.9371 34.1136 40.9371 30.1693C40.9371 26.225 43.7636 23.0133 47.3178 23.0133C50.9 23.0133 53.7545 26.2532 53.6986 30.1693C53.6986 34.1136 50.9 37.3253 47.3178 37.3253Z"/>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 17 18" id="mastodon">
+    <path
+    fill="#ffffff"
+    d="m 15.054695,9.8859583 c -0.22611,1.1632697 -2.02517,2.4363497 -4.09138,2.6830797 -1.0774504,0.12856 -2.1382704,0.24673 -3.2694704,0.19484 -1.84996,-0.0848 -3.30971,-0.44157 -3.30971,-0.44157 0,0.1801 0.0111,0.35157 0.0333,0.51194 0.24051,1.82571 1.81034,1.93508 3.29737,1.98607 1.50088,0.0514 2.8373104,-0.37004 2.8373104,-0.37004 l 0.0617,1.35686 c 0,0 -1.0498104,0.56374 -2.9199404,0.66742 -1.03124,0.0567 -2.3117,-0.0259 -3.80308,-0.42069 -3.23454998,-0.85613 -3.79081998,-4.304 -3.87592998,-7.8024197 -0.026,-1.03871 -0.01,-2.01815 -0.01,-2.83732 0,-3.57732 2.34385998,-4.62587996 2.34385998,-4.62587996 1.18184,-0.54277 3.20976,-0.77101 5.318,-0.7882499985409 h 0.0518 C 9.8267646,0.01719834 11.856025,0.24547834 13.037775,0.78824834 c 0,0 2.34377,1.04855996 2.34377,4.62587996 0,0 0.0294,2.63937 -0.32687,4.47183"/>
+ <path
+    fill="#000000"
+    d="m 12.616925,5.6916583 v 4.3315297 h -1.71607 V 5.8189683 c 0,-0.88624 -0.37289,-1.33607 -1.1187604,-1.33607 -0.82467,0 -1.23799,0.53361 -1.23799,1.58875 v 2.30122 h -1.70594 v -2.30122 c 0,-1.05514 -0.4134,-1.58875 -1.23808,-1.58875 -0.74587,0 -1.11876,0.44983 -1.11876,1.33607 v 4.2042197 h -1.71607 V 5.6916583 c 0,-0.88527 0.22541,-1.58876 0.67817,-2.10922 0.46689,-0.52047 1.07833,-0.78727 1.83735,-0.78727 0.87816,0 1.54317,0.33752 1.98288,1.01267 l 0.42744,0.71655 0.42753,-0.71655 c 0.43961,-0.67515 1.10463,-1.01267 1.9828704,-1.01267 0.75893,0 1.37037,0.2668 1.83735,0.78727 0.45268,0.52046 0.67808,1.22395 0.67808,2.10922"/>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 530" id="bluesky" >
+    <path d="m135.72 44.03c66.496 49.921 138.02 151.14 164.28 205.46 26.262-54.316 97.782-155.54 164.28-205.46 47.98-36.021 125.72-63.892 125.72 24.795 0 17.712-10.155 148.79-16.111 170.07-20.703 73.984-96.144 92.854-163.25 81.433 117.3 19.964 147.14 86.092 82.697 152.22-122.39 125.59-175.91-31.511-189.63-71.766-2.514-7.3797-3.6904-10.832-3.7077-7.8964-0.0174-2.9357-1.1937 0.51669-3.7077 7.8964-13.714 40.255-67.233 197.36-189.63 71.766-64.444-66.128-34.605-132.26 82.697-152.22-67.108 11.421-142.55-7.4491-163.25-81.433-5.9562-21.282-16.111-152.36-16.111-170.07 0-88.687 77.742-60.816 125.72-24.795z"/>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" id="ko-fi">
+    <path fill="#ffffff" d="M4.5,9.8527H32.7947a0,0,0,0,1,0,0v19.225a9.07,9.07,0,0,1-9.07,9.07H13.57a9.07,9.07,0,0,1-9.07-9.07V9.8527A0,0,0,0,1,4.5,9.8527Z"/>
+    <path fill="#000000" d="M12.197,25.9493l6.45,6.45,6.45-6.45a8.2,8.2,0,0,0,2.4016-5.798h0a4.5082,4.5082,0,0,0-4.212-4.5459,4.4262,4.4262,0,0,0-4.64,4.4209,4.4261,4.4261,0,0,0-4.64-4.4209,4.5082,4.5082,0,0,0-4.212,4.5459h0A8.2,8.2,0,0,0,12.197,25.9493Z"/>
+    <path fill="#ffffff" d="M32.7947,9.8527H35.73a7.77,7.77,0,0,1,0,15.5394H32.7947"/>
+  </svg>
+  </symbol>
+</svg>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha512-aOFyMMzZF7l7ei3vOKgQiRhZnYqk9YC/uMzl4T0j5N5D3Kul+QAFU8ssENDRMAqr/lxDOjMF69dSYJ8HYqY+WQ==" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" integrity="sha512-UPFOadao2nEorjtjl0xUTtN3w20Ja143UPEU6EyJ1mi5MB2bDtMkiWmqGDqi47xNLB5z1dy31GKJDEWhjUJFiQ==" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" integrity="sha512-YJVxTjqttjsU3cSvaTRqsSl0wbRgZUNF+NGGCgto/MUbIvaLdXQzGTCQu4CvyJZbZctgflVB0PXw9LLmTWm5/w==" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
+<footer class="footer">
+  <div class="footer_inner wrap pale">
+    <img src='https://jianlin-li.github.io/icons/apple-touch-icon.png' class="icon icon_2 transparent" alt="Copyright © 1989–2025, 李建林 ">
+    <p>Copyright&nbsp;1989-&nbsp;<span class="year"></span>&nbsp;COPYRIGHT © 1989–2025, 李建林 . All Rights Reserved</p><a class="to_top" href="#documentTop">
+  <svg class="icon">
+  <title>to-top</title>
+  <use xlink:href="#to-top"></use>
+</svg>
+
+</a>
+
+  </div>
+</footer>
+
+<script type="text/javascript" src="https://jianlin-li.github.io/zh-cn/js/bundle.e4e0e4fbe8acb50d7f973828f4138cdbea727800047fc93f9abbd6751e8f3422d6ef193f98da36fdb8488219c25692d73da89480f46abc8421a4ee3526dd6c23.js" integrity="sha512-5ODk&#43;&#43;istQ1/lzgo9BOM2&#43;pyeAAEf8k/mrvWdR6PNCLW7xk/mNo2/bhIghnCVpLXPaiUgPRqvIQhpO41Jt1sIw==" crossorigin="anonymous"></script>
+
+  <script src="https://jianlin-li.github.io/js/search.min.4c2b0421d128bbd7c43fc7d662fb5dfd8e439c60ee92c900a26d72d9c3271d2256f5bac9f6f919cddfd55101e9272898716cbb3381b4360bf43a66a5f7664f54.js"></script>
+
+  </body>
+</html>

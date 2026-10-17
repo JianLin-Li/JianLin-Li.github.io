@@ -1,0 +1,1206 @@
+
+<!DOCTYPE html>
+<html
+  lang="zh-cn"
+  data-figures=""
+  
+    class="page"
+  
+  
+  >
+  <head>
+<title>三项目技术栈与运行形态梳理 | 李建林个人知识库</title>
+<meta charset="utf-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+
+
+
+
+<meta property="og:locale" content="zh-cn" />
+
+<meta property="og:type" content="article">
+<meta name="description" content="GTC 三项目技术栈与运行形态梳理
+梳理日期：2026-09-30。
+分析对象：gtc_admin、gtc_admin_vue、gtcuser 当前本地工作区。
+本次未修改业务代码，仅新增本分析文档。结论来自项目规范、依赖清单与锁文件、已安装依赖元数据、启动入口、配置、代表性业务调用链和数据字典。未启动服务、执行业务任 …" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:creator" content="">
+<meta name="twitter:title" content="" />
+<meta name="twitter:image" content="https://jianlin-li.github.io/images/thumbnail.png"/>
+<meta property="og:url" content="https://jianlin-li.github.io/gtc/gtc_admin/%E4%B8%89%E9%A1%B9%E7%9B%AE%E6%8A%80%E6%9C%AF%E6%A0%88%E4%B8%8E%E8%BF%90%E8%A1%8C%E5%BD%A2%E6%80%81%E6%A2%B3%E7%90%86/" />
+<meta property="og:title" content="" />
+<meta property="og:description" content="GTC 三项目技术栈与运行形态梳理
+梳理日期：2026-09-30。
+分析对象：gtc_admin、gtc_admin_vue、gtcuser 当前本地工作区。
+本次未修改业务代码，仅新增本分析文档。结论来自项目规范、依赖清单与锁文件、已安装依赖元数据、启动入口、配置、代表性业务调用链和数据字典。未启动服务、执行业务任 …" />
+<meta property="og:image" content="https://jianlin-li.github.io/images/thumbnail.png" />
+
+<link rel="apple-touch-icon" sizes="180x180" href="https://jianlin-li.github.io/icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://jianlin-li.github.io/icons/favicon-32x32.png">
+<link rel="manifest" href="https://jianlin-li.github.io/icons/site.webmanifest">
+
+<link rel="canonical" href="https://jianlin-li.github.io/gtc/gtc_admin/%E4%B8%89%E9%A1%B9%E7%9B%AE%E6%8A%80%E6%9C%AF%E6%A0%88%E4%B8%8E%E8%BF%90%E8%A1%8C%E5%BD%A2%E6%80%81%E6%A2%B3%E7%90%86/">
+
+
+
+<link rel="preload" href="https://jianlin-li.github.io/css/styles.dc38388a8f0b890e788bd3a99b7495d14e7d5ac4359ed3b49abeb778497863b284ad4cc7e496ef58c84139295f9bafed82f5a41345eda86bd2d429cccb7c2596.css" integrity = "sha512-3Dg4io8LiQ54i9Opm3SV0U59WsQ1ntO0mr63eEl4Y7KErUzH5JbvWMhBOSlfm6/tgvWkE0XtqGvS1CnMy3wllg==" as="style" crossorigin="anonymous">
+
+
+
+<link rel="preload" href="https://jianlin-li.github.io/zh-cn/js/bundle.e4e0e4fbe8acb50d7f973828f4138cdbea727800047fc93f9abbd6751e8f3422d6ef193f98da36fdb8488219c25692d73da89480f46abc8421a4ee3526dd6c23.js" as="script" integrity=
+"sha512-5ODk&#43;&#43;istQ1/lzgo9BOM2&#43;pyeAAEf8k/mrvWdR6PNCLW7xk/mNo2/bhIghnCVpLXPaiUgPRqvIQhpO41Jt1sIw==" crossorigin="anonymous">
+
+
+<link rel="stylesheet" type="text/css" href="https://jianlin-li.github.io/css/styles.dc38388a8f0b890e788bd3a99b7495d14e7d5ac4359ed3b49abeb778497863b284ad4cc7e496ef58c84139295f9bafed82f5a41345eda86bd2d429cccb7c2596.css" integrity="sha512-3Dg4io8LiQ54i9Opm3SV0U59WsQ1ntO0mr63eEl4Y7KErUzH5JbvWMhBOSlfm6/tgvWkE0XtqGvS1CnMy3wllg==" crossorigin="anonymous">
+
+
+  </head>
+  <body
+    data-code="7"
+    data-lines="true"
+    id="documentTop"
+    data-lang="zh-cn"
+  >
+
+<header class="nav_header" >
+  <nav class="nav"><a href='https://jianlin-li.github.io/' class="nav_brand nav_item" title="李建林个人知识库">
+  <img src="https://jianlin-li.github.io/logos/logo.png" class="logo" alt="李建林个人知识库">
+  <div class="nav_close">
+    <div><svg class="icon">
+  <title>open-menu</title>
+  <use xlink:href="#open-menu"></use>
+</svg>
+<svg class="icon">
+  <title>closeme</title>
+  <use xlink:href="#closeme"></use>
+</svg>
+</div>
+  </div>
+</a>
+
+    <div class='nav_body nav_body_left'>
+      
+      
+      
+        
+
+  <div class="nav_parent">
+    <a href="https://jianlin-li.github.io/" class="nav_item" title="首页">首页 </a>
+  </div>
+  <div class="nav_parent">
+    <a href="https://jianlin-li.github.io/archives/" class="nav_item" title="归档">归档 </a>
+  </div>
+  <div class="nav_parent">
+    <a href="https://jianlin-li.github.io/gtc/" class="nav_item" title="GTC 文档">GTC 文档 </a>
+  </div>
+  <div class="nav_parent">
+    <a href="https://jianlin-li.github.io/categories/" class="nav_item" title="分类">分类 </a>
+  </div>
+  <div class="nav_parent">
+    <a href="https://jianlin-li.github.io/tags/" class="nav_item" title="标签">标签 </a>
+  </div>
+  <div class="nav_parent">
+    <a href="https://jianlin-li.github.io/about/" class="nav_item" title="关于">关于 </a>
+  </div>
+      
+<div class='follow'>
+  <a href="https://github.com/JianLin-Li">
+    <svg class="icon">
+  <title>github</title>
+  <use xlink:href="#github"></use>
+</svg>
+
+  </a>
+  <a href="http://local.gitlab.com">
+    <svg class="icon">
+  <title>gitlab</title>
+  <use xlink:href="#gitlab"></use>
+</svg>
+
+  </a>
+<div class="color_mode">
+  <input type="checkbox" class="color_choice" id="mode">
+</div>
+
+</div>
+
+    </div>
+  </nav>
+</header>
+
+    <main><div class="grid-inverse wrap content">
+  <article class="post_content">
+    <p class="gtc-breadcrumb"><a href="/gtc/">GTC 文档归档</a> / gtc_admin</p>
+    <h1 class="post_title">三项目技术栈与运行形态梳理</h1>
+    <div class="post_meta gtc-meta">
+      <span class="post_date">
+        2026-10-17
+      </span>
+      <span>项目：gtc_admin</span>
+    </div>
+    
+    <div class="post_body">
+      <h1 id="gtc-三项目技术栈与运行形态梳理">GTC 三项目技术栈与运行形态梳理</h1>
+<p>梳理日期：2026-09-30。</p>
+<p>分析对象：<code>gtc_admin</code>、<code>gtc_admin_vue</code>、<code>gtcuser</code> 当前本地工作区。</p>
+<p>本次未修改业务代码，仅新增本分析文档。结论来自项目规范、依赖清单与锁文件、已安装依赖元数据、启动入口、配置、代表性业务调用链和数据字典。未启动服务、执行业务任务、连接数据库或第三方服务，也未验证生产部署。下文的“已配置”“代码存在”不等于生产已经启用。</p>
+<h2 id="1-总体结论">1. 总体结论</h2>
+<p>三个项目组成管理前端、管理后端和客户侧业务后端。两个后端同时涉及 CRM、MT、资金、KYC、跟单、PAMM、返佣和风控，职责通过具体入口和调用链区分，业务名称并不互斥。</p>
+<table>
+  <thead>
+      <tr>
+          <th>项目</th>
+          <th>主要定位</th>
+          <th>核心框架</th>
+          <th>运行形态</th>
+          <th>交付物</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>gtc_admin_vue</td>
+          <td>CRM/交易管理后台前端</td>
+          <td>Vue 3、Vite 4、Ele Admin Pro、Ant Design Vue</td>
+          <td>浏览器 SPA；开发时由 Vite 提供服务</td>
+          <td><code>dist/</code> 静态文件</td>
+      </tr>
+      <tr>
+          <td>gtc_admin</td>
+          <td>当前管理后台的主要接口及历史批处理入口</td>
+          <td>ThinkPHP 8 体系，本地 YKD 定制框架</td>
+          <td>生产 Web/FPM 请求处理；另有 CLI、队列及历史任务入口</td>
+          <td>PHP 源码、Composer 依赖、本地包、配置和文件资源</td>
+      </tr>
+      <tr>
+          <td>gtcuser</td>
+          <td>客户侧 API、交易业务及异步处理后端</td>
+          <td>Hyperf 3.1、MineAdmin 3.0、Swoole</td>
+          <td>PHP CLI 常驻进程，提供 HTTP、Socket.IO/WebSocket，并承载队列与定时任务</td>
+          <td>PHP 应用及依赖；仓库包含 Docker/Compose 配置</td>
+      </tr>
+  </tbody>
+</table>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="ln"> 1</span><span class="cl">flowchart TD
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl">    AdminBrowser[管理员浏览器] --&gt; Vue[gtc_admin_vue 静态 SPA]
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl">    Vue --&gt;|管理接口及部分历史公共 API| Admin[gtc_admin / ThinkPHP / FPM]
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl">    Client[客户 Web 或 App 调用方，前端代码不在本次三个项目内] --&gt; User[gtcuser / Hyperf / Swoole]
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl">    Admin --&gt;|内部 HTTP：导出、开户、任务、翻译等| User
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">    User --&gt;|部分导出任务按传入接口地址拉取数据| Admin
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl">    Admin --&gt; AdminData[业务库、MT 报表库、分析库、Redis]
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl">    User --&gt; UserData[业务库、MT 报表库、分析库、Redis]
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">    User --&gt; Workers[AsyncQueue / Crontab / Socket.IO]
+</span></span><span class="line"><span class="ln">10</span><span class="cl">    Admin --&gt; External[MT、KYC、支付、OSS、短信、邮件等]
+</span></span><span class="line"><span class="ln">11</span><span class="cl">    User --&gt; External
+</span></span></code></pre></div><p>图中的数据连接表示代码具备相关连接能力；两个后端是否连接同一个物理数据库、Redis 实例，以及生产网关的路由分配，需要部署配置进一步确认。</p>
+<h2 id="2-gtc_admin">2. gtc_admin</h2>
+<h3 id="21-技术栈及版本依据">2.1 技术栈及版本依据</h3>
+<ul>
+<li>PHP：根依赖声明 <code>&gt;=8.0.0</code>，项目协作规范明确 Web/FPM 运行环境按 PHP 8.0 兼容。</li>
+<li>框架：依赖清单声明 ThinkPHP 8，但实际由本地 <code>ykd/framework</code> 提供 <code>think\\</code> 命名空间。根 Composer 配置使用 <code>replace</code>，替代上游 <code>topthink/framework</code>；本地包和当前安装包的 <code>App::VERSION</code> 均为 <code>8.0.0</code>。</li>
+<li>多应用：<code>topthink/think-multi-app</code>，当前安装版本 <code>v1.1.1</code>。</li>
+<li>ORM：Think ORM，当前安装版本 <code>v3.0.33</code>；同时存在 <code>Db::name()</code>、动态连接和自定义查询扩展。</li>
+<li>鉴权：<code>tinywan/think-jwt v1.5.0</code>，配合后台会话、角色节点、数据范围、IP 白名单及登录限制。</li>
+<li>缓存与队列：默认 Redis 缓存、Think Queue Redis 驱动，当前安装 Think Queue <code>v3.0.10</code>。</li>
+<li>文件及文档：Think Filesystem、本地 <code>ykd/think-filesystem</code>、OSS、Easy Excel、TCPDF、FPDI；另有本地 PDF 相关资源。</li>
+<li>外部集成：MT 远程接口、Salesforce、支付与 Udun 钱包、KYC、短信、邮件、AI 翻译等。</li>
+</ul>
+<p>这里必须把“ThinkPHP 8 体系”与“原版上游框架”区分开。框架维护和依赖安装需要保留本地包，不能仅按照标准 ThinkPHP 项目重新安装或升级。</p>
+<p>依据：<a href="/Users/lijianlin/www/local/gtc_admin/composer.json">composer.json</a>、<a href="/Users/lijianlin/www/local/gtc_admin/localPackage/framework/composer.json">本地框架包</a>、<a href="/Users/lijianlin/www/local/gtc_admin/docs/%E9%A1%B9%E7%9B%AE%E5%BC%80%E5%8F%91%E8%A7%84%E8%8C%83.md">项目规范</a>。</p>
+<h3 id="22-请求入口与运行过程">2.2 请求入口与运行过程</h3>
+<ol>
+<li>Web 入口为 <code>public/index.php</code>，加载 Composer 自动加载，再执行 ThinkPHP HTTP 应用。</li>
+<li>支持多应用，默认应用配置为 <code>api</code>，管理后台主要使用 <code>admin</code>。</li>
+<li>显式路由较少，<code>url_route_must=false</code>，主要采用 <code>/应用/控制器/方法</code> 自动解析。</li>
+<li>后台基类配合语言、跨域、登录中间件解析用户和权限，加载会员、MT server、系统配置和数据范围，执行节点权限检查和操作日志。</li>
+<li>项目响应通常是 <code>{code, message, data}</code>，业务成功码通常为 <code>0</code>。</li>
+</ol>
+<p>生产形态是 Web Server 将 PHP 请求转交 PHP-FPM，执行请求后返回响应。与 Hyperf 常驻应用相比，代码更新、请求状态生命周期及进程管理方式不同。</p>
+<p>依据：<a href="/Users/lijianlin/www/local/gtc_admin/public/index.php">Web 入口</a>、<a href="/Users/lijianlin/www/local/gtc_admin/config/route.php">路由配置</a>、<a href="/Users/lijianlin/www/local/gtc_admin/app/admin/controller/BaseController.php">后台基类</a>、<a href="/Users/lijianlin/www/local/gtc_admin/app/admin/middleware/CheckLogin.php">登录中间件</a>。</p>
+<h3 id="23-分层与业务模块">2.3 分层与业务模块</h3>
+<p>规范要求新增后台业务采用：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">app/admin/controller -&gt; app/service -&gt; app/admin/model
+</span></span></code></pre></div><p>当前代码保留历史结构，控制器中仍有直接数据库查询、状态处理和业务编排；也存在 <code>app/admin/service</code>、<code>app/api/model</code> 等既有目录。规范描述的是后续开发边界，不能据此认为现有代码已全部完成三层拆分。</p>
+<p>主要业务包括会员与团队、后台权限和菜单、MT4/MT5 账户与交易、出入金及内部转账、KYC 审核、IB/返佣、跟单/PAMM、风控规则、经营与交易报表、支付渠道、活动、内容和系统配置。</p>
+<p><code>app/risk</code> 具有交易同步、返佣计算、佣金钱包结算、跟单和报表等历史入口。维护这些流程时使用模块内 <code>app/risk/service</code>，应进一步核对任务调度来源及与 gtcuser 同类任务的实际分工。</p>
+<h3 id="24-数据与后台任务">2.4 数据与后台任务</h3>
+<ul>
+<li>业务数据库以 MySQL 为主，数据字典使用 <code>t_</code> 表名体系。</li>
+<li>数据库配置包含多个 MT4/MT5 报表连接及 SelectDB/ClickHouse 相关连接；有自定义 <code>ClickHouseConnection</code> 和 Builder。配置存在不代表每个连接当前都使用。</li>
+<li>Redis 用于缓存、会话相关状态、队列等；队列配置默认连接为 Redis，业务队列消费需要独立运行消费者。</li>
+<li>存在 RabbitMQ 消费代码，以及 Workerman/Crontab 历史代码和配置。当前根依赖与安装元数据未确认对应库，因此不能直接认定这些入口可运行或已在生产启用。</li>
+<li><code>app/command/workman.php</code> 当前只输出启动文字，并未实际启动 Workerman。根目录 <code>run.php</code> 也不是已确认的服务入口。</li>
+<li>部分后台动作调用 gtcuser 内部接口，例如异步导出、审核通过后的信号开户及 AI 翻译刷新。</li>
+</ul>
+<p>依据：<a href="/Users/lijianlin/www/local/gtc_admin/config/database.php">数据库配置</a>、<a href="/Users/lijianlin/www/local/gtc_admin/config/queue.php">队列配置</a>、<a href="/Users/lijianlin/www/local/gtc_admin/config/console.php">CLI 命令配置</a>、<a href="/Users/lijianlin/www/local/gtc_admin/app/command/workman.php">历史 workman 命令</a>。</p>
+<h3 id="25-开发部署与测试">2.5 开发、部署与测试</h3>
+<table>
+  <thead>
+      <tr>
+          <th>用途</th>
+          <th>入口或命令</th>
+          <th>说明</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>生产 HTTP</td>
+          <td>Web Server + PHP-FPM，文档根目录 <code>public/</code></td>
+          <td>PHP 8.0 兼容要求来自项目规范</td>
+      </tr>
+      <tr>
+          <td>CLI</td>
+          <td><code>php think</code></td>
+          <td>命令入口，不等同于启动完整业务系统</td>
+      </tr>
+      <tr>
+          <td>本地开发 HTTP</td>
+          <td><code>php think run</code></td>
+          <td>应以当前安装框架的命令可用性为准，不能替代生产 FPM</td>
+      </tr>
+      <tr>
+          <td>队列消费者</td>
+          <td>Think Queue 的 <code>queue:work</code> 或 <code>queue:listen</code></td>
+          <td>队列名称和参数按实际部署确认</td>
+      </tr>
+      <tr>
+          <td>PHP 单元测试</td>
+          <td><code>php tests/phpunit/vendor/bin/phpunit -c tests/phpunit.xml</code></td>
+          <td>测试工具依赖与生产依赖隔离</td>
+      </tr>
+  </tbody>
+</table>
+<p>当前根目录没有 <code>composer.lock</code>，安装依赖的可复现性不足；安装也会触发框架服务发现和发布脚本。本次没有执行安装或启动。</p>
+<h2 id="3-gtc_admin_vue">3. gtc_admin_vue</h2>
+<h3 id="31-技术栈及实际解析版本">3.1 技术栈及实际解析版本</h3>
+<p>这是 JavaScript 为主的 Vue 3 管理后台，使用 Vue SFC、Composition API、<code>script setup</code>，并非整体 TypeScript 项目。</p>
+<table>
+  <thead>
+      <tr>
+          <th>组件</th>
+          <th>依赖清单中的版本范围</th>
+          <th>锁文件及当前安装版本</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Vue</td>
+          <td><code>^3.2.47</code></td>
+          <td><code>3.5.26</code></td>
+      </tr>
+      <tr>
+          <td>Vite</td>
+          <td><code>^4.2.1</code></td>
+          <td><code>4.5.14</code></td>
+      </tr>
+      <tr>
+          <td>Pinia</td>
+          <td><code>^2.0.34</code></td>
+          <td><code>2.3.1</code></td>
+      </tr>
+      <tr>
+          <td>Vue Router</td>
+          <td><code>^4.1.6</code></td>
+          <td><code>4.6.4</code></td>
+      </tr>
+      <tr>
+          <td>Vue I18n</td>
+          <td><code>^9.2.2</code></td>
+          <td><code>9.14.4</code></td>
+      </tr>
+      <tr>
+          <td>Ant Design Vue</td>
+          <td><code>^3.2.17</code></td>
+          <td><code>3.2.20</code></td>
+      </tr>
+      <tr>
+          <td>Ele Admin Pro</td>
+          <td><code>^1.11.1</code></td>
+          <td><code>1.11.1</code></td>
+      </tr>
+      <tr>
+          <td>Axios</td>
+          <td><code>^1.3.5</code></td>
+          <td><code>1.13.2</code></td>
+      </tr>
+  </tbody>
+</table>
+<p>其他主要能力包括 Less、ECharts、Day.js、Big.js、富文本/Markdown、图片处理、XLSX、PDF、二维码、拖拽和视频播放。开发工具包括 ESLint、Prettier、Terser、自动组件导入和 gzip 构建插件。</p>
+<p>版本范围不是当前准确版本。当前 <code>cross-env 10.1.0</code> 要求 Node <code>&gt;=20</code>，因此不能只根据 Vite 4 自身支持较旧 Node 就确定整个项目的构建环境；建议使用团队统一的 Node 20+ 版本并验证。</p>
+<p>依据：<a href="/Users/lijianlin/www/local/gtc_admin_vue/package.json">package.json</a>、<a href="/Users/lijianlin/www/local/gtc_admin_vue/package-lock.json">package-lock.json</a>。</p>
+<h3 id="32-运行形态与构建">3.2 运行形态与构建</h3>
+<ul>
+<li>应用入口为 <code>src/main.js</code>，注册 Pinia、路由、权限和国际化，挂载到浏览器页面。</li>
+<li>路由实际使用 <code>createWebHashHistory()</code>，属于 <code>/#/...</code> 形式的 SPA；已导入 <code>createWebHistory</code> 不代表启用了 History 路由。</li>
+<li>本地开发通过 <code>npm run dev</code> 启动 Vite，监听 <code>0.0.0.0</code>，端口读取 <code>VITE_APP_PORT</code>，未设置时为 <code>9000</code>。</li>
+<li>开发代理分别转发 <code>/api</code>、<code>/admin</code>，目标读取 <code>VITE_PROXY_API_URL</code>、<code>VITE_PROXY_ADMIN_URL</code>。这两个目标可相同，也可不同。</li>
+<li>API baseURL 来源为 <code>VITE_API_URL</code>。Vite 的开发代理不会自动成为生产静态站点的代理规则；生产需要正确配置 baseURL 或 Web Server 转发。</li>
+<li><code>npm run build</code> 生成 <code>dist/</code>，<code>base='./'</code>，产物可由 Nginx/静态托管服务部署；生产不要求运行 Node 应用服务器。</li>
+<li>构建使用 Terser、生产移除 console/debugger/注释，并生成符合阈值的 <code>.gz</code> 文件。服务端是否实际使用预压缩文件由 Web Server 配置决定。</li>
+<li><code>npm run serve</code> 会先构建再运行 Vite preview，用于预览，不应视为生产部署方式。</li>
+</ul>
+<p>依据：<a href="/Users/lijianlin/www/local/gtc_admin_vue/vite.config.js">Vite 配置</a>、<a href="/Users/lijianlin/www/local/gtc_admin_vue/src/main.js">入口</a>、<a href="/Users/lijianlin/www/local/gtc_admin_vue/src/router/index.js">路由</a>、<a href="/Users/lijianlin/www/local/gtc_admin_vue/src/config/setting.js">设置</a>。</p>
+<h3 id="33-请求权限和菜单链路">3.3 请求、权限和菜单链路</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">views 页面 -&gt; api 业务封装 -&gt; utils/request.js -&gt; 后端接口
+</span></span><span class="line"><span class="ln">2</span><span class="cl">登录 token -&gt; 用户 store 获取菜单/会员信息 -&gt; 动态注册路由 -&gt; 页面及按钮权限
+</span></span></code></pre></div><p>统一请求层使用 Bearer Authorization，并携带 <code>serverid</code>、<code>think-lang</code>、<code>X-Timezone</code>、时区偏移等上下文，敏感密码请求还包含 RSA 公钥/nonce 处理。生产请求超时通常为 15 秒，开发模式配置为不设置超时。</p>
+<p>前端登录调用 <code>/admin/pub/login</code>；菜单调用 <code>/admin/menu/mymenu</code>；用户信息调用 <code>/api/member/info</code>；公共配置调用 <code>/api/pub/config</code>。这些 <code>/api/member/info</code> 和 <code>/api/pub/config</code> 在 gtc_admin 中确有实现，且前端按成功码 <code>0</code> 判断。</p>
+<p>因此，不能简单配置“所有 <code>/admin</code> 交给 gtc_admin，所有 <code>/api</code> 交给 gtcuser”。具体接口归属需要按调用方、响应契约和网关规则核对。</p>
+<p>菜单主要来自后端，路由使用 <code>import.meta.glob('/src/views/**/index.vue')</code> 解析页面，Pinia 保存用户、菜单、权限及系统配置。前端权限控制应与后台节点权限和数据范围协作，服务端仍承担最终授权判断。</p>
+<p>国际化入口显式注册 18 个语言集合。语言头映射与两个 PHP 后端的语言标识体系需要保持兼容；金额、精度、日期和时区工具也是报表及资金页面的重要公共依赖。</p>
+<p>依据：<a href="/Users/lijianlin/www/local/gtc_admin_vue/src/utils/request.js">请求封装</a>、<a href="/Users/lijianlin/www/local/gtc_admin_vue/src/api/login/index.js">登录 API</a>、<a href="/Users/lijianlin/www/local/gtc_admin_vue/src/api/layout/index.js">布局 API</a>、<a href="/Users/lijianlin/www/local/gtc_admin_vue/src/store/modules/user.js">用户 store</a>、<a href="/Users/lijianlin/www/local/gtc_admin_vue/src/i18n/index.js">国际化入口</a>。</p>
+<h3 id="34-业务范围与测试">3.4 业务范围与测试</h3>
+<p>页面涵盖会员、资金、KYC、代理、返佣、MT 配置、交易记录、跟单、PAMM、风控、报表、支付、活动、系统、工单和通知等。多个业务有历史页面、备份或重复实现，目录存在并不代表页面已进入当前菜单。</p>
+<p><code>tests/unit</code> 当前有 4 个 Node <code>node:test</code> 测试文件，另有源码目录内的测试文件；<code>package.json</code> 未定义统一 <code>test</code> 脚本。可按具体测试通过 <code>node --test</code> 执行，现有测试数量不能证明全部页面覆盖。<code>lint:eslint</code> 带 <code>--fix</code>，会写入文件，本次未执行。</p>
+<h2 id="4-gtcuser">4. gtcuser</h2>
+<h3 id="41-技术栈及-php-版本差异">4.1 技术栈及 PHP 版本差异</h3>
+<ul>
+<li>框架：Hyperf 3.1、MineAdmin 3.0；锁文件与当前安装元数据的 Hyperf 核心版本为 <code>v3.1.42</code>，MineAdmin 核心为 <code>v3.0</code>。</li>
+<li>运行引擎：Swoole，Composer 声明 <code>ext-swoole &gt;=5.0</code>；声明依赖 PDO/MySQL、Redis 等扩展。</li>
+<li>数据层：Hyperf Database/Eloquent 风格模型、Query Builder、Repository、数据库连接池；配置包含读写/分析数据源、MT4/MT5 报表源及 TDengine。</li>
+<li>服务能力：依赖注入、PHP Attributes 路由、AOP、事件、异步队列、Crontab、连接池、缓存和常驻进程。</li>
+<li>鉴权与安全：MineAdmin JWT、客户侧 OAuth、Token 中间件、会话失效、内部 Token、请求来源检查、RSA 解密、设备授权和限流等。</li>
+<li>文件与外部集成：OSS/文件系统、邮件、短信、支付、OAuth、KYC、MT、PDF/Office、Lark、AI/OpenAI；有 Prometheus/metric 和 PostHog 相关能力。</li>
+<li>本地依赖：<code>packages/*</code> Composer path 包及 <code>plugin/</code> MineAdmin 插件。</li>
+</ul>
+<p>PHP 版本存在明确差异：项目规范和 Composer 根声明以 PHP 8.1 为基线，Dockerfile 也使用 8.1；但当前生产锁定依赖中，OpenAI client、Symfony 7、WebAuthn 等要求 PHP 8.2，当前 <code>vendor/composer/platform_check.php</code> 的门槛也是 <code>PHP_VERSION_ID &gt;= 80200</code>，Compose 使用 8.2 镜像。</p>
+<p>按当前依赖正常安装和加载，需要至少 PHP 8.2。后续业务代码仍应遵守仓库规定的 PHP 8.1 语法边界；运行版本与依赖版本的统一需要单独处理，不能把文档中的 8.1 当作当前锁文件已兼容的事实。</p>
+<p>依据：<a href="/Users/lijianlin/www/local/gtcuser/composer.json">composer.json</a>、<a href="/Users/lijianlin/www/local/gtcuser/composer.lock">composer.lock</a>、<a href="/Users/lijianlin/www/local/gtcuser/docs/%E9%A1%B9%E7%9B%AE%E5%BC%80%E5%8F%91%E8%A7%84%E8%8C%83.md">项目规范</a>、<a href="/Users/lijianlin/www/local/gtcuser/Dockerfile">Dockerfile</a>、<a href="/Users/lijianlin/www/local/gtcuser/docker-compose.yml">Compose</a>。</p>
+<h3 id="42-常驻应用启动和端口">4.2 常驻应用启动和端口</h3>
+<p>实际启动链路是：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">composer start -&gt; 清理 runtime/container -&gt; php bin/hyperf.php start
+</span></span><span class="line"><span class="ln">2</span><span class="cl">bin/hyperf.php -&gt; Composer autoload -&gt; 插件初始化 -&gt; DI ClassLoader -&gt; 容器 -&gt; Hyperf 应用
+</span></span></code></pre></div><p>项目规范提到 <code>public/index.php</code>，但当前仓库没有该文件，也没有 <code>public/</code> 目录。HTTP 请求由 Swoole HTTP Server 回调交给 Hyperf 处理，实际启动入口是 <code>bin/hyperf.php</code>。</p>
+<table>
+  <thead>
+      <tr>
+          <th>监听项</th>
+          <th>当前代码配置</th>
+          <th>用途</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>HTTP</td>
+          <td><code>0.0.0.0:9505</code></td>
+          <td>API 请求</td>
+      </tr>
+      <tr>
+          <td>socket-io</td>
+          <td><code>0.0.0.0:9507</code></td>
+          <td>Socket.IO/WebSocket</td>
+      </tr>
+      <tr>
+          <td>9506</td>
+          <td>Compose 映射，当前 server.php 未注册对应业务监听</td>
+          <td>不能仅凭端口映射认定服务存在</td>
+      </tr>
+  </tbody>
+</table>
+<p><code>server.php</code> 使用 <code>SWOOLE_PROCESS</code>，启用协程，配置 CPU 相关 worker 数、4 个 task worker、请求数回收、异步 reload、PID 和日志。静态文件处理关闭，文件访问需要结合 Nginx/OSS 等方案。入口代码将 PHP 默认时区设为 UTC。</p>
+<p>常驻进程的配置、容器和代码在启动时加载，代码发布后需结合缓存处理和 reload/restart。请求数据必须注意协程上下文隔离；数据库/Redis 连接池、各队列进程及后台任务共同占用资源。</p>
+<p>依据：<a href="/Users/lijianlin/www/local/gtcuser/bin/hyperf.php">启动入口</a>、<a href="/Users/lijianlin/www/local/gtcuser/config/autoload/server.php">服务配置</a>。</p>
+<h3 id="43-分层路由与接口类型">4.3 分层、路由与接口类型</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">app/Http/Admin 或 app/Http/Api -&gt; app/Service -&gt; app/Repository 或 app/Model
+</span></span></code></pre></div><p>主要业务域包括 <code>Trade</code>、<code>Cash</code>、<code>Commission</code>、<code>Follow</code>、<code>Pamm</code>、<code>Risk</code>、<code>SecurityPolicy</code>、<code>IbAccount</code>、<code>crm</code>、<code>member</code> 等。历史代码并不全部严格遵循分层，某些控制器和 Model 仍直接承担查询或业务处理。</p>
+<p>客户侧控制器位于 <code>app/Http/Api/Controller</code>，包含 V1/V2/V3、开放接口、OAuth2、内部接口、设备接口和 Socket.IO。多数使用 Attributes 显式注册路由；V1 常使用 <code>/api/member</code> 等未带版本号的前缀，V2/V3 则有 <code>/api/v2</code>、<code>/api/v3</code>，不能只按文件目录推断 URL。</p>
+<p>MineAdmin 自带的管理接口目录也存在，但 <code>disable_admin_manage</code> 默认为 <code>true</code>，全局 RouterBlack 中间件据此拦截 <code>admin/</code> 请求；注释明确说明当前使用旧版管理后台。具体环境是否覆盖此默认值未验证。</p>
+<p>客户侧 API 成功码通常为 <code>200</code>，与 gtc_admin 常用的 <code>0</code> 不同。返回字段虽均常见 <code>code/message/data</code>，调用方仍必须按接口契约处理，不能直接互换。</p>
+<p>依据：<a href="/Users/lijianlin/www/local/gtcuser/app/Http/Api/Controller/V1/MemberController.php">会员接口</a>、<a href="/Users/lijianlin/www/local/gtcuser/config/autoload/middlewares.php">中间件</a>、<a href="/Users/lijianlin/www/local/gtcuser/config/config.php">后台访问开关</a>、<a href="/Users/lijianlin/www/local/gtcuser/app/Http/Admin/Middleware/RouterBlackMiddleware.php">后台拦截</a>、<a href="/Users/lijianlin/www/local/gtcuser/app/Http/Common/ResultCode.php">响应码</a>。</p>
+<h3 id="44-队列调度和-websocket">4.4 队列、调度和 WebSocket</h3>
+<ul>
+<li><code>config/autoload/processes.php</code> 注册 CrontabDispatcherProcess 和 AsyncQueue ConsumerProcess，随应用启动。</li>
+<li>AsyncQueue 使用 Redis，配置普通、快速、高优先级、报表、安全事件、下载、邮件、风控等多个队列及不同进程数、并发和超时。</li>
+<li><code>ASYNC_QUEUE_ENABLED</code> 控制多项队列进程数，但部分下载队列固定为 1 个进程，因此它不是当前配置中所有队列的统一关闭开关。</li>
+<li>Crontab 全局配置启用，但具体业务任务通常还受 <code>APP_RUN_TASK</code> 和任务自身开关控制。不能把“调度进程启动”理解为全部业务任务都会运行。</li>
+<li>通用异步任务以数据库任务记录保存入参、状态和重试信息，队列 Job 携带任务 ID 调用 Service 消费。</li>
+<li>Socket.IO 具备加入会员房间、主设备确认授权、取消授权及向发起设备通知等实际业务逻辑。</li>
+<li><code>app/Process/RemoteEventListenerProcess.php</code> 的 Process 注解当前被注释，不能据文件存在认定 Redis remoteEvent 监听已启动。<code>LogProcess</code> 实现的是日志 Processor，也不是独立常驻进程。</li>
+</ul>
+<p>这说明仅检查 HTTP 健康不足以判断系统功能正常，还需要确认队列消费、调度开关、任务状态、WebSocket 及外部依赖。</p>
+<p>依据：<a href="/Users/lijianlin/www/local/gtcuser/config/autoload/processes.php">进程注册</a>、<a href="/Users/lijianlin/www/local/gtcuser/config/autoload/async_queue.php">队列配置</a>、<a href="/Users/lijianlin/www/local/gtcuser/app/Jobs/CommonTaskJob.php">通用任务 Job</a>、<a href="/Users/lijianlin/www/local/gtcuser/app/Task/TaskTrait.php">任务开关</a>、<a href="/Users/lijianlin/www/local/gtcuser/app/Http/Api/Controller/Ws/WebSocketController.php">Socket.IO 控制器</a>。</p>
+<h3 id="45-部署与测试">4.5 部署与测试</h3>
+<table>
+  <thead>
+      <tr>
+          <th>用途</th>
+          <th>命令或配置</th>
+          <th>说明</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>常规启动</td>
+          <td><code>composer start</code></td>
+          <td>会清理容器缓存并启动常驻服务</td>
+      </tr>
+      <tr>
+          <td>开发监听</td>
+          <td><code>composer dev</code></td>
+          <td><code>server:watch</code>，以当前 watcher 配置为准</td>
+      </tr>
+      <tr>
+          <td>容器运行</td>
+          <td><code>docker-compose.yml</code> 及 dev/staging 变体</td>
+          <td>当前为 Hyperf PHP 8.2 镜像、源码挂载、<code>composer start</code></td>
+      </tr>
+      <tr>
+          <td>独立镜像构建</td>
+          <td><code>Dockerfile</code></td>
+          <td>PHP 8.1 基础镜像与当前锁定依赖存在不匹配</td>
+      </tr>
+      <tr>
+          <td>快速测试</td>
+          <td><code>composer test</code></td>
+          <td>co-phpunit，排除 database 分组</td>
+      </tr>
+      <tr>
+          <td>数据库测试</td>
+          <td><code>composer test:database</code></td>
+          <td>包含迁移和数据库集成，只能在隔离测试环境执行</td>
+      </tr>
+      <tr>
+          <td>静态分析</td>
+          <td><code>composer analyse</code></td>
+          <td>PHPStan level 5</td>
+      </tr>
+  </tbody>
+</table>
+<p>Compose 并未在有效配置中启动 MySQL/Redis，Redis 服务样例是注释状态，需要外部提供数据库及 Redis。Dockerfile 的 <code>EXPOSE 9501/9502/9503</code> 与代码实际监听 <code>9505/9507</code> 不一致；EXPOSE 是镜像元数据，不会直接改变监听端口，但可能误导部署。</p>
+<p>另有一个 PHP 8.3 的 <code>.dockerfile</code> 草稿，关键 Swoole 安装与启动部分被注释，不能认定它是可用替代部署方案。</p>
+<p>根 <code>composer.json</code> 出现两个同级 <code>config</code> 键，常规 JSON 解析后的结果仅保留末尾 <code>process-timeout</code>，前一个 config 块存在被覆盖的问题。该文件需要在后续依赖维护时核对，本次未调整。</p>
+<h2 id="5-三个项目的协作链路">5. 三个项目的协作链路</h2>
+<h3 id="51-管理后台登录和初始化">5.1 管理后台登录和初始化</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">Vue 登录页 -&gt; /admin/pub/login -&gt; gtc_admin 签发后台 token
+</span></span><span class="line"><span class="ln">2</span><span class="cl">Vue 请求拦截器 -&gt; 携带 Authorization/serverid/语言/时区
+</span></span><span class="line"><span class="ln">3</span><span class="cl">Vue user store -&gt; /admin/menu/mymenu + /api/member/info
+</span></span><span class="line"><span class="ln">4</span><span class="cl">Vue 动态注册菜单路由 -&gt; 打开对应管理页面
+</span></span></code></pre></div><p>上述管理菜单和历史公共会员信息接口在 gtc_admin 中存在。gtcuser 客户侧有自己的 JWT/会话/OAuth 链路，不能假设两端 token 在所有接口中可以互用。</p>
+<h3 id="52-后台触发客户侧执行">5.2 后台触发客户侧执行</h3>
+<table>
+  <thead>
+      <tr>
+          <th>已核对链路</th>
+          <th>gtc_admin 职责</th>
+          <th>gtcuser 职责</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>信号审核通过后的 MT 开户</td>
+          <td>审核入口及同步内部 HTTP 调用，远端失败会阻断成功结果</td>
+          <td>OptionController 调用信号开户服务，完成具体开户/绑定</td>
+      </tr>
+      <tr>
+          <td>导出下载</td>
+          <td>组织接口地址、参数、语言、表头等，调用下载中心并转换响应码</td>
+          <td>创建任务，投递 downloads 队列，后台生成文件；部分任务按提供的地址拉取数据</td>
+      </tr>
+      <tr>
+          <td>AI 内容翻译刷新</td>
+          <td>管理内容更新后通知内部接口，失败记录日志</td>
+          <td>内容翻译服务处理刷新与落库</td>
+      </tr>
+      <tr>
+          <td>通用后台任务</td>
+          <td>按内部任务契约传入类型、业务参数、幂等键等</td>
+          <td>CommonTaskController 创建任务记录并投递 AsyncQueue</td>
+      </tr>
+  </tbody>
+</table>
+<p>内部调用依赖 <code>REMOTE_EVENT_URL</code> 和内部 Token 等配置名；gtcuser 使用 <code>InternalTokenMiddleware</code> 校验 <code>Token</code> 请求头。本文不记录任何配置值或凭证。</p>
+<p>依据：<a href="/Users/lijianlin/www/local/gtc_admin/app/common.php:2029">内部 HTTP helper</a>、<a href="/Users/lijianlin/www/local/gtc_admin/app/service/SignalMtAccountDispatchService.php">开户派发</a>、<a href="/Users/lijianlin/www/local/gtc_admin/app/common.php:2510">导出适配</a>、<a href="/Users/lijianlin/www/local/gtcuser/app/Http/Api/Controller/Inner/OptionController.php">OptionController</a>、<a href="/Users/lijianlin/www/local/gtcuser/app/Http/Api/Controller/Inner/DownloadCenterController.php">下载中心入口</a>、<a href="/Users/lijianlin/www/local/gtcuser/app/Http/Api/Controller/Inner/CommonTaskController.php">通用任务入口</a>。</p>
+<h3 id="53-共享数据结构与耦合">5.3 共享数据结构与耦合</h3>
+<p>gtc_admin 数据字典包含 425 张表，gtcuser 包含 424 张表，其中 424 个表名重合；gtc_admin 额外有 <code>t_admin_translation_kv</code>。这里比较的是建表名称，不代表全部字段、索引和约束完全一致。</p>
+<p>两个后端都覆盖 <code>t_member</code>、<code>t_member_mtlogin</code>、<code>t_fund_detail</code>、<code>t_sale_commission</code>、KYC、策略、权限、日志和报表等结构，说明存在较强的数据模型关联。物理库、读写库、分析库及 Redis 是否实际共用，仍需部署资料确认。</p>
+<p>因此未来改动公共状态、敏感字段、金额口径、权限或表结构时，应同时核对两个后端；涉及大表还需要按各自数据字典和查询来源检查索引、分页及统计方式。本次没有新增或修改 SQL，也没有进行性能压测。</p>
+<h2 id="6-规模与维护特征">6. 规模与维护特征</h2>
+<p>以下为当前目录内对应类型的文件数量，包含基类、历史文件和未必启用的代码，不代表有效接口数量、完整测试用例数量或覆盖率。</p>
+<table>
+  <thead>
+      <tr>
+          <th>项目</th>
+          <th>静态规模快照</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>gtc_admin</td>
+          <td>后台控制器 PHP 181、后台 Model PHP 195、全局 Service PHP 111、既有后台 Service PHP 17、历史 API 控制器 PHP 6、risk 控制器 PHP 11；unit PHP 148、feature PHP 5</td>
+      </tr>
+      <tr>
+          <td>gtc_admin_vue</td>
+          <td>views 下 Vue 文件 507，其中 <code>index.vue</code> 335；api 下 JS 文件 189；tests/unit 中 Node 测试文件 4；国际化显式注册 18 个语言集合</td>
+      </tr>
+      <tr>
+          <td>gtcuser</td>
+          <td>Admin 控制器 PHP 9、Api 控制器 PHP 79、Service PHP 290、Repository PHP 222、Model PHP 428、Task PHP 59、Jobs PHP 11、Command PHP 30；Unit PHP 210、Feature PHP 29</td>
+      </tr>
+  </tbody>
+</table>
+<p>三个项目均属于较大规模的历史业务系统。当前更适合依据业务调用链进行局部维护，不能把框架规范、目录命名或依赖声明视为现有实现完全一致的证明。</p>
+<h2 id="7-待确认项与后续顺序">7. 待确认项与后续顺序</h2>
+<ol>
+<li><strong>确认实际部署拓扑</strong>：取得 Web Server/网关规则，标注管理 <code>/admin</code>、历史 <code>/api</code>、客户侧 <code>/api</code>、内部接口及 WebSocket 的真实目标；确认域名、进程管理和文件服务。</li>
+<li><strong>确认运行和安装版本</strong>：核对 gtc_admin FPM 的 PHP 8.0、gtcuser 实际 PHP/Swoole、前端构建 Node；优先解决 gtcuser 8.1 文档/镜像与 8.2 依赖门槛的不一致，再处理端口和 Composer 配置差异。</li>
+<li><strong>确认任务责任和开关</strong>：列出 gtc_admin 历史批处理、外部 cron、Think Queue、RabbitMQ 与 gtcuser Crontab/AsyncQueue 的生产启用情况，检查同类资金/返佣任务是否存在重复执行风险。</li>
+<li><strong>确认数据拓扑和发布基线</strong>：核对两个后端的物理库、分析库、读写分离、Redis DB/prefix 以及字段/索引差异；再确定两个项目的 SQL 发布先后关系。</li>
+<li><strong>执行隔离环境联调</strong>：后台登录/菜单/会员信息、列表、导出、信号审核开户、KYC/资金相关状态同步、队列和 WebSocket。外部服务采用测试环境或 mock，按业务风险执行针对性测试。</li>
+</ol>
+<p>本次完成的是源码与配置层面的架构梳理。生产路由、真实服务版本、启用任务、数据库连接、性能、外部接口可用性和端到端流程仍未验证；新增文档不改变任何运行行为。</p>
+
+    </div>
+  </article>
+  
+    
+<aside class="sidebar">
+  <section class="sidebar_inner">
+    <br>
+    
+  
+  <div class="search">
+    <input type="search" class="search_field form_field" placeholder='搜索内容...' id="find" autocomplete="off" data-scope='gtc'>
+    <label for="find" class="search_label"><svg class="icon">
+  <title>search</title>
+  <use xlink:href="#search"></use>
+</svg>
+
+    </label>
+    
+    <div class="search_results results"></div>
+  </div>
+
+        <div class="author_header">
+          <img src="https://jianlin-li.github.io/images/fish-head.png" alt="李建林 photo">
+          <h2>李建林</h2>
+        </div>
+      <div class="author_bio">
+        PHP, Go, MySQL, Redis, RabbitMQ, Elasticsearch, Docker, Kubernetes, Shell
+      </div>
+      <a href='https://jianlin-li.github.io/about/' class="button mt-1" role="button" title='阅读更多'>阅读更多</a>
+
+    
+    <h2 class="mt-4">精选文章</h2>
+    <ul>
+      <li>
+        <a href="https://jianlin-li.github.io/post/jiagou-elk-stack/" class="nav-link" title="架构-使用ELK Stack在本地Macbookpro搭建一套日志收集并且可视化系统">架构-使用ELK Stack在本地Macbookpro搭建一套日志收集并且可视化系统</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/jiagou-prometheus-grafana/" class="nav-link" title="架构-Prometheus&#43;Grafana">架构-Prometheus+Grafana</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/jiagou-cicd-jenkins-argo/" class="nav-link" title="架构-基于JenKins的CI/CD平台之Argo CD">架构-基于JenKins的CI/CD平台之Argo CD</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/jiagou-cicd-jenkins/" class="nav-link" title="架构-基于JenKins的CI/CD平台">架构-基于JenKins的CI/CD平台</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/k8s_review_12/" class="nav-link" title="Kubernetes的知识库-12">Kubernetes的知识库-12</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/k8s_review_11/" class="nav-link" title="Kubernetes的知识库-11">Kubernetes的知识库-11</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/k8s_review_10/" class="nav-link" title="Kubernetes的知识库-10">Kubernetes的知识库-10</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/k8s_review_9/" class="nav-link" title="Kubernetes的知识库-9">Kubernetes的知识库-9</a>
+      </li>
+    </ul>
+    <h2 class="mt-4">最新文章</h2>
+    <ul class="flex-column">
+      <li>
+        <a href="https://jianlin-li.github.io/post/k8s_review_8/" class="nav-link" title="Kubernetes的知识库-8">Kubernetes的知识库-8</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/k8s_review_7/" class="nav-link" title="Kubernetes的知识库-7">Kubernetes的知识库-7</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/k8s_review_6/" class="nav-link" title="Kubernetes的知识库-6">Kubernetes的知识库-6</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/k8s_review_5/" class="nav-link" title="Kubernetes的知识库-5">Kubernetes的知识库-5</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/k8s_review_4/" class="nav-link" title="Kubernetes的知识库-4">Kubernetes的知识库-4</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/k8s_review_3/" class="nav-link" title="Kubernetes的知识库-3">Kubernetes的知识库-3</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/k8s_review_2/" class="nav-link" title="Kubernetes的知识库-2">Kubernetes的知识库-2</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/k8s_review_1/" class="nav-link" title="Kubernetes的知识库-1">Kubernetes的知识库-1</a>
+      </li>
+    </ul>
+    <div>
+      <h2 class="mt-4 taxonomy" id="categories-section">分类</h2>
+      <nav class="tags_nav">
+        <a href='https://jianlin-li.github.io/categories/kubernetes/' class="post_tag button button_translucent" title="kubernetes">
+          KUBERNETES
+          <span class="button_tally">13</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/categories/php%E8%AF%AD%E8%A8%80/' class="post_tag button button_translucent" title="php语言">
+          PHP语言
+          <span class="button_tally">7</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/categories/%E6%9E%B6%E6%9E%84/' class="post_tag button button_translucent" title="架构">
+          架构
+          <span class="button_tally">7</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/categories/go%E8%AF%AD%E8%A8%80/' class="post_tag button button_translucent" title="go语言">
+          GO语言
+          <span class="button_tally">6</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/categories/elasticsearch/' class="post_tag button button_translucent" title="elasticsearch">
+          ELASTICSEARCH
+          <span class="button_tally">5</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/categories/redis/' class="post_tag button button_translucent" title="redis">
+          REDIS
+          <span class="button_tally">5</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/categories/mysql/' class="post_tag button button_translucent" title="mysql">
+          MYSQL
+          <span class="button_tally">4</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/categories/rabbitmq/' class="post_tag button button_translucent" title="rabbitmq">
+          RABBITMQ
+          <span class="button_tally">4</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/categories/ci/cd/' class="post_tag button button_translucent" title="ci/cd">
+          CI/CD
+          <span class="button_tally">2</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/categories/git/' class="post_tag button button_translucent" title="git">
+          GIT
+          <span class="button_tally">2</span>
+        </a>
+        
+        
+        <br>
+        <div class="post_tags_toggle button">所有分类</div>
+        <div class="post_tags">
+          <div class="tags_list">
+            
+            <a href='https://jianlin-li.github.io/categories/argo/' class=" post_tag button button_translucent" data-position=1 title="argo">ARGO<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/centos7/' class=" post_tag button button_translucent" data-position=1 title="centos7">CENTOS7<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/ci/cd/' class=" post_tag button button_translucent" data-position=2 title="ci/cd">CI/CD<span class="button_tally">2</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/c%E8%AF%AD%E8%A8%80/' class=" post_tag button button_translucent" data-position=1 title="c语言">C语言<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/devops/' class=" post_tag button button_translucent" data-position=1 title="devops">DEVOPS<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/docker/' class=" post_tag button button_translucent" data-position=1 title="docker">DOCKER<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/elasticsearch/' class=" post_tag button button_translucent" data-position=5 title="elasticsearch">ELASTICSEARCH<span class="button_tally">5</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/elk/' class=" post_tag button button_translucent" data-position=1 title="elk">ELK<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/git/' class=" post_tag button button_translucent" data-position=2 title="git">GIT<span class="button_tally">2</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/go%E8%AF%AD%E8%A8%80/' class=" post_tag button button_translucent" data-position=6 title="go语言">GO语言<span class="button_tally">6</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/grafana/' class=" post_tag button button_translucent" data-position=1 title="grafana">GRAFANA<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/gtc/' class=" post_tag button button_translucent" data-position=2 title="gtc">GTC<span class="button_tally">2</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/gtcadmin/' class=" post_tag button button_translucent" data-position=1 title="gtcadmin">GTCADMIN<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/gtcuser/' class=" post_tag button button_translucent" data-position=1 title="gtcuser">GTCUSER<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/hugo/' class=" post_tag button button_translucent" data-position=1 title="hugo">HUGO<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/jenkins/' class=" post_tag button button_translucent" data-position=2 title="jenkins">JENKINS<span class="button_tally">2</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/kubernetes/' class=" post_tag button button_translucent" data-position=13 title="kubernetes">KUBERNETES<span class="button_tally">13</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/mkcert/' class=" post_tag button button_translucent" data-position=1 title="mkcert">MKCERT<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/mysql/' class=" post_tag button button_translucent" data-position=4 title="mysql">MYSQL<span class="button_tally">4</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/nginx/' class=" post_tag button button_translucent" data-position=1 title="nginx">NGINX<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/php%E8%AF%AD%E8%A8%80/' class=" post_tag button button_translucent" data-position=7 title="php语言">PHP语言<span class="button_tally">7</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/prometheus/' class=" post_tag button button_translucent" data-position=1 title="prometheus">PROMETHEUS<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/rabbitmq/' class=" post_tag button button_translucent" data-position=4 title="rabbitmq">RABBITMQ<span class="button_tally">4</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/redis/' class=" post_tag button button_translucent" data-position=5 title="redis">REDIS<span class="button_tally">5</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/shell/' class=" post_tag button button_translucent" data-position=2 title="shell">SHELL<span class="button_tally">2</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/web%E6%9C%8D%E5%8A%A1%E5%99%A8/' class=" post_tag button button_translucent" data-position=1 title="web服务器">WEB服务器<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/%E6%9C%AC%E5%9C%B0%E7%8E%AF%E5%A2%83/' class=" post_tag button button_translucent" data-position=2 title="本地环境">本地环境<span class="button_tally">2</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/%E5%A4%8D%E4%B9%A0/' class=" post_tag button button_translucent" data-position=1 title="复习">复习<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/%E5%8D%8E%E5%BE%AE%E4%B8%96%E7%BA%AA/' class=" post_tag button button_translucent" data-position=1 title="华微世纪">华微世纪<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/%E6%9E%B6%E6%9E%84/' class=" post_tag button button_translucent" data-position=7 title="架构">架构<span class="button_tally">7</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/%E6%95%99%E7%A8%8B/' class=" post_tag button button_translucent" data-position=1 title="教程">教程<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/%E8%A7%86%E9%A2%91/' class=" post_tag button button_translucent" data-position=1 title="视频">视频<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/%E4%B9%A6%E7%B1%8D/' class=" post_tag button button_translucent" data-position=1 title="书籍">书籍<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/%E7%AE%97%E6%B3%95/' class=" post_tag button button_translucent" data-position=1 title="算法">算法<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/%E8%87%AA%E7%AD%BE%E5%90%8D%E8%AF%81%E4%B9%A6/' class=" post_tag button button_translucent" data-position=1 title="自签名证书">自签名证书<span class="button_tally">1</span>
+            </a>
+            
+            <div class="tags_sort"><span title="sort alphabetically">[A~Z]</span><span title="sort by count">[0~9]</span>
+            </div>
+            <span class="tags_hide"><svg class="icon">
+            <use xlink:href="#closeme"></use>
+          </svg></span>
+          </div>
+        </div>
+      </nav>
+    </div>
+    <div>
+      <h2 class="mt-4 taxonomy" id="tags-section">标签</h2>
+      <nav class="tags_nav">
+        <a href='https://jianlin-li.github.io/tags/kubernetes/' class="post_tag button button_translucent" title="kubernetes">
+          KUBERNETES
+          <span class="button_tally">13</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/tags/php/' class="post_tag button button_translucent" title="php">
+          PHP
+          <span class="button_tally">7</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/tags/go/' class="post_tag button button_translucent" title="go">
+          GO
+          <span class="button_tally">6</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/tags/elasticsearch/' class="post_tag button button_translucent" title="elasticsearch">
+          ELASTICSEARCH
+          <span class="button_tally">5</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/tags/redis/' class="post_tag button button_translucent" title="redis">
+          REDIS
+          <span class="button_tally">5</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/tags/mysql/' class="post_tag button button_translucent" title="mysql">
+          MYSQL
+          <span class="button_tally">4</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/tags/rabbitmq/' class="post_tag button button_translucent" title="rabbitmq">
+          RABBITMQ
+          <span class="button_tally">4</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/tags/devops/' class="post_tag button button_translucent" title="devops">
+          DEVOPS
+          <span class="button_tally">3</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/tags/ci/cd/' class="post_tag button button_translucent" title="ci/cd">
+          CI/CD
+          <span class="button_tally">2</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/tags/git/' class="post_tag button button_translucent" title="git">
+          GIT
+          <span class="button_tally">2</span>
+        </a>
+        
+        
+        <br>
+        <div class="post_tags_toggle button">所有标签</div>
+        <div class="post_tags">
+          <div class="tags_list">
+            
+            <a href='https://jianlin-li.github.io/tags/argo/' class=" post_tag button button_translucent" data-position=1 title="argo">ARGO<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/centos7/' class=" post_tag button button_translucent" data-position=1 title="centos7">CENTOS7<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/ci/cd/' class=" post_tag button button_translucent" data-position=2 title="ci/cd">CI/CD<span class="button_tally">2</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/c%E8%AF%AD%E8%A8%80/' class=" post_tag button button_translucent" data-position=1 title="c语言">C语言<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/devops/' class=" post_tag button button_translucent" data-position=3 title="devops">DEVOPS<span class="button_tally">3</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/docker/' class=" post_tag button button_translucent" data-position=1 title="docker">DOCKER<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/elasticsearch/' class=" post_tag button button_translucent" data-position=5 title="elasticsearch">ELASTICSEARCH<span class="button_tally">5</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/elk/' class=" post_tag button button_translucent" data-position=1 title="elk">ELK<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/emoji/' class=" post_tag button button_translucent" data-position=1 title="emoji">EMOJI<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/git/' class=" post_tag button button_translucent" data-position=2 title="git">GIT<span class="button_tally">2</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/go/' class=" post_tag button button_translucent" data-position=6 title="go">GO<span class="button_tally">6</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/grafana/' class=" post_tag button button_translucent" data-position=1 title="grafana">GRAFANA<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/gtc/' class=" post_tag button button_translucent" data-position=2 title="gtc">GTC<span class="button_tally">2</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/gtcadmin/' class=" post_tag button button_translucent" data-position=1 title="gtcadmin">GTCADMIN<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/gtcuser/' class=" post_tag button button_translucent" data-position=1 title="gtcuser">GTCUSER<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/hosts/' class=" post_tag button button_translucent" data-position=1 title="hosts">HOSTS<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/hugo/' class=" post_tag button button_translucent" data-position=1 title="hugo">HUGO<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/jenkins/' class=" post_tag button button_translucent" data-position=2 title="jenkins">JENKINS<span class="button_tally">2</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/kubernetes/' class=" post_tag button button_translucent" data-position=13 title="kubernetes">KUBERNETES<span class="button_tally">13</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/markdown/' class=" post_tag button button_translucent" data-position=1 title="markdown">MARKDOWN<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/math/' class=" post_tag button button_translucent" data-position=1 title="math">MATH<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/mkcert/' class=" post_tag button button_translucent" data-position=1 title="mkcert">MKCERT<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/mysql/' class=" post_tag button button_translucent" data-position=4 title="mysql">MYSQL<span class="button_tally">4</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/nginx/' class=" post_tag button button_translucent" data-position=1 title="nginx">NGINX<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/notices/' class=" post_tag button button_translucent" data-position=1 title="notices">NOTICES<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/openstreetmap/' class=" post_tag button button_translucent" data-position=1 title="openstreetmap">OPENSTREETMAP<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/php/' class=" post_tag button button_translucent" data-position=7 title="php">PHP<span class="button_tally">7</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/prometheus/' class=" post_tag button button_translucent" data-position=1 title="prometheus">PROMETHEUS<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/rabbitmq/' class=" post_tag button button_translucent" data-position=4 title="rabbitmq">RABBITMQ<span class="button_tally">4</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/redis/' class=" post_tag button button_translucent" data-position=5 title="redis">REDIS<span class="button_tally">5</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/shell/' class=" post_tag button button_translucent" data-position=2 title="shell">SHELL<span class="button_tally">2</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/sql/' class=" post_tag button button_translucent" data-position=1 title="sql">SQL<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/web%E6%9C%8D%E5%8A%A1%E5%99%A8/' class=" post_tag button button_translucent" data-position=1 title="web服务器">WEB服务器<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/%E6%9C%AC%E5%9C%B0%E7%8E%AF%E5%A2%83/' class=" post_tag button button_translucent" data-position=1 title="本地环境">本地环境<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/%E5%A4%8D%E4%B9%A0/' class=" post_tag button button_translucent" data-position=1 title="复习">复习<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/%E6%95%99%E7%A8%8B/' class=" post_tag button button_translucent" data-position=1 title="教程">教程<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/%E4%B9%B1%E7%A0%81/' class=" post_tag button button_translucent" data-position=1 title="乱码">乱码<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/%E8%A7%86%E9%A2%91/' class=" post_tag button button_translucent" data-position=1 title="视频">视频<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/%E4%B9%A6%E7%B1%8D/' class=" post_tag button button_translucent" data-position=1 title="书籍">书籍<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/%E7%AE%97%E6%B3%95/' class=" post_tag button button_translucent" data-position=1 title="算法">算法<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6/' class=" post_tag button button_translucent" data-position=1 title="主从复制">主从复制<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/%E8%87%AA%E7%AD%BE%E5%90%8D%E8%AF%81%E4%B9%A6/' class=" post_tag button button_translucent" data-position=1 title="自签名证书">自签名证书<span class="button_tally">1</span>
+            </a>
+            
+            <div class="tags_sort"><span title="sort alphabetically">[A~Z]</span><span title="sort by count">[0~9]</span>
+            </div>
+            <span class="tags_hide"><svg class="icon">
+            <use xlink:href="#closeme"></use>
+          </svg></span>
+          </div>
+        </div>
+      </nav>
+    </div>
+  </section>
+</aside>
+
+  
+</div>
+
+<style>
+  .gtc-breadcrumb {
+    margin-bottom: 12px;
+    font-size: 0.9em;
+    opacity: 0.75;
+  }
+
+  .gtc-meta {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+</style>
+    </main><svg width="0" height="0" class="hidden">
+  <symbol viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" id="facebook">
+    <path d="M437 0H75C33.648 0 0 33.648 0 75v362c0 41.352 33.648 75 75 75h151V331h-60v-90h60v-61c0-49.629 40.371-90 90-90h91v90h-91v61h91l-15 90h-76v181h121c41.352 0 75-33.648 75-75V75c0-41.352-33.648-75-75-75zm0 0"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18.001 18.001" id="twitter">
+    <path d="M15.891 4.013c.808-.496 1.343-1.173 1.605-2.034a8.68 8.68 0 0 1-2.351.861c-.703-.756-1.593-1.14-2.66-1.14-1.043 0-1.924.366-2.643 1.078a3.56 3.56 0 0 0-1.076 2.605c0 .309.039.585.117.819-3.076-.105-5.622-1.381-7.628-3.837-.34.601-.51 1.213-.51 1.846 0 1.301.549 2.332 1.645 3.089-.625-.053-1.176-.211-1.645-.47 0 .929.273 1.705.82 2.388a3.623 3.623 0 0 0 2.115 1.291c-.312.08-.641.118-.979.118-.312 0-.533-.026-.664-.083.23.757.664 1.371 1.291 1.841a3.652 3.652 0 0 0 2.152.743C4.148 14.173 2.625 14.69.902 14.69c-.422 0-.721-.006-.902-.038 1.697 1.102 3.586 1.649 5.676 1.649 2.139 0 4.029-.542 5.674-1.626 1.645-1.078 2.859-2.408 3.639-3.974a10.77 10.77 0 0 0 1.172-4.892v-.468a7.788 7.788 0 0 0 1.84-1.921 8.142 8.142 0 0 1-2.11.593z"
+      ></path>
+  </symbol>
+  <symbol aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" id="mail">
+    <path  d="M502.3 190.8c3.9-3.1 9.7-.2 9.7 4.7V400c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V195.6c0-5 5.7-7.8 9.7-4.7 22.4 17.4 52.1 39.5 154.1 113.6 21.1 15.4 56.7 47.8 92.2 47.6 35.7.3 72-32.8 92.3-47.6 102-74.1 131.6-96.3 154-113.7zM256 320c23.2.4 56.6-29.2 73.4-41.4 132.7-96.3 142.8-104.7 173.4-128.7 5.8-4.5 9.2-11.5 9.2-18.9v-19c0-26.5-21.5-48-48-48H48C21.5 64 0 85.5 0 112v19c0 7.4 3.4 14.3 9.2 18.9 30.6 23.9 40.7 32.4 173.4 128.7 16.8 12.2 50.2 41.8 73.4 41.4z"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" id="calendar">
+    <path d="M452 40h-24V0h-40v40H124V0H84v40H60C26.916 40 0 66.916 0 100v352c0 33.084 26.916 60 60 60h392c33.084 0 60-26.916 60-60V100c0-33.084-26.916-60-60-60zm20 412c0 11.028-8.972 20-20 20H60c-11.028 0-20-8.972-20-20V188h432v264zm0-304H40v-48c0-11.028 8.972-20 20-20h24v40h40V80h264v40h40V80h24c11.028 0 20 8.972 20 20v48z"></path>
+    <path d="M76 230h40v40H76zm80 0h40v40h-40zm80 0h40v40h-40zm80 0h40v40h-40zm80 0h40v40h-40zM76 310h40v40H76zm80 0h40v40h-40zm80 0h40v40h-40zm80 0h40v40h-40zM76 390h40v40H76zm80 0h40v40h-40zm80 0h40v40h-40zm80 0h40v40h-40zm80-80h40v40h-40z"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" id="github">
+    <path d="M255.968 5.329C114.624 5.329 0 120.401 0 262.353c0 113.536 73.344 209.856 175.104 243.872 12.8 2.368 17.472-5.568 17.472-12.384 0-6.112-.224-22.272-.352-43.712-71.2 15.52-86.24-34.464-86.24-34.464-11.616-29.696-28.416-37.6-28.416-37.6-23.264-15.936 1.728-15.616 1.728-15.616 25.696 1.824 39.2 26.496 39.2 26.496 22.848 39.264 59.936 27.936 74.528 21.344 2.304-16.608 8.928-27.936 16.256-34.368-56.832-6.496-116.608-28.544-116.608-127.008 0-28.064 9.984-51.008 26.368-68.992-2.656-6.496-11.424-32.64 2.496-68 0 0 21.504-6.912 70.4 26.336 20.416-5.696 42.304-8.544 64.096-8.64 21.728.128 43.648 2.944 64.096 8.672 48.864-33.248 70.336-26.336 70.336-26.336 13.952 35.392 5.184 61.504 2.56 68 16.416 17.984 26.304 40.928 26.304 68.992 0 98.72-59.84 120.448-116.864 126.816 9.184 7.936 17.376 23.616 17.376 47.584 0 34.368-.32 62.08-.32 70.496 0 6.88 4.608 14.88 17.6 12.352C438.72 472.145 512 375.857 512 262.353 512 120.401 397.376 5.329 255.968 5.329z"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 212 212" id="gitlab">
+    <path d="M12.3 74.7h54L43.3 3c-1-3.6-6.4-3.6-7.6 0L12.3 74.8z" />
+    <path d="M12.3 74.7L.5 111c-1 3.2 0 6.8 3 8.8l101.6 74-92.5-119z"/>
+    <path d="M105 193.7l-38.6-119h-54l92.7 119z"/>
+    <path d="M105 193.7l38.7-119H66.4l38.7 119z"/>
+    <path d="M105 193.7l38.7-119H198l-93 119z"/>
+    <path d="M198 74.7l11.6 36.2c1 3 0 6.6-3 8.6l-101.5 74 93-119z"/>
+    <path d="M198 74.7h-54.3L167 3c1.2-3.6 6.4-3.6 7.6 0L198 74.8z"/>
+  </symbol>
+  <symbol viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" id="rss">
+    <circle cx="3.429" cy="20.571" r="3.429"></circle>
+    <path d="M11.429 24h4.57C15.999 15.179 8.821 8.001 0 8v4.572c6.302.001 11.429 5.126 11.429 11.428z"></path>
+    <path d="M24 24C24 10.766 13.234 0 0 0v4.571c10.714 0 19.43 8.714 19.43 19.429z"></path>
+  </symbol>
+  <symbol viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" id="linkedin">
+    <path d="M437 0H75C33.648 0 0 33.648 0 75v362c0 41.352 33.648 75 75 75h362c41.352 0 75-33.648 75-75V75c0-41.352-33.648-75-75-75zM181 406h-60V196h60zm0-240h-60v-60h60zm210 240h-60V286c0-16.54-13.46-30-30-30s-30 13.46-30 30v120h-60V196h60v11.309C286.719 202.422 296.93 196 316 196c40.691.043 75 36.547 75 79.688zm0 0"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 612 612" id="to-top">
+    <path d="M604.501 440.509L325.398 134.956c-5.331-5.357-12.423-7.627-19.386-7.27-6.989-.357-14.056 1.913-19.387 7.27L7.499 440.509c-9.999 10.024-9.999 26.298 0 36.323s26.223 10.024 36.222 0l262.293-287.164L568.28 476.832c9.999 10.024 26.222 10.024 36.221 0 9.999-10.023 9.999-26.298 0-36.323z"></path>
+  </symbol>
+  <symbol viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" id="carly">
+    <path d="M504.971 239.029L448 182.059V84c0-46.317-37.682-84-84-84h-44c-13.255 0-24 10.745-24 24s10.745 24 24 24h44c19.851 0 36 16.149 36 36v108c0 6.365 2.529 12.47 7.029 16.971L454.059 256l-47.029 47.029A24.002 24.002 0 0 0 400 320v108c0 19.851-16.149 36-36 36h-44c-13.255 0-24 10.745-24 24s10.745 24 24 24h44c46.318 0 84-37.683 84-84v-98.059l56.971-56.971c9.372-9.372 9.372-24.568 0-33.941zM112 192V84c0-19.851 16.149-36 36-36h44c13.255 0 24-10.745 24-24S205.255 0 192 0h-44c-46.318 0-84 37.683-84 84v98.059l-56.971 56.97c-9.373 9.373-9.373 24.568 0 33.941L64 329.941V428c0 46.317 37.682 84 84 84h44c13.255 0 24-10.745 24-24s-10.745-24-24-24h-44c-19.851 0-36-16.149-36-36V320c0-6.365-2.529-12.47-7.029-16.971L57.941 256l47.029-47.029A24.002 24.002 0 0 0 112 192z"></path>
+  </symbol>
+  <symbol viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" id="copy">
+    <path d="M23 2.75A2.75 2.75 0 0 0 20.25 0H8.75A2.75 2.75 0 0 0 6 2.75v13.5A2.75 2.75 0 0 0 8.75 19h11.5A2.75 2.75 0 0 0 23 16.25zM18.25 14.5h-7.5a.75.75 0 0 1 0-1.5h7.5a.75.75 0 0 1 0 1.5zm0-3h-7.5a.75.75 0 0 1 0-1.5h7.5a.75.75 0 0 1 0 1.5zm0-3h-7.5a.75.75 0 0 1 0-1.5h7.5a.75.75 0 0 1 0 1.5z"></path>
+    <path d="M8.75 20.5a4.255 4.255 0 0 1-4.25-4.25V2.75c0-.086.02-.166.025-.25H3.75A2.752 2.752 0 0 0 1 5.25v16A2.752 2.752 0 0 0 3.75 24h12a2.752 2.752 0 0 0 2.75-2.75v-.75z"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512.001 512.001" id="closeme">
+    <path d="M284.286 256.002L506.143 34.144c7.811-7.811 7.811-20.475 0-28.285-7.811-7.81-20.475-7.811-28.285 0L256 227.717 34.143 5.859c-7.811-7.811-20.475-7.811-28.285 0-7.81 7.811-7.811 20.475 0 28.285l221.857 221.857L5.858 477.859c-7.811 7.811-7.811 20.475 0 28.285a19.938 19.938 0 0 0 14.143 5.857 19.94 19.94 0 0 0 14.143-5.857L256 284.287l221.857 221.857c3.905 3.905 9.024 5.857 14.143 5.857s10.237-1.952 14.143-5.857c7.811-7.811 7.811-20.475 0-28.285L284.286 256.002z"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" id="open-menu">
+    <path d="M492 236H20c-11.046 0-20 8.954-20 20s8.954 20 20 20h472c11.046 0 20-8.954 20-20s-8.954-20-20-20zm0-160H20C8.954 76 0 84.954 0 96s8.954 20 20 20h472c11.046 0 20-8.954 20-20s-8.954-20-20-20zm0 320H20c-11.046 0-20 8.954-20 20s8.954 20 20 20h472c11.046 0 20-8.954 20-20s-8.954-20-20-20z"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" id="instagram">
+    <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" id=youtube>
+    <path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" id="stackoverflow">
+    <path d="M21 27v-8h3v11H0V19h3v8h18z"></path><path d="M17.1.2L15 1.8l7.9 10.6 2.1-1.6L17.1.2zm3.7 14.7L10.6 6.4l1.7-2 10.2 8.5-1.7 2zM7.2 12.3l12 5.6 1.1-2.4-12-5.6-1.1 2.4zm-1.8 6.8l13.56 1.96.17-2.38-13.26-2.55-.47 2.97zM19 25H5v-3h14v3z"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" id="xing">
+    <path d="M18.188 0c-.517 0-.741.325-.927.66 0 0-7.455 13.224-7.702 13.657.015.024 4.919 9.023 4.919 9.023.17.308.436.66.967.66h3.454c.211 0 .375-.078.463-.22.089-.151.089-.346-.009-.536l-4.879-8.916c-.004-.006-.004-.016 0-.022L22.139.756c.095-.191.097-.387.006-.535C22.056.078 21.894 0 21.686 0h-3.498zM3.648 4.74c-.211 0-.385.074-.473.216-.09.149-.078.339.02.531l2.34 4.05c.004.01.004.016 0 .021L1.86 16.051c-.099.188-.093.381 0 .529.085.142.239.234.45.234h3.461c.518 0 .766-.348.945-.667l3.734-6.609-2.378-4.155c-.172-.315-.434-.659-.962-.659H3.648v.016z"/>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 71 55" id="discord">
+    <path d="M60.1045 4.8978C55.5792 2.8214 50.7265 1.2916 45.6527 0.41542C45.5603 0.39851 45.468 0.440769 45.4204 0.525289C44.7963 1.6353 44.105 3.0834 43.6209 4.2216C38.1637 3.4046 32.7345 3.4046 27.3892 4.2216C26.905 3.0581 26.1886 1.6353 25.5617 0.525289C25.5141 0.443589 25.4218 0.40133 25.3294 0.41542C20.2584 1.2888 15.4057 2.8186 10.8776 4.8978C10.8384 4.9147 10.8048 4.9429 10.7825 4.9795C1.57795 18.7309 -0.943561 32.1443 0.293408 45.3914C0.299005 45.4562 0.335386 45.5182 0.385761 45.5576C6.45866 50.0174 12.3413 52.7249 18.1147 54.5195C18.2071 54.5477 18.305 54.5139 18.3638 54.4378C19.7295 52.5728 20.9469 50.6063 21.9907 48.5383C22.0523 48.4172 21.9935 48.2735 21.8676 48.2256C19.9366 47.4931 18.0979 46.6 16.3292 45.5858C16.1893 45.5041 16.1781 45.304 16.3068 45.2082C16.679 44.9293 17.0513 44.6391 17.4067 44.3461C17.471 44.2926 17.5606 44.2813 17.6362 44.3151C29.2558 49.6202 41.8354 49.6202 53.3179 44.3151C53.3935 44.2785 53.4831 44.2898 53.5502 44.3433C53.9057 44.6363 54.2779 44.9293 54.6529 45.2082C54.7816 45.304 54.7732 45.5041 54.6333 45.5858C52.8646 46.6197 51.0259 47.4931 49.0921 48.2228C48.9662 48.2707 48.9102 48.4172 48.9718 48.5383C50.038 50.6034 51.2554 52.5699 52.5959 54.435C52.6519 54.5139 52.7526 54.5477 52.845 54.5195C58.6464 52.7249 64.529 50.0174 70.6019 45.5576C70.6551 45.5182 70.6887 45.459 70.6943 45.3942C72.1747 30.0791 68.2147 16.7757 60.1968 4.9823C60.1772 4.9429 60.1437 4.9147 60.1045 4.8978ZM23.7259 37.3253C20.2276 37.3253 17.3451 34.1136 17.3451 30.1693C17.3451 26.225 20.1717 23.0133 23.7259 23.0133C27.308 23.0133 30.1626 26.2532 30.1066 30.1693C30.1066 34.1136 27.28 37.3253 23.7259 37.3253ZM47.3178 37.3253C43.8196 37.3253 40.9371 34.1136 40.9371 30.1693C40.9371 26.225 43.7636 23.0133 47.3178 23.0133C50.9 23.0133 53.7545 26.2532 53.6986 30.1693C53.6986 34.1136 50.9 37.3253 47.3178 37.3253Z"/>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 17 18" id="mastodon">
+    <path
+    fill="#ffffff"
+    d="m 15.054695,9.8859583 c -0.22611,1.1632697 -2.02517,2.4363497 -4.09138,2.6830797 -1.0774504,0.12856 -2.1382704,0.24673 -3.2694704,0.19484 -1.84996,-0.0848 -3.30971,-0.44157 -3.30971,-0.44157 0,0.1801 0.0111,0.35157 0.0333,0.51194 0.24051,1.82571 1.81034,1.93508 3.29737,1.98607 1.50088,0.0514 2.8373104,-0.37004 2.8373104,-0.37004 l 0.0617,1.35686 c 0,0 -1.0498104,0.56374 -2.9199404,0.66742 -1.03124,0.0567 -2.3117,-0.0259 -3.80308,-0.42069 -3.23454998,-0.85613 -3.79081998,-4.304 -3.87592998,-7.8024197 -0.026,-1.03871 -0.01,-2.01815 -0.01,-2.83732 0,-3.57732 2.34385998,-4.62587996 2.34385998,-4.62587996 1.18184,-0.54277 3.20976,-0.77101 5.318,-0.7882499985409 h 0.0518 C 9.8267646,0.01719834 11.856025,0.24547834 13.037775,0.78824834 c 0,0 2.34377,1.04855996 2.34377,4.62587996 0,0 0.0294,2.63937 -0.32687,4.47183"/>
+ <path
+    fill="#000000"
+    d="m 12.616925,5.6916583 v 4.3315297 h -1.71607 V 5.8189683 c 0,-0.88624 -0.37289,-1.33607 -1.1187604,-1.33607 -0.82467,0 -1.23799,0.53361 -1.23799,1.58875 v 2.30122 h -1.70594 v -2.30122 c 0,-1.05514 -0.4134,-1.58875 -1.23808,-1.58875 -0.74587,0 -1.11876,0.44983 -1.11876,1.33607 v 4.2042197 h -1.71607 V 5.6916583 c 0,-0.88527 0.22541,-1.58876 0.67817,-2.10922 0.46689,-0.52047 1.07833,-0.78727 1.83735,-0.78727 0.87816,0 1.54317,0.33752 1.98288,1.01267 l 0.42744,0.71655 0.42753,-0.71655 c 0.43961,-0.67515 1.10463,-1.01267 1.9828704,-1.01267 0.75893,0 1.37037,0.2668 1.83735,0.78727 0.45268,0.52046 0.67808,1.22395 0.67808,2.10922"/>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 530" id="bluesky" >
+    <path d="m135.72 44.03c66.496 49.921 138.02 151.14 164.28 205.46 26.262-54.316 97.782-155.54 164.28-205.46 47.98-36.021 125.72-63.892 125.72 24.795 0 17.712-10.155 148.79-16.111 170.07-20.703 73.984-96.144 92.854-163.25 81.433 117.3 19.964 147.14 86.092 82.697 152.22-122.39 125.59-175.91-31.511-189.63-71.766-2.514-7.3797-3.6904-10.832-3.7077-7.8964-0.0174-2.9357-1.1937 0.51669-3.7077 7.8964-13.714 40.255-67.233 197.36-189.63 71.766-64.444-66.128-34.605-132.26 82.697-152.22-67.108 11.421-142.55-7.4491-163.25-81.433-5.9562-21.282-16.111-152.36-16.111-170.07 0-88.687 77.742-60.816 125.72-24.795z"/>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" id="ko-fi">
+    <path fill="#ffffff" d="M4.5,9.8527H32.7947a0,0,0,0,1,0,0v19.225a9.07,9.07,0,0,1-9.07,9.07H13.57a9.07,9.07,0,0,1-9.07-9.07V9.8527A0,0,0,0,1,4.5,9.8527Z"/>
+    <path fill="#000000" d="M12.197,25.9493l6.45,6.45,6.45-6.45a8.2,8.2,0,0,0,2.4016-5.798h0a4.5082,4.5082,0,0,0-4.212-4.5459,4.4262,4.4262,0,0,0-4.64,4.4209,4.4261,4.4261,0,0,0-4.64-4.4209,4.5082,4.5082,0,0,0-4.212,4.5459h0A8.2,8.2,0,0,0,12.197,25.9493Z"/>
+    <path fill="#ffffff" d="M32.7947,9.8527H35.73a7.77,7.77,0,0,1,0,15.5394H32.7947"/>
+  </svg>
+  </symbol>
+</svg>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha512-aOFyMMzZF7l7ei3vOKgQiRhZnYqk9YC/uMzl4T0j5N5D3Kul+QAFU8ssENDRMAqr/lxDOjMF69dSYJ8HYqY+WQ==" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" integrity="sha512-UPFOadao2nEorjtjl0xUTtN3w20Ja143UPEU6EyJ1mi5MB2bDtMkiWmqGDqi47xNLB5z1dy31GKJDEWhjUJFiQ==" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" integrity="sha512-YJVxTjqttjsU3cSvaTRqsSl0wbRgZUNF+NGGCgto/MUbIvaLdXQzGTCQu4CvyJZbZctgflVB0PXw9LLmTWm5/w==" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
+<footer class="footer">
+  <div class="footer_inner wrap pale">
+    <img src='https://jianlin-li.github.io/icons/apple-touch-icon.png' class="icon icon_2 transparent" alt="Copyright © 1989–2025, 李建林 ">
+    <p>Copyright&nbsp;1989-&nbsp;<span class="year"></span>&nbsp;COPYRIGHT © 1989–2025, 李建林 . All Rights Reserved</p><a class="to_top" href="#documentTop">
+  <svg class="icon">
+  <title>to-top</title>
+  <use xlink:href="#to-top"></use>
+</svg>
+
+</a>
+
+  </div>
+</footer>
+
+<script type="text/javascript" src="https://jianlin-li.github.io/zh-cn/js/bundle.e4e0e4fbe8acb50d7f973828f4138cdbea727800047fc93f9abbd6751e8f3422d6ef193f98da36fdb8488219c25692d73da89480f46abc8421a4ee3526dd6c23.js" integrity="sha512-5ODk&#43;&#43;istQ1/lzgo9BOM2&#43;pyeAAEf8k/mrvWdR6PNCLW7xk/mNo2/bhIghnCVpLXPaiUgPRqvIQhpO41Jt1sIw==" crossorigin="anonymous"></script>
+
+  <script src="https://jianlin-li.github.io/js/search.min.4c2b0421d128bbd7c43fc7d662fb5dfd8e439c60ee92c900a26d72d9c3271d2256f5bac9f6f919cddfd55101e9272898716cbb3381b4360bf43a66a5f7664f54.js"></script>
+
+  </body>
+</html>

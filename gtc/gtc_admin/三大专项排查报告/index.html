@@ -1,0 +1,2471 @@
+
+<!DOCTYPE html>
+<html
+  lang="zh-cn"
+  data-figures=""
+  
+    class="page"
+  
+  
+  >
+  <head>
+<title>三大专项排查报告 | 李建林个人知识库</title>
+<meta charset="utf-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+
+
+
+
+<meta property="og:locale" content="zh-cn" />
+
+<meta property="og:type" content="article">
+<meta name="description" content="三大专项排查报告
+三个专项的范围
+本报告对应“连接与事务泄漏、N&#43;1 查询、索引失效 SQL”三个专项，具体范围如下：
+
+  
+      
+          专项
+          排查内容
+          对应问题编号
+      
+  
+  
+      
+          连接与事务 …" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:creator" content="">
+<meta name="twitter:title" content="" />
+<meta name="twitter:image" content="https://jianlin-li.github.io/images/thumbnail.png"/>
+<meta property="og:url" content="https://jianlin-li.github.io/gtc/gtc_admin/%E4%B8%89%E5%A4%A7%E4%B8%93%E9%A1%B9%E6%8E%92%E6%9F%A5%E6%8A%A5%E5%91%8A/" />
+<meta property="og:title" content="" />
+<meta property="og:description" content="三大专项排查报告
+三个专项的范围
+本报告对应“连接与事务泄漏、N&#43;1 查询、索引失效 SQL”三个专项，具体范围如下：
+
+  
+      
+          专项
+          排查内容
+          对应问题编号
+      
+  
+  
+      
+          连接与事务 …" />
+<meta property="og:image" content="https://jianlin-li.github.io/images/thumbnail.png" />
+
+<link rel="apple-touch-icon" sizes="180x180" href="https://jianlin-li.github.io/icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://jianlin-li.github.io/icons/favicon-32x32.png">
+<link rel="manifest" href="https://jianlin-li.github.io/icons/site.webmanifest">
+
+<link rel="canonical" href="https://jianlin-li.github.io/gtc/gtc_admin/%E4%B8%89%E5%A4%A7%E4%B8%93%E9%A1%B9%E6%8E%92%E6%9F%A5%E6%8A%A5%E5%91%8A/">
+
+
+
+<link rel="preload" href="https://jianlin-li.github.io/css/styles.dc38388a8f0b890e788bd3a99b7495d14e7d5ac4359ed3b49abeb778497863b284ad4cc7e496ef58c84139295f9bafed82f5a41345eda86bd2d429cccb7c2596.css" integrity = "sha512-3Dg4io8LiQ54i9Opm3SV0U59WsQ1ntO0mr63eEl4Y7KErUzH5JbvWMhBOSlfm6/tgvWkE0XtqGvS1CnMy3wllg==" as="style" crossorigin="anonymous">
+
+
+
+<link rel="preload" href="https://jianlin-li.github.io/zh-cn/js/bundle.e4e0e4fbe8acb50d7f973828f4138cdbea727800047fc93f9abbd6751e8f3422d6ef193f98da36fdb8488219c25692d73da89480f46abc8421a4ee3526dd6c23.js" as="script" integrity=
+"sha512-5ODk&#43;&#43;istQ1/lzgo9BOM2&#43;pyeAAEf8k/mrvWdR6PNCLW7xk/mNo2/bhIghnCVpLXPaiUgPRqvIQhpO41Jt1sIw==" crossorigin="anonymous">
+
+
+<link rel="stylesheet" type="text/css" href="https://jianlin-li.github.io/css/styles.dc38388a8f0b890e788bd3a99b7495d14e7d5ac4359ed3b49abeb778497863b284ad4cc7e496ef58c84139295f9bafed82f5a41345eda86bd2d429cccb7c2596.css" integrity="sha512-3Dg4io8LiQ54i9Opm3SV0U59WsQ1ntO0mr63eEl4Y7KErUzH5JbvWMhBOSlfm6/tgvWkE0XtqGvS1CnMy3wllg==" crossorigin="anonymous">
+
+
+  </head>
+  <body
+    data-code="7"
+    data-lines="true"
+    id="documentTop"
+    data-lang="zh-cn"
+  >
+
+<header class="nav_header" >
+  <nav class="nav"><a href='https://jianlin-li.github.io/' class="nav_brand nav_item" title="李建林个人知识库">
+  <img src="https://jianlin-li.github.io/logos/logo.png" class="logo" alt="李建林个人知识库">
+  <div class="nav_close">
+    <div><svg class="icon">
+  <title>open-menu</title>
+  <use xlink:href="#open-menu"></use>
+</svg>
+<svg class="icon">
+  <title>closeme</title>
+  <use xlink:href="#closeme"></use>
+</svg>
+</div>
+  </div>
+</a>
+
+    <div class='nav_body nav_body_left'>
+      
+      
+      
+        
+
+  <div class="nav_parent">
+    <a href="https://jianlin-li.github.io/" class="nav_item" title="首页">首页 </a>
+  </div>
+  <div class="nav_parent">
+    <a href="https://jianlin-li.github.io/archives/" class="nav_item" title="归档">归档 </a>
+  </div>
+  <div class="nav_parent">
+    <a href="https://jianlin-li.github.io/gtc/" class="nav_item" title="GTC 文档">GTC 文档 </a>
+  </div>
+  <div class="nav_parent">
+    <a href="https://jianlin-li.github.io/categories/" class="nav_item" title="分类">分类 </a>
+  </div>
+  <div class="nav_parent">
+    <a href="https://jianlin-li.github.io/tags/" class="nav_item" title="标签">标签 </a>
+  </div>
+  <div class="nav_parent">
+    <a href="https://jianlin-li.github.io/about/" class="nav_item" title="关于">关于 </a>
+  </div>
+      
+<div class='follow'>
+  <a href="https://github.com/JianLin-Li">
+    <svg class="icon">
+  <title>github</title>
+  <use xlink:href="#github"></use>
+</svg>
+
+  </a>
+  <a href="http://local.gitlab.com">
+    <svg class="icon">
+  <title>gitlab</title>
+  <use xlink:href="#gitlab"></use>
+</svg>
+
+  </a>
+<div class="color_mode">
+  <input type="checkbox" class="color_choice" id="mode">
+</div>
+
+</div>
+
+    </div>
+  </nav>
+</header>
+
+    <main><div class="grid-inverse wrap content">
+  <article class="post_content">
+    <p class="gtc-breadcrumb"><a href="/gtc/">GTC 文档归档</a> / gtc_admin</p>
+    <h1 class="post_title">三大专项排查报告</h1>
+    <div class="post_meta gtc-meta">
+      <span class="post_date">
+        2026-10-17
+      </span>
+      <span>项目：gtc_admin</span>
+    </div>
+    
+    <div class="post_body">
+      <h1 id="三大专项排查报告">三大专项排查报告</h1>
+<h2 id="三个专项的范围">三个专项的范围</h2>
+<p>本报告对应“连接与事务泄漏、N+1 查询、索引失效 SQL”三个专项，具体范围如下：</p>
+<table>
+  <thead>
+      <tr>
+          <th>专项</th>
+          <th>排查内容</th>
+          <th>对应问题编号</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>连接与事务</td>
+          <td>事务未提交或回滚、提前返回和异常路径的事务闭合、长事务、连接占用及连接池配置风险</td>
+          <td>T01—T08、C01—C05</td>
+      </tr>
+      <tr>
+          <td>N+1 查询</td>
+          <td>列表、循环及批处理中的逐条查询，以及间接调用造成的重复读取；当前记录 45 个已复核的读取位置或调用路径，不代表 45 个独立接口</td>
+          <td>N01—N45</td>
+      </tr>
+      <tr>
+          <td>SQL 与索引使用</td>
+          <td>FIND_IN_SET、过滤列函数、前置通配模糊匹配、无界读取及缺少时间范围等可能增加扫描成本的 SQL 形态</td>
+          <td>S01—S15</td>
+      </tr>
+  </tbody>
+</table>
+<p>判断边界：事务闭合缺口不等于已证实永久连接泄漏；存在重复读取不等于都能安全批量替代；某个条件不能有效利用索引，也不等于整条 SQL 完全不走索引。实际影响需要结合连接池数据、执行计划及慢查询 Profile 验证，MySQL/PolarDB 与 SelectDB 分别按对应引擎判断。</p>
+<p>首次扫描：2026-10-13；全面扩展复核：2026-10-14<br>
+代码基线：<code>master</code><br>
+方式：全项目关键词检索后，对高风险命中阅读上下文、Repository、Model、数据字典及连接池实现。本文为新生成的静态复核文档，不代表已穷尽全部路径。</p>
+<p>本次仅更新文档，不修改业务代码，不连接生产服务，不执行资金操作或数据库迁移。未取得线上 SQL、EXPLAIN、连接池运行数据，不能据此宣称已复现线上泄漏或慢查询。</p>
+<h2 id="一结论与处理顺序">一、结论与处理顺序</h2>
+<table>
+  <thead>
+      <tr>
+          <th>编号</th>
+          <th>优先级</th>
+          <th>问题</th>
+          <th>证据等级</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>T01</td>
+          <td>P1</td>
+          <td>subscribeFinish 提前返回及非正金额分支未闭合事务</td>
+          <td>已确认代码路径</td>
+      </tr>
+      <tr>
+          <td>T02</td>
+          <td>P1</td>
+          <td>despoitMt 异常处理未统一回滚</td>
+          <td>已确认异常路径</td>
+      </tr>
+      <tr>
+          <td>T03</td>
+          <td>P1</td>
+          <td>SystemMoneyLogRepository 手动事务无异常兜底</td>
+          <td>已确认方法内缺口；需结合调用者</td>
+      </tr>
+      <tr>
+          <td>T04</td>
+          <td>P1</td>
+          <td>MtServer 事务开启后、try 之前执行写入；失败分支重复回滚</td>
+          <td>已确认代码路径</td>
+      </tr>
+      <tr>
+          <td>T05</td>
+          <td>P2</td>
+          <td>TMemberRepository 仅捕获 Exception，未覆盖 Error</td>
+          <td>条件性风险</td>
+      </tr>
+      <tr>
+          <td>C01</td>
+          <td>P1</td>
+          <td>默认数据库池每进程上限 1000</td>
+          <td>配置已确认，实际连接量待测</td>
+      </tr>
+      <tr>
+          <td>C02</td>
+          <td>P1</td>
+          <td>MT 远程请求在持有数据库事务期间执行</td>
+          <td>已确认结构，持续时间待测</td>
+      </tr>
+      <tr>
+          <td>N01</td>
+          <td>P2</td>
+          <td>登录设备列表逐设备查询日志</td>
+          <td>已确认 N+1</td>
+      </tr>
+      <tr>
+          <td>N02</td>
+          <td>P2</td>
+          <td>交易品种列表逐条查询品种与收藏</td>
+          <td>已确认最多约 2N 额外查询</td>
+      </tr>
+      <tr>
+          <td>N03</td>
+          <td>P2</td>
+          <td>MT5 成交列表逐条查询订单</td>
+          <td>已确认 N 次额外查询</td>
+      </tr>
+      <tr>
+          <td>N04</td>
+          <td>P2</td>
+          <td>PAMM 审核列表逐条查询持仓和策略附加信息</td>
+          <td>已确认条件性 2K 查询</td>
+      </tr>
+      <tr>
+          <td>S01</td>
+          <td>P1</td>
+          <td>转账候选层级 FIND_IN_SET 加无界 get</td>
+          <td>已确认 SQL 形态，成本待测</td>
+      </tr>
+      <tr>
+          <td>S02</td>
+          <td>P2</td>
+          <td>IB 关键词 CAST/LOWER 加包含匹配</td>
+          <td>已确认 SQL 形态，执行引擎待核</td>
+      </tr>
+      <tr>
+          <td>S03</td>
+          <td>P2</td>
+          <td>SelectDB 资金历史多列包含匹配、时间范围可选</td>
+          <td>已确认 SQL 形态，Profile 待采</td>
+      </tr>
+      <tr>
+          <td>S04</td>
+          <td>P3</td>
+          <td>配置表 CSV 字段 FIND_IN_SET</td>
+          <td>已确认 SQL 形态，通常先看表规模</td>
+      </tr>
+  </tbody>
+</table>
+<p>本轮台账共覆盖 <strong>8 条事务风险、5 条连接/资源风险、45 条重复读取路径、15 类 SQL 风险</strong>。编号可能描述同一调用链的不同方面，例如 N03/S05、N32/S11，不应相加当作独立 Bug 数。</p>
+<table>
+  <thead>
+      <tr>
+          <th>本轮重点</th>
+          <th>优先级</th>
+          <th>结论与处理入口</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>T06 / T07</td>
+          <td>P1</td>
+          <td>钱包提现缺统一异常闭合；入金回调未区分提交前后失败，先做资金异常与幂等测试</td>
+      </tr>
+      <tr>
+          <td>T08</td>
+          <td>P1（嵌套场景）</td>
+          <td>订阅申请失败可能重复回滚，检查事务层级所有权</td>
+      </tr>
+      <tr>
+          <td>C03 / C04</td>
+          <td>P1/P2</td>
+          <td>多池/多进程共同放大连接预算；部分 HTTP 只有连接超时，没有总超时</td>
+      </tr>
+      <tr>
+          <td>N32 / S11</td>
+          <td>P2</td>
+          <td>按日首尾查询、零值缓存失效及无最大跨度共同放大 SelectDB 请求</td>
+      </tr>
+      <tr>
+          <td>N39 / S07</td>
+          <td>P2</td>
+          <td>会员×分组循环查询，字典缺少相关组合索引；先批查再评估关系规范化</td>
+      </tr>
+      <tr>
+          <td>N03 / S05</td>
+          <td>优先核实</td>
+          <td>订单查询缺 Server 主键维度，既影响定位效率，也需验证跨服务器数据归属</td>
+      </tr>
+  </tbody>
+</table>
+<p>P1 表示优先复核和修复，并非已经发生生产事故。资金路径需要业务回归，不能机械地批量替换事务代码。</p>
+<h2 id="二连接与事务">二、连接与事务</h2>
+<h3 id="t01结算退款存在未闭合事务分支">T01：结算退款存在未闭合事务分支</h3>
+<p>位置：<code>app/Common/Lib/Transfer/Transfer.php:1080</code>，<code>subscribeFinish()</code>；事务开启在 1092 行。</p>
+<ul>
+<li>开启事务后，<code>$forword-&gt;status != 1</code> 直接返回错误数组，没有 commit/rollback。</li>
+<li>写入 <code>status=9</code> 后，仅在 <code>$amount &gt; 0</code> 的成功分支 commit。金额为零或负数时执行到闭包末尾，没有闭合事务，也没有明确业务返回。</li>
+<li>正常正金额成功和 Throwable 分支有闭合，不应误报为所有调用都会泄漏。</li>
+</ul>
+<p>影响：事务残留到连接释放；状态更新可能被框架回滚；后续同协程操作可能落入残留事务。常驻任务中风险更大。</p>
+<p>建议：明确非正金额业务规则；使用受控事务边界，使每个返回路径都结束本层事务。不得简单 commit 非正金额分支而改变资金规则。</p>
+<p>验证：构造状态不等于 1、金额 0、负数、正常成功、下游抛异常；逐项断言事务层级恢复到调用前值、状态及资金变化符合规则。</p>
+<h3 id="t02自动入金异常路径未统一回滚">T02：自动入金异常路径未统一回滚</h3>
+<p>位置：<code>app/Common/Lib/Transfer/Transfer.php:127</code>，<code>despoitMt()</code>；catch 在约 169 行。</p>
+<p>事务内创建转账记录、扣款并调用 MT 远程 balance。部分显式失败分支已 rollback，但 catch(Exception) 本身只更新支付状态并返回。创建记录或远程调用等位置直接抛异常时，可能进入未回滚路径；catch 中的状态更新还可能一起被框架回滚。</p>
+<p>建议：明确事务所有者，异常时只回滚本方法开启的层级，再记录独立的失败状态。远程结果未知不能直接重试扣款，必须按订单号对账。</p>
+<p>验证：分别在创建记录、扣款、远程调用超时处注入异常；检查事务层级、支付状态落库及远程实际到账情况。</p>
+<h3 id="t03系统资金流水手动事务缺少异常兜底">T03：系统资金流水手动事务缺少异常兜底</h3>
+<p>位置：<code>app/Repository/crm/SystemMoneyLogRepository.php:79</code>，<code>addMoney()</code>。</p>
+<p>beginTransaction 后仅正常成功 commit、更新失败 rollback；查询、计算、写入直接抛异常时没有本地 catch/finally。该方法还可能嵌套在调用者事务内；外层只 rollback 一层未必回到入口层级。</p>
+<p>建议：采用框架事务闭包或严格记录入口层级，统一异常传播。不要无条件 rollback(0) 破坏调用者的事务。</p>
+<p>验证：独立调用和嵌套事务调用均注入异常，检查事务层级与资金原子性。</p>
+<h3 id="t04mtserver-写入位于-try-保护范围外且有重复回滚">T04：MtServer 写入位于 try 保护范围外，且有重复回滚</h3>
+<p>位置：<code>app/Model/Trade/MtServer.php:255</code>。</p>
+<p>beginTransaction 后创建 MemberMtForwardLog，之后才进入 try。创建失败不经过该方法 catch。远程失败分支先 rollback 再抛异常，catch 又 rollback；有外层事务时可能多回滚一层。</p>
+<p>建议：把所有事务内语句放入同一受控边界，确保仅结束本层事务；保持远程资金处理的幂等和对账逻辑。</p>
+<h3 id="t05会员余额更新未覆盖全部-throwable">T05：会员余额更新未覆盖全部 Throwable</h3>
+<p>位置：<code>app/Repository/member/TMemberRepository.php:506</code>，catch 在 565 行。</p>
+<p>正常返回分支已有 commit/rollback，但仅捕获 Exception，TypeError、ValueError 等 Error 不走该回滚分支。仅作为异常覆盖风险记录，不等同于已发生连接泄漏。</p>
+<p>建议：对资金方法评估 Throwable 处理，回滚后按既有业务契约传播异常；用非法计算输入或受控异常桩验证。</p>
+<h3 id="c01连接池上限与-worker-数量放大">C01：连接池上限与 Worker 数量放大</h3>
+<p>位置：<code>config/autoload/databases.php:32</code>，default 池：min_connections=10、max_connections=1000、wait_timeout=10 秒。</p>
+<p>连接池按进程、连接配置分别建立。若 8 个 Worker 均使用该池，配置上限预算可达 8000；不是启动时立即创建 8000 条连接，也不是实际连接量证明。还需计入其他进程、实例、读写分离连接及数据库端限制。</p>
+<p>建议：按峰值同时访问数据库的协程数、SQL 时延和数据库 max_connections 分配连接预算；先测池等待和活跃连接，再调小上限，不直接给所有池套同一个数值。</p>
+<h3 id="c02事务中等待远程-mt-响应">C02：事务中等待远程 MT 响应</h3>
+<p>位置：<code>app/Common/Lib/Transfer/Transfer.php:134</code>、<code>app/Model/Trade/MtServer.php:278</code> 附近。</p>
+<p>远程请求发生在写入/扣款之后、提交之前。对方慢或超时会延长本地连接和锁持有时间。这属于长事务/连接占用风险，不是永久泄漏证据。</p>
+<p>短期：核实远程连接/读取超时，记录事务耗时及订单号，避免无限重试。
+长期：评估状态机、幂等请求、对账补偿，缩短本地事务；不能简单把远程调用移到事务外而忽略资金一致性。</p>
+<h3 id="t06钱包提现事务没有统一异常出口p1">T06：钱包提现事务没有统一异常出口（P1）</h3>
+<p>位置：<code>app/Service/crm/PayService.php:2594</code>，<code>withdrawGtcWallet()</code>；beginTransaction 在 2638 行。</p>
+<p>创建提现记录、跟踪记录、余额变更、资金明细及审核步骤后，正常路径在 2661 行提交；业务失败返回分支在 2677 行回滚。但 2638 行之后并没有覆盖整个事务的 try/catch，之前的 try 只保护另一段插入。任一写入直接抛异常，都可能留下本层事务。余额 Repository 还会开启嵌套事务，不能假设外层回滚一次就足够。</p>
+<p>处理：统一本方法拥有的事务边界，保留余额、提现单、审核步骤的原子性；失败记录是否独立提交必须明确。验证记录创建失败、余额异常、明细失败、步骤失败和外层已有事务的情形，检查资金、状态及事务层级。</p>
+<h3 id="t07入金回调异常未回滚且混合提交前后失败p1">T07：入金回调异常未回滚，且混合提交前后失败（P1）</h3>
+<p>位置：<code>app/Service/crm/PayService.php:1555</code>，<code>payCallbackNext()</code>；事务 1610，提交 1635，catch(Exception) 1750。</p>
+<p>catch 只记录异常并返回 false，没有回滚。订单保存和余额变更抛错时存在事务闭合缺口；而提交之后还会调用 MT、写资金明细及统计，这些失败同样进入 catch。<strong>回调返回失败不能证明入金没到账</strong>，无条件重放可能造成重复资金处理。</p>
+<p>处理：区分“提交前失败”“提交结果不明”“已提交、后续动作失败”，依据持久化订单状态做幂等和补偿。提交后的失败不能靠 rollback 撤销已提交资金。验证重复回调、并发回调、提交前后异常及远程结果未知，不只测 HTTP 返回码。</p>
+<h3 id="t08订阅申请失败路径重复回滚p1嵌套时重点">T08：订阅申请失败路径重复回滚（P1，嵌套时重点）</h3>
+<p>位置：<code>app/Common/Lib/Transfer/Transfer.php:956</code>，<code>applySubscribe()</code>。</p>
+<p>971、998 行的失败分支先 rollback 再抛异常；1002 行 catch 再 rollback。独立调用时第二次可能无实际动作，但存在外层事务时可能结束不属于本方法的事务层级；内部 addMoney 的异常闭合问题还会放大层级判断难度。</p>
+<p>处理：单一异常出口，每层仅结束自己开启的事务；不要统一 rollback(0)。验证两类业务失败、嵌套调用及内层写入异常，同时检查外层后续写入是否仍受外层事务保护。</p>
+<h3 id="c03多连接配置共同占用连接预算p2">C03：多连接配置共同占用连接预算（P2）</h3>
+<p>位置：<code>config/autoload/databases.php</code>。除了 default 的 1000，selectDB、bigdataDB 配置上限分别为 50；bw2_2gtc 为 20；多组 MT 配置为 50；ib_report2—5 为 200。<code>config/autoload/redis.php:20</code> 的 Redis 池上限为 100，也需要独立观测。</p>
+<p>不能只用 default 的数字评估系统：同一物理数据库可能被多个逻辑连接名访问，各进程、队列消费者、实例还会分别持池。估算应为“实际启用进程 × 各目标连接池预算”的汇总，再加其他服务余量；并非所有池都会同时达到上限。</p>
+<p>先按数据库目标归类，记录 Worker/消费者数量、活跃连接、等待时长、峰值 SQL 延迟，再调整上限。连接池等待超时与 SQL 执行超时是不同指标。</p>
+<h3 id="c04部分外部请求没有总超时p1p2按调用频率">C04：部分外部请求没有总超时（P1/P2，按调用频率）</h3>
+<ul>
+<li><code>common/crm.php:118</code> 的 getData：仅设连接超时，没有整个请求的 CURLOPT_TIMEOUT；会员 KeChat 认证服务存在调用。</li>
+<li><code>app/Common/Lib/Withdraw/GtcOutPay.php:575</code> 的 postData：同样只有连接超时。付款结果未知时应先对账，不能因为本地超时直接再付款。</li>
+<li><code>app/Common/Lib/Zoom/ZoomBase.php:68,111</code>：令牌及业务请求未看到连接/总超时设置。</li>
+</ul>
+<p>连接建立成功后，对端持续不返回仍可能长期占用协程或消费者。同协程之前借出的数据库连接可能一直持有到协程结束，即使没有开启事务。设置连接及总超时、限制重试和并发，记录各阶段耗时；鉴权、支付和一般读取分别处理超时后果。</p>
+<p>反例：common 的 postData 已有总超时；GtcPay 的 postData 有 300 秒总超时，属于超时较长而非缺失。不能把所有 curl 调用统一报成无超时。</p>
+<h3 id="c05文件处理异常路径没有显式关闭p3条件风险">C05：文件处理异常路径没有显式关闭（P3，条件风险）</h3>
+<p><code>app/Service/crm/MemberKeChatImportService.php:24</code> 打开 CSV，循环处理后第 40 行关闭；中途异常没有 finally。<code>app/Jobs/SystemDownloadJob.php:982</code> 打开输出文件，1035 行正常关闭，但 1040 行 catch 重抛，异常路径未统一清理。导入还会累积整份文件数据，需看文件规模和 RSS。</p>
+<p>建议使用 finally 管理句柄、按批处理大文件。PHP 资源析构可能最终释放句柄，所以这不是已证实的永久 FD 泄漏。测试连续异常批次的 FD/RSS 是否回落。SystemDownloadV2Job 和部分上传流已有 finally，不列为同类缺口。</p>
+<h3 id="框架兜底与判断边界">框架兜底与判断边界</h3>
+<p><code>vendor/hyperf/db-connection/src/ConnectionResolver.php:63</code> 在协程结束时 defer 归还连接。
+<code>vendor/hyperf/db-connection/src/Connection.php:107</code> 在 release 时检查 transactionLevel，存在未结束事务则 rollback(0)，并记录：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">Maybe you&#39;ve forgotten to commit or rollback the MySQL transaction.
+</span></span></code></pre></div><p>因此本报告确认的是业务事务闭合缺口，不能据此断言连接永远不归还。协程未结束、长任务持续占用连接、异常回滚失败等需要运行数据验证。普通 ORM 查询未显式 close 不是自动构成泄漏。</p>
+<p>本次抽查的 UaePassAuthService HTTP 请求设有超时并调用 curl_close；CSV 导入正常路径有 fclose，但异常清理仍有条件风险，见 C05。未将这些直接列为永久泄漏。</p>
+<h2 id="三n1-查询">三、N+1 查询</h2>
+<h3 id="n01设备列表">N01：设备列表</h3>
+<p>位置：<code>app/Service/member/TMemberService.php:3651</code>，<code>loginDevice()</code>。</p>
+<p>分页设备后 foreach 内逐个 <code>MemberLoginLogRepository::findByFilter()</code>，按会员、设备、成功状态、id 倒序查询；N 个设备约增加 N 条 SQL，另有在线状态查询依赖。</p>
+<p>最近的空设备修复只增加 EXISTS 过滤，没有消除 N+1。数据字典已有 <code>(member_id,device_id,login_status)</code> 索引，应先核实测试/生产是否一致，不重复盲目加索引。</p>
+<p>建议：在当前会员、当前页 device_id 范围内批量取每个设备最新成功记录；保留 PC/App、已退出设备及最新记录选择语义。不要先对全日志表 group by。</p>
+<p>验证：1、10、20 个设备的 SQL 次数应近似固定；比较旧结果与新结果、分页 total、设备归属和在线状态。</p>
+<p>补充正确性风险：当前查不到日志时将设备信息覆盖为空值再 continue，若 EXISTS 分页后日志被并发删除，仍可能保留空设备列表项；需另行处理并发一致性。App 缺失的实际数据原因未通过测试环境返回值验证，不能认定过滤空行已修好全部原 Bug。</p>
+<h3 id="n02品种与收藏">N02：品种与收藏</h3>
+<p>位置：<code>app/Service/Trade/TradeService.php:764</code>。</p>
+<p>图标已批量查询，但循环仍对每个 symbol/server_id 查询 Symbol，并对找到的品种按 login_id/symbol_id count 收藏。N 个品种最多约 2N 次额外 SQL。</p>
+<p>建议：按同一 server_id 和 symbol 集合批量取品种，按同一 login_id 和 symbol_id 集合取收藏，内存映射。不要跨服务器只按 symbol 合并。</p>
+<p>验证：100 个品种的数据库查询次数不随品种数线性增长，收藏状态及缺失品种返回保持一致。</p>
+<h3 id="n03mt5-成交补订单时间">N03：MT5 成交补订单时间</h3>
+<p>位置：<code>app/Service/Cross/CrossMt5DealsService.php:105</code>。</p>
+<p>分页后按每条 PositionTicket 查询 CrossMt5Orders，N 条成交增加 N 次查询。</p>
+<p>建议：仅针对当前页批量读取订单。还需核实 Ticket 是否跨 Server 唯一；批量映射必须保留真实业务复合键，不能扩大现有串服务器风险。</p>
+<h3 id="n04pamm-待审列表">N04：PAMM 待审列表</h3>
+<p>位置：<code>app/Service/Pamm/PammService.php:1600</code>。</p>
+<p>每条 OUTALLMONEY 且 check_status=1 的记录分别查 StrategyCopy 和 StrategyOther；符合条件的 K 条记录增加 2K 次查询，同策略信息可能重复查询。</p>
+<p>建议：收集当前页 copy_id、strategy_id 批量取数据，计算仍沿用原金额精度规则。测试缺失持仓、缺失策略、不同状态及相同策略重复出现。</p>
+<h2 id="四不可有效利用普通索引的-sql-形态">四、不可有效利用普通索引的 SQL 形态</h2>
+<p>这里区分“条件本身不能做普通 B-tree 范围定位”与“整条 SQL 完全不用索引”。其他等值条件仍可能有效，最终要看执行计划。SelectDB 需检查分区、Tablet、倒排索引和 Profile，不直接套用 MySQL B-tree 结论。</p>
+<h3 id="s01转账候选人的层级和包含搜索">S01：转账候选人的层级和包含搜索</h3>
+<p>位置：<code>app/Service/Cash/CashService.php:617,651</code>。</p>
+<p><code>FIND_IN_SET(?, path)</code>，并有 nickname/email/loginid 的包含匹配，钱包候选直接 get，没有数据库分页上限。member_root_path 数据字典虽有 path FULLTEXT，但 FIND_IN_SET 不会因此自动使用全文索引。member_id 主键仍可用于连接。</p>
+<p>短期：限制候选返回数量，数字账户优先等值匹配，维持原有转账权限范围。
+长期：使用项目已有层级关系表做 ancestor/descendant 等值连接，先验证自本人、直属、跨级范围语义。
+验证：按大团队会员获取 EXPLAIN、扫描行数、返回行数和耗时；不可仅凭小测试库判断。</p>
+<h3 id="s02ib-关键词列函数和前置通配">S02：IB 关键词列函数和前置通配</h3>
+<p>位置：<code>app/Service/IbAccount/IbAgentReportService.php:771</code>。</p>
+<p><code>CAST(id AS CHAR) LIKE '%关键词%'</code>，以及 <code>LOWER(email/nickname/username) LIKE LOWER(?)</code>。查询已有 relation 层级范围，应保留；非游标路径还做 COUNT(DISTINCT id)。</p>
+<p>建议：数字会员 ID 拆成等值匹配；文本包含搜索评估专用搜索能力，若改为前缀须得到产品语义确认。不能仅去掉 LOWER 就声称解决包含匹配。</p>
+<p>验证：确认实际连接引擎、字符排序规则、权限范围及执行计划；用不同团队规模比较 count 和列表各自耗时。</p>
+<h3 id="s03selectdb-资金历史的广泛关键词过滤">S03：SelectDB 资金历史的广泛关键词过滤</h3>
+<p>位置：<code>app/Service/crm/FundChangesHistoryService.php:145</code>；<code>app/Model/crm/FundDetailSelect.php</code> 指定 selectDB 连接。</p>
+<p>关键词横跨发送方/接收方 email、会员 ID、type_id、昵称并使用 <code>%keyword%</code>；时间条件按参数可选。数字 ID 的模糊匹配和宽 OR 条件可能增加扫描，缺少时间限制时更需关注。</p>
+<p>建议：优先会员/账户等值条件及明确的业务时间范围；字符串包含检索根据 SelectDB 版本、索引类型和真实计划决定是否增加倒排索引。不要在没有目标表 DDL 的情况下直接生成 MySQL 索引 SQL。</p>
+<p>验证：收集 SelectDB SHOW CREATE TABLE、EXPLAIN、慢 SQL Profile，检查扫描行数/字节、分区和 Tablet 裁剪、过滤率及 I/O。数据字典里的 MySQL 表结构不能代替 SelectDB 物理设计。</p>
+<h3 id="s04配置表-csv-字段匹配">S04：配置表 CSV 字段匹配</h3>
+<p>位置：<code>app/Repository/crm/AccountRegisterSettingRepository.php:129</code>、<code>app/Repository/crm/ConfigMemberNameRepository.php:54</code>。</p>
+<p>分别使用 FIND_IN_SET(all_group) 和 FIND_IN_SET(REPLACE(UPPER(country_code)))。普通列索引不能直接完成 CSV 元素定位；前者还有 server_id/status 条件可缩小范围。</p>
+<p>建议：小配置表优先批量读取/合理缓存，大规模时规范化组和国家映射表。缓存必须考虑配置刷新，不能为了避免几十行扫描增加错误配置风险。</p>
+<h2 id="五排除的误报">五、排除的误报</h2>
+<ul>
+<li><code>AffDeviceService::getDeviceAllInfo()</code> 已 with('affDevice')，循环访问这个预加载关系不直接构成 N+1。</li>
+<li><code>MemberLoginLogRepository.php:99</code> 的 DATE_FORMAT 用于 SELECT/GROUP BY，不能直接判定 WHERE 索引失效；需另看时间范围、聚合规模和临时表。</li>
+<li><code>ConfigRepository</code> 的 <code>prefix%</code> 搜索没有前置通配，不能与 <code>%keyword%</code> 等同。</li>
+<li>Collection 的 first/where 是内存操作，不应因出现在 foreach 就判定数据库查询。</li>
+<li>历史注释中的事务和 SQL 未纳入问题数量。</li>
+</ul>
+<h2 id="六测试环境验证与监控取证">六、测试环境验证与监控取证</h2>
+<h3 id="事务与连接">事务与连接</h3>
+<p>在隔离测试库中覆盖 T01—T08 的正常、提前返回、异常和嵌套事务路径，断言入口/出口 transactionLevel 相等。不得在生产执行故障注入。</p>
+<p>MySQL 只读检查（需相应权限）：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="k">SELECT</span><span class="w"> </span><span class="n">trx_mysql_thread_id</span><span class="p">,</span><span class="w"> </span><span class="n">trx_started</span><span class="p">,</span><span class="w"> </span><span class="n">trx_state</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="w">       </span><span class="n">trx_rows_locked</span><span class="p">,</span><span class="w"> </span><span class="n">trx_rows_modified</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="w"></span><span class="k">FROM</span><span class="w"> </span><span class="n">information_schema</span><span class="p">.</span><span class="n">innodb_trx</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="w"></span><span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">trx_started</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="ln"> 6</span><span class="cl"><span class="w"></span><span class="k">SHOW</span><span class="w"> </span><span class="k">GLOBAL</span><span class="w"> </span><span class="n">STATUS</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">Variable_name</span><span class="w"> </span><span class="k">IN</span><span class="w"> </span><span class="p">(</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="w">  </span><span class="s1">&#39;Threads_connected&#39;</span><span class="p">,</span><span class="s1">&#39;Threads_running&#39;</span><span class="p">,</span><span class="s1">&#39;Max_used_connections&#39;</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="w">  </span><span class="s1">&#39;Connection_errors_max_connections&#39;</span><span class="p">,</span><span class="s1">&#39;Aborted_clients&#39;</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 9</span><span class="cl"><span class="w"></span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="w"></span><span class="k">SHOW</span><span class="w"> </span><span class="n">VARIABLES</span><span class="w"> </span><span class="k">LIKE</span><span class="w"> </span><span class="s1">&#39;max_connections&#39;</span><span class="p">;</span><span class="w">
+</span></span></span></code></pre></div><p>结合应用日志中 forgotten commit/rollback、pool wait timeout、远程超时及订单号定位；SQL/日志脱敏后再共享。连接多、Sleep 多不单独证明泄漏。</p>
+<p>按实例与进程观察池活跃/空闲/等待、请求并发和事务耗时。若暂无对应指标，应先补采集，不能使用未确认存在的指标名拼告警。</p>
+<h3 id="sql-与-n1">SQL 与 N+1</h3>
+<ol>
+<li>用测试账号复现设备、品种、成交、PAMM 列表，记录每请求 SQL 次数和总 SQL 时间。</li>
+<li>比较列表大小 1/10/20（品种可用 100），确认是否随 N 线性增加。</li>
+<li>MySQL 使用 EXPLAIN FORMAT=JSON，核对 key、rows、filtered；EXPLAIN ANALYZE 会执行查询，仅在可控环境使用。</li>
+<li>SelectDB 获取同一次慢查询的 Query ID 与完整 Profile，避免用快查询 Profile 解释另一次慢日志。</li>
+<li>核对实际索引与字典差异；记录数据库版本、数据量、参数和时间窗口。</li>
+</ol>
+<h2 id="七执行建议和验收">七、执行建议和验收</h2>
+<p>第一批处理 T01—T04、T06—T08 的事务边界与 C01/C03 连接预算；资金逻辑须单独评审并测试嵌套事务。第二批按调用频率处理 N02/N01/N03/N04。第三批用执行计划确定 S01—S15 的实际优先级，不批量建索引。</p>
+<p>验收要求：事务出口层级一致；无隐式回滚告警；远程失败不重复入金；列表内容及权限一致；分页 total 正确；N+1 查询次数降为有界批量；SQL 优化有同参数前后计划和耗时证据。</p>
+<p>未验证项：线上连接池峰值、实际表索引、目标 SelectDB DDL、线上调用频率、异常路径复现和 HTTP 端到端回归。本报告已记录代码证据，不作为已修复或可直接上线的结论。</p>
+<h2 id="八n1-扩展复核清单2026-10-13-补充">八、N+1 扩展复核清单（2026-10-13 补充）</h2>
+<p>前文 N01—N04 是首批典型问题，不是全项目总数。本节将直接循环查询和追踪到数据库的间接调用扩展列出。N 表示循环元素数，K 表示满足条件的元素数，S 表示去重后的服务器数；次数只计算明确看到的额外读取，不包含必要写入、缓存、远程调用和公共鉴权。</p>
+<p>“已确认”指代码存在随循环重复读取的路径，不等于已在生产执行、也不等于所有逐条读取都能安全删除。定时任务注解关闭的条目单独标注；其余任务也需核实运行环境是否启用。</p>
+<h3 id="81-新增已复核的直接或间接逐条查询">8.1 新增已复核的直接或间接逐条查询</h3>
+<table>
+  <thead>
+      <tr>
+          <th>编号</th>
+          <th>位置（相对项目根目录）</th>
+          <th>触发及读取证据</th>
+          <th>放大规模</th>
+          <th>优化方向及保留语义</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>N05</td>
+          <td>app/Service/V3/StrategyFollowService.php:373</td>
+          <td>策略列表逐策略 sum(show_equity)，过滤 strategy_id/status</td>
+          <td>N 次聚合</td>
+          <td>当前页策略 ID 批量 groupBy，保留 status=1 与金额精度</td>
+      </tr>
+      <tr>
+          <td>N06</td>
+          <td>app/Model/crm/MemberRootPathSelect.php:536</td>
+          <td>agentIds 已去重且 path 已批量读取，但逐代理 count 下级</td>
+          <td>K 次 count</td>
+          <td>用祖先关系聚合；保持 level 对应深度和状态条件；大团队优先验证</td>
+      </tr>
+      <tr>
+          <td>N07</td>
+          <td>app/Service/IbAccount/IbService.php:2859</td>
+          <td>佣金规则循环逐 rule_id 查 SaleSetting</td>
+          <td>K 次</td>
+          <td>规则 ID 批量取；或只在需要错误标题时读取</td>
+      </tr>
+      <tr>
+          <td>N08</td>
+          <td>app/Service/IbAccount/IbService.php:3120</td>
+          <td>比例设置循环逐规则读取 SaleSetting</td>
+          <td>K 次</td>
+          <td>同 N07；不改变佣金上下限和历史降佣校验</td>
+      </tr>
+      <tr>
+          <td>N09</td>
+          <td>app/Service/IbAccount/IbService.php:5161</td>
+          <td>unSignIbEmail 每个 chunk 内逐会员查询 TMember</td>
+          <td>N 次/批</td>
+          <td>当前批会员信息批量取，保持邮件接收人和发送去重</td>
+      </tr>
+      <tr>
+          <td>N10</td>
+          <td>app/Service/IbAccount/IbService.php:5194</td>
+          <td>逐父级查会员，随后逐父级查未配佣下级列表（5198）</td>
+          <td>约 2N 次</td>
+          <td>批量取父级及其下级再分组；保留权限与邮件内容，不扩大收件范围</td>
+      </tr>
+      <tr>
+          <td>N11</td>
+          <td>app/Service/crm/KycService.php:1582</td>
+          <td>逐 form 查询已通过设置，不存在时查用户内容，再条件查表单</td>
+          <td>N 至约 3N 次</td>
+          <td>以会员/表单集合批量取；保留历史用户兼容和通过状态</td>
+      </tr>
+      <tr>
+          <td>N12</td>
+          <td>app/Service/crm/KycService.php:1623</td>
+          <td>第二个表单循环逐 form 查会员认证内容</td>
+          <td>N 次</td>
+          <td>按 form_id 和当前 kyc_config_id/成功状态建立映射</td>
+      </tr>
+      <tr>
+          <td>N13</td>
+          <td>app/Service/crm/KycService.php:1616 → 1838</td>
+          <td>循环调用 buildKycFormDetail，内部查子类型，再查表单详情</td>
+          <td>N 至约 2N 次（各表单内部子类型已批量）</td>
+          <td>批量取类型和详情；按表单分组，保持展示排序和 auto 规则</td>
+      </tr>
+      <tr>
+          <td>N14</td>
+          <td>app/Service/crm/KycService.php:1943</td>
+          <td>生成快照时逐 form_type 查最新成功内容</td>
+          <td>N 次</td>
+          <td>先去重类型，再批量获取各类型最新 kyc_id；不得选错历史认证版本</td>
+      </tr>
+      <tr>
+          <td>N15</td>
+          <td>app/Service/Exchange/ExchangeService.php:866</td>
+          <td>账户循环内读取 MtServer、CrossMtUsers，部分分支另读 MemberExchangeMtlogin（881）；外部账户分支也读 CrossMtUsers（911）</td>
+          <td>本地分支最多约 3K 次读取，另有条件远程调用</td>
+          <td>服务器批量映射、账户复合键批查；远程调用单独限并发/超时</td>
+      </tr>
+      <tr>
+          <td>N16</td>
+          <td>app/Service/Pamm/PammService.php:2491</td>
+          <td>逐列表项查 MtServer；运行中策略还调用 getMtServerinfo/远程接口</td>
+          <td>至少 N 次直接 SQL</td>
+          <td>server_id 去重预取；实时净值不能随意替换为过期缓存</td>
+      </tr>
+      <tr>
+          <td>N17</td>
+          <td>app/Service/Mtnew/CopyCalculateService.php:63</td>
+          <td>每个策略并发闭包查询 StrategyOther</td>
+          <td>N 次/批</td>
+          <td>进入并发前批量加载；并发只能缩短等待，不减少 SQL</td>
+      </tr>
+      <tr>
+          <td>N18</td>
+          <td>app/Service/Mtnew/CopyCalculateService.php:584</td>
+          <td>每个结算聚合结果重新查询 Strategy，同策略不同周期可重复</td>
+          <td>N 次</td>
+          <td>strategy_id 去重预取；保留后续结算动作逐笔幂等</td>
+      </tr>
+      <tr>
+          <td>N19</td>
+          <td>app/Service/Mtnew/StrategyCalculateService.php:97</td>
+          <td>chunk 中每个策略查询 StrategyOther</td>
+          <td>N 次/批</td>
+          <td>批次预加载；对需要最新状态的字段另行受控复核</td>
+      </tr>
+      <tr>
+          <td>N20</td>
+          <td>app/Service/Mtnew/StrategyCalculateService.php:349</td>
+          <td>另一计算入口逐策略查询 StrategyOther</td>
+          <td>N 次/批</td>
+          <td>同 N19，两个入口均需覆盖测试</td>
+      </tr>
+      <tr>
+          <td>N21</td>
+          <td>app/Task/Follow/ProfitDataTask.php:155</td>
+          <td>分批并发任务逐策略查询 StrategyOther</td>
+          <td>N 次/批</td>
+          <td>预加载附表；回撤计算是独立工作量，不计作同一条可消除 SQL</td>
+      </tr>
+      <tr>
+          <td>N22</td>
+          <td>app/Task/Risk/HandleRiskMoveGroupTask.php:129</td>
+          <td>自动移组遍历会员账户，逐 batch/login/server 查询 exists</td>
+          <td>N 次</td>
+          <td>预取本批已处理复合键；仍需数据库幂等约束，不能仅靠内存去重</td>
+      </tr>
+      <tr>
+          <td>N23</td>
+          <td>app/Task/CommissionLogsProcessTask.php:66</td>
+          <td>聚合结果循环逐项查返佣配置，键为伙伴/客户/账户</td>
+          <td>N 次</td>
+          <td>当前批复合键批量获取；按真实键匹配，不只按 loginid</td>
+      </tr>
+      <tr>
+          <td>N24</td>
+          <td>app/Task/StrategyTradeTask/PammSettleTask.php:86</td>
+          <td>每个有 copies 的策略查询 MemberExchangeMtlogin</td>
+          <td>K 次</td>
+          <td>当前批账户预取，核实服务器维度；结算安全校验保留</td>
+      </tr>
+      <tr>
+          <td>N25</td>
+          <td>app/Task/Follow/PammSelfCheckWarnTask.php:102</td>
+          <td>未命中告警缓存的成交逐个查询 MemberForwordLog</td>
+          <td>K 次</td>
+          <td>当前批提取转账 ID 后批查，保持告警去重与状态实时性</td>
+      </tr>
+      <tr>
+          <td>N26</td>
+          <td>app/Service/IbAccount/IbService.php:5292 → app/Service/crm/ConfigServerService.php:43</td>
+          <td>openMtserverlist 每服务器调用 getConfigValue；先查服务器配置，缺失再查公共配置，缓存注解关闭</td>
+          <td>N 至 2N 次</td>
+          <td>服务器配置批查、公共 fallback 一次取，保留优先级</td>
+      </tr>
+  </tbody>
+</table>
+<p>与 N01—N04 合计，本节原有明细记录 <strong>26 个逐条读取位置/调用路径</strong>；本次增加 N27—N45，合计 <strong>45 个</strong>。同一接口可能包含多个位置，包含冷缓存、条件分支与手工任务，不代表 45 个独立慢接口。</p>
+<h3 id="82-同样存在重复读取但不能机械删除">8.2 同样存在重复读取，但不能机械删除</h3>
+<table>
+  <thead>
+      <tr>
+          <th>编号</th>
+          <th>位置</th>
+          <th>判断</th>
+          <th>建议</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>B01</td>
+          <td>app/Task/WithdrawPayoutReconcileTask.php:49</td>
+          <td>pluck 后逐单重查状态；N 次，但可能是处理前防止状态变化的必要复核</td>
+          <td>批次限量，保留处理前幂等/原子状态检查；不能仅用启动时快照替换</td>
+      </tr>
+      <tr>
+          <td>B02</td>
+          <td>app/Task/FixRebateMemberTask.php:29,36</td>
+          <td>每条返佣账户 count 后条件 first；最多 2N；Crontab 注解已注释</td>
+          <td>历史修复入口按需优化，核实是否另有手工调用</td>
+      </tr>
+      <tr>
+          <td>B03</td>
+          <td>app/Task/FixPammTask.php:31</td>
+          <td>每策略查询账户；Crontab 注解已注释</td>
+          <td>同上，不算已启用线上热点</td>
+      </tr>
+      <tr>
+          <td>B04</td>
+          <td>app/Service/member/TMemberService.php:1207</td>
+          <td>邮箱同步已按 mtserver 分组；数据库读取按 S 增长</td>
+          <td>可批量查服务器，但逐账户远程更新是业务操作，不算 SQL N+1</td>
+      </tr>
+      <tr>
+          <td>B05</td>
+          <td>app/Service/crm/FundChangesHistoryService.php:848</td>
+          <td>已按服务器聚合 Ticket，逐服务器查配置和批量远程取订单</td>
+          <td>O(S) 而非逐成交 O(N)，优先级较低</td>
+      </tr>
+      <tr>
+          <td>B06</td>
+          <td>app/Model/SaleCommission.php:825</td>
+          <td>同样按服务器分组查询与远程批查</td>
+          <td>可复用服务器映射，不能报成每订单查库</td>
+      </tr>
+      <tr>
+          <td>B07</td>
+          <td>app/Task/MtTask/MtLoginArchiveTask.php:48</td>
+          <td>有 serverInstances 缓存；首次并发未命中可能重复读取</td>
+          <td>批次预加载可避免并发首次未命中，非稳定每条查询</td>
+      </tr>
+      <tr>
+          <td>B08</td>
+          <td>app/Service/Risk/CrmCredentialStuffingService.php:182</td>
+          <td>按风控目标循环取记录</td>
+          <td>目标集合受业务约束，先测次数与锁/更新语义，低于无界列表优先级</td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="83-已排除或不能算作-n1-的命中">8.3 已排除或不能算作 N+1 的命中</h3>
+<ul>
+<li>IbService.php:2991：查询后立即 throw，中断整个调用，不能在一次请求中累计 N 次；与 2859、3120 的位置不同。</li>
+<li>StrategyStatCopyTask.php:40：已 with(copies,stat)，copies-&gt;count/sum 是集合操作。</li>
+<li>StrategyCopy.php:580、StrategySettleList.php:1105：循环构造 SELECT 表达式，SQL 在循环结束后执行一次。</li>
+<li>MemberRootPathSelect.php 中收集 memberIds 后 whereIn 批量读取，不能因靠近 foreach 就报 N+1。</li>
+<li>RiskMetricConfigService 的 configs-&gt;first、symbolGroups-&gt;get 为集合读取。</li>
+<li>SystemDownloadJob 中逐行写 CSV、遍历 heading 不构成数据库查询。分页导出本身的每页读取属于批量读取；被调导出方法仍需单独看调用链。</li>
+<li>抽查 MtServer 的 time_offset_second 访问器和 IbLoyalPlanConfigItem 的 plan_config_item_id：只读取内存字段，不计入隐式 SQL。</li>
+</ul>
+<h3 id="84-尚需追踪的候选不计入-45-个确认位置">8.4 尚需追踪的候选（不计入 45 个确认位置）</h3>
+<table>
+  <thead>
+      <tr>
+          <th>位置</th>
+          <th>尚未确认之处</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>app/Service/Mtnew/StrategyCalculateService.php:801</td>
+          <td>MemberHourCountTotal 读取的上层调用频率及是否按跟单账户重复触发</td>
+      </tr>
+      <tr>
+          <td>app/Service/Follow/FollowDataService.php:152,2525</td>
+          <td>first 周边循环是否构造条件或发生间接重复调用</td>
+      </tr>
+      <tr>
+          <td>app/Task/Follow/StrategyCheck.php:70,110</td>
+          <td>重读申请状态是否承担锁内最新状态校验，不能直接批量替代</td>
+      </tr>
+      <tr>
+          <td>各 Model 的关联属性与 appends</td>
+          <td>需要逐入口确认是否 with/load；仅见关系定义不能认定懒加载 N+1</td>
+      </tr>
+      <tr>
+          <td>map/each/transform、导出回调和 Job 内 Service 调用</td>
+          <td>需要结合 SQL 监听补齐动态分派和更深调用链，当前正则不保证覆盖</td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="85-后续修复验收与优先级">8.5 后续修复验收与优先级</h3>
+<ol>
+<li>优先高频读接口：N02 品种收藏、N05 策略聚合、N11—N14 KYC、N01 设备列表。先测请求频率及 SQL 时间，决定排序。</li>
+<li>然后批任务：N17—N25，分别量化每批读取、写入及远程调用。不要用提高并发代替批量查询。</li>
+<li>所有改动以复合键保持数据归属，限制在当前页或当前批次，防止一次取全库；有币种、服务器和状态维度时必须保留。</li>
+<li>通过 QueryExecuted 等 SQL 监听统计同请求/同 Job 的 SQL 指纹和次数，脱敏绑定值；验证规模增大时“可批量读取”次数不再线性增加。</li>
+<li>必要锁内查询、逐单幂等检查和远程状态复核单独保留；避免为减少次数破坏资金一致性。</li>
+</ol>
+<p>本次扩展是静态问题台账，仍不声明全项目所有动态路径已穷尽。确认条目、需保留语义的重复读取、未确认候选和误报已分别列明，避免用关键词命中数量冒充 Bug 数量。</p>
+<h2 id="九本次新增-n1-复核清单2026-10-14">九、本次新增 N+1 复核清单（2026-10-14）</h2>
+<p>N/K 沿用前文定义，D 为请求天数，M 为会员数，G 为分组数。下列都是明确追踪到读取的路径，但缓存命中、状态分支和运行入口会影响实际次数。默认按 P2 治理，手工/低频任务按 P3；先用调用量和数据库时间排序。</p>
+<table>
+  <thead>
+      <tr>
+          <th>编号</th>
+          <th>位置与入口</th>
+          <th>读取及放大条件</th>
+          <th>优化与验收重点</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>N27</td>
+          <td>app/Service/crm/SaleSettingService.php:37，commissionMySetting</td>
+          <td>每项配置按 CLIENT_ID 查 SaleSetting 标题，N 次</td>
+          <td>当前配置 ID 批取，保留状态条件和不存在时表现</td>
+      </tr>
+      <tr>
+          <td>N28</td>
+          <td>app/Service/Exchange/ExchangeService.php:1192，exchangeExtAccount</td>
+          <td>每账户查跟单申请（1201，经 FollowApplyRepository::findPendingOrApproved 的 first），再条件读 CrossMtUsers（1223），最多约 2N</td>
+          <td>按 login/exchange/status 及服务器复合键批查；本地账号校验中的服务器名称有 60 秒缓存，不算额外无条件 SQL</td>
+      </tr>
+      <tr>
+          <td>N29</td>
+          <td>app/Service/Exchange/ExchangeService.php:1632，followExchangeExtAccount</td>
+          <td>条件读取 CrossMtUsers（1649），K 次</td>
+          <td>当前账户集合批查；保留账号类型/状态限制</td>
+      </tr>
+      <tr>
+          <td>N30</td>
+          <td>app/Service/Exchange/ExchangeService.php:1938，exchangeOptMyAccountBalance</td>
+          <td>缺少 open_account_type 时逐账户查 AccountRegisterSetting（1977），K 次</td>
+          <td>配置按服务器/组预取；已有按服务器读取 MT 数据不误算成逐账户读取</td>
+      </tr>
+      <tr>
+          <td>N31</td>
+          <td>app/Service/Follow/Follow1Service.php:1302，myPubList</td>
+          <td>每项 MtServer::findByFilter（1327），另有远程请求</td>
+          <td>批量加载所需服务器完整字段，分开统计 SQL 与远程等待</td>
+      </tr>
+      <tr>
+          <td>N32</td>
+          <td>app/Service/Pamm/PammService.php:1088 → app/Model/Follow/MemberHourCount.php:2501</td>
+          <td>逐日查询首尾值，冷缓存约 2D；缓存值为 0 被真假判断当成未命中</td>
+          <td>区分未命中与 0；限制跨度；同账户按范围批查/聚合，保持时区及原公式</td>
+      </tr>
+      <tr>
+          <td>N33</td>
+          <td>app/Service/Follow/Follow2Service.php:1893 → MemberHourCountTotal::getEarningRate</td>
+          <td>每条跟单读取收益率，60 秒缓存未命中时 N 次</td>
+          <td>冷/热缓存分别测，按账户复合键批取；利润部分已批量读取</td>
+      </tr>
+      <tr>
+          <td>N34</td>
+          <td>app/Service/Follow/FollowDataService.php:2467</td>
+          <td>同 N33 的另一列表入口</td>
+          <td>两个入口都回归，不能只改其中一个；已批量的利润不重复列问题</td>
+      </tr>
+      <tr>
+          <td>N35</td>
+          <td>app/Task/StrategyStatusTask.php:159</td>
+          <td>每策略 sum 净值，K 次聚合；关联已预加载</td>
+          <td>当前批策略分组聚合，保留状态切换时的最新数据要求；核实任务启用情况</td>
+      </tr>
+      <tr>
+          <td>N36</td>
+          <td>app/Task/TradeHistoryTask/PammOrderHistoryTask.php:85</td>
+          <td>每订单按策略读 copies，最多随本批 1000 订单增长</td>
+          <td>批次按策略复用读取；保持订单时点、份额和状态一致性</td>
+      </tr>
+      <tr>
+          <td>N37</td>
+          <td>app/Task/SyncCalendarDataTask.php:95</td>
+          <td>每日历事件按日期/标题 first 后写入，N 次读</td>
+          <td>预取本批键；批量 upsert 前确认唯一键、语言维度及模型事件</td>
+      </tr>
+      <tr>
+          <td>N38</td>
+          <td>app/Service/crm/GroupsService.php:77</td>
+          <td>每组 updateOrCreate 内部 firstOrNew 隐含一次读取；方法有 1800 秒缓存</td>
+          <td>缓存失效后仍有 N 次读取；server/group 唯一约束和事件确认后再批量写</td>
+      </tr>
+      <tr>
+          <td>N39</td>
+          <td>app/Service/IbAccount/IbService.php:3908</td>
+          <td>每会员×每分组 exists（3913），最多 M×G</td>
+          <td>批取候选申请并匹配；CSV 分组语义与权限不能用简单子串判断替代</td>
+      </tr>
+      <tr>
+          <td>N40</td>
+          <td>app/Task/Risk/HandleRiskMoveGroupTask.php:94</td>
+          <td>缺失会员映射时查 MtServer（95）和 MemberMtlogin（108），最多约 2K；另有远程查询</td>
+          <td>本批 200 项预加载映射；与 N22 的已处理记录 exists 是不同位置</td>
+      </tr>
+      <tr>
+          <td>N41</td>
+          <td>app/Service/member/TMemberService.php:6100 → 6112</td>
+          <td>每禁用证件会员查账户，再按服务器查配置和 MT 用户，约 M+2ΣS，可能提前退出</td>
+          <td>批次复用服务器和账户；禁用检查关系到权限，保留最新状态复核</td>
+      </tr>
+      <tr>
+          <td>N42</td>
+          <td>app/Http/Api/Listeners/IbNupipsEventListener.php:78 → 84</td>
+          <td>按选中祖先调用 upload，每次 88—101 行查下级，K 次且范围可能重叠</td>
+          <td>合并可复用读取，但保留各祖先独立上传语义；电话读取已批量</td>
+      </tr>
+      <tr>
+          <td>N43</td>
+          <td>app/Command/PatchFollowMttype.php:45</td>
+          <td>手工修复：每信号查 CrossFollowConfig，再逐 copy 查 MemberExchangeMtlogin</td>
+          <td>chunk 50 内按复合键预取，N+K；不作为已启用高频接口</td>
+      </tr>
+      <tr>
+          <td>N44</td>
+          <td>app/Command/CheckPammShareCommand.php:39</td>
+          <td>手工核对：每策略读附加信息、sum 份额、条件读 copies，约 2N+K</td>
+          <td>chunk 50 内批取与分组聚合，保留精度；先测是否值得改</td>
+      </tr>
+      <tr>
+          <td>N45</td>
+          <td>app/Command/PatchGtcDataCommand.php:42</td>
+          <td>手工修复：每 copy 查 SelectDB fund_detail 的 memo，N 次</td>
+          <td>批量关联业务键并限制范围；禁止为了测试直接运行资金修复命令</td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="n32-的重点说明">N32 的重点说明</h3>
+<p><code>app/Http/Api/Controller/V1/PammController.php:376</code> 的 day_max_drawdown 校验开始/结束时间的合法范围和先后顺序，但没有限制两者最大跨度。Service 默认 7 天不代表调用方只能查 7 天。若历史结果为 0，<code>if ($cachedata = cache($key))</code> 会反复查询，热缓存也无法避免这些日期的 SQL。</p>
+<p>验收覆盖 7/30/90 天、零值、非零值、无数据、跨时区日界和当前未结束日期；记录冷/热缓存 SQL 次数。不要在性能修改中顺带改变“回撤”的现有金额计算公式；业务口径如需修订另行确认。</p>
+<h2 id="十本次新增-sql-与索引风险">十、本次新增 SQL 与索引风险</h2>
+<p>以下是代码形态和仓库字典证据，尚无生产 EXPLAIN/Profile。P2 为默认级别；S05 同时有跨服务器正确性风险，应优先核实。数据库字典并非线上索引快照。</p>
+<table>
+  <thead>
+      <tr>
+          <th>编号</th>
+          <th>来源与证据</th>
+          <th>短期处理</th>
+          <th>长期方向与验证</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>S05</td>
+          <td>app/Service/Cross/CrossMt5DealsService.php:108 仅按 Ticket 查 CrossMt5Orders；字典主键为 (Server,Ticket)，未见 Ticket 前导索引</td>
+          <td>查清成交所属 Server，按真实 Server+Ticket 批量取；不能只加 Ticket 索引掩盖跨服问题</td>
+          <td>核对实际 SHOW INDEX 和重复 Ticket；对比结果归属及扫描行数，与 N03 合并修复</td>
+      </tr>
+      <tr>
+          <td>S06</td>
+          <td>app/Service/crm/PayService.php:1611,1698 按 member_id/status 做 exists/count；t_pay_result 的 idx_member_status 实际只有 status</td>
+          <td>候选索引 (member_id,status)，先查实际 DDL、选择性和计划</td>
+          <td>首次入金统计需要 count 的语义不能随意改 exists；评估索引写放大</td>
+      </tr>
+      <tr>
+          <td>S07</td>
+          <td>app/Service/IbAccount/IbService.php:3913，member/status 加分组包含匹配；字典 t_member_group_apply 仅 PK</td>
+          <td>测试 (member_id,status) 缩小候选集，结合 N39 批取</td>
+          <td>CSV 包含仍未解决，规范化会员申请与分组关系；回归授权边界</td>
+      </tr>
+      <tr>
+          <td>S08</td>
+          <td>app/Service/IbAccount/OpenGroupListService.php:198，MySQL 会员 LOWER/CAST 加包含匹配</td>
+          <td>保留已有祖先权限条件、页大小上限 100、可选总数及总数缓存；数字 ID 可按产品语义做精确查找</td>
+          <td>深分页/count 分别测，专用搜索需满足中文/大小写语义；不能误报该接口为完全无分页</td>
+      </tr>
+      <tr>
+          <td>S09</td>
+          <td>app/Service/Exchange/ExchangeService.php:2380，exchangeOptAccountAgent 的 SelectDB 关键词分支</td>
+          <td>邮箱 LOWER 等值、其他字段 LIKE 的分支分别取计划；保留祖先范围与精确 MT 条件</td>
+          <td>按 SelectDB 版本评估规范化检索列/倒排索引，不能套 MySQL collation 索引方案</td>
+      </tr>
+      <tr>
+          <td>S10</td>
+          <td>app/Service/crm/MemberMtloginService.php:1458、app/Service/Exchange/ExchangeService.php:3031，FIND_IN_SET 配置组 JOIN</td>
+          <td>核对 account_register_setting 大小、server/status 过滤及 JOIN 放大；前者还需验证服务器关联语义</td>
+          <td>规范化服务器/组映射；循环拼 UNION 最后执行一次不属于 SQL N+1</td>
+      </tr>
+      <tr>
+          <td>S11</td>
+          <td>app/Model/Follow/MemberHourCount.php:2501，SelectDB login + (server_id OR exchange_name) + dateh 范围，首尾两次排序取值</td>
+          <td>修复 N32 零值缓存及跨度；同账户批查时间范围，保持并列时的选择规则</td>
+          <td>用目标 SelectDB DDL/Profile 判断裁剪与扫描；MySQL 字典索引不能证明此处已优化</td>
+      </tr>
+      <tr>
+          <td>S12</td>
+          <td>app/Model/BaseModel.php:33，公共分页 countGrouped、offset</td>
+          <td>基类内没有统一 pageSize 上限，需逐入口确认；复杂查询 count 与列表分别计时</td>
+          <td>可选 total、缓存或游标需保持 API 契约；不是所有调用都无界，也不能全局硬改分页</td>
+      </tr>
+      <tr>
+          <td>S13</td>
+          <td>app/Task/TradeHistoryTask/PammOrderHistoryTask.php:42，limit 1000 但 ticket 游标条件被注释，依赖历史范围及反连接排除已处理数据</td>
+          <td>查看每批扫描/返回比、反连接计划和任务滞后，limit 不等于只扫描 1000 行</td>
+          <td>若引入游标，保留 ticket/strategy 组合及迟到、回补数据处理，不能只按 ticket 跳过历史</td>
+      </tr>
+      <tr>
+          <td>S14</td>
+          <td>app/Command/PatchGtcDataCommand.php:45，SelectDB 按 memo 查资金明细，没有明确日期/会员范围</td>
+          <td>手工入口先限定待修复集合，记录读写数量；不可在生产试跑验证</td>
+          <td>用可靠业务键关联替代大范围文本匹配，保持原资金归属；与 N45 合并治理</td>
+      </tr>
+      <tr>
+          <td>S15</td>
+          <td>app/Http/Api/Listeners/SyncSingleOnlyListener.php:87，账户历史上 CONCAT 表达式不等比较</td>
+          <td>已有 login/exchange 范围，不是全表无条件扫；量化单大账户历史扫描量</td>
+          <td>分批校验并记录进度；该流程涉及删除异常记录，性能修改必须先证明一致性判断不变</td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="字典与线上结构核验清单">字典与线上结构核验清单</h3>
+<table>
+  <thead>
+      <tr>
+          <th>表/对象</th>
+          <th>仓库已知信息</th>
+          <th>上线方案前补齐</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>t_cross_mt5_orders</td>
+          <td>主键 (Server,Ticket)</td>
+          <td>生产索引、Server/Ticket 真实唯一性、实际 SQL</td>
+      </tr>
+      <tr>
+          <td>t_pay_result</td>
+          <td>idx_member_status 只有 status；order_id 唯一</td>
+          <td>(member_id,status) 计划收益、已有隐式/新增索引</td>
+      </tr>
+      <tr>
+          <td>t_member_group_apply / t_account_register_setting</td>
+          <td>字典只有主键</td>
+          <td>行数、真实索引、CSV 规模、复合键业务约束</td>
+      </tr>
+      <tr>
+          <td>t_member_login_log</td>
+          <td>已有 (member_id,device_id,login_status)</td>
+          <td>是否一致部署、按 id 最新读取的实际代价</td>
+      </tr>
+      <tr>
+          <td>t_member / t_member_root_path</td>
+          <td>email 普通索引，部分文本 FULLTEXT</td>
+          <td>LIKE/FIND_IN_SET 不会自动转换全文检索；核对字符集与条件</td>
+      </tr>
+      <tr>
+          <td>t_member_hour_count / fund_detail 的 SelectDB 版本</td>
+          <td>查询模型/代码使用 selectDB</td>
+          <td>必须取 SelectDB SHOW CREATE TABLE、分区、分桶、索引和 Profile</td>
+      </tr>
+      <tr>
+          <td>dim_member_tree_relation</td>
+          <td>本次未在数据字典找到定义</td>
+          <td>实际引擎、结构、关系深度和权限口径</td>
+      </tr>
+  </tbody>
+</table>
+<p>不提供可直接在线执行的批量建索引 SQL：现阶段没有生产 DDL 和执行计划，重复索引、低选择性索引或错误引擎语法都可能造成额外负担。</p>
+<h2 id="十一扫描覆盖事务台账与排除项">十一、扫描覆盖、事务台账与排除项</h2>
+<h3 id="111-范围与方法">11.1 范围与方法</h3>
+<p>本轮全局检索范围：app 1548、common 3、packages 399、plugin 97 个 PHP 文件，共 2047 个；同时检索 config 46、tests 255 个 PHP 文件，按命中读取关联代码。数量是文件覆盖范围，<strong>不代表逐文件完整人工审计</strong>。另外核对 docs/数据字典.sql、相关 scripts、Hyperf 连接回收与 ORM 实现。</p>
+<p>循环启发式检索产生 338 个候选片段，资源类关键词命中 106 行。这些包含集合操作、注释、死代码和语法边界误匹配，不能当作问题数量。复核追踪 Controller/Task/Command → Service → Repository/Model，检查连接名、缓存、条件和关联预加载；动态分派、运行配置和深层回调仍需 SQL 监听补足。</p>
+<h3 id="112-当前-app-中-16-处非注释手动事务入口">11.2 当前 app 中 16 处非注释手动事务入口</h3>
+<table>
+  <thead>
+      <tr>
+          <th>位置</th>
+          <th>静态结论</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>app/Repository/member/TMemberRepository.php:506</td>
+          <td>T05，Exception 覆盖不足</td>
+      </tr>
+      <tr>
+          <td>app/Repository/crm/SystemMoneyLogRepository.php:79</td>
+          <td>T03，无统一异常兜底</td>
+      </tr>
+      <tr>
+          <td>app/Common/Lib/Transfer/Transfer.php:127</td>
+          <td>T02，异常回滚缺口及远程等待</td>
+      </tr>
+      <tr>
+          <td>app/Common/Lib/Transfer/Transfer.php:866</td>
+          <td>已有 Throwable 回滚；仍需测试嵌套资金调用层级</td>
+      </tr>
+      <tr>
+          <td>app/Common/Lib/Transfer/Transfer.php:956</td>
+          <td>T08，失败分支重复回滚</td>
+      </tr>
+      <tr>
+          <td>app/Common/Lib/Transfer/Transfer.php:1038</td>
+          <td>已有 Throwable 回滚；不列成独立泄漏问题</td>
+      </tr>
+      <tr>
+          <td>app/Common/Lib/Transfer/Transfer.php:1092</td>
+          <td>T01，提前返回/非正金额缺口</td>
+      </tr>
+      <tr>
+          <td>app/Http/Api/Controller/Inner/DownloadCenterController.php:198</td>
+          <td>提交后 pushQueue 失败再进入 rollback，不能撤销已提交的任务状态；需投递补偿，不是已证实泄漏</td>
+      </tr>
+      <tr>
+          <td>app/Task/StrategySettleFeeDoneTask.php:53</td>
+          <td>已有 Throwable 回滚；资金结果需动态测试</td>
+      </tr>
+      <tr>
+          <td>app/Task/StrategySettleFeeDoneNewTask.php:60</td>
+          <td>已有 Throwable 回滚，Crontab 注解关闭，不认定当前生产热点</td>
+      </tr>
+      <tr>
+          <td>app/Model/Trade/MtServer.php:255</td>
+          <td>T04，事务写入不在 try 内及重复回滚</td>
+      </tr>
+      <tr>
+          <td>app/Command/RepairGtcWalletTransferCommand.php:173</td>
+          <td>已有异常处理；手工修复入口，本次未执行</td>
+      </tr>
+      <tr>
+          <td>app/Service/Trade/WithdrawRefundService.php:629</td>
+          <td>余额变更先于该事务，需结合退款操作幂等/补偿核验资金与状态；不直接认定整个退款无保护</td>
+      </tr>
+      <tr>
+          <td>app/Service/crm/MemberKeChatAuthService.php:556</td>
+          <td>有 Throwable 回滚，文件上传在事务前</td>
+      </tr>
+      <tr>
+          <td>app/Service/crm/PayService.php:1610</td>
+          <td>T07，提交前后失败混合处理</td>
+      </tr>
+      <tr>
+          <td>app/Service/crm/PayService.php:2638</td>
+          <td>T06，缺少完整异常闭合</td>
+      </tr>
+  </tbody>
+</table>
+<p>事务闭包、隐式 ORM 事务和跨连接一致性不是上述 16 处统计的全部范围。抽查 <code>app/Model/member/TMemberSelect.php:953</code> 的 setBalance：模型使用 selectDB，而 Db::transaction 使用默认连接，闭包无法自动保证两种连接的原子性；本次未找到直接调用者，暂列低优先级候选，先确认可达性，不能作为当前线上资金事故结论。</p>
+<h3 id="113-额外排除或降级的命中">11.3 额外排除或降级的命中</h3>
+<ul>
+<li>OAuth2TradingMarketDataService 的品种元数据按缺失集合批查；SymbolService 分类、ArticleService 翻译、AppRepository 版本/翻译已有批量加载。</li>
+<li>Follow1 的 shareAndinviteSum 已批量读取配置；Follow2/FollowData 的利润已批量，但收益率的冷缓存查询仍见 N33/N34。</li>
+<li>StrategyStatusTask 已预加载关系，问题在循环 sum，不在已加载的关联属性。</li>
+<li>MtServerService 的旧循环位于无条件 return 之后，不计运行中 N+1；WorkOrderService 指定单 ID 分支不计列表逐项查询。</li>
+<li>IbService 查询后立即 throw 的分支（2734、2991）最多执行一次，区别于 N07/N08。</li>
+<li>updateOrCreate 有隐含读，但逐笔资金锁、幂等状态复查不能简单换成批量写；缓存注解也要看有效期和是否走代理。</li>
+<li>CurrencyRateRepository 的全量汇率有短期缓存，循环换算不等于稳定每次查库；MemberLoginSessionService 逐会话复查涉及状态竞争，不能直接删掉。</li>
+<li>SystemDownloadV2Job 及部分文件上传流有 finally；PHP 资源/对象析构也会清理，未显式 close 不能单独证明永久泄漏。</li>
+<li>部分旧历史修复任务的 Crontab 已注释，或仅手工 Command 可达；不以文件存在推断生产正在执行。</li>
+</ul>
+<h2 id="十二落地验证与交付分组">十二、落地验证与交付分组</h2>
+<table>
+  <thead>
+      <tr>
+          <th>批次</th>
+          <th>主要条目</th>
+          <th>必须取得的证据</th>
+          <th>通过条件</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>1：资金边界</td>
+          <td>T01—T08，尤其新增 T06/T07/T08</td>
+          <td>隔离测试下各异常点、嵌套层级、余额/流水/订单结果</td>
+          <td>所有出口恢复入口层级；重复请求不重复变更余额；提交后异常有明确补偿</td>
+      </tr>
+      <tr>
+          <td>2：连接占用</td>
+          <td>C01—C05</td>
+          <td>实际进程/连接配置、池等待、远程耗时、FD/RSS 趋势</td>
+          <td>预算在数据库能力内；外部等待有上界；连续失败后资源回落</td>
+      </tr>
+      <tr>
+          <td>3：高频列表</td>
+          <td>N01—N16、N27—N34、N39；S05</td>
+          <td>同参数请求 SQL 指纹/次数、冷热缓存、1/10/20 项结果对照</td>
+          <td>可批取读取不随行数增长；权限、服务器键、分页、精度不变</td>
+      </tr>
+      <tr>
+          <td>4：批任务</td>
+          <td>N17—N26、N35—N45；S13—S15</td>
+          <td>每批数量、读取/写入/远程耗时、运行频率、积压量</td>
+          <td>单批有界、幂等可重入，迟到数据不丢，核对结果与原处理一致</td>
+      </tr>
+      <tr>
+          <td>5：执行计划</td>
+          <td>S01—S15</td>
+          <td>MySQL EXPLAIN/慢日志；SelectDB 同次 Query ID/Profile/DDL</td>
+          <td>同规模扫描量/数据库时间改善，结果一致，写入成本可接受</td>
+      </tr>
+  </tbody>
+</table>
+<p>SQL 取证至少记录：脱敏接口/任务名、请求标识、连接名及引擎、SQL 指纹、执行次数、数据库总时间、返回条数、页大小/时间跨度、缓存状态、应用总耗时。应用慢但 SQL 快时继续拆解池等待、远程调用、队列和序列化，不能仅加索引。</p>
+<p>现有 <code>tests/Unit/Crm/PayServiceDepositCallbackTest.php</code> 主要覆盖汇率等行为，不能代替提交前后异常及事务层级测试。<code>tests/Feature/Member/TMemberRepositoryAddMoneyTest.php</code> 包含真实数据库资金写入/并发场景，环境未确认前不能直接运行。</p>
+<p>本次未运行 PHP 单测、PHPStan 或 HTTP 回归：当前命令环境未找到 PHP，也未接入隔离数据库。没有连接生产、执行资金命令、建索引或修改业务代码。本文交付的是扩大覆盖的静态问题台账和可执行验证方案，不能据此宣称生产根因已确认或问题已修复。</p>
+<h2 id="十三git-历史溯源与开发对接清单2026-10-14">十三、Git 历史溯源与开发对接清单（2026-10-14）</h2>
+<h3 id="131-如何使用这份人员清单">13.1 如何使用这份人员清单</h3>
+<p>用途是找到熟悉代码的开发协作优化，<strong>不是直接认定 Bug 责任人</strong>。本轮对前文全部 73 个编号补充代表性风险语句的 Git 归属，查询基线仍为 <code>master</code>，未联网拉取其他仓库。当前仓库不是浅克隆，但不代表包含被导入项目的全部历史。</p>
+<ul>
+<li>表中作者来自 <code>git blame -w -M -C</code>，忽略空白变化并尝试识别代码移动/复制；它说明所选行的历史来源，不一定是整段业务的最初作者。</li>
+<li>每个条目列出定位文件/行号、Git 作者、作者日期（北京时间）和提交号。多段代码来自不同作者时分别保留；未将文件最近一次提交者当作问题引入者。</li>
+<li>对 N01、N32、T06、T07、T08、S08 额外查看相关提交差异，具体判断见 13.3。其他条目为行级归属证据，尚未逐一证明缺陷从哪个版本开始出现。</li>
+<li><strong><code>b897763820</code> 是“复制fx”的大批量导入提交，涉及 15415 个文件。</strong> 这些行虽然署名 mic_soo，也只能确认本仓库的导入者，原项目作者需要原仓库记录。不能将这些条目直接派为该作者个人引入的问题。</li>
+<li><code>mic_soo</code> / <code>micso</code>、<code>Edison</code> / <code>edison</code>、<code>Tink</code> / <code>tink</code>、<code>Alax</code> / <code>alax</code>、<code>ZhiGuo</code> / <code>周治国</code> 等署名暂不自动合并，先由团队确认是否同一人。数字形式作者名在文档脱敏；用提交号可在本地查原署名。</li>
+<li>缺少 rollback、缺少超时或缺少索引属于“缺失行为”，不能单凭某一行 blame 证明是谁遗漏。这里定位已有事务/请求/查询语句，最终由模块维护人结合完整历史复核。数据库线上索引由谁部署，也不能从 PHP 作者推断。</li>
+</ul>
+<h3 id="132-按问题编号定位相关开发">13.2 按问题编号定位相关开发</h3>
+<p>“行归属”表示可联系的历史作者线索；“导入”表示原作者未确认。该表覆盖全部编号，但只选择关键语句，不是每个文件所有贡献者名单。同一提交出现在多个问题中，不代表多个独立缺陷。</p>
+<h4 id="事务风险">事务风险</h4>
+<table>
+  <thead>
+      <tr>
+          <th>编号</th>
+          <th>代表性代码位置</th>
+          <th>Git 作者 · 作者日期 · 提交</th>
+          <th>证据性质</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>T01</td>
+          <td><code>app/Common/Lib/Transfer/Transfer.php:1092</code><br><code>app/Common/Lib/Transfer/Transfer.php:1094</code></td>
+          <td>mic_soo · 2025-10-08 · <code>2aa45ae1c4</code><br>mic_soo · 2025-07-08 · <code>78d3c0c1fc</code></td>
+          <td>行归属</td>
+      </tr>
+      <tr>
+          <td>T02</td>
+          <td><code>app/Common/Lib/Transfer/Transfer.php:127</code><br><code>app/Common/Lib/Transfer/Transfer.php:169</code></td>
+          <td>mic_soo · 2025-10-28 · <code>162af62338</code><br>mic_soo · 2025-09-16 · <code>d1986d0f7d</code></td>
+          <td>行归属</td>
+      </tr>
+      <tr>
+          <td>T03</td>
+          <td><code>app/Repository/crm/SystemMoneyLogRepository.php:79</code></td>
+          <td>mic_soo · 2025-07-28 · <code>ada2a0022d</code></td>
+          <td>行归属</td>
+      </tr>
+      <tr>
+          <td>T04</td>
+          <td><code>app/Model/Trade/MtServer.php:255</code></td>
+          <td>mic_soo · 2025-04-23 · <code>b897763820</code></td>
+          <td>含整库导入；原作者待追溯</td>
+      </tr>
+      <tr>
+          <td>T05</td>
+          <td><code>app/Repository/member/TMemberRepository.php:565</code></td>
+          <td>mic_soo · 2025-10-09 · <code>4113337384</code></td>
+          <td>行归属</td>
+      </tr>
+      <tr>
+          <td>T06</td>
+          <td><code>app/Service/crm/PayService.php:2638</code></td>
+          <td>mic_soo · 2025-06-10 · <code>f48701b1e8</code></td>
+          <td>行归属</td>
+      </tr>
+      <tr>
+          <td>T07</td>
+          <td><code>app/Service/crm/PayService.php:1610</code><br><code>app/Service/crm/PayService.php:1750</code></td>
+          <td>mic_soo · 2025-08-25 · <code>14eb6a4b16</code><br>mic_soo · 2025-07-03 · <code>e6f10a1548</code></td>
+          <td>行归属</td>
+      </tr>
+      <tr>
+          <td>T08</td>
+          <td><code>app/Common/Lib/Transfer/Transfer.php:971</code><br><code>app/Common/Lib/Transfer/Transfer.php:1002</code></td>
+          <td>mic_soo · 2025-10-27 · <code>09d13258e2</code><br>mic_soo · 2025-09-13 · <code>41eb593b66</code></td>
+          <td>行归属</td>
+      </tr>
+  </tbody>
+</table>
+<h4 id="连接与资源风险">连接与资源风险</h4>
+<table>
+  <thead>
+      <tr>
+          <th>编号</th>
+          <th>代表性代码位置</th>
+          <th>Git 作者 · 作者日期 · 提交</th>
+          <th>证据性质</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>C01</td>
+          <td><code>config/autoload/databases.php:34</code></td>
+          <td>leon · 2026-08-04 · <code>0c9a69970e</code></td>
+          <td>行归属</td>
+      </tr>
+      <tr>
+          <td>C02</td>
+          <td><code>app/Common/Lib/Transfer/Transfer.php:134</code><br><code>app/Model/Trade/MtServer.php:280</code></td>
+          <td>mic_soo · 2025-12-17 · <code>3e6e3f5218</code><br>mic_soo · 2025-04-23 · <code>b897763820</code></td>
+          <td>含整库导入；原作者待追溯</td>
+      </tr>
+      <tr>
+          <td>C03</td>
+          <td><code>config/autoload/databases.php:102</code><br><code>config/autoload/databases.php:558</code></td>
+          <td>leon · 2026-08-06 · <code>d1296dc723</code><br>mmkk · 2025-11-26 · <code>983ff39dec</code></td>
+          <td>行归属</td>
+      </tr>
+      <tr>
+          <td>C04</td>
+          <td><code>common/crm.php:141</code><br><code>app/Common/Lib/Withdraw/GtcOutPay.php:595</code><br><code>app/Common/Lib/Zoom/ZoomBase.php:111</code></td>
+          <td>mike · 2025-05-28 · <code>342ea5bfb9</code><br>mic_soo · 2025-06-09 · <code>5330e4b832</code><br>mic_soo · 2025-07-19 · <code>a7f96de0fe</code></td>
+          <td>行归属</td>
+      </tr>
+      <tr>
+          <td>C05</td>
+          <td><code>app/Service/crm/MemberKeChatImportService.php:24</code><br><code>app/Jobs/SystemDownloadJob.php:982</code></td>
+          <td>Alax · 2025-12-16 · <code>1c1df808ad</code><br>james · 2025-11-24 · <code>e038101761</code></td>
+          <td>行归属</td>
+      </tr>
+  </tbody>
+</table>
+<h4 id="重复读取路径">重复读取路径</h4>
+<table>
+  <thead>
+      <tr>
+          <th>编号</th>
+          <th>代表性代码位置</th>
+          <th>Git 作者 · 作者日期 · 提交</th>
+          <th>证据性质</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>N01</td>
+          <td><code>app/Service/member/TMemberService.php:3652</code></td>
+          <td>zhangcong_net · 2025-07-03 · <code>88be1de416</code></td>
+          <td>行归属</td>
+      </tr>
+      <tr>
+          <td>N02</td>
+          <td><code>app/Service/Trade/TradeService.php:769</code><br><code>app/Service/Trade/TradeService.php:771</code></td>
+          <td>zhangcong_net · 2025-09-22 · <code>3fb3203f6e</code><br>zhangcong_net · 2025-08-07 · <code>1bbca75b6e</code></td>
+          <td>行归属</td>
+      </tr>
+      <tr>
+          <td>N03</td>
+          <td><code>app/Service/Cross/CrossMt5DealsService.php:108</code></td>
+          <td>mic_soo · 2025-04-23 · <code>b897763820</code></td>
+          <td>含整库导入；原作者待追溯</td>
+      </tr>
+      <tr>
+          <td>N04</td>
+          <td><code>app/Service/Pamm/PammService.php:1602</code><br><code>app/Service/Pamm/PammService.php:1603</code></td>
+          <td>mmkk · 2025-10-18 · <code>76a1923ec0</code></td>
+          <td>行归属</td>
+      </tr>
+      <tr>
+          <td>N05</td>
+          <td><code>app/Service/V3/StrategyFollowService.php:373</code></td>
+          <td>ZhiGuo · 2025-12-29 · <code>23d75e6810</code></td>
+          <td>行归属</td>
+      </tr>
+      <tr>
+          <td>N06</td>
+          <td><code>app/Model/crm/MemberRootPathSelect.php:536</code></td>
+          <td>Edison · 2026-04-29 · <code>45f3067f93</code></td>
+          <td>行归属</td>
+      </tr>
+      <tr>
+          <td>N07</td>
+          <td><code>app/Service/IbAccount/IbService.php:2859</code></td>
+          <td>micso · 2026-03-31 · <code>8b29819df0</code></td>
+          <td>行归属</td>
+      </tr>
+      <tr>
+          <td>N08</td>
+          <td><code>app/Service/IbAccount/IbService.php:3120</code></td>
+          <td>micso · 2026-03-31 · <code>8b29819df0</code></td>
+          <td>行归属</td>
+      </tr>
+      <tr>
+          <td>N09</td>
+          <td><code>app/Service/IbAccount/IbService.php:5161</code></td>
+          <td>mic_soo · 2025-12-30 · <code>5ad3c8a87b</code></td>
+          <td>行归属</td>
+      </tr>
+      <tr>
+          <td>N10</td>
+          <td><code>app/Service/IbAccount/IbService.php:5194</code></td>
+          <td>mic_soo · 2025-12-30 · <code>e9fd33688a</code></td>
+          <td>行归属</td>
+      </tr>
+      <tr>
+          <td>N11</td>
+          <td><code>app/Service/crm/KycService.php:1582</code></td>
+          <td>mic_soo · 2025-06-03 · <code>e6cde17b37</code></td>
+          <td>行归属</td>
+      </tr>
+      <tr>
+          <td>N12</td>
+          <td><code>app/Service/crm/KycService.php:1623</code></td>
+          <td>137****8144（Git 数字署名） · 2026-06-01 · <code>54cbbfa582</code></td>
+          <td>行归属</td>
+      </tr>
+      <tr>
+          <td>N13</td>
+          <td><code>app/Service/crm/KycService.php:1616</code></td>
+          <td>137****8144（Git 数字署名） · 2026-06-08 · <code>2836439915</code></td>
+          <td>行归属</td>
+      </tr>
+      <tr>
+          <td>N14</td>
+          <td><code>app/Service/crm/KycService.php:1943</code></td>
+          <td>137****8144（Git 数字署名） · 2026-06-08 · <code>2836439915</code></td>
+          <td>行归属</td>
+      </tr>
+      <tr>
+          <td>N15</td>
+          <td><code>app/Service/Exchange/ExchangeService.php:866</code></td>
+          <td>mic_soo · 2025-04-23 · <code>b897763820</code></td>
+          <td>含整库导入；原作者待追溯</td>
+      </tr>
+      <tr>
+          <td>N16</td>
+          <td><code>app/Service/Pamm/PammService.php:2491</code></td>
+          <td>ZhiGuo · 2025-11-07 · <code>7de9b589f2</code></td>
+          <td>行归属</td>
+      </tr>
+      <tr>
+          <td>N17</td>
+          <td><code>app/Service/Mtnew/CopyCalculateService.php:63</code></td>
+          <td>mmkk · 2025-09-19 · <code>2af4fea626</code></td>
+          <td>行归属</td>
+      </tr>
+      <tr>
+          <td>N18</td>
+          <td><code>app/Service/Mtnew/CopyCalculateService.php:584</code></td>
+          <td>mmkk · 2025-09-19 · <code>2af4fea626</code></td>
+          <td>行归属</td>
+      </tr>
+      <tr>
+          <td>N19</td>
+          <td><code>app/Service/Mtnew/StrategyCalculateService.php:97</code></td>
+          <td>mmkk · 2025-09-10 · <code>155e1dbccb</code></td>
+          <td>行归属</td>
+      </tr>
+      <tr>
+          <td>N20</td>
+          <td><code>app/Service/Mtnew/StrategyCalculateService.php:349</code></td>
+          <td>mmkk · 2025-09-10 · <code>155e1dbccb</code></td>
+          <td>行归属</td>
+      </tr>
+      <tr>
+          <td>N21</td>
+          <td><code>app/Task/Follow/ProfitDataTask.php:155</code></td>
+          <td>zzg · 2026-03-05 · <code>25744630bf</code></td>
+          <td>行归属</td>
+      </tr>
+      <tr>
+          <td>N22</td>
+          <td><code>app/Task/Risk/HandleRiskMoveGroupTask.php:129</code></td>
+          <td>jack · 2026-03-30 · <code>bbe5bb39ca</code></td>
+          <td>行归属</td>
+      </tr>
+      <tr>
+          <td>N23</td>
+          <td><code>app/Task/CommissionLogsProcessTask.php:66</code></td>
+          <td>mic_soo · 2025-04-23 · <code>b897763820</code></td>
+          <td>含整库导入；原作者待追溯</td>
+      </tr>
+      <tr>
+          <td>N24</td>
+          <td><code>app/Task/StrategyTradeTask/PammSettleTask.php:86</code></td>
+          <td>mic_soo · 2025-04-23 · <code>b897763820</code></td>
+          <td>含整库导入；原作者待追溯</td>
+      </tr>
+      <tr>
+          <td>N25</td>
+          <td><code>app/Task/Follow/PammSelfCheckWarnTask.php:102</code></td>
+          <td>zzg · 2026-04-28 · <code>e7a9bbbb21</code></td>
+          <td>行归属</td>
+      </tr>
+      <tr>
+          <td>N26</td>
+          <td><code>app/Service/IbAccount/IbService.php:5292</code></td>
+          <td>micso · 2026-01-25 · <code>99fbf561ef</code></td>
+          <td>行归属</td>
+      </tr>
+      <tr>
+          <td>N27</td>
+          <td><code>app/Service/crm/SaleSettingService.php:38</code></td>
+          <td>mic_soo · 2025-04-23 · <code>b897763820</code></td>
+          <td>含整库导入；原作者待追溯</td>
+      </tr>
+      <tr>
+          <td>N28</td>
+          <td><code>app/Service/Exchange/ExchangeService.php:1201</code><br><code>app/Service/Exchange/ExchangeService.php:1223</code></td>
+          <td>zzg · 2026-03-13 · <code>0fd1dbc7b9</code><br>mic_soo · 2025-04-23 · <code>b897763820</code></td>
+          <td>含整库导入；原作者待追溯</td>
+      </tr>
+      <tr>
+          <td>N29</td>
+          <td><code>app/Service/Exchange/ExchangeService.php:1649</code></td>
+          <td>mic_soo · 2025-04-23 · <code>b897763820</code></td>
+          <td>含整库导入；原作者待追溯</td>
+      </tr>
+      <tr>
+          <td>N30</td>
+          <td><code>app/Service/Exchange/ExchangeService.php:1977</code></td>
+          <td>mic_soo · 2025-10-18 · <code>a0a09d992b</code></td>
+          <td>行归属</td>
+      </tr>
+      <tr>
+          <td>N31</td>
+          <td><code>app/Service/Follow/Follow1Service.php:1327</code></td>
+          <td>周治国 · 2026-02-04 · <code>02042228f8</code></td>
+          <td>行归属</td>
+      </tr>
+      <tr>
+          <td>N32</td>
+          <td><code>app/Service/Pamm/PammService.php:1088</code><br><code>app/Model/Follow/MemberHourCount.php:2505</code></td>
+          <td>mmkk · 2025-10-31 · <code>4f3acf0ff1</code></td>
+          <td>行归属</td>
+      </tr>
+      <tr>
+          <td>N33</td>
+          <td><code>app/Service/Follow/Follow2Service.php:1893</code></td>
+          <td>mic_soo · 2025-10-28 · <code>7749b4b200</code></td>
+          <td>行归属</td>
+      </tr>
+      <tr>
+          <td>N34</td>
+          <td><code>app/Service/Follow/FollowDataService.php:2467</code></td>
+          <td>mic_soo · 2025-10-28 · <code>7749b4b200</code></td>
+          <td>行归属</td>
+      </tr>
+      <tr>
+          <td>N35</td>
+          <td><code>app/Task/StrategyStatusTask.php:159</code></td>
+          <td>mic_soo · 2025-04-23 · <code>b897763820</code></td>
+          <td>含整库导入；原作者待追溯</td>
+      </tr>
+      <tr>
+          <td>N36</td>
+          <td><code>app/Task/TradeHistoryTask/PammOrderHistoryTask.php:107</code></td>
+          <td>mic_soo · 2025-09-29 · <code>b2693456bf</code></td>
+          <td>行归属</td>
+      </tr>
+      <tr>
+          <td>N37</td>
+          <td><code>app/Task/SyncCalendarDataTask.php:95</code></td>
+          <td>zhangcong_net · 2025-09-06 · <code>d1878819d2</code></td>
+          <td>行归属</td>
+      </tr>
+      <tr>
+          <td>N38</td>
+          <td><code>app/Service/crm/GroupsService.php:78</code></td>
+          <td>mike · 2025-08-22 · <code>f7b93f402a</code></td>
+          <td>行归属</td>
+      </tr>
+      <tr>
+          <td>N39</td>
+          <td><code>app/Service/IbAccount/IbService.php:3913</code></td>
+          <td>mic_soo · 2025-11-01 · <code>4a681da88a</code></td>
+          <td>行归属</td>
+      </tr>
+      <tr>
+          <td>N40</td>
+          <td><code>app/Task/Risk/HandleRiskMoveGroupTask.php:95</code><br><code>app/Task/Risk/HandleRiskMoveGroupTask.php:108</code></td>
+          <td>jack · 2026-03-27 · <code>98558f67aa</code></td>
+          <td>行归属</td>
+      </tr>
+      <tr>
+          <td>N41</td>
+          <td><code>app/Service/member/TMemberService.php:6114</code><br><code>app/Service/member/TMemberService.php:6124</code></td>
+          <td>micso · 2026-05-28 · <code>70e8208fa3</code></td>
+          <td>行归属</td>
+      </tr>
+      <tr>
+          <td>N42</td>
+          <td><code>app/Http/Api/Listeners/IbNupipsEventListener.php:88</code></td>
+          <td>mic_soo · 2025-12-05 · <code>b19fbed21e</code></td>
+          <td>行归属</td>
+      </tr>
+      <tr>
+          <td>N43</td>
+          <td><code>app/Command/PatchFollowMttype.php:46</code><br><code>app/Command/PatchFollowMttype.php:52</code></td>
+          <td>ZhiGuo · 2025-12-09 · <code>c7823869b2</code></td>
+          <td>行归属</td>
+      </tr>
+      <tr>
+          <td>N44</td>
+          <td><code>app/Command/CheckPammShareCommand.php:39</code></td>
+          <td>周治国 · 2026-03-02 · <code>cf40f469cf</code></td>
+          <td>行归属</td>
+      </tr>
+      <tr>
+          <td>N45</td>
+          <td><code>app/Command/PatchGtcDataCommand.php:42</code></td>
+          <td>周治国 · 2026-03-02 · <code>f71842890f</code></td>
+          <td>行归属</td>
+      </tr>
+  </tbody>
+</table>
+<h4 id="sql-与索引风险">SQL 与索引风险</h4>
+<table>
+  <thead>
+      <tr>
+          <th>编号</th>
+          <th>代表性代码位置</th>
+          <th>Git 作者 · 作者日期 · 提交</th>
+          <th>证据性质</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>S01</td>
+          <td><code>app/Service/Cash/CashService.php:617</code><br><code>app/Service/Cash/CashService.php:651</code></td>
+          <td>mic_soo · 2025-04-23 · <code>b897763820</code></td>
+          <td>含整库导入；原作者待追溯</td>
+      </tr>
+      <tr>
+          <td>S02</td>
+          <td><code>app/Service/IbAccount/IbAgentReportService.php:771</code></td>
+          <td>Tink · 2026-05-14 · <code>ba2e4e5868</code></td>
+          <td>行归属</td>
+      </tr>
+      <tr>
+          <td>S03</td>
+          <td><code>app/Service/crm/FundChangesHistoryService.php:155</code></td>
+          <td>Alax · 2025-12-10 · <code>181a03c0fb</code></td>
+          <td>行归属</td>
+      </tr>
+      <tr>
+          <td>S04</td>
+          <td><code>app/Repository/crm/AccountRegisterSettingRepository.php:129</code><br><code>app/Repository/crm/ConfigMemberNameRepository.php:54</code></td>
+          <td>Edison · 2026-05-08 · <code>1958d083f8</code><br>Tink · 2026-04-22 · <code>c8c176f995</code></td>
+          <td>行归属</td>
+      </tr>
+      <tr>
+          <td>S05</td>
+          <td><code>app/Service/Cross/CrossMt5DealsService.php:108</code></td>
+          <td>mic_soo · 2025-04-23 · <code>b897763820</code></td>
+          <td>含整库导入；原作者待追溯</td>
+      </tr>
+      <tr>
+          <td>S06</td>
+          <td><code>app/Service/crm/PayService.php:1611</code></td>
+          <td>mic_soo · 2025-08-15 · <code>4b681dd116</code></td>
+          <td>行归属</td>
+      </tr>
+      <tr>
+          <td>S07</td>
+          <td><code>app/Service/IbAccount/IbService.php:3913</code></td>
+          <td>mic_soo · 2025-11-01 · <code>4a681da88a</code></td>
+          <td>行归属</td>
+      </tr>
+      <tr>
+          <td>S08</td>
+          <td><code>app/Service/IbAccount/OpenGroupListService.php:202</code><br><code>app/Service/IbAccount/OpenGroupListService.php:205</code></td>
+          <td>edison · 2026-08-05 · <code>8c1a5dddd4</code></td>
+          <td>行归属</td>
+      </tr>
+      <tr>
+          <td>S09</td>
+          <td><code>app/Service/Exchange/ExchangeService.php:2392</code><br><code>app/Service/Exchange/ExchangeService.php:2396</code></td>
+          <td>tink · 2026-07-29 · <code>ac6b8eaac1</code><br>mic_soo · 2025-12-02 · <code>9a5ef3ca10</code></td>
+          <td>行归属</td>
+      </tr>
+      <tr>
+          <td>S10</td>
+          <td><code>app/Service/crm/MemberMtloginService.php:1458</code></td>
+          <td>micso · 2026-03-24 · <code>e1e0f06f7b</code></td>
+          <td>行归属</td>
+      </tr>
+      <tr>
+          <td>S11</td>
+          <td><code>app/Model/Follow/MemberHourCount.php:2505</code><br><code>app/Model/Follow/MemberHourCount.php:2509</code></td>
+          <td>mmkk · 2025-10-31 · <code>4f3acf0ff1</code><br>mmkk · 2025-09-27 · <code>e5992e1b8f</code></td>
+          <td>行归属</td>
+      </tr>
+      <tr>
+          <td>S12</td>
+          <td><code>app/Model/BaseModel.php:36</code><br><code>app/Model/BaseModel.php:51</code></td>
+          <td>mmkk · 2025-10-31 · <code>3ebdf6a9fe</code><br>mmkk · 2025-09-29 · <code>2b09879b78</code></td>
+          <td>行归属</td>
+      </tr>
+      <tr>
+          <td>S13</td>
+          <td><code>app/Task/TradeHistoryTask/PammOrderHistoryTask.php:73</code><br><code>app/Task/TradeHistoryTask/PammOrderHistoryTask.php:79</code></td>
+          <td>mic_soo · 2025-10-20 · <code>dc53596342</code><br>mic_soo · 2025-10-23 · <code>b151a06d4a</code></td>
+          <td>行归属</td>
+      </tr>
+      <tr>
+          <td>S14</td>
+          <td><code>app/Command/PatchGtcDataCommand.php:45</code></td>
+          <td>周治国 · 2026-03-02 · <code>f71842890f</code></td>
+          <td>行归属</td>
+      </tr>
+      <tr>
+          <td>S15</td>
+          <td><code>app/Http/Api/Listeners/SyncSingleOnlyListener.php:87</code></td>
+          <td>ZhiGuo · 2026-01-26 · <code>8d275badf1</code></td>
+          <td>行归属</td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="133-已查看提交差异的重点条目">13.3 已查看提交差异的重点条目</h3>
+<table>
+  <thead>
+      <tr>
+          <th>条目</th>
+          <th>差异证据</th>
+          <th>对接结论</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>N01</td>
+          <td>zhangcong_net 的 <code>88be1de416</code>（设备管理）新增 loginDevice，包含设备循环内查日志</td>
+          <td>可优先找该功能历史作者确认批量读取和设备状态语义</td>
+      </tr>
+      <tr>
+          <td>N32 / S11</td>
+          <td>mmkk 的 <code>4f3acf0ff1</code>（连续盈利亏损）新增按日调用及缓存真假判断；后续 <code>d80e27b8b3</code> 调整返回值，<code>e5992e1b8f</code> 修改首尾查询</td>
+          <td>当前链路与历史作者可对应；零值未命中判断确实出现在新增代码中，优先共同处理缓存和查询跨度</td>
+      </tr>
+      <tr>
+          <td>T06</td>
+          <td>mic_soo 的 <code>f48701b1e8</code>（出金+谷歌验证码）新增当前 Db::beginTransaction 并将已有 $db 提交/回滚改为 Db 调用</td>
+          <td>可确认事务实现修改者；此前已存在提现逻辑，不能仅据此认定其为完整业务原作者或首次遗漏者</td>
+      </tr>
+      <tr>
+          <td>T07</td>
+          <td>mic_soo 的 <code>e6f10a1548</code> 调整回调异常处理；事务行另归于 <code>14eb6a4b16</code></td>
+          <td>涉及多次资金流程变更，应一起看提交前后状态与幂等，不只看 catch 作者</td>
+      </tr>
+      <tr>
+          <td>T08</td>
+          <td>mic_soo 的 <code>09d13258e2</code> 改动分支 rollback；catch 的 rollback 行归于 <code>41eb593b66</code></td>
+          <td>当前风险由分支和外层处理共同构成，应让熟悉订阅资金流程的开发整体复核</td>
+      </tr>
+      <tr>
+          <td>S08</td>
+          <td>edison 的 <code>8c1a5dddd4</code> 新增独立 OpenGroupListService，含 LOWER/CAST 条件，注释明确保持旧接口筛选范围</td>
+          <td>可找该服务维护者继续优化，但不能断言包含搜索语义由其首次引入；可能是兼容旧接口的保留行为</td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="134-按-git-署名分派的检索索引">13.4 按 Git 署名分派的检索索引</h3>
+<p>以下仅列非整库导入的归属线索，同一条目可以出现在多个人名下。建议由当前模块负责人牵头，再找历史作者确认；不要按条目数量评估个人代码质量。</p>
+<table>
+  <thead>
+      <tr>
+          <th>Git 署名（未合并别名）</th>
+          <th>可对接的问题编号</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>137****8144（Git 数字署名）</td>
+          <td>N12, N13, N14</td>
+      </tr>
+      <tr>
+          <td>Alax</td>
+          <td>C05, S03</td>
+      </tr>
+      <tr>
+          <td>Edison</td>
+          <td>N06, S04</td>
+      </tr>
+      <tr>
+          <td>edison</td>
+          <td>S08</td>
+      </tr>
+      <tr>
+          <td>jack</td>
+          <td>N22, N40</td>
+      </tr>
+      <tr>
+          <td>james</td>
+          <td>C05</td>
+      </tr>
+      <tr>
+          <td>leon</td>
+          <td>C01, C03</td>
+      </tr>
+      <tr>
+          <td>mic_soo</td>
+          <td>C02, C04, N09, N10, N11, N30, N33, N34, N36, N39, N42, S06, S07, S09, S13, T01, T02, T03, T05, T06, T07, T08</td>
+      </tr>
+      <tr>
+          <td>micso</td>
+          <td>N07, N08, N26, N41, S10</td>
+      </tr>
+      <tr>
+          <td>mike</td>
+          <td>C04, N38</td>
+      </tr>
+      <tr>
+          <td>mmkk</td>
+          <td>C03, N04, N17, N18, N19, N20, N32, S11, S12</td>
+      </tr>
+      <tr>
+          <td>Tink</td>
+          <td>S02, S04</td>
+      </tr>
+      <tr>
+          <td>tink</td>
+          <td>S09</td>
+      </tr>
+      <tr>
+          <td>zhangcong_net</td>
+          <td>N01, N02, N37</td>
+      </tr>
+      <tr>
+          <td>ZhiGuo</td>
+          <td>N05, N16, N43, S15</td>
+      </tr>
+      <tr>
+          <td>zzg</td>
+          <td>N21, N25, N28</td>
+      </tr>
+      <tr>
+          <td>周治国</td>
+          <td>N31, N44, N45, S14</td>
+      </tr>
+  </tbody>
+</table>
+<p>含整库导入代码、其中导入部分需要找原项目/当前模块维护者的条目：T04, C02, N03, N15, N23, N24, N27, N28, N29, N35, S01, S05。这些条目的导入部分不归入上方个人索引；另有非导入修改的作者仍保留，例如 N28 的 zzg。</p>
+<h3 id="135-本地复核命令">13.5 本地复核命令</h3>
+<p>以下命令只读，使用本报告的文件、行号和提交号替换示例即可；不需要切换分支或修改文件。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="nb">cd</span> /Users/ahs/work/code/gtcuser
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="c1"># 当前风险语句的来源，带上下文查看更可靠</span>
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl">git blame -w -M -C -L 3651,3660 -- app/Service/member/TMemberService.php
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl"><span class="c1"># 核对提交作者、日期及实际改动，而非只看提交标题</span>
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl">git show --format<span class="o">=</span>fuller 88be1de416 -- app/Service/member/TMemberService.php
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl"><span class="c1"># 查看单文件演变，跟踪重命名</span>
+</span></span><span class="line"><span class="ln">10</span><span class="cl">git log --follow --date<span class="o">=</span>short --format<span class="o">=</span><span class="s1">&#39;%h %an %ad %s&#39;</span> -- app/Service/member/TMemberService.php
+</span></span><span class="line"><span class="ln">11</span><span class="cl">
+</span></span><span class="line"><span class="ln">12</span><span class="cl"><span class="c1"># 查看该区间的历史演变（不同版本行号会变化）</span>
+</span></span><span class="line"><span class="ln">13</span><span class="cl">git log -L 3651,3660:app/Service/member/TMemberService.php
+</span></span></code></pre></div><p>资金、交易及权限问题分派时附上“问题编号 + 当前代码位置 + 历史提交 + 必须保留的业务语义 + 验收条件”，以本报告对应章节为准。本轮仅完成历史取证和文档补充，没有联系开发人员、修改业务代码或创建提交。</p>
+
+    </div>
+  </article>
+  
+    
+<aside class="sidebar">
+  <section class="sidebar_inner">
+    <br>
+    
+  
+  <div class="search">
+    <input type="search" class="search_field form_field" placeholder='搜索内容...' id="find" autocomplete="off" data-scope='gtc'>
+    <label for="find" class="search_label"><svg class="icon">
+  <title>search</title>
+  <use xlink:href="#search"></use>
+</svg>
+
+    </label>
+    
+    <div class="search_results results"></div>
+  </div>
+
+        <div class="author_header">
+          <img src="https://jianlin-li.github.io/images/fish-head.png" alt="李建林 photo">
+          <h2>李建林</h2>
+        </div>
+      <div class="author_bio">
+        PHP, Go, MySQL, Redis, RabbitMQ, Elasticsearch, Docker, Kubernetes, Shell
+      </div>
+      <a href='https://jianlin-li.github.io/about/' class="button mt-1" role="button" title='阅读更多'>阅读更多</a>
+
+    
+    <h2 class="mt-4">精选文章</h2>
+    <ul>
+      <li>
+        <a href="https://jianlin-li.github.io/post/jiagou-elk-stack/" class="nav-link" title="架构-使用ELK Stack在本地Macbookpro搭建一套日志收集并且可视化系统">架构-使用ELK Stack在本地Macbookpro搭建一套日志收集并且可视化系统</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/jiagou-prometheus-grafana/" class="nav-link" title="架构-Prometheus&#43;Grafana">架构-Prometheus+Grafana</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/jiagou-cicd-jenkins-argo/" class="nav-link" title="架构-基于JenKins的CI/CD平台之Argo CD">架构-基于JenKins的CI/CD平台之Argo CD</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/jiagou-cicd-jenkins/" class="nav-link" title="架构-基于JenKins的CI/CD平台">架构-基于JenKins的CI/CD平台</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/k8s_review_12/" class="nav-link" title="Kubernetes的知识库-12">Kubernetes的知识库-12</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/k8s_review_11/" class="nav-link" title="Kubernetes的知识库-11">Kubernetes的知识库-11</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/k8s_review_10/" class="nav-link" title="Kubernetes的知识库-10">Kubernetes的知识库-10</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/k8s_review_9/" class="nav-link" title="Kubernetes的知识库-9">Kubernetes的知识库-9</a>
+      </li>
+    </ul>
+    <h2 class="mt-4">最新文章</h2>
+    <ul class="flex-column">
+      <li>
+        <a href="https://jianlin-li.github.io/post/k8s_review_8/" class="nav-link" title="Kubernetes的知识库-8">Kubernetes的知识库-8</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/k8s_review_7/" class="nav-link" title="Kubernetes的知识库-7">Kubernetes的知识库-7</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/k8s_review_6/" class="nav-link" title="Kubernetes的知识库-6">Kubernetes的知识库-6</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/k8s_review_5/" class="nav-link" title="Kubernetes的知识库-5">Kubernetes的知识库-5</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/k8s_review_4/" class="nav-link" title="Kubernetes的知识库-4">Kubernetes的知识库-4</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/k8s_review_3/" class="nav-link" title="Kubernetes的知识库-3">Kubernetes的知识库-3</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/k8s_review_2/" class="nav-link" title="Kubernetes的知识库-2">Kubernetes的知识库-2</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/k8s_review_1/" class="nav-link" title="Kubernetes的知识库-1">Kubernetes的知识库-1</a>
+      </li>
+    </ul>
+    <div>
+      <h2 class="mt-4 taxonomy" id="categories-section">分类</h2>
+      <nav class="tags_nav">
+        <a href='https://jianlin-li.github.io/categories/kubernetes/' class="post_tag button button_translucent" title="kubernetes">
+          KUBERNETES
+          <span class="button_tally">13</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/categories/php%E8%AF%AD%E8%A8%80/' class="post_tag button button_translucent" title="php语言">
+          PHP语言
+          <span class="button_tally">7</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/categories/%E6%9E%B6%E6%9E%84/' class="post_tag button button_translucent" title="架构">
+          架构
+          <span class="button_tally">7</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/categories/go%E8%AF%AD%E8%A8%80/' class="post_tag button button_translucent" title="go语言">
+          GO语言
+          <span class="button_tally">6</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/categories/elasticsearch/' class="post_tag button button_translucent" title="elasticsearch">
+          ELASTICSEARCH
+          <span class="button_tally">5</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/categories/redis/' class="post_tag button button_translucent" title="redis">
+          REDIS
+          <span class="button_tally">5</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/categories/mysql/' class="post_tag button button_translucent" title="mysql">
+          MYSQL
+          <span class="button_tally">4</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/categories/rabbitmq/' class="post_tag button button_translucent" title="rabbitmq">
+          RABBITMQ
+          <span class="button_tally">4</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/categories/ci/cd/' class="post_tag button button_translucent" title="ci/cd">
+          CI/CD
+          <span class="button_tally">2</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/categories/git/' class="post_tag button button_translucent" title="git">
+          GIT
+          <span class="button_tally">2</span>
+        </a>
+        
+        
+        <br>
+        <div class="post_tags_toggle button">所有分类</div>
+        <div class="post_tags">
+          <div class="tags_list">
+            
+            <a href='https://jianlin-li.github.io/categories/argo/' class=" post_tag button button_translucent" data-position=1 title="argo">ARGO<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/centos7/' class=" post_tag button button_translucent" data-position=1 title="centos7">CENTOS7<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/ci/cd/' class=" post_tag button button_translucent" data-position=2 title="ci/cd">CI/CD<span class="button_tally">2</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/c%E8%AF%AD%E8%A8%80/' class=" post_tag button button_translucent" data-position=1 title="c语言">C语言<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/devops/' class=" post_tag button button_translucent" data-position=1 title="devops">DEVOPS<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/docker/' class=" post_tag button button_translucent" data-position=1 title="docker">DOCKER<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/elasticsearch/' class=" post_tag button button_translucent" data-position=5 title="elasticsearch">ELASTICSEARCH<span class="button_tally">5</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/elk/' class=" post_tag button button_translucent" data-position=1 title="elk">ELK<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/git/' class=" post_tag button button_translucent" data-position=2 title="git">GIT<span class="button_tally">2</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/go%E8%AF%AD%E8%A8%80/' class=" post_tag button button_translucent" data-position=6 title="go语言">GO语言<span class="button_tally">6</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/grafana/' class=" post_tag button button_translucent" data-position=1 title="grafana">GRAFANA<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/gtc/' class=" post_tag button button_translucent" data-position=2 title="gtc">GTC<span class="button_tally">2</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/gtcadmin/' class=" post_tag button button_translucent" data-position=1 title="gtcadmin">GTCADMIN<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/gtcuser/' class=" post_tag button button_translucent" data-position=1 title="gtcuser">GTCUSER<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/hugo/' class=" post_tag button button_translucent" data-position=1 title="hugo">HUGO<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/jenkins/' class=" post_tag button button_translucent" data-position=2 title="jenkins">JENKINS<span class="button_tally">2</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/kubernetes/' class=" post_tag button button_translucent" data-position=13 title="kubernetes">KUBERNETES<span class="button_tally">13</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/mkcert/' class=" post_tag button button_translucent" data-position=1 title="mkcert">MKCERT<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/mysql/' class=" post_tag button button_translucent" data-position=4 title="mysql">MYSQL<span class="button_tally">4</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/nginx/' class=" post_tag button button_translucent" data-position=1 title="nginx">NGINX<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/php%E8%AF%AD%E8%A8%80/' class=" post_tag button button_translucent" data-position=7 title="php语言">PHP语言<span class="button_tally">7</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/prometheus/' class=" post_tag button button_translucent" data-position=1 title="prometheus">PROMETHEUS<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/rabbitmq/' class=" post_tag button button_translucent" data-position=4 title="rabbitmq">RABBITMQ<span class="button_tally">4</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/redis/' class=" post_tag button button_translucent" data-position=5 title="redis">REDIS<span class="button_tally">5</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/shell/' class=" post_tag button button_translucent" data-position=2 title="shell">SHELL<span class="button_tally">2</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/web%E6%9C%8D%E5%8A%A1%E5%99%A8/' class=" post_tag button button_translucent" data-position=1 title="web服务器">WEB服务器<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/%E6%9C%AC%E5%9C%B0%E7%8E%AF%E5%A2%83/' class=" post_tag button button_translucent" data-position=2 title="本地环境">本地环境<span class="button_tally">2</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/%E5%A4%8D%E4%B9%A0/' class=" post_tag button button_translucent" data-position=1 title="复习">复习<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/%E5%8D%8E%E5%BE%AE%E4%B8%96%E7%BA%AA/' class=" post_tag button button_translucent" data-position=1 title="华微世纪">华微世纪<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/%E6%9E%B6%E6%9E%84/' class=" post_tag button button_translucent" data-position=7 title="架构">架构<span class="button_tally">7</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/%E6%95%99%E7%A8%8B/' class=" post_tag button button_translucent" data-position=1 title="教程">教程<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/%E8%A7%86%E9%A2%91/' class=" post_tag button button_translucent" data-position=1 title="视频">视频<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/%E4%B9%A6%E7%B1%8D/' class=" post_tag button button_translucent" data-position=1 title="书籍">书籍<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/%E7%AE%97%E6%B3%95/' class=" post_tag button button_translucent" data-position=1 title="算法">算法<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/%E8%87%AA%E7%AD%BE%E5%90%8D%E8%AF%81%E4%B9%A6/' class=" post_tag button button_translucent" data-position=1 title="自签名证书">自签名证书<span class="button_tally">1</span>
+            </a>
+            
+            <div class="tags_sort"><span title="sort alphabetically">[A~Z]</span><span title="sort by count">[0~9]</span>
+            </div>
+            <span class="tags_hide"><svg class="icon">
+            <use xlink:href="#closeme"></use>
+          </svg></span>
+          </div>
+        </div>
+      </nav>
+    </div>
+    <div>
+      <h2 class="mt-4 taxonomy" id="tags-section">标签</h2>
+      <nav class="tags_nav">
+        <a href='https://jianlin-li.github.io/tags/kubernetes/' class="post_tag button button_translucent" title="kubernetes">
+          KUBERNETES
+          <span class="button_tally">13</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/tags/php/' class="post_tag button button_translucent" title="php">
+          PHP
+          <span class="button_tally">7</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/tags/go/' class="post_tag button button_translucent" title="go">
+          GO
+          <span class="button_tally">6</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/tags/elasticsearch/' class="post_tag button button_translucent" title="elasticsearch">
+          ELASTICSEARCH
+          <span class="button_tally">5</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/tags/redis/' class="post_tag button button_translucent" title="redis">
+          REDIS
+          <span class="button_tally">5</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/tags/mysql/' class="post_tag button button_translucent" title="mysql">
+          MYSQL
+          <span class="button_tally">4</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/tags/rabbitmq/' class="post_tag button button_translucent" title="rabbitmq">
+          RABBITMQ
+          <span class="button_tally">4</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/tags/devops/' class="post_tag button button_translucent" title="devops">
+          DEVOPS
+          <span class="button_tally">3</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/tags/ci/cd/' class="post_tag button button_translucent" title="ci/cd">
+          CI/CD
+          <span class="button_tally">2</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/tags/git/' class="post_tag button button_translucent" title="git">
+          GIT
+          <span class="button_tally">2</span>
+        </a>
+        
+        
+        <br>
+        <div class="post_tags_toggle button">所有标签</div>
+        <div class="post_tags">
+          <div class="tags_list">
+            
+            <a href='https://jianlin-li.github.io/tags/argo/' class=" post_tag button button_translucent" data-position=1 title="argo">ARGO<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/centos7/' class=" post_tag button button_translucent" data-position=1 title="centos7">CENTOS7<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/ci/cd/' class=" post_tag button button_translucent" data-position=2 title="ci/cd">CI/CD<span class="button_tally">2</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/c%E8%AF%AD%E8%A8%80/' class=" post_tag button button_translucent" data-position=1 title="c语言">C语言<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/devops/' class=" post_tag button button_translucent" data-position=3 title="devops">DEVOPS<span class="button_tally">3</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/docker/' class=" post_tag button button_translucent" data-position=1 title="docker">DOCKER<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/elasticsearch/' class=" post_tag button button_translucent" data-position=5 title="elasticsearch">ELASTICSEARCH<span class="button_tally">5</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/elk/' class=" post_tag button button_translucent" data-position=1 title="elk">ELK<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/emoji/' class=" post_tag button button_translucent" data-position=1 title="emoji">EMOJI<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/git/' class=" post_tag button button_translucent" data-position=2 title="git">GIT<span class="button_tally">2</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/go/' class=" post_tag button button_translucent" data-position=6 title="go">GO<span class="button_tally">6</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/grafana/' class=" post_tag button button_translucent" data-position=1 title="grafana">GRAFANA<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/gtc/' class=" post_tag button button_translucent" data-position=2 title="gtc">GTC<span class="button_tally">2</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/gtcadmin/' class=" post_tag button button_translucent" data-position=1 title="gtcadmin">GTCADMIN<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/gtcuser/' class=" post_tag button button_translucent" data-position=1 title="gtcuser">GTCUSER<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/hosts/' class=" post_tag button button_translucent" data-position=1 title="hosts">HOSTS<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/hugo/' class=" post_tag button button_translucent" data-position=1 title="hugo">HUGO<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/jenkins/' class=" post_tag button button_translucent" data-position=2 title="jenkins">JENKINS<span class="button_tally">2</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/kubernetes/' class=" post_tag button button_translucent" data-position=13 title="kubernetes">KUBERNETES<span class="button_tally">13</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/markdown/' class=" post_tag button button_translucent" data-position=1 title="markdown">MARKDOWN<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/math/' class=" post_tag button button_translucent" data-position=1 title="math">MATH<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/mkcert/' class=" post_tag button button_translucent" data-position=1 title="mkcert">MKCERT<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/mysql/' class=" post_tag button button_translucent" data-position=4 title="mysql">MYSQL<span class="button_tally">4</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/nginx/' class=" post_tag button button_translucent" data-position=1 title="nginx">NGINX<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/notices/' class=" post_tag button button_translucent" data-position=1 title="notices">NOTICES<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/openstreetmap/' class=" post_tag button button_translucent" data-position=1 title="openstreetmap">OPENSTREETMAP<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/php/' class=" post_tag button button_translucent" data-position=7 title="php">PHP<span class="button_tally">7</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/prometheus/' class=" post_tag button button_translucent" data-position=1 title="prometheus">PROMETHEUS<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/rabbitmq/' class=" post_tag button button_translucent" data-position=4 title="rabbitmq">RABBITMQ<span class="button_tally">4</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/redis/' class=" post_tag button button_translucent" data-position=5 title="redis">REDIS<span class="button_tally">5</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/shell/' class=" post_tag button button_translucent" data-position=2 title="shell">SHELL<span class="button_tally">2</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/sql/' class=" post_tag button button_translucent" data-position=1 title="sql">SQL<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/web%E6%9C%8D%E5%8A%A1%E5%99%A8/' class=" post_tag button button_translucent" data-position=1 title="web服务器">WEB服务器<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/%E6%9C%AC%E5%9C%B0%E7%8E%AF%E5%A2%83/' class=" post_tag button button_translucent" data-position=1 title="本地环境">本地环境<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/%E5%A4%8D%E4%B9%A0/' class=" post_tag button button_translucent" data-position=1 title="复习">复习<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/%E6%95%99%E7%A8%8B/' class=" post_tag button button_translucent" data-position=1 title="教程">教程<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/%E4%B9%B1%E7%A0%81/' class=" post_tag button button_translucent" data-position=1 title="乱码">乱码<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/%E8%A7%86%E9%A2%91/' class=" post_tag button button_translucent" data-position=1 title="视频">视频<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/%E4%B9%A6%E7%B1%8D/' class=" post_tag button button_translucent" data-position=1 title="书籍">书籍<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/%E7%AE%97%E6%B3%95/' class=" post_tag button button_translucent" data-position=1 title="算法">算法<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6/' class=" post_tag button button_translucent" data-position=1 title="主从复制">主从复制<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/%E8%87%AA%E7%AD%BE%E5%90%8D%E8%AF%81%E4%B9%A6/' class=" post_tag button button_translucent" data-position=1 title="自签名证书">自签名证书<span class="button_tally">1</span>
+            </a>
+            
+            <div class="tags_sort"><span title="sort alphabetically">[A~Z]</span><span title="sort by count">[0~9]</span>
+            </div>
+            <span class="tags_hide"><svg class="icon">
+            <use xlink:href="#closeme"></use>
+          </svg></span>
+          </div>
+        </div>
+      </nav>
+    </div>
+  </section>
+</aside>
+
+  
+</div>
+
+<style>
+  .gtc-breadcrumb {
+    margin-bottom: 12px;
+    font-size: 0.9em;
+    opacity: 0.75;
+  }
+
+  .gtc-meta {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+</style>
+    </main><svg width="0" height="0" class="hidden">
+  <symbol viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" id="facebook">
+    <path d="M437 0H75C33.648 0 0 33.648 0 75v362c0 41.352 33.648 75 75 75h151V331h-60v-90h60v-61c0-49.629 40.371-90 90-90h91v90h-91v61h91l-15 90h-76v181h121c41.352 0 75-33.648 75-75V75c0-41.352-33.648-75-75-75zm0 0"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18.001 18.001" id="twitter">
+    <path d="M15.891 4.013c.808-.496 1.343-1.173 1.605-2.034a8.68 8.68 0 0 1-2.351.861c-.703-.756-1.593-1.14-2.66-1.14-1.043 0-1.924.366-2.643 1.078a3.56 3.56 0 0 0-1.076 2.605c0 .309.039.585.117.819-3.076-.105-5.622-1.381-7.628-3.837-.34.601-.51 1.213-.51 1.846 0 1.301.549 2.332 1.645 3.089-.625-.053-1.176-.211-1.645-.47 0 .929.273 1.705.82 2.388a3.623 3.623 0 0 0 2.115 1.291c-.312.08-.641.118-.979.118-.312 0-.533-.026-.664-.083.23.757.664 1.371 1.291 1.841a3.652 3.652 0 0 0 2.152.743C4.148 14.173 2.625 14.69.902 14.69c-.422 0-.721-.006-.902-.038 1.697 1.102 3.586 1.649 5.676 1.649 2.139 0 4.029-.542 5.674-1.626 1.645-1.078 2.859-2.408 3.639-3.974a10.77 10.77 0 0 0 1.172-4.892v-.468a7.788 7.788 0 0 0 1.84-1.921 8.142 8.142 0 0 1-2.11.593z"
+      ></path>
+  </symbol>
+  <symbol aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" id="mail">
+    <path  d="M502.3 190.8c3.9-3.1 9.7-.2 9.7 4.7V400c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V195.6c0-5 5.7-7.8 9.7-4.7 22.4 17.4 52.1 39.5 154.1 113.6 21.1 15.4 56.7 47.8 92.2 47.6 35.7.3 72-32.8 92.3-47.6 102-74.1 131.6-96.3 154-113.7zM256 320c23.2.4 56.6-29.2 73.4-41.4 132.7-96.3 142.8-104.7 173.4-128.7 5.8-4.5 9.2-11.5 9.2-18.9v-19c0-26.5-21.5-48-48-48H48C21.5 64 0 85.5 0 112v19c0 7.4 3.4 14.3 9.2 18.9 30.6 23.9 40.7 32.4 173.4 128.7 16.8 12.2 50.2 41.8 73.4 41.4z"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" id="calendar">
+    <path d="M452 40h-24V0h-40v40H124V0H84v40H60C26.916 40 0 66.916 0 100v352c0 33.084 26.916 60 60 60h392c33.084 0 60-26.916 60-60V100c0-33.084-26.916-60-60-60zm20 412c0 11.028-8.972 20-20 20H60c-11.028 0-20-8.972-20-20V188h432v264zm0-304H40v-48c0-11.028 8.972-20 20-20h24v40h40V80h264v40h40V80h24c11.028 0 20 8.972 20 20v48z"></path>
+    <path d="M76 230h40v40H76zm80 0h40v40h-40zm80 0h40v40h-40zm80 0h40v40h-40zm80 0h40v40h-40zM76 310h40v40H76zm80 0h40v40h-40zm80 0h40v40h-40zm80 0h40v40h-40zM76 390h40v40H76zm80 0h40v40h-40zm80 0h40v40h-40zm80 0h40v40h-40zm80-80h40v40h-40z"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" id="github">
+    <path d="M255.968 5.329C114.624 5.329 0 120.401 0 262.353c0 113.536 73.344 209.856 175.104 243.872 12.8 2.368 17.472-5.568 17.472-12.384 0-6.112-.224-22.272-.352-43.712-71.2 15.52-86.24-34.464-86.24-34.464-11.616-29.696-28.416-37.6-28.416-37.6-23.264-15.936 1.728-15.616 1.728-15.616 25.696 1.824 39.2 26.496 39.2 26.496 22.848 39.264 59.936 27.936 74.528 21.344 2.304-16.608 8.928-27.936 16.256-34.368-56.832-6.496-116.608-28.544-116.608-127.008 0-28.064 9.984-51.008 26.368-68.992-2.656-6.496-11.424-32.64 2.496-68 0 0 21.504-6.912 70.4 26.336 20.416-5.696 42.304-8.544 64.096-8.64 21.728.128 43.648 2.944 64.096 8.672 48.864-33.248 70.336-26.336 70.336-26.336 13.952 35.392 5.184 61.504 2.56 68 16.416 17.984 26.304 40.928 26.304 68.992 0 98.72-59.84 120.448-116.864 126.816 9.184 7.936 17.376 23.616 17.376 47.584 0 34.368-.32 62.08-.32 70.496 0 6.88 4.608 14.88 17.6 12.352C438.72 472.145 512 375.857 512 262.353 512 120.401 397.376 5.329 255.968 5.329z"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 212 212" id="gitlab">
+    <path d="M12.3 74.7h54L43.3 3c-1-3.6-6.4-3.6-7.6 0L12.3 74.8z" />
+    <path d="M12.3 74.7L.5 111c-1 3.2 0 6.8 3 8.8l101.6 74-92.5-119z"/>
+    <path d="M105 193.7l-38.6-119h-54l92.7 119z"/>
+    <path d="M105 193.7l38.7-119H66.4l38.7 119z"/>
+    <path d="M105 193.7l38.7-119H198l-93 119z"/>
+    <path d="M198 74.7l11.6 36.2c1 3 0 6.6-3 8.6l-101.5 74 93-119z"/>
+    <path d="M198 74.7h-54.3L167 3c1.2-3.6 6.4-3.6 7.6 0L198 74.8z"/>
+  </symbol>
+  <symbol viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" id="rss">
+    <circle cx="3.429" cy="20.571" r="3.429"></circle>
+    <path d="M11.429 24h4.57C15.999 15.179 8.821 8.001 0 8v4.572c6.302.001 11.429 5.126 11.429 11.428z"></path>
+    <path d="M24 24C24 10.766 13.234 0 0 0v4.571c10.714 0 19.43 8.714 19.43 19.429z"></path>
+  </symbol>
+  <symbol viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" id="linkedin">
+    <path d="M437 0H75C33.648 0 0 33.648 0 75v362c0 41.352 33.648 75 75 75h362c41.352 0 75-33.648 75-75V75c0-41.352-33.648-75-75-75zM181 406h-60V196h60zm0-240h-60v-60h60zm210 240h-60V286c0-16.54-13.46-30-30-30s-30 13.46-30 30v120h-60V196h60v11.309C286.719 202.422 296.93 196 316 196c40.691.043 75 36.547 75 79.688zm0 0"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 612 612" id="to-top">
+    <path d="M604.501 440.509L325.398 134.956c-5.331-5.357-12.423-7.627-19.386-7.27-6.989-.357-14.056 1.913-19.387 7.27L7.499 440.509c-9.999 10.024-9.999 26.298 0 36.323s26.223 10.024 36.222 0l262.293-287.164L568.28 476.832c9.999 10.024 26.222 10.024 36.221 0 9.999-10.023 9.999-26.298 0-36.323z"></path>
+  </symbol>
+  <symbol viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" id="carly">
+    <path d="M504.971 239.029L448 182.059V84c0-46.317-37.682-84-84-84h-44c-13.255 0-24 10.745-24 24s10.745 24 24 24h44c19.851 0 36 16.149 36 36v108c0 6.365 2.529 12.47 7.029 16.971L454.059 256l-47.029 47.029A24.002 24.002 0 0 0 400 320v108c0 19.851-16.149 36-36 36h-44c-13.255 0-24 10.745-24 24s10.745 24 24 24h44c46.318 0 84-37.683 84-84v-98.059l56.971-56.971c9.372-9.372 9.372-24.568 0-33.941zM112 192V84c0-19.851 16.149-36 36-36h44c13.255 0 24-10.745 24-24S205.255 0 192 0h-44c-46.318 0-84 37.683-84 84v98.059l-56.971 56.97c-9.373 9.373-9.373 24.568 0 33.941L64 329.941V428c0 46.317 37.682 84 84 84h44c13.255 0 24-10.745 24-24s-10.745-24-24-24h-44c-19.851 0-36-16.149-36-36V320c0-6.365-2.529-12.47-7.029-16.971L57.941 256l47.029-47.029A24.002 24.002 0 0 0 112 192z"></path>
+  </symbol>
+  <symbol viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" id="copy">
+    <path d="M23 2.75A2.75 2.75 0 0 0 20.25 0H8.75A2.75 2.75 0 0 0 6 2.75v13.5A2.75 2.75 0 0 0 8.75 19h11.5A2.75 2.75 0 0 0 23 16.25zM18.25 14.5h-7.5a.75.75 0 0 1 0-1.5h7.5a.75.75 0 0 1 0 1.5zm0-3h-7.5a.75.75 0 0 1 0-1.5h7.5a.75.75 0 0 1 0 1.5zm0-3h-7.5a.75.75 0 0 1 0-1.5h7.5a.75.75 0 0 1 0 1.5z"></path>
+    <path d="M8.75 20.5a4.255 4.255 0 0 1-4.25-4.25V2.75c0-.086.02-.166.025-.25H3.75A2.752 2.752 0 0 0 1 5.25v16A2.752 2.752 0 0 0 3.75 24h12a2.752 2.752 0 0 0 2.75-2.75v-.75z"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512.001 512.001" id="closeme">
+    <path d="M284.286 256.002L506.143 34.144c7.811-7.811 7.811-20.475 0-28.285-7.811-7.81-20.475-7.811-28.285 0L256 227.717 34.143 5.859c-7.811-7.811-20.475-7.811-28.285 0-7.81 7.811-7.811 20.475 0 28.285l221.857 221.857L5.858 477.859c-7.811 7.811-7.811 20.475 0 28.285a19.938 19.938 0 0 0 14.143 5.857 19.94 19.94 0 0 0 14.143-5.857L256 284.287l221.857 221.857c3.905 3.905 9.024 5.857 14.143 5.857s10.237-1.952 14.143-5.857c7.811-7.811 7.811-20.475 0-28.285L284.286 256.002z"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" id="open-menu">
+    <path d="M492 236H20c-11.046 0-20 8.954-20 20s8.954 20 20 20h472c11.046 0 20-8.954 20-20s-8.954-20-20-20zm0-160H20C8.954 76 0 84.954 0 96s8.954 20 20 20h472c11.046 0 20-8.954 20-20s-8.954-20-20-20zm0 320H20c-11.046 0-20 8.954-20 20s8.954 20 20 20h472c11.046 0 20-8.954 20-20s-8.954-20-20-20z"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" id="instagram">
+    <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" id=youtube>
+    <path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" id="stackoverflow">
+    <path d="M21 27v-8h3v11H0V19h3v8h18z"></path><path d="M17.1.2L15 1.8l7.9 10.6 2.1-1.6L17.1.2zm3.7 14.7L10.6 6.4l1.7-2 10.2 8.5-1.7 2zM7.2 12.3l12 5.6 1.1-2.4-12-5.6-1.1 2.4zm-1.8 6.8l13.56 1.96.17-2.38-13.26-2.55-.47 2.97zM19 25H5v-3h14v3z"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" id="xing">
+    <path d="M18.188 0c-.517 0-.741.325-.927.66 0 0-7.455 13.224-7.702 13.657.015.024 4.919 9.023 4.919 9.023.17.308.436.66.967.66h3.454c.211 0 .375-.078.463-.22.089-.151.089-.346-.009-.536l-4.879-8.916c-.004-.006-.004-.016 0-.022L22.139.756c.095-.191.097-.387.006-.535C22.056.078 21.894 0 21.686 0h-3.498zM3.648 4.74c-.211 0-.385.074-.473.216-.09.149-.078.339.02.531l2.34 4.05c.004.01.004.016 0 .021L1.86 16.051c-.099.188-.093.381 0 .529.085.142.239.234.45.234h3.461c.518 0 .766-.348.945-.667l3.734-6.609-2.378-4.155c-.172-.315-.434-.659-.962-.659H3.648v.016z"/>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 71 55" id="discord">
+    <path d="M60.1045 4.8978C55.5792 2.8214 50.7265 1.2916 45.6527 0.41542C45.5603 0.39851 45.468 0.440769 45.4204 0.525289C44.7963 1.6353 44.105 3.0834 43.6209 4.2216C38.1637 3.4046 32.7345 3.4046 27.3892 4.2216C26.905 3.0581 26.1886 1.6353 25.5617 0.525289C25.5141 0.443589 25.4218 0.40133 25.3294 0.41542C20.2584 1.2888 15.4057 2.8186 10.8776 4.8978C10.8384 4.9147 10.8048 4.9429 10.7825 4.9795C1.57795 18.7309 -0.943561 32.1443 0.293408 45.3914C0.299005 45.4562 0.335386 45.5182 0.385761 45.5576C6.45866 50.0174 12.3413 52.7249 18.1147 54.5195C18.2071 54.5477 18.305 54.5139 18.3638 54.4378C19.7295 52.5728 20.9469 50.6063 21.9907 48.5383C22.0523 48.4172 21.9935 48.2735 21.8676 48.2256C19.9366 47.4931 18.0979 46.6 16.3292 45.5858C16.1893 45.5041 16.1781 45.304 16.3068 45.2082C16.679 44.9293 17.0513 44.6391 17.4067 44.3461C17.471 44.2926 17.5606 44.2813 17.6362 44.3151C29.2558 49.6202 41.8354 49.6202 53.3179 44.3151C53.3935 44.2785 53.4831 44.2898 53.5502 44.3433C53.9057 44.6363 54.2779 44.9293 54.6529 45.2082C54.7816 45.304 54.7732 45.5041 54.6333 45.5858C52.8646 46.6197 51.0259 47.4931 49.0921 48.2228C48.9662 48.2707 48.9102 48.4172 48.9718 48.5383C50.038 50.6034 51.2554 52.5699 52.5959 54.435C52.6519 54.5139 52.7526 54.5477 52.845 54.5195C58.6464 52.7249 64.529 50.0174 70.6019 45.5576C70.6551 45.5182 70.6887 45.459 70.6943 45.3942C72.1747 30.0791 68.2147 16.7757 60.1968 4.9823C60.1772 4.9429 60.1437 4.9147 60.1045 4.8978ZM23.7259 37.3253C20.2276 37.3253 17.3451 34.1136 17.3451 30.1693C17.3451 26.225 20.1717 23.0133 23.7259 23.0133C27.308 23.0133 30.1626 26.2532 30.1066 30.1693C30.1066 34.1136 27.28 37.3253 23.7259 37.3253ZM47.3178 37.3253C43.8196 37.3253 40.9371 34.1136 40.9371 30.1693C40.9371 26.225 43.7636 23.0133 47.3178 23.0133C50.9 23.0133 53.7545 26.2532 53.6986 30.1693C53.6986 34.1136 50.9 37.3253 47.3178 37.3253Z"/>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 17 18" id="mastodon">
+    <path
+    fill="#ffffff"
+    d="m 15.054695,9.8859583 c -0.22611,1.1632697 -2.02517,2.4363497 -4.09138,2.6830797 -1.0774504,0.12856 -2.1382704,0.24673 -3.2694704,0.19484 -1.84996,-0.0848 -3.30971,-0.44157 -3.30971,-0.44157 0,0.1801 0.0111,0.35157 0.0333,0.51194 0.24051,1.82571 1.81034,1.93508 3.29737,1.98607 1.50088,0.0514 2.8373104,-0.37004 2.8373104,-0.37004 l 0.0617,1.35686 c 0,0 -1.0498104,0.56374 -2.9199404,0.66742 -1.03124,0.0567 -2.3117,-0.0259 -3.80308,-0.42069 -3.23454998,-0.85613 -3.79081998,-4.304 -3.87592998,-7.8024197 -0.026,-1.03871 -0.01,-2.01815 -0.01,-2.83732 0,-3.57732 2.34385998,-4.62587996 2.34385998,-4.62587996 1.18184,-0.54277 3.20976,-0.77101 5.318,-0.7882499985409 h 0.0518 C 9.8267646,0.01719834 11.856025,0.24547834 13.037775,0.78824834 c 0,0 2.34377,1.04855996 2.34377,4.62587996 0,0 0.0294,2.63937 -0.32687,4.47183"/>
+ <path
+    fill="#000000"
+    d="m 12.616925,5.6916583 v 4.3315297 h -1.71607 V 5.8189683 c 0,-0.88624 -0.37289,-1.33607 -1.1187604,-1.33607 -0.82467,0 -1.23799,0.53361 -1.23799,1.58875 v 2.30122 h -1.70594 v -2.30122 c 0,-1.05514 -0.4134,-1.58875 -1.23808,-1.58875 -0.74587,0 -1.11876,0.44983 -1.11876,1.33607 v 4.2042197 h -1.71607 V 5.6916583 c 0,-0.88527 0.22541,-1.58876 0.67817,-2.10922 0.46689,-0.52047 1.07833,-0.78727 1.83735,-0.78727 0.87816,0 1.54317,0.33752 1.98288,1.01267 l 0.42744,0.71655 0.42753,-0.71655 c 0.43961,-0.67515 1.10463,-1.01267 1.9828704,-1.01267 0.75893,0 1.37037,0.2668 1.83735,0.78727 0.45268,0.52046 0.67808,1.22395 0.67808,2.10922"/>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 530" id="bluesky" >
+    <path d="m135.72 44.03c66.496 49.921 138.02 151.14 164.28 205.46 26.262-54.316 97.782-155.54 164.28-205.46 47.98-36.021 125.72-63.892 125.72 24.795 0 17.712-10.155 148.79-16.111 170.07-20.703 73.984-96.144 92.854-163.25 81.433 117.3 19.964 147.14 86.092 82.697 152.22-122.39 125.59-175.91-31.511-189.63-71.766-2.514-7.3797-3.6904-10.832-3.7077-7.8964-0.0174-2.9357-1.1937 0.51669-3.7077 7.8964-13.714 40.255-67.233 197.36-189.63 71.766-64.444-66.128-34.605-132.26 82.697-152.22-67.108 11.421-142.55-7.4491-163.25-81.433-5.9562-21.282-16.111-152.36-16.111-170.07 0-88.687 77.742-60.816 125.72-24.795z"/>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" id="ko-fi">
+    <path fill="#ffffff" d="M4.5,9.8527H32.7947a0,0,0,0,1,0,0v19.225a9.07,9.07,0,0,1-9.07,9.07H13.57a9.07,9.07,0,0,1-9.07-9.07V9.8527A0,0,0,0,1,4.5,9.8527Z"/>
+    <path fill="#000000" d="M12.197,25.9493l6.45,6.45,6.45-6.45a8.2,8.2,0,0,0,2.4016-5.798h0a4.5082,4.5082,0,0,0-4.212-4.5459,4.4262,4.4262,0,0,0-4.64,4.4209,4.4261,4.4261,0,0,0-4.64-4.4209,4.5082,4.5082,0,0,0-4.212,4.5459h0A8.2,8.2,0,0,0,12.197,25.9493Z"/>
+    <path fill="#ffffff" d="M32.7947,9.8527H35.73a7.77,7.77,0,0,1,0,15.5394H32.7947"/>
+  </svg>
+  </symbol>
+</svg>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha512-aOFyMMzZF7l7ei3vOKgQiRhZnYqk9YC/uMzl4T0j5N5D3Kul+QAFU8ssENDRMAqr/lxDOjMF69dSYJ8HYqY+WQ==" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" integrity="sha512-UPFOadao2nEorjtjl0xUTtN3w20Ja143UPEU6EyJ1mi5MB2bDtMkiWmqGDqi47xNLB5z1dy31GKJDEWhjUJFiQ==" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" integrity="sha512-YJVxTjqttjsU3cSvaTRqsSl0wbRgZUNF+NGGCgto/MUbIvaLdXQzGTCQu4CvyJZbZctgflVB0PXw9LLmTWm5/w==" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
+<footer class="footer">
+  <div class="footer_inner wrap pale">
+    <img src='https://jianlin-li.github.io/icons/apple-touch-icon.png' class="icon icon_2 transparent" alt="Copyright © 1989–2025, 李建林 ">
+    <p>Copyright&nbsp;1989-&nbsp;<span class="year"></span>&nbsp;COPYRIGHT © 1989–2025, 李建林 . All Rights Reserved</p><a class="to_top" href="#documentTop">
+  <svg class="icon">
+  <title>to-top</title>
+  <use xlink:href="#to-top"></use>
+</svg>
+
+</a>
+
+  </div>
+</footer>
+
+<script type="text/javascript" src="https://jianlin-li.github.io/zh-cn/js/bundle.e4e0e4fbe8acb50d7f973828f4138cdbea727800047fc93f9abbd6751e8f3422d6ef193f98da36fdb8488219c25692d73da89480f46abc8421a4ee3526dd6c23.js" integrity="sha512-5ODk&#43;&#43;istQ1/lzgo9BOM2&#43;pyeAAEf8k/mrvWdR6PNCLW7xk/mNo2/bhIghnCVpLXPaiUgPRqvIQhpO41Jt1sIw==" crossorigin="anonymous"></script>
+
+  <script src="https://jianlin-li.github.io/js/search.min.4c2b0421d128bbd7c43fc7d662fb5dfd8e439c60ee92c900a26d72d9c3271d2256f5bac9f6f919cddfd55101e9272898716cbb3381b4360bf43a66a5f7664f54.js"></script>
+
+  </body>
+</html>
