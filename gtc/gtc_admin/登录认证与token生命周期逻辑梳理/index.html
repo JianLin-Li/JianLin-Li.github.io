@@ -57,6 +57,120 @@
 <link rel="stylesheet" type="text/css" href="https://jianlin-li.github.io/css/styles.dc38388a8f0b890e788bd3a99b7495d14e7d5ac4359ed3b49abeb778497863b284ad4cc7e496ef58c84139295f9bafed82f5a41345eda86bd2d429cccb7c2596.css" integrity="sha512-3Dg4io8LiQ54i9Opm3SV0U59WsQ1ntO0mr63eEl4Y7KErUzH5JbvWMhBOSlfm6/tgvWkE0XtqGvS1CnMy3wllg==" crossorigin="anonymous">
 
 
+
+<style>
+  .post_body .mermaid {
+    overflow-x: auto;
+    margin: 1.5rem 0;
+  }
+
+  .post_body .mermaid svg {
+    min-width: 100%;
+    width: 100%;
+    height: auto;
+    max-width: none;
+  }
+
+  .post_body .mermaid svg[aria-roledescription="flowchart"],
+  .post_body .mermaid svg[aria-roledescription="flowchart-v2"] {
+    --gtc-flowchart-node-fill: #e7f2ff;
+    --gtc-flowchart-node-border: #d4e4f7;
+    --gtc-flowchart-node-text: #1683e8;
+    --gtc-flowchart-line: #b8bec6;
+    --gtc-flowchart-cluster-border: #e7e9ed;
+  }
+
+  .post_body .mermaid svg[aria-roledescription="flowchart"] .node rect,
+  .post_body .mermaid svg[aria-roledescription="flowchart-v2"] .node rect {
+    fill: var(--gtc-flowchart-node-fill);
+    stroke: var(--gtc-flowchart-node-border);
+    rx: 12px;
+    ry: 12px;
+  }
+
+  .post_body .mermaid svg[aria-roledescription="flowchart"] .node polygon,
+  .post_body .mermaid svg[aria-roledescription="flowchart-v2"] .node polygon {
+    fill: #ffffff !important;
+    stroke: var(--gtc-flowchart-node-text) !important;
+    stroke-dasharray: 3 3 !important;
+  }
+
+  .post_body .mermaid svg[aria-roledescription="flowchart"] .node .label,
+  .post_body .mermaid svg[aria-roledescription="flowchart-v2"] .node .label,
+  .post_body .mermaid svg[aria-roledescription="flowchart"] .nodeLabel,
+  .post_body .mermaid svg[aria-roledescription="flowchart-v2"] .nodeLabel {
+    color: var(--gtc-flowchart-node-text);
+    fill: var(--gtc-flowchart-node-text);
+  }
+
+  .post_body .mermaid svg[aria-roledescription="flowchart"] .edgePath path,
+  .post_body .mermaid svg[aria-roledescription="flowchart-v2"] .edgePath path {
+    stroke: var(--gtc-flowchart-line);
+    stroke-width: 1.2px;
+  }
+
+  .post_body .mermaid svg[aria-roledescription="flowchart"] .edgeLabel,
+  .post_body .mermaid svg[aria-roledescription="flowchart-v2"] .edgeLabel {
+    background-color: #ffffff;
+    color: var(--gtc-flowchart-node-text);
+  }
+
+  .post_body .mermaid svg[aria-roledescription="flowchart"] .edgeLabel rect,
+  .post_body .mermaid svg[aria-roledescription="flowchart-v2"] .edgeLabel rect {
+    fill: #ffffff;
+  }
+
+  .post_body .mermaid svg[aria-roledescription="flowchart"] .cluster rect,
+  .post_body .mermaid svg[aria-roledescription="flowchart-v2"] .cluster rect {
+    fill: #ffffff;
+    stroke: var(--gtc-flowchart-cluster-border);
+  }
+
+  .post_body .mermaid svg[aria-roledescription="flowchart"] .cluster text,
+  .post_body .mermaid svg[aria-roledescription="flowchart-v2"] .cluster text {
+    fill: #4b5563;
+  }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11.17.2/dist/mermaid.min.js" crossorigin="anonymous" defer></script>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    if (!window.mermaid) {
+      return;
+    }
+
+    window.mermaid.initialize({
+      startOnLoad: false,
+      securityLevel: "strict",
+      theme: "base",
+      themeVariables: {
+        primaryColor: "#e7f2ff",
+        primaryTextColor: "#1683e8",
+        primaryBorderColor: "#d4e4f7",
+        lineColor: "#b8bec6",
+        secondaryColor: "#ffffff",
+        tertiaryColor: "#ffffff",
+        clusterBkg: "#ffffff",
+        clusterBorder: "#e7e9ed",
+        edgeLabelBackground: "#ffffff",
+        fontFamily: "-apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif"
+      },
+      flowchart: {
+        curve: "linear",
+        nodeSpacing: 34,
+        rankSpacing: 44,
+        padding: 12,
+        subGraphTitleMargin: {
+          top: 12,
+          bottom: 18
+        },
+        htmlLabels: true
+      }
+    });
+    window.mermaid.run({ querySelector: ".mermaid" });
+  });
+</script>
+
+
   </head>
   <body
     data-code="7"
@@ -137,7 +251,7 @@
     <h1 class="post_title">登录认证与 token生命周期逻辑梳理</h1>
     <div class="post_meta gtc-meta">
       <span class="post_date">
-        2026-10-17
+        2026-10-27
       </span>
       <span>项目：gtc_admin</span>
     </div>
@@ -329,10 +443,10 @@
   </tbody>
 </table>
 <p><code>P1M</code> 是 PHP <code>DateInterval</code> 的一个日历月，不应直接解释为固定 30 天。CRM JWT 支持 <code>&lt;device&gt;_ttl</code>、<code>&lt;device&gt;_refresh_ttl</code> 覆盖，如 <code>pc_ttl</code>、<code>app_refresh_ttl</code>；当前仓库 JWT 配置未声明这些覆盖键，所以静态默认回退到通用 TTL。</p>
-<p>配置证据：<a href="/Users/lijianlin/www/local/gtc_admin/config/jwt.php:13">后台 JWT 配置</a>、<a href="/Users/lijianlin/www/local/gtcuser/config/autoload/jwt.php:19">客户 JWT 配置</a>、<a href="/Users/lijianlin/www/local/gtcuser/app/OAuth2/OAuth2ServerOptions.php:70">OAuth2 TTL 读取</a>。</p>
+<p>配置证据：<a href="/Users/jalen/www/local/gtc_admin/config/jwt.php:13">后台 JWT 配置</a>、<a href="/Users/jalen/www/local/gtcuser/config/autoload/jwt.php:19">客户 JWT 配置</a>、<a href="/Users/jalen/www/local/gtcuser/app/OAuth2/OAuth2ServerOptions.php:70">OAuth2 TTL 读取</a>。</p>
 <h2 id="3-gtc_admin管理后台登录">3. gtc_admin：管理后台登录</h2>
 <h3 id="31-入口与密码验证">3.1 入口与密码验证</h3>
-<p>入口为 <a href="/Users/lijianlin/www/local/gtc_admin/app/admin/controller/Pub.php:52">Pub::login()</a>。主要流程：</p>
+<p>入口为 <a href="/Users/jalen/www/local/gtc_admin/app/admin/controller/Pub.php:52">Pub::login()</a>。主要流程：</p>
 <ol>
 <li>读取登录参数；阿里验证码开关启用时，先验证 <code>captchaVerifyParam</code>。</li>
 <li>当前仅开放邮箱密码登录；<code>type == 1</code> 的手机号登录直接返回“暂未开放”。</li>
@@ -344,7 +458,7 @@
 <li>签发 JWT，写 Redis 会话及可选终端集合，返回结果。</li>
 </ol>
 <p><strong>审计时序需要特别注意</strong>：登录日志插入在 Google 验证码校验之前，也在 Token 签发之前。因此这一条日志不能单独证明二次验证已完成或客户端已经取得 Token；该写入也没有保存随后生成的访问令牌。</p>
-<p>证据：<a href="/Users/lijianlin/www/local/gtc_admin/app/common.php:800">密码 helper</a>、<a href="/Users/lijianlin/www/local/gtc_admin/app/admin/controller/Pub.php:135">后台登录审计写入</a>、<a href="/Users/lijianlin/www/local/gtc_admin/app/admin/controller/Pub.php:164">Google 校验及签发</a>。</p>
+<p>证据：<a href="/Users/jalen/www/local/gtc_admin/app/common.php:800">密码 helper</a>、<a href="/Users/jalen/www/local/gtc_admin/app/admin/controller/Pub.php:135">后台登录审计写入</a>、<a href="/Users/jalen/www/local/gtc_admin/app/admin/controller/Pub.php:164">Google 校验及签发</a>。</p>
 <h3 id="32-access_token-和-refresh_token-的实际字段">3.2 access_token 和 refresh_token 的实际字段</h3>
 <p>控制器构造如下业务数据，再交给 <code>tinywan\JWT::generateToken($user)</code>：</p>
 <table>
@@ -436,7 +550,7 @@
 </span></span><span class="line"><span class="ln">12</span><span class="cl">  <span class="p">}</span>
 </span></span><span class="line"><span class="ln">13</span><span class="cl"><span class="p">}</span>
 </span></span></code></pre></div><p>访问签名读取 <code>access_secret_key</code>，刷新签名读取 <code>refresh_secret_key</code>。当前仓库两项是同一个固定字符串；在默认 TTL 相同且生成的 <code>exp</code> 相同时，两种令牌输入完全相同，签名也相同。若实际 TTL 被配置为不同值，或生成跨秒，则令牌字符串可能不同，但当前没有独立用途声明供解析器区分。</p>
-<p>证据：<a href="/Users/lijianlin/www/local/gtc_admin/app/admin/controller/Pub.php:176">业务字段</a>、<a href="/Users/lijianlin/www/local/gtc_admin/vendor/tinywan/think-jwt/src/JWT.php:143">generateToken</a>、<a href="/Users/lijianlin/www/local/gtc_admin/vendor/tinywan/think-jwt/src/JWT.php:292">generatePayload</a>。</p>
+<p>证据：<a href="/Users/jalen/www/local/gtc_admin/app/admin/controller/Pub.php:176">业务字段</a>、<a href="/Users/jalen/www/local/gtc_admin/vendor/tinywan/think-jwt/src/JWT.php:143">generateToken</a>、<a href="/Users/jalen/www/local/gtc_admin/vendor/tinywan/think-jwt/src/JWT.php:292">generatePayload</a>。</p>
 <h3 id="33-响应与-token_typeexpires_in">3.3 响应与 token_type、expires_in</h3>
 <p>控制器将 Tinywan 返回数组放在业务响应的 <code>data</code> 中：</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="p">{</span>
@@ -501,7 +615,7 @@
 <p>ThinkPHP 默认缓存选择 Redis，逻辑键还会叠加 <code>REDIS_PREFIX</code>，仓库默认值为 <code>max</code>。表名也由数据库前缀最终决定，不应将逻辑名直接当作部署中的完整物理名。</p>
 <p>启用 <code>CRM_MAX_USER_LOGIN_DEVICE &gt; 0</code> 后，指纹由 <code>md5(type + &quot;|&quot; + os + &quot;|&quot; + version + &quot;|&quot; + User-Agent)</code> 得到；同指纹重新登录清除其旧 <code>admin_user_token</code>，新指纹超限时按最早登录时间 <code>t</code> 淘汰。</p>
 <p>该终端集合在登录/退出时维护，不能等同于每次请求都同步刷新的完整在线设备表；普通访问续期的是 Token 标记，集合 TTL 并未随之统一更新。</p>
-<p>证据：<a href="/Users/lijianlin/www/local/gtc_admin/app/admin/controller/Pub.php:183">会话和终端缓存写入</a>、<a href="/Users/lijianlin/www/local/gtc_admin/config/cache.php:9">默认 Redis 缓存</a>、<a href="/Users/lijianlin/www/local/gtc_admin/vendor/tinywan/think-jwt/src/RedisHandler.php:23">Tinywan RedisHandler</a>。</p>
+<p>证据：<a href="/Users/jalen/www/local/gtc_admin/app/admin/controller/Pub.php:183">会话和终端缓存写入</a>、<a href="/Users/jalen/www/local/gtc_admin/config/cache.php:9">默认 Redis 缓存</a>、<a href="/Users/jalen/www/local/gtc_admin/vendor/tinywan/think-jwt/src/RedisHandler.php:23">Tinywan RedisHandler</a>。</p>
 <h3 id="35-后台客户端如何保存">3.5 后台客户端如何保存</h3>
 <p>已核对对应的 <code>gtc_admin_vue</code>：</p>
 <ol>
@@ -513,22 +627,22 @@
 <li>响应拦截器可以读取响应头 <code>authorization</code> 并替换本地凭证，但这仅代表前端有接收能力。本次后台登录/鉴权链路未发现常规请求自动签发新 JWT 并下发该响应头的实现。</li>
 <li>上述登录路径没有保存 <code>refresh_token</code>、<code>token_type</code> 或 <code>expires_in</code>，也未发现使用后台刷新令牌的调用。</li>
 </ol>
-<p>证据：<a href="/Users/lijianlin/www/local/gtc_admin_vue/src/api/login/index.js:8">前端登录</a>、<a href="/Users/lijianlin/www/local/gtc_admin_vue/src/utils/token-util.js:68">Token 存储</a>、<a href="/Users/lijianlin/www/local/gtc_admin_vue/src/utils/request.js:63">请求 Authorization</a>、<a href="/Users/lijianlin/www/local/gtc_admin_vue/src/utils/request.js:167">响应头替换能力</a>、<a href="/Users/lijianlin/www/local/gtc_admin_vue/src/utils/tab-session.js:141">页签生命周期</a>。</p>
+<p>证据：<a href="/Users/jalen/www/local/gtc_admin_vue/src/api/login/index.js:8">前端登录</a>、<a href="/Users/jalen/www/local/gtc_admin_vue/src/utils/token-util.js:68">Token 存储</a>、<a href="/Users/jalen/www/local/gtc_admin_vue/src/utils/request.js:63">请求 Authorization</a>、<a href="/Users/jalen/www/local/gtc_admin_vue/src/utils/request.js:167">响应头替换能力</a>、<a href="/Users/jalen/www/local/gtc_admin_vue/src/utils/tab-session.js:141">页签生命周期</a>。</p>
 <h3 id="36-登录时和后续请求怎样验证-authorization">3.6 登录时和后续请求怎样验证 Authorization</h3>
 <p><strong>用户名密码登录时</strong>：<code>Pub</code> 是登录校验跳过的控制器。登录依赖密码、验证码、账户/角色/IP 等校验，不要求客户端先有有效 <code>Authorization</code>。因此不要把“密码登录验证”和“后续凭证校验”混为一件事。</p>
 <p><strong>受保护请求时</strong>：存在 <code>CheckLogin</code> 中间件和 <code>BaseController</code> 构造逻辑两处校验。控制器构造涉及框架创建时机，不应将它们画成所有路由都严格按同一顺序执行的一条流水线；它们共同构成认证检查。</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="ln"> 1</span><span class="cl">flowchart TD
-</span></span><span class="line"><span class="ln"> 2</span><span class="cl">  R[后台请求] --&gt; E{是否登录校验跳过路径}
-</span></span><span class="line"><span class="ln"> 3</span><span class="cl">  E --&gt;|否| H[取得 Authorization]
-</span></span><span class="line"><span class="ln"> 4</span><span class="cl">  H --&gt; J[校验 JWT 格式、算法、签名和时间]
-</span></span><span class="line"><span class="ln"> 5</span><span class="cl">  J --&gt; U[读取 extend.id]
-</span></span><span class="line"><span class="ln"> 6</span><span class="cl">  U --&gt; M[查询当前会员状态、后台禁用、IP与权限]
-</span></span><span class="line"><span class="ln"> 7</span><span class="cl">  M --&gt; A{当前数据库 admin 或 scope 为真}
-</span></span><span class="line"><span class="ln"> 8</span><span class="cl">  A --&gt;|是且进入会话检查路径| C[校验 admin_user_token 标记并续 Redis TTL]
-</span></span><span class="line"><span class="ln"> 9</span><span class="cl">  A --&gt;|否| P[后续节点与数据权限判断]
-</span></span><span class="line"><span class="ln">10</span><span class="cl">  C --&gt; P
-</span></span><span class="line"><span class="ln">11</span><span class="cl">  E --&gt;|是| X[执行对应开放逻辑]
-</span></span></code></pre></div><p>具体行为：</p>
+<div class="mermaid">flowchart TD
+  R[后台请求] --&gt; E{是否登录校验跳过路径}
+  E --&gt;|否| H[取得 Authorization]
+  H --&gt; J[校验 JWT 格式、算法、签名和时间]
+  J --&gt; U[读取 extend.id]
+  U --&gt; M[查询当前会员状态、后台禁用、IP与权限]
+  M --&gt; A{当前数据库 admin 或 scope 为真}
+  A --&gt;|是且进入会话检查路径| C[校验 admin_user_token 标记并续 Redis TTL]
+  A --&gt;|否| P[后续节点与数据权限判断]
+  C --&gt; P
+  E --&gt;|是| X[执行对应开放逻辑]</div>
+<p>具体行为：</p>
 <ul>
 <li><code>CheckLogin</code> 跳过 <code>Pub</code>、<code>Kchart</code> 以及其 <code>notauth</code> 中的 <code>index/groups</code>、<code>index/server_list</code>。<code>BaseController</code> 的跳过条件不同，不能由一个中间件的白名单推断接口最终完全免认证。</li>
 <li>受保护路径先要求请求头包含 <code>Bearer </code>；Tinywan 的解析更严格：整个字符串按空格拆分必须恰好两项，第一项必须是大小写精确的 <code>Bearer</code>，Token 必须非空，字符串必须有两个 <code>.</code>。</li>
@@ -539,7 +653,7 @@
 <li><code>_logger()</code> 会调用 <code>refreshAdminTokenSession()</code>，要求会话标记存在并重置 TTL；全局搜索也有专门调用。该方法对 <code>admin=false</code> 直接返回；<code>_logger()</code> 对 URI 含 <code>get_notify</code> 的请求提前返回，跳过这一处会话检查与续期。</li>
 <li>解析失败在中间件可能返回业务 <code>code=401</code>；基类失效通常返回 <code>code=10002</code>。这些 JSON 业务码不能不加区分地当作 HTTP 状态码。</li>
 </ul>
-<p>证据：<a href="/Users/lijianlin/www/local/gtc_admin/app/admin/middleware/CheckLogin.php:28">CheckLogin</a>、<a href="/Users/lijianlin/www/local/gtc_admin/app/admin/controller/BaseController.php:76">基类会员与权限检查</a>、<a href="/Users/lijianlin/www/local/gtc_admin/vendor/tinywan/think-jwt/src/JWT.php:226">严格请求头解析</a>、<a href="/Users/lijianlin/www/local/gtc_admin/vendor/tinywan/think-jwt/src/JWT.php:263">签名验证</a>、<a href="/Users/lijianlin/www/local/gtc_admin/app/admin/controller/BaseController.php:405">会话检查入口</a>。</p>
+<p>证据：<a href="/Users/jalen/www/local/gtc_admin/app/admin/middleware/CheckLogin.php:28">CheckLogin</a>、<a href="/Users/jalen/www/local/gtc_admin/app/admin/controller/BaseController.php:76">基类会员与权限检查</a>、<a href="/Users/jalen/www/local/gtc_admin/vendor/tinywan/think-jwt/src/JWT.php:226">严格请求头解析</a>、<a href="/Users/jalen/www/local/gtc_admin/vendor/tinywan/think-jwt/src/JWT.php:263">签名验证</a>、<a href="/Users/jalen/www/local/gtc_admin/app/admin/controller/BaseController.php:405">会话检查入口</a>。</p>
 <h3 id="37-redis-续期与-jwt-到期的关系">3.7 Redis 续期与 JWT 到期的关系</h3>
 <p>以虚构登录时刻 <code>T</code> 和仓库默认值为例：</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">JWT 访问令牌固定截止：T + 57600 秒
@@ -550,40 +664,40 @@
 </span></span><span class="line"><span class="ln">6</span><span class="cl">JWT exp 仍然 = T + 57600
 </span></span></code></pre></div><p>对执行会话检查的账号/路径，Redis 提前过期会导致 JWT 尚未到期也不能使用；持续访问最多维持缓存，无法跨越 JWT 固定截止时间。普通角色或跳过该检查的路径不具备完全相同的空闲过期行为。</p>
 <p>源码注释中的“加半小时”不是准确配置说明：实际使用 <code>(int) env('SESSION_EXPIRE', 3600)</code>，默认是一小时。</p>
-<p>证据：<a href="/Users/lijianlin/www/local/gtc_admin/app/admin/controller/BaseController.php:450">refreshAdminTokenSession</a>。</p>
+<p>证据：<a href="/Users/jalen/www/local/gtc_admin/app/admin/controller/BaseController.php:450">refreshAdminTokenSession</a>。</p>
 <h3 id="38-刷新退出与其他签发路径">3.8 刷新、退出与其他签发路径</h3>
 <p><strong>刷新能力</strong>：Tinywan 的 <code>JWT::refreshToken()</code> 从 <code>Authorization</code> 取刷新 JWT，使用刷新配置验证，可选比对 Redis 中保存的刷新令牌，然后替换 <code>exp</code> 并签发访问令牌。返回值只有 <code>access_token</code>，不会同时轮换刷新令牌，也不会自动写应用自己的 <code>admin_user_token</code> 标记。当前应用 <code>app/</code> 中未发现该方法的调用，所以这是依赖库能力，不是已确认上线的后台刷新流程。</p>
 <p><strong>退出</strong>：<code>Pub::logout()</code> 优先读输入 <code>token</code>，然后读 <code>Authorization</code> 的 Bearer 凭证，最后读输入 <code>access_token</code>；删除对应会话缓存。若 JWT 仍能验证则定位用户，并按当前设备指纹移除终端集合项。它不建立 JWT 黑名单，也不统一撤销刷新凭证。因缓存校验范围有限，不能断言后台退出后同一 JWT 在所有后台账号和路径上都立即失效。</p>
 <p><strong>IP 拒绝分支</strong>：<code>check_ip_list()</code> 调用 <code>JWT::deleteRefreshToken($token)</code>，传入的是令牌字符串；依赖库实际期望用户 ID 并删除 <code>JWT:REFRESH_TOKEN:{id}</code>。因此这段代码不能作为刷新凭证已正确撤销的证据，当前刷新存储又是关闭的。</p>
 <p><strong>后台模拟客户登录</strong>：<code>Role::demo_login()</code> 通过内部调用访问 <code>gtcuser</code> 的 <code>remoteDemoLogin</code>，取得的是客户侧 JWT，不是 Tinywan 后台 JWT，见 4.8。</p>
 <p><strong>后台注册代码中的签发</strong>：<code>Member.php</code> 有一处调用 <code>generateToken()</code>，随后马上把 <code>$token</code> 置为空数组，最终返回空数据；不能把这段当成已向客户端交付的自动登录凭证。</p>
-<p>证据：<a href="/Users/lijianlin/www/local/gtc_admin/vendor/tinywan/think-jwt/src/JWT.php:110">依赖库刷新方法</a>、<a href="/Users/lijianlin/www/local/gtc_admin/app/admin/controller/Pub.php:213">退出</a>、<a href="/Users/lijianlin/www/local/gtc_admin/app/admin/controller/BaseController.php:211">IP 拒绝分支</a>、<a href="/Users/lijianlin/www/local/gtc_admin/app/admin/controller/Role.php:237">模拟登录</a>、<a href="/Users/lijianlin/www/local/gtc_admin/app/admin/controller/Member.php:5365">注册签发后覆盖</a>。</p>
+<p>证据：<a href="/Users/jalen/www/local/gtc_admin/vendor/tinywan/think-jwt/src/JWT.php:110">依赖库刷新方法</a>、<a href="/Users/jalen/www/local/gtc_admin/app/admin/controller/Pub.php:213">退出</a>、<a href="/Users/jalen/www/local/gtc_admin/app/admin/controller/BaseController.php:211">IP 拒绝分支</a>、<a href="/Users/jalen/www/local/gtc_admin/app/admin/controller/Role.php:237">模拟登录</a>、<a href="/Users/jalen/www/local/gtc_admin/app/admin/controller/Member.php:5365">注册签发后覆盖</a>。</p>
 <h2 id="4-gtcusercrm-客户登录">4. gtcuser：CRM 客户登录</h2>
 <h3 id="41-实际生效的技术实现">4.1 实际生效的技术实现</h3>
 <p>普通客户登录使用 <code>App\Http\Common\Lib\OAuth\OauthPassportService</code>，JWT 场景名为 <code>oauth</code>。它的名称含 OAuth，但这里是项目自己的密码/第三方登录 JWT 契约，不能直接等同于第 6 节的 League OAuth2 Server。</p>
 <p><code>config/autoload/annotations.php</code> 将 <code>Mine\Jwt\Jwt</code> 映射到 <code>app/Common/Lib/Jwt/Jwt.php</code>，所以梳理必须以这份覆盖实现为准。<code>Mine\Jwt\Factory</code> 根据场景加载配置，最终使用 Lcobucci 的 <code>JwtFacade</code> 和项目时钟签发/解析。</p>
 <p>签名算法为 HMAC SHA256（HS256）；密钥通过 <code>InMemory::base64Encoded(env('JWT_SECRET'))</code> 读取。同一仓库默认 <code>default</code> 和 <code>oauth</code> 场景使用同一个环境变量，客户访问和刷新令牌也使用同一个场景签名密钥。</p>
 <p>配置声明了 <code>claims.iss</code>，但当前覆盖实现的构建方法没有读取并添加这些默认声明。因此实际客户 JWT 不能凭该配置断言包含 <code>iss</code>。</p>
-<p>证据：<a href="/Users/lijianlin/www/local/gtcuser/config/autoload/annotations.php:37">类映射</a>、<a href="/Users/lijianlin/www/local/gtcuser/app/Common/Lib/Jwt/Jwt.php:29">实际 Jwt 实现</a>、<a href="/Users/lijianlin/www/local/gtcuser/vendor/mineadmin/jwt/Factory.php:1">场景工厂</a>、<a href="/Users/lijianlin/www/local/gtcuser/config/autoload/jwt.php:19">配置</a>。</p>
+<p>证据：<a href="/Users/jalen/www/local/gtcuser/config/autoload/annotations.php:37">类映射</a>、<a href="/Users/jalen/www/local/gtcuser/app/Common/Lib/Jwt/Jwt.php:29">实际 Jwt 实现</a>、<a href="/Users/jalen/www/local/gtcuser/vendor/mineadmin/jwt/Factory.php:1">场景工厂</a>、<a href="/Users/jalen/www/local/gtcuser/config/autoload/jwt.php:19">配置</a>。</p>
 <h3 id="42-密码登录完整调用链">4.2 密码登录完整调用链</h3>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="ln"> 1</span><span class="cl">sequenceDiagram
-</span></span><span class="line"><span class="ln"> 2</span><span class="cl">  participant C as 客户端
-</span></span><span class="line"><span class="ln"> 3</span><span class="cl">  participant P as PubController
-</span></span><span class="line"><span class="ln"> 4</span><span class="cl">  participant S as OauthPassportService
-</span></span><span class="line"><span class="ln"> 5</span><span class="cl">  participant J as 自定义 JWT
-</span></span><span class="line"><span class="ln"> 6</span><span class="cl">  participant R as Redis
-</span></span><span class="line"><span class="ln"> 7</span><span class="cl">  participant D as 登录日志/会话数据库
-</span></span><span class="line"><span class="ln"> 8</span><span class="cl">  C-&gt;&gt;P: 邮箱或手机号、密码、设备信息
-</span></span><span class="line"><span class="ln"> 9</span><span class="cl">  P-&gt;&gt;P: IP、地区、撞库防护及参数校验
-</span></span><span class="line"><span class="ln">10</span><span class="cl">  P-&gt;&gt;S: 前置事件检查后调用 login
-</span></span><span class="line"><span class="ln">11</span><span class="cl">  S-&gt;&gt;S: 验证密码、检查设备数量
-</span></span><span class="line"><span class="ln">12</span><span class="cl">  S-&gt;&gt;J: 共享 email/sid/sv 签发 access 和 refresh
-</span></span><span class="line"><span class="ln">13</span><span class="cl">  S-&gt;&gt;R: 写 login_token 列表
-</span></span><span class="line"><span class="ln">14</span><span class="cl">  S-&gt;&gt;D: 登录后事件写日志和 sid 会话
-</span></span><span class="line"><span class="ln">15</span><span class="cl">  D--&gt;&gt;S: 同库事务成功
-</span></span><span class="line"><span class="ln">16</span><span class="cl">  S--&gt;&gt;P: Token 对、expire_at、expire_time
-</span></span><span class="line"><span class="ln">17</span><span class="cl">  P--&gt;&gt;C: 业务响应
-</span></span></code></pre></div><p>入口 <a href="/Users/lijianlin/www/local/gtcuser/app/Http/Api/Controller/V1/PubController.php:334">PubController::login()</a> 对应 <code>/api/pub/login</code>：</p>
+<div class="mermaid">sequenceDiagram
+  participant C as 客户端
+  participant P as PubController
+  participant S as OauthPassportService
+  participant J as 自定义 JWT
+  participant R as Redis
+  participant D as 登录日志/会话数据库
+  C-&gt;&gt;P: 邮箱或手机号、密码、设备信息
+  P-&gt;&gt;P: IP、地区、撞库防护及参数校验
+  P-&gt;&gt;S: 前置事件检查后调用 login
+  S-&gt;&gt;S: 验证密码、检查设备数量
+  S-&gt;&gt;J: 共享 email/sid/sv 签发 access 和 refresh
+  S-&gt;&gt;R: 写 login_token 列表
+  S-&gt;&gt;D: 登录后事件写日志和 sid 会话
+  D--&gt;&gt;S: 同库事务成功
+  S--&gt;&gt;P: Token 对、expire_at、expire_time
+  P--&gt;&gt;C: 业务响应</div>
+<p>入口 <a href="/Users/jalen/www/local/gtcuser/app/Http/Api/Controller/V1/PubController.php:334">PubController::login()</a> 对应 <code>/api/pub/login</code>：</p>
 <ol>
 <li>检查客户端 IP、地区规则、登录参数和撞库防护。<code>type=0/1</code> 对应邮箱/手机号密码登录；手机号经敏感信息登录服务解析。</li>
 <li>查到用户后触发 <code>OAuthBeforeEvent</code>。监听器处理手机号验证状态、密码错误锁定及业务风控等。配置默认最大密码错误次数为 3 次，锁定时长 10 分钟，实际以运行配置为准。</li>
@@ -594,7 +708,7 @@
 <li><code>record()</code> 在数据库事务中锁会员行，复核 <code>status=1</code>、<code>banned_login!=1</code>，创建登录日志和会话记录；失败登录不会创建会话。</li>
 <li>返回 <code>expire_at</code> 和 <code>expire_time</code>。前置/密码/后置阶段的失败会按现有审计逻辑记录，不能把所有异常都理解为密码不正确。</li>
 </ol>
-<p>证据：<a href="/Users/lijianlin/www/local/gtcuser/app/Http/Api/Listeners/UserLoginBeforeListener.php:43">前置监听器</a>、<a href="/Users/lijianlin/www/local/gtcuser/app/Http/Common/Lib/OAuth/OauthPassportService.php:62">登录服务</a>、<a href="/Users/lijianlin/www/local/gtcuser/app/Model/member/TMember.php:412">会员密码验证</a>、<a href="/Users/lijianlin/www/local/gtcuser/common/crm.php:268">密码 helper</a>、<a href="/Users/lijianlin/www/local/gtcuser/app/Http/Api/Listeners/UserLoginAfterListener.php:236">登录后监听器</a>、<a href="/Users/lijianlin/www/local/gtcuser/app/Service/crm/MemberLoginLogService.php:43">同库写入</a>。</p>
+<p>证据：<a href="/Users/jalen/www/local/gtcuser/app/Http/Api/Listeners/UserLoginBeforeListener.php:43">前置监听器</a>、<a href="/Users/jalen/www/local/gtcuser/app/Http/Common/Lib/OAuth/OauthPassportService.php:62">登录服务</a>、<a href="/Users/jalen/www/local/gtcuser/app/Model/member/TMember.php:412">会员密码验证</a>、<a href="/Users/jalen/www/local/gtcuser/common/crm.php:268">密码 helper</a>、<a href="/Users/jalen/www/local/gtcuser/app/Http/Api/Listeners/UserLoginAfterListener.php:236">登录后监听器</a>、<a href="/Users/jalen/www/local/gtcuser/app/Service/crm/MemberLoginLogService.php:43">同库写入</a>。</p>
 <h3 id="43-客户-token-精确载荷">4.3 客户 Token 精确载荷</h3>
 <p><code>MemberLoginSessionService::claims()</code> 每次正常新登录返回：</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">email = 用户邮箱
@@ -681,7 +795,7 @@
 </span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="p">}</span>
 </span></span></code></pre></div><p>虚构刷新 JWT 在上述业务字段基础上，将 <code>exp</code> 改为 <code>1800007200</code> 并加入 <code>&quot;sub&quot;:&quot;refresh&quot;</code>。真实两次签发可能跨秒，不应假设两个 <code>iat</code> 永远完全一样。</p>
 <p>不在正常客户 JWT 中的字段包括密码、原始手机号、角色列表、IP、设备实例 ID、<code>auth_source</code>、<code>token_type</code>、响应 <code>expire_at/expire_time</code>。审计表中的认证来源和设备详情不等于 JWT 声明。</p>
-<p>证据：<a href="/Users/lijianlin/www/local/gtcuser/app/Service/member/MemberLoginSessionService.php:18">sid/sv 生成</a>、<a href="/Users/lijianlin/www/local/gtcuser/app/Common/Lib/Jwt/Jwt.php:116">访问构建</a>、<a href="/Users/lijianlin/www/local/gtcuser/app/Common/Lib/Jwt/Jwt.php:67">刷新构建</a>、<a href="/Users/lijianlin/www/local/gtcuser/vendor/lcobucci/jwt/src/JwtFacade.php:36">时间自动补充</a>、<a href="/Users/lijianlin/www/local/gtcuser/vendor/lcobucci/jwt/src/Encoding/UnifyAudience.php:13">单受众编码</a>。</p>
+<p>证据：<a href="/Users/jalen/www/local/gtcuser/app/Service/member/MemberLoginSessionService.php:18">sid/sv 生成</a>、<a href="/Users/jalen/www/local/gtcuser/app/Common/Lib/Jwt/Jwt.php:116">访问构建</a>、<a href="/Users/jalen/www/local/gtcuser/app/Common/Lib/Jwt/Jwt.php:67">刷新构建</a>、<a href="/Users/jalen/www/local/gtcuser/vendor/lcobucci/jwt/src/JwtFacade.php:36">时间自动补充</a>、<a href="/Users/jalen/www/local/gtcuser/vendor/lcobucci/jwt/src/Encoding/UnifyAudience.php:13">单受众编码</a>。</p>
 <h3 id="44-expire_at-和-expire_time-的实际作用">4.4 expire_at 和 expire_time 的实际作用</h3>
 <p>普通客户登录和刷新结果的核心数据形态是：</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="ln">1</span><span class="cl"><span class="p">{</span>
@@ -752,7 +866,7 @@
 <h4 id="数据库会话">数据库会话</h4>
 <p>登录日志和会话同事务写入。正常登录同时传入 Token 对时，<code>session.expires_at</code> 从刷新 JWT 的 <code>exp</code> 取得，初始 <code>version=0</code>；数据库不需要保存完整刷新 JWT。若调用方未传刷新令牌，记录服务才回退使用访问令牌截止时间。</p>
 <p><code>session_id</code> 是会话表主键；登录日志有 <code>session_id</code> 唯一索引；日志 <code>token</code> 为 <code>varchar(2048)</code>，有前 191 字符前缀索引。会话表还有会员状态组合索引和到期扫描索引。部署后的实际库/表前缀由 <code>DB_PREFIX</code> 等运行配置决定；本文未核验生产物理表。</p>
-<p>证据：<a href="/Users/lijianlin/www/local/gtcuser/app/Http/Common/Lib/OAuth/OauthPassportService.php:244">缓存列表</a>、<a href="/Users/lijianlin/www/local/gtcuser/common/common.php:864">缓存 helper</a>、<a href="/Users/lijianlin/www/local/gtcuser/config/autoload/cache.php:16">缓存配置</a>、<a href="/Users/lijianlin/www/local/gtcuser/vendor/hyperf/cache/src/Driver/Driver.php:60">Redis 键拼接</a>、<a href="/Users/lijianlin/www/local/gtcuser/app/Common/Lib/Jwt/Jwt.php:187">黑名单写入</a>、<a href="/Users/lijianlin/www/local/gtcuser/docs/%E6%95%B0%E6%8D%AE%E5%AD%97%E5%85%B8.sql:3643">日志与会话结构</a>。</p>
+<p>证据：<a href="/Users/jalen/www/local/gtcuser/app/Http/Common/Lib/OAuth/OauthPassportService.php:244">缓存列表</a>、<a href="/Users/jalen/www/local/gtcuser/common/common.php:864">缓存 helper</a>、<a href="/Users/jalen/www/local/gtcuser/config/autoload/cache.php:16">缓存配置</a>、<a href="/Users/jalen/www/local/gtcuser/vendor/hyperf/cache/src/Driver/Driver.php:60">Redis 键拼接</a>、<a href="/Users/jalen/www/local/gtcuser/app/Common/Lib/Jwt/Jwt.php:187">黑名单写入</a>、<a href="/Users/jalen/www/local/gtcuser/docs/%E6%95%B0%E6%8D%AE%E5%AD%97%E5%85%B8.sql:3643">日志与会话结构</a>。</p>
 <h3 id="46-authorization-如何验证">4.6 Authorization 如何验证</h3>
 <p>全局 HTTP 中间件会先处理 <code>ApiTokenMiddleware</code>，再进入具体路由和其认证要求。密码登录本身不要求已有有效访问令牌。</p>
 <p>读取凭证优先级：</p>
@@ -773,7 +887,7 @@
 </ol>
 <p><strong>普通 HTTP 会话校验不比较 <code>sv</code> 与数据库 <code>version</code></strong>。<code>sv</code> 防重放目前主要作用于刷新，不是每次访问都执行的版本失效机制。普通解析也未配置预期 <code>iss</code> 或设备/场景 <code>aud</code> 约束。</p>
 <p>开放 <code>Pub</code> 登录/刷新路由没有普遍要求旧 Authorization 有效，但仍经过全局中间件：提交过期/签名错误 Token 可能降为匿名，提交能解析但会话已结束或水位已撤销的 Token 则可能提前被拒绝。客户端应避免在重新登录时无条件附带已撤销的旧凭证。</p>
-<p>证据：<a href="/Users/lijianlin/www/local/gtcuser/config/autoload/middlewares.php:26">HTTP 中间件注册</a>、<a href="/Users/lijianlin/www/local/gtcuser/app/Http/Api/Middleware/ApiTokenMiddleware.php:46">ApiTokenMiddleware</a>、<a href="/Users/lijianlin/www/local/gtcuser/vendor/mineadmin/auth-jwt/Middleware/AbstractTokenMiddleware.php:59">凭证提取</a>、<a href="/Users/lijianlin/www/local/gtcuser/app/Common/Lib/Jwt/Jwt.php:164">访问解析约束</a>、<a href="/Users/lijianlin/www/local/gtcuser/app/Http/Api/Middleware/TokenMiddleware.php:78">受保护路由要求</a>、<a href="/Users/lijianlin/www/local/gtcuser/app/Service/member/MemberLoginSessionService.php:24">会话有效性</a>、<a href="/Users/lijianlin/www/local/gtcuser/app/Service/member/MemberTokenInvalidationService.php:53">失效水位</a>。</p>
+<p>证据：<a href="/Users/jalen/www/local/gtcuser/config/autoload/middlewares.php:26">HTTP 中间件注册</a>、<a href="/Users/jalen/www/local/gtcuser/app/Http/Api/Middleware/ApiTokenMiddleware.php:46">ApiTokenMiddleware</a>、<a href="/Users/jalen/www/local/gtcuser/vendor/mineadmin/auth-jwt/Middleware/AbstractTokenMiddleware.php:59">凭证提取</a>、<a href="/Users/jalen/www/local/gtcuser/app/Common/Lib/Jwt/Jwt.php:164">访问解析约束</a>、<a href="/Users/jalen/www/local/gtcuser/app/Http/Api/Middleware/TokenMiddleware.php:78">受保护路由要求</a>、<a href="/Users/jalen/www/local/gtcuser/app/Service/member/MemberLoginSessionService.php:24">会话有效性</a>、<a href="/Users/jalen/www/local/gtcuser/app/Service/member/MemberTokenInvalidationService.php:53">失效水位</a>。</p>
 <h3 id="47-刷新两套入口必须分别看">4.7 刷新：两套入口必须分别看</h3>
 <h4 id="a-apipubrefresh_token开放刷新入口">A. <code>/api/pub/refresh_token</code>，开放刷新入口</h4>
 <p>请求体必须同时提供 <code>refresh_token</code> 和 <code>access_token</code>。适用于访问令牌已经到期、刷新令牌仍有效的情形。</p>
@@ -803,7 +917,7 @@
 <h4 id="刷新中的事务边界">刷新中的事务边界</h4>
 <p>会话锁和版本更新在 MySQL 事务内，但 Redis 黑名单、列表写入发生在签发回调中，不随 MySQL 回滚；公开入口的登录日志 Token 替换又在服务层事务完成后执行。因此当前流程存在跨存储失败和并发窗口，应通过测试环境故障注入验证恢复能力，不能声称整个刷新过程在 Redis/MySQL 间完全原子。</p>
 <p>无 <code>sid</code> 的旧令牌不走持久化版本校验，主要依赖黑名单、时间和水位，长期 TTL 配置调整时要单独考虑旧刷新 Token 重放。</p>
-<p>证据：<a href="/Users/lijianlin/www/local/gtcuser/app/Http/Api/Controller/V1/PubController.php:415">开放刷新入口</a>、<a href="/Users/lijianlin/www/local/gtcuser/app/Http/Common/Lib/OAuth/OauthPassportService.php:419">服务层刷新</a>、<a href="/Users/lijianlin/www/local/gtcuser/app/Service/member/MemberLoginSessionService.php:35">行锁与版本</a>、<a href="/Users/lijianlin/www/local/gtcuser/app/Http/Api/Controller/V1/MemberController.php:1342">会员刷新入口</a>、<a href="/Users/lijianlin/www/local/gtcuser/app/Repository/crm/MemberLoginLogRepository.php:120">日志 Token 替换</a>。</p>
+<p>证据：<a href="/Users/jalen/www/local/gtcuser/app/Http/Api/Controller/V1/PubController.php:415">开放刷新入口</a>、<a href="/Users/jalen/www/local/gtcuser/app/Http/Common/Lib/OAuth/OauthPassportService.php:419">服务层刷新</a>、<a href="/Users/jalen/www/local/gtcuser/app/Service/member/MemberLoginSessionService.php:35">行锁与版本</a>、<a href="/Users/jalen/www/local/gtcuser/app/Http/Api/Controller/V1/MemberController.php:1342">会员刷新入口</a>、<a href="/Users/jalen/www/local/gtcuser/app/Repository/crm/MemberLoginLogRepository.php:120">日志 Token 替换</a>。</p>
 <h3 id="48-其他客户签发场景">4.8 其他客户签发场景</h3>
 <table>
   <thead>
@@ -843,7 +957,7 @@
 </table>
 <p>内部模拟登录路由由 <code>InternalTokenMiddleware</code> 验证请求头 <code>Token</code> 与 <code>config('internal_token')</code>，要求双方非空并 <code>hash_equals()</code>；这个内部通信凭证与客户 JWT 的 Authorization 不同。</p>
 <p>MT 安全码复用相同 JWT 构建器/场景，而常规访问解析没有 <code>aud</code> 用途限制，后续应评估业务用途隔离，不能只因载荷中有 <code>aud</code> 就认为用途已经被验证。</p>
-<p>证据：<a href="/Users/lijianlin/www/local/gtcuser/app/Service/member/TMemberService.php:2180">注册签发</a>、<a href="/Users/lijianlin/www/local/gtcuser/app/Service/crm/MemberThirdAuthService.php:175">第三方签发</a>、<a href="/Users/lijianlin/www/local/gtcuser/app/Http/Common/Lib/OAuth/OauthPassportService.php:130">无密码签发</a>、<a href="/Users/lijianlin/www/local/gtcuser/app/Http/Api/Controller/Inner/OptionController.php:763">模拟签发</a>、<a href="/Users/lijianlin/www/local/gtcuser/app/Http/Api/Middleware/InternalTokenMiddleware.php:24">内部校验</a>、<a href="/Users/lijianlin/www/local/gtcuser/app/Service/Trade/TradeService.php:2212">MT 安全码</a>。</p>
+<p>证据：<a href="/Users/jalen/www/local/gtcuser/app/Service/member/TMemberService.php:2180">注册签发</a>、<a href="/Users/jalen/www/local/gtcuser/app/Service/crm/MemberThirdAuthService.php:175">第三方签发</a>、<a href="/Users/jalen/www/local/gtcuser/app/Http/Common/Lib/OAuth/OauthPassportService.php:130">无密码签发</a>、<a href="/Users/jalen/www/local/gtcuser/app/Http/Api/Controller/Inner/OptionController.php:763">模拟签发</a>、<a href="/Users/jalen/www/local/gtcuser/app/Http/Api/Middleware/InternalTokenMiddleware.php:24">内部校验</a>、<a href="/Users/jalen/www/local/gtcuser/app/Service/Trade/TradeService.php:2212">MT 安全码</a>。</p>
 <p>客户 Web/App 前端源码不属于这两个后端项目，本次不能确认它们将 Token 存在 localStorage、Cookie、App 安全存储还是其他位置。后端能确认的是响应交付和服务端保存，不应把后台 Vue 的存储方式套到客户 App。</p>
 <h3 id="49-退出踢设备密码修改禁用和自然到期">4.9 退出、踢设备、密码修改、禁用和自然到期</h3>
 <table>
@@ -905,7 +1019,7 @@
 <p>失效水位默认以当前秒写入，要求新 Token 的 <code>iat</code> 大于该秒。仓库提供 <code>waitUntilTokenCanBeIssued()</code> 方法，但本次搜索未发现实际调用；密码重置/全量撤销同秒重新签发的边界需要验证，不能仅因方法存在就断言已解决。</p>
 <h4 id="websocket-与-http-的差异">WebSocket 与 HTTP 的差异</h4>
 <p><code>socket-io</code> 注册 <code>WebSocketAuthMiddleware</code>。握手使用 query <code>token</code>，校验 JWT、会员失效水位、黑名单和当前会员状态；当前这份中间件未调用 <code>MemberLoginSessionService::assertValid()</code>。因此 HTTP 已依据 sid 拒绝的会话，不应推断 WebSocket 握手必然做了同样检查；已建立连接是否立即断开也不能从 HTTP 鉴权推导，应另行验证连接生命周期。</p>
-<p>证据：<a href="/Users/lijianlin/www/local/gtcuser/app/Http/Common/Lib/OAuth/OauthPassportService.php:400">客户退出</a>、<a href="/Users/lijianlin/www/local/gtcuser/app/Service/member/TMemberService.php:3666">批量撤销</a>、<a href="/Users/lijianlin/www/local/gtc_admin/app/admin/controller/Member.php:2698">后台禁用客户</a>、<a href="/Users/lijianlin/www/local/gtc_admin/app/service/MemberLoginSessionService.php:11">后台共享会话结束</a>、<a href="/Users/lijianlin/www/local/gtcuser/app/Task/MemberLoginSessionExpireTask.php:8">自然到期任务</a>、<a href="/Users/lijianlin/www/local/gtcuser/config/autoload/member_login_audit.php:8">扫描配置</a>、<a href="/Users/lijianlin/www/local/gtcuser/app/Http/Api/Middleware/WebSocketAuthMiddleware.php:30">WebSocket 鉴权</a>。</p>
+<p>证据：<a href="/Users/jalen/www/local/gtcuser/app/Http/Common/Lib/OAuth/OauthPassportService.php:400">客户退出</a>、<a href="/Users/jalen/www/local/gtcuser/app/Service/member/TMemberService.php:3666">批量撤销</a>、<a href="/Users/jalen/www/local/gtc_admin/app/admin/controller/Member.php:2698">后台禁用客户</a>、<a href="/Users/jalen/www/local/gtc_admin/app/service/MemberLoginSessionService.php:11">后台共享会话结束</a>、<a href="/Users/jalen/www/local/gtcuser/app/Task/MemberLoginSessionExpireTask.php:8">自然到期任务</a>、<a href="/Users/jalen/www/local/gtcuser/config/autoload/member_login_audit.php:8">扫描配置</a>、<a href="/Users/jalen/www/local/gtcuser/app/Http/Api/Middleware/WebSocketAuthMiddleware.php:30">WebSocket 鉴权</a>。</p>
 <h2 id="5-gtcusermineadmin-自带管理端-passport">5. gtcuser：MineAdmin 自带管理端 Passport</h2>
 <p>这套管理端位于 <code>gtcuser</code>，与 <code>gtc_admin</code> 的 <code>/admin/pub/login</code> 属于不同代码和用户认证入口。</p>
 <h3 id="51-登录与声明">5.1 登录与声明</h3>
@@ -923,7 +1037,7 @@
 <li><code>/admin/passport/logout</code> 仅拉黑本次访问 JWT，不结束 sid 会话，也不关联撤销已经签发的 refresh。持有未过期刷新令牌仍可能获取新 access。</li>
 <li><code>default/oauth</code> 使用同一个签名密钥，解析器没有场景/预期受众约束；两个认证域都将用户 ID 放在 <code>jti</code>。跨场景误用的影响需结合用户存在性和权限中间件验证，不能宣称已完成利用验证，但应优先评估。</li>
 </ul>
-<p>证据：<a href="/Users/lijianlin/www/local/gtcuser/app/Http/Admin/Controller/PassportController.php:65">管理登录入口</a>、<a href="/Users/lijianlin/www/local/gtcuser/app/Service/PassportService.php:46">Passport 签发与退出</a>、<a href="/Users/lijianlin/www/local/gtcuser/app/Service/PassportService.php:95">Passport 刷新</a>、<a href="/Users/lijianlin/www/local/gtcuser/app/Http/Common/Middleware/RefreshTokenMiddleware.php:25">刷新中间件</a>、<a href="/Users/lijianlin/www/local/gtcuser/app/Common/Lib/Jwt/Jwt.php:143">刷新解析器</a>。</p>
+<p>证据：<a href="/Users/jalen/www/local/gtcuser/app/Http/Admin/Controller/PassportController.php:65">管理登录入口</a>、<a href="/Users/jalen/www/local/gtcuser/app/Service/PassportService.php:46">Passport 签发与退出</a>、<a href="/Users/jalen/www/local/gtcuser/app/Service/PassportService.php:95">Passport 刷新</a>、<a href="/Users/jalen/www/local/gtcuser/app/Http/Common/Middleware/RefreshTokenMiddleware.php:25">刷新中间件</a>、<a href="/Users/jalen/www/local/gtcuser/app/Common/Lib/Jwt/Jwt.php:143">刷新解析器</a>。</p>
 <h2 id="6-gtcuser独立-league-oauth2-授权">6. gtcuser：独立 League OAuth2 授权</h2>
 <p>本节解释客户项目中另一组 <code>token_type/expires_in/expire_time</code> 来源，避免将它们错误归到 <code>/api/pub/login</code>。</p>
 <h3 id="61-授权入口与技术栈">6.1 授权入口与技术栈</h3>
@@ -960,7 +1074,7 @@
 </table>
 <p>工厂启用的是授权码 grant 和带会员状态复核的刷新 grant（各有启用配置），不能因为依赖包包含 PasswordGrant 文件，就认为系统通过 OAuth2 密码 grant 登录。</p>
 <p>静默 <code>login_ticket</code> 为 <code>lt_ + bin2hex(random_bytes(24))</code>，缓存绑定用户和 client，默认 TTL 60 秒，消费时使用锁并删除。票据响应字段是 <strong><code>expire_in</code></strong>，既不是 <code>expires_in</code> 也不是客户登录的 <code>expire_at</code>；它不是最终访问 JWT。</p>
-<p>证据：<a href="/Users/lijianlin/www/local/gtcuser/app/Http/Api/Controller/OAuth2/OAuth2Controller.php:37">OAuth2 控制器</a>、<a href="/Users/lijianlin/www/local/gtcuser/app/OAuth2/AuthorizationServerFactory.php:66">服务器工厂</a>、<a href="/Users/lijianlin/www/local/gtcuser/app/Service/OAuth2/LoginTicketService.php:31">票据服务</a>。</p>
+<p>证据：<a href="/Users/jalen/www/local/gtcuser/app/Http/Api/Controller/OAuth2/OAuth2Controller.php:37">OAuth2 控制器</a>、<a href="/Users/jalen/www/local/gtcuser/app/OAuth2/AuthorizationServerFactory.php:66">服务器工厂</a>、<a href="/Users/jalen/www/local/gtcuser/app/Service/OAuth2/LoginTicketService.php:31">票据服务</a>。</p>
 <h3 id="62-access_tokenrs256-jwt">6.2 access_token：RS256 JWT</h3>
 <p>库为令牌生成随机 ID，默认 <code>bin2hex(random_bytes(40))</code>，即 80 位十六进制字符串。访问 JWT 使用 RSA 私钥签名，声明如下：</p>
 <table>
@@ -998,7 +1112,7 @@
   </tbody>
 </table>
 <p>头部为 <code>typ=JWT/alg=RS256</code>。这里没有 CRM 的 <code>email/sid/sv</code>。签名使用 <code>OAuth2ServerOptions</code> 指定的私钥，资源服务器读取公钥；不得与 <code>JWT_SECRET</code> 的 HS256 处理混用。</p>
-<p>证据：<a href="/Users/lijianlin/www/local/gtcuser/packages/league-oauth2-server/src/Grant/AbstractGrant.php:569">随机 ID 生成</a>、<a href="/Users/lijianlin/www/local/gtcuser/packages/league-oauth2-server/src/Entities/Traits/AccessTokenTrait.php:64">访问 JWT 构建</a>。</p>
+<p>证据：<a href="/Users/jalen/www/local/gtcuser/packages/league-oauth2-server/src/Grant/AbstractGrant.php:569">随机 ID 生成</a>、<a href="/Users/jalen/www/local/gtcuser/packages/league-oauth2-server/src/Entities/Traits/AccessTokenTrait.php:64">访问 JWT 构建</a>。</p>
 <h3 id="63-refresh_token加密-json">6.3 refresh_token：加密 JSON</h3>
 <p>BearerTokenResponse 先构造：</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="ln">1</span><span class="cl"><span class="p">{</span>
@@ -1011,7 +1125,7 @@
 </span></span><span class="line"><span class="ln">8</span><span class="cl"><span class="p">}</span>
 </span></span></code></pre></div><p>随后调用 <code>CryptTrait::encrypt()</code>。根据 encryption key 的类型，使用 Defuse Crypto 的 <code>encrypt()</code> 或 <code>encryptWithPassword()</code>；最终给客户端的是加密字符串。</p>
 <p>这里的 <code>expire_time</code> 在<strong>加密刷新载荷内部</strong>，是刷新令牌的绝对截止 Unix 秒，与 <code>/api/pub/login</code> 响应中访问令牌的 <code>expire_time</code> 作用不同。这个刷新 Token 不能当 JWT 解码或用 HS256 parser 验证。</p>
-<p>证据：<a href="/Users/lijianlin/www/local/gtcuser/packages/league-oauth2-server/src/ResponseTypes/BearerTokenResponse.php:24">响应及刷新载荷</a>、<a href="/Users/lijianlin/www/local/gtcuser/packages/league-oauth2-server/src/CryptTrait.php:36">Defuse 加解密</a>。</p>
+<p>证据：<a href="/Users/jalen/www/local/gtcuser/packages/league-oauth2-server/src/ResponseTypes/BearerTokenResponse.php:24">响应及刷新载荷</a>、<a href="/Users/jalen/www/local/gtcuser/packages/league-oauth2-server/src/CryptTrait.php:36">Defuse 加解密</a>。</p>
 <h3 id="64-响应与存储">6.4 响应与存储</h3>
 <p>OAuth2 成功结果是协议 JSON，并非普通 CRM 的同一 <code>data</code> 结构：</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="ln">1</span><span class="cl"><span class="p">{</span>
@@ -1043,7 +1157,7 @@
   </tbody>
 </table>
 <p>模型使用日期时间字段 <code>expires_at</code>，不是客户会话的 Unix 秒字段。实际物理前缀随 DB 配置；本次在当前数据字典中未定位到这两表定义，能确认的是模型和仓储契约，不能据此确认线上表、索引或迁移已部署。</p>
-<p>证据：<a href="/Users/lijianlin/www/local/gtcuser/app/OAuth2/Repository/AccessTokenRepository.php:44">访问仓储</a>、<a href="/Users/lijianlin/www/local/gtcuser/app/OAuth2/Repository/RefreshTokenRepository.php:31">刷新仓储</a>、<a href="/Users/lijianlin/www/local/gtcuser/app/Model/OAuth2/AccessToken.php:24">访问模型</a>。</p>
+<p>证据：<a href="/Users/jalen/www/local/gtcuser/app/OAuth2/Repository/AccessTokenRepository.php:44">访问仓储</a>、<a href="/Users/jalen/www/local/gtcuser/app/OAuth2/Repository/RefreshTokenRepository.php:31">刷新仓储</a>、<a href="/Users/jalen/www/local/gtcuser/app/Model/OAuth2/AccessToken.php:24">访问模型</a>。</p>
 <h3 id="65-authorization-与刷新验证">6.5 Authorization 与刷新验证</h3>
 <p>资源请求由 <code>ResourceServer + BearerTokenValidator</code> 处理：</p>
 <ol>
@@ -1056,7 +1170,7 @@
 <p>刷新流程会验证 client、解密刷新字符串、检查 client 绑定、内部 <code>expire_time</code>、数据库刷新撤销状态；项目覆盖 grant 还复核会员当前是否允许 OAuth2 登录。新 scopes 不能比原 scopes 扩大。正常轮换撤销旧访问 ID 和旧刷新 ID，再写新实体并返回凭证。</p>
 <p>这里没有 CRM 的 <code>sid/sv</code> 行锁机制；当前仓储方法展示的是逐条写入/更新，不能认定并发刷新天然等价于客户持久化版本保护，应单独验证。</p>
 <p>全局 <code>ApiTokenMiddleware</code> 可能先尝试以 HS256 解析这个 RS256 Token 并降为匿名，OAuth2 路由随后用自己的中间件完成认证。所以不能把“CRM parser 不识别”理解为 OAuth2 请求必然非法，也不能把这两套 Token 任意替换。</p>
-<p>证据：<a href="/Users/lijianlin/www/local/gtcuser/packages/league-oauth2-server/src/AuthorizationValidators/BearerTokenValidator.php:90">OAuth2 Bearer 验证</a>、<a href="/Users/lijianlin/www/local/gtcuser/app/Http/Api/Middleware/OAuth2Middleware.php:34">路由 OAuth2 中间件</a>、<a href="/Users/lijianlin/www/local/gtcuser/packages/league-oauth2-server/src/Grant/RefreshTokenGrant.php:99">刷新 grant</a>、<a href="/Users/lijianlin/www/local/gtcuser/app/OAuth2/Grant/MemberAwareRefreshTokenGrant.php:43">会员状态复核</a>。</p>
+<p>证据：<a href="/Users/jalen/www/local/gtcuser/packages/league-oauth2-server/src/AuthorizationValidators/BearerTokenValidator.php:90">OAuth2 Bearer 验证</a>、<a href="/Users/jalen/www/local/gtcuser/app/Http/Api/Middleware/OAuth2Middleware.php:34">路由 OAuth2 中间件</a>、<a href="/Users/jalen/www/local/gtcuser/packages/league-oauth2-server/src/Grant/RefreshTokenGrant.php:99">刷新 grant</a>、<a href="/Users/jalen/www/local/gtcuser/app/OAuth2/Grant/MemberAwareRefreshTokenGrant.php:43">会员状态复核</a>。</p>
 <h2 id="7-跨项目生命周期对照">7. 跨项目生命周期对照</h2>
 <table>
   <thead>

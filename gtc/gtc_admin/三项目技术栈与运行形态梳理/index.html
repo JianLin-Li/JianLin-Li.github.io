@@ -57,6 +57,120 @@
 <link rel="stylesheet" type="text/css" href="https://jianlin-li.github.io/css/styles.dc38388a8f0b890e788bd3a99b7495d14e7d5ac4359ed3b49abeb778497863b284ad4cc7e496ef58c84139295f9bafed82f5a41345eda86bd2d429cccb7c2596.css" integrity="sha512-3Dg4io8LiQ54i9Opm3SV0U59WsQ1ntO0mr63eEl4Y7KErUzH5JbvWMhBOSlfm6/tgvWkE0XtqGvS1CnMy3wllg==" crossorigin="anonymous">
 
 
+
+<style>
+  .post_body .mermaid {
+    overflow-x: auto;
+    margin: 1.5rem 0;
+  }
+
+  .post_body .mermaid svg {
+    min-width: 100%;
+    width: 100%;
+    height: auto;
+    max-width: none;
+  }
+
+  .post_body .mermaid svg[aria-roledescription="flowchart"],
+  .post_body .mermaid svg[aria-roledescription="flowchart-v2"] {
+    --gtc-flowchart-node-fill: #e7f2ff;
+    --gtc-flowchart-node-border: #d4e4f7;
+    --gtc-flowchart-node-text: #1683e8;
+    --gtc-flowchart-line: #b8bec6;
+    --gtc-flowchart-cluster-border: #e7e9ed;
+  }
+
+  .post_body .mermaid svg[aria-roledescription="flowchart"] .node rect,
+  .post_body .mermaid svg[aria-roledescription="flowchart-v2"] .node rect {
+    fill: var(--gtc-flowchart-node-fill);
+    stroke: var(--gtc-flowchart-node-border);
+    rx: 12px;
+    ry: 12px;
+  }
+
+  .post_body .mermaid svg[aria-roledescription="flowchart"] .node polygon,
+  .post_body .mermaid svg[aria-roledescription="flowchart-v2"] .node polygon {
+    fill: #ffffff !important;
+    stroke: var(--gtc-flowchart-node-text) !important;
+    stroke-dasharray: 3 3 !important;
+  }
+
+  .post_body .mermaid svg[aria-roledescription="flowchart"] .node .label,
+  .post_body .mermaid svg[aria-roledescription="flowchart-v2"] .node .label,
+  .post_body .mermaid svg[aria-roledescription="flowchart"] .nodeLabel,
+  .post_body .mermaid svg[aria-roledescription="flowchart-v2"] .nodeLabel {
+    color: var(--gtc-flowchart-node-text);
+    fill: var(--gtc-flowchart-node-text);
+  }
+
+  .post_body .mermaid svg[aria-roledescription="flowchart"] .edgePath path,
+  .post_body .mermaid svg[aria-roledescription="flowchart-v2"] .edgePath path {
+    stroke: var(--gtc-flowchart-line);
+    stroke-width: 1.2px;
+  }
+
+  .post_body .mermaid svg[aria-roledescription="flowchart"] .edgeLabel,
+  .post_body .mermaid svg[aria-roledescription="flowchart-v2"] .edgeLabel {
+    background-color: #ffffff;
+    color: var(--gtc-flowchart-node-text);
+  }
+
+  .post_body .mermaid svg[aria-roledescription="flowchart"] .edgeLabel rect,
+  .post_body .mermaid svg[aria-roledescription="flowchart-v2"] .edgeLabel rect {
+    fill: #ffffff;
+  }
+
+  .post_body .mermaid svg[aria-roledescription="flowchart"] .cluster rect,
+  .post_body .mermaid svg[aria-roledescription="flowchart-v2"] .cluster rect {
+    fill: #ffffff;
+    stroke: var(--gtc-flowchart-cluster-border);
+  }
+
+  .post_body .mermaid svg[aria-roledescription="flowchart"] .cluster text,
+  .post_body .mermaid svg[aria-roledescription="flowchart-v2"] .cluster text {
+    fill: #4b5563;
+  }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11.17.2/dist/mermaid.min.js" crossorigin="anonymous" defer></script>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    if (!window.mermaid) {
+      return;
+    }
+
+    window.mermaid.initialize({
+      startOnLoad: false,
+      securityLevel: "strict",
+      theme: "base",
+      themeVariables: {
+        primaryColor: "#e7f2ff",
+        primaryTextColor: "#1683e8",
+        primaryBorderColor: "#d4e4f7",
+        lineColor: "#b8bec6",
+        secondaryColor: "#ffffff",
+        tertiaryColor: "#ffffff",
+        clusterBkg: "#ffffff",
+        clusterBorder: "#e7e9ed",
+        edgeLabelBackground: "#ffffff",
+        fontFamily: "-apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif"
+      },
+      flowchart: {
+        curve: "linear",
+        nodeSpacing: 34,
+        rankSpacing: 44,
+        padding: 12,
+        subGraphTitleMargin: {
+          top: 12,
+          bottom: 18
+        },
+        htmlLabels: true
+      }
+    });
+    window.mermaid.run({ querySelector: ".mermaid" });
+  });
+</script>
+
+
   </head>
   <body
     data-code="7"
@@ -137,7 +251,7 @@
     <h1 class="post_title">三项目技术栈与运行形态梳理</h1>
     <div class="post_meta gtc-meta">
       <span class="post_date">
-        2026-10-17
+        2026-10-27
       </span>
       <span>项目：gtc_admin</span>
     </div>
@@ -183,18 +297,18 @@
       </tr>
   </tbody>
 </table>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="ln"> 1</span><span class="cl">flowchart TD
-</span></span><span class="line"><span class="ln"> 2</span><span class="cl">    AdminBrowser[管理员浏览器] --&gt; Vue[gtc_admin_vue 静态 SPA]
-</span></span><span class="line"><span class="ln"> 3</span><span class="cl">    Vue --&gt;|管理接口及部分历史公共 API| Admin[gtc_admin / ThinkPHP / FPM]
-</span></span><span class="line"><span class="ln"> 4</span><span class="cl">    Client[客户 Web 或 App 调用方，前端代码不在本次三个项目内] --&gt; User[gtcuser / Hyperf / Swoole]
-</span></span><span class="line"><span class="ln"> 5</span><span class="cl">    Admin --&gt;|内部 HTTP：导出、开户、任务、翻译等| User
-</span></span><span class="line"><span class="ln"> 6</span><span class="cl">    User --&gt;|部分导出任务按传入接口地址拉取数据| Admin
-</span></span><span class="line"><span class="ln"> 7</span><span class="cl">    Admin --&gt; AdminData[业务库、MT 报表库、分析库、Redis]
-</span></span><span class="line"><span class="ln"> 8</span><span class="cl">    User --&gt; UserData[业务库、MT 报表库、分析库、Redis]
-</span></span><span class="line"><span class="ln"> 9</span><span class="cl">    User --&gt; Workers[AsyncQueue / Crontab / Socket.IO]
-</span></span><span class="line"><span class="ln">10</span><span class="cl">    Admin --&gt; External[MT、KYC、支付、OSS、短信、邮件等]
-</span></span><span class="line"><span class="ln">11</span><span class="cl">    User --&gt; External
-</span></span></code></pre></div><p>图中的数据连接表示代码具备相关连接能力；两个后端是否连接同一个物理数据库、Redis 实例，以及生产网关的路由分配，需要部署配置进一步确认。</p>
+<div class="mermaid">flowchart TD
+    AdminBrowser[管理员浏览器] --&gt; Vue[gtc_admin_vue 静态 SPA]
+    Vue --&gt;|管理接口及部分历史公共 API| Admin[gtc_admin / ThinkPHP / FPM]
+    Client[客户 Web 或 App 调用方，前端代码不在本次三个项目内] --&gt; User[gtcuser / Hyperf / Swoole]
+    Admin --&gt;|内部 HTTP：导出、开户、任务、翻译等| User
+    User --&gt;|部分导出任务按传入接口地址拉取数据| Admin
+    Admin --&gt; AdminData[业务库、MT 报表库、分析库、Redis]
+    User --&gt; UserData[业务库、MT 报表库、分析库、Redis]
+    User --&gt; Workers[AsyncQueue / Crontab / Socket.IO]
+    Admin --&gt; External[MT、KYC、支付、OSS、短信、邮件等]
+    User --&gt; External</div>
+<p>图中的数据连接表示代码具备相关连接能力；两个后端是否连接同一个物理数据库、Redis 实例，以及生产网关的路由分配，需要部署配置进一步确认。</p>
 <h2 id="2-gtc_admin">2. gtc_admin</h2>
 <h3 id="21-技术栈及版本依据">2.1 技术栈及版本依据</h3>
 <ul>
@@ -208,7 +322,7 @@
 <li>外部集成：MT 远程接口、Salesforce、支付与 Udun 钱包、KYC、短信、邮件、AI 翻译等。</li>
 </ul>
 <p>这里必须把“ThinkPHP 8 体系”与“原版上游框架”区分开。框架维护和依赖安装需要保留本地包，不能仅按照标准 ThinkPHP 项目重新安装或升级。</p>
-<p>依据：<a href="/Users/lijianlin/www/local/gtc_admin/composer.json">composer.json</a>、<a href="/Users/lijianlin/www/local/gtc_admin/localPackage/framework/composer.json">本地框架包</a>、<a href="/Users/lijianlin/www/local/gtc_admin/docs/%E9%A1%B9%E7%9B%AE%E5%BC%80%E5%8F%91%E8%A7%84%E8%8C%83.md">项目规范</a>。</p>
+<p>依据：<a href="/Users/jalen/www/local/gtc_admin/composer.json">composer.json</a>、<a href="/Users/jalen/www/local/gtc_admin/localPackage/framework/composer.json">本地框架包</a>、<a href="/Users/jalen/www/local/gtc_admin/docs/%E9%A1%B9%E7%9B%AE%E5%BC%80%E5%8F%91%E8%A7%84%E8%8C%83.md">项目规范</a>。</p>
 <h3 id="22-请求入口与运行过程">2.2 请求入口与运行过程</h3>
 <ol>
 <li>Web 入口为 <code>public/index.php</code>，加载 Composer 自动加载，再执行 ThinkPHP HTTP 应用。</li>
@@ -218,7 +332,7 @@
 <li>项目响应通常是 <code>{code, message, data}</code>，业务成功码通常为 <code>0</code>。</li>
 </ol>
 <p>生产形态是 Web Server 将 PHP 请求转交 PHP-FPM，执行请求后返回响应。与 Hyperf 常驻应用相比，代码更新、请求状态生命周期及进程管理方式不同。</p>
-<p>依据：<a href="/Users/lijianlin/www/local/gtc_admin/public/index.php">Web 入口</a>、<a href="/Users/lijianlin/www/local/gtc_admin/config/route.php">路由配置</a>、<a href="/Users/lijianlin/www/local/gtc_admin/app/admin/controller/BaseController.php">后台基类</a>、<a href="/Users/lijianlin/www/local/gtc_admin/app/admin/middleware/CheckLogin.php">登录中间件</a>。</p>
+<p>依据：<a href="/Users/jalen/www/local/gtc_admin/public/index.php">Web 入口</a>、<a href="/Users/jalen/www/local/gtc_admin/config/route.php">路由配置</a>、<a href="/Users/jalen/www/local/gtc_admin/app/admin/controller/BaseController.php">后台基类</a>、<a href="/Users/jalen/www/local/gtc_admin/app/admin/middleware/CheckLogin.php">登录中间件</a>。</p>
 <h3 id="23-分层与业务模块">2.3 分层与业务模块</h3>
 <p>规范要求新增后台业务采用：</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">app/admin/controller -&gt; app/service -&gt; app/admin/model
@@ -234,7 +348,7 @@
 <li><code>app/command/workman.php</code> 当前只输出启动文字，并未实际启动 Workerman。根目录 <code>run.php</code> 也不是已确认的服务入口。</li>
 <li>部分后台动作调用 gtcuser 内部接口，例如异步导出、审核通过后的信号开户及 AI 翻译刷新。</li>
 </ul>
-<p>依据：<a href="/Users/lijianlin/www/local/gtc_admin/config/database.php">数据库配置</a>、<a href="/Users/lijianlin/www/local/gtc_admin/config/queue.php">队列配置</a>、<a href="/Users/lijianlin/www/local/gtc_admin/config/console.php">CLI 命令配置</a>、<a href="/Users/lijianlin/www/local/gtc_admin/app/command/workman.php">历史 workman 命令</a>。</p>
+<p>依据：<a href="/Users/jalen/www/local/gtc_admin/config/database.php">数据库配置</a>、<a href="/Users/jalen/www/local/gtc_admin/config/queue.php">队列配置</a>、<a href="/Users/jalen/www/local/gtc_admin/config/console.php">CLI 命令配置</a>、<a href="/Users/jalen/www/local/gtc_admin/app/command/workman.php">历史 workman 命令</a>。</p>
 <h3 id="25-开发部署与测试">2.5 开发、部署与测试</h3>
 <table>
   <thead>
@@ -329,7 +443,7 @@
 </table>
 <p>其他主要能力包括 Less、ECharts、Day.js、Big.js、富文本/Markdown、图片处理、XLSX、PDF、二维码、拖拽和视频播放。开发工具包括 ESLint、Prettier、Terser、自动组件导入和 gzip 构建插件。</p>
 <p>版本范围不是当前准确版本。当前 <code>cross-env 10.1.0</code> 要求 Node <code>&gt;=20</code>，因此不能只根据 Vite 4 自身支持较旧 Node 就确定整个项目的构建环境；建议使用团队统一的 Node 20+ 版本并验证。</p>
-<p>依据：<a href="/Users/lijianlin/www/local/gtc_admin_vue/package.json">package.json</a>、<a href="/Users/lijianlin/www/local/gtc_admin_vue/package-lock.json">package-lock.json</a>。</p>
+<p>依据：<a href="/Users/jalen/www/local/gtc_admin_vue/package.json">package.json</a>、<a href="/Users/jalen/www/local/gtc_admin_vue/package-lock.json">package-lock.json</a>。</p>
 <h3 id="32-运行形态与构建">3.2 运行形态与构建</h3>
 <ul>
 <li>应用入口为 <code>src/main.js</code>，注册 Pinia、路由、权限和国际化，挂载到浏览器页面。</li>
@@ -341,7 +455,7 @@
 <li>构建使用 Terser、生产移除 console/debugger/注释，并生成符合阈值的 <code>.gz</code> 文件。服务端是否实际使用预压缩文件由 Web Server 配置决定。</li>
 <li><code>npm run serve</code> 会先构建再运行 Vite preview，用于预览，不应视为生产部署方式。</li>
 </ul>
-<p>依据：<a href="/Users/lijianlin/www/local/gtc_admin_vue/vite.config.js">Vite 配置</a>、<a href="/Users/lijianlin/www/local/gtc_admin_vue/src/main.js">入口</a>、<a href="/Users/lijianlin/www/local/gtc_admin_vue/src/router/index.js">路由</a>、<a href="/Users/lijianlin/www/local/gtc_admin_vue/src/config/setting.js">设置</a>。</p>
+<p>依据：<a href="/Users/jalen/www/local/gtc_admin_vue/vite.config.js">Vite 配置</a>、<a href="/Users/jalen/www/local/gtc_admin_vue/src/main.js">入口</a>、<a href="/Users/jalen/www/local/gtc_admin_vue/src/router/index.js">路由</a>、<a href="/Users/jalen/www/local/gtc_admin_vue/src/config/setting.js">设置</a>。</p>
 <h3 id="33-请求权限和菜单链路">3.3 请求、权限和菜单链路</h3>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">views 页面 -&gt; api 业务封装 -&gt; utils/request.js -&gt; 后端接口
 </span></span><span class="line"><span class="ln">2</span><span class="cl">登录 token -&gt; 用户 store 获取菜单/会员信息 -&gt; 动态注册路由 -&gt; 页面及按钮权限
@@ -350,7 +464,7 @@
 <p>因此，不能简单配置“所有 <code>/admin</code> 交给 gtc_admin，所有 <code>/api</code> 交给 gtcuser”。具体接口归属需要按调用方、响应契约和网关规则核对。</p>
 <p>菜单主要来自后端，路由使用 <code>import.meta.glob('/src/views/**/index.vue')</code> 解析页面，Pinia 保存用户、菜单、权限及系统配置。前端权限控制应与后台节点权限和数据范围协作，服务端仍承担最终授权判断。</p>
 <p>国际化入口显式注册 18 个语言集合。语言头映射与两个 PHP 后端的语言标识体系需要保持兼容；金额、精度、日期和时区工具也是报表及资金页面的重要公共依赖。</p>
-<p>依据：<a href="/Users/lijianlin/www/local/gtc_admin_vue/src/utils/request.js">请求封装</a>、<a href="/Users/lijianlin/www/local/gtc_admin_vue/src/api/login/index.js">登录 API</a>、<a href="/Users/lijianlin/www/local/gtc_admin_vue/src/api/layout/index.js">布局 API</a>、<a href="/Users/lijianlin/www/local/gtc_admin_vue/src/store/modules/user.js">用户 store</a>、<a href="/Users/lijianlin/www/local/gtc_admin_vue/src/i18n/index.js">国际化入口</a>。</p>
+<p>依据：<a href="/Users/jalen/www/local/gtc_admin_vue/src/utils/request.js">请求封装</a>、<a href="/Users/jalen/www/local/gtc_admin_vue/src/api/login/index.js">登录 API</a>、<a href="/Users/jalen/www/local/gtc_admin_vue/src/api/layout/index.js">布局 API</a>、<a href="/Users/jalen/www/local/gtc_admin_vue/src/store/modules/user.js">用户 store</a>、<a href="/Users/jalen/www/local/gtc_admin_vue/src/i18n/index.js">国际化入口</a>。</p>
 <h3 id="34-业务范围与测试">3.4 业务范围与测试</h3>
 <p>页面涵盖会员、资金、KYC、代理、返佣、MT 配置、交易记录、跟单、PAMM、风控、报表、支付、活动、系统、工单和通知等。多个业务有历史页面、备份或重复实现，目录存在并不代表页面已进入当前菜单。</p>
 <p><code>tests/unit</code> 当前有 4 个 Node <code>node:test</code> 测试文件，另有源码目录内的测试文件；<code>package.json</code> 未定义统一 <code>test</code> 脚本。可按具体测试通过 <code>node --test</code> 执行，现有测试数量不能证明全部页面覆盖。<code>lint:eslint</code> 带 <code>--fix</code>，会写入文件，本次未执行。</p>
@@ -367,7 +481,7 @@
 </ul>
 <p>PHP 版本存在明确差异：项目规范和 Composer 根声明以 PHP 8.1 为基线，Dockerfile 也使用 8.1；但当前生产锁定依赖中，OpenAI client、Symfony 7、WebAuthn 等要求 PHP 8.2，当前 <code>vendor/composer/platform_check.php</code> 的门槛也是 <code>PHP_VERSION_ID &gt;= 80200</code>，Compose 使用 8.2 镜像。</p>
 <p>按当前依赖正常安装和加载，需要至少 PHP 8.2。后续业务代码仍应遵守仓库规定的 PHP 8.1 语法边界；运行版本与依赖版本的统一需要单独处理，不能把文档中的 8.1 当作当前锁文件已兼容的事实。</p>
-<p>依据：<a href="/Users/lijianlin/www/local/gtcuser/composer.json">composer.json</a>、<a href="/Users/lijianlin/www/local/gtcuser/composer.lock">composer.lock</a>、<a href="/Users/lijianlin/www/local/gtcuser/docs/%E9%A1%B9%E7%9B%AE%E5%BC%80%E5%8F%91%E8%A7%84%E8%8C%83.md">项目规范</a>、<a href="/Users/lijianlin/www/local/gtcuser/Dockerfile">Dockerfile</a>、<a href="/Users/lijianlin/www/local/gtcuser/docker-compose.yml">Compose</a>。</p>
+<p>依据：<a href="/Users/jalen/www/local/gtcuser/composer.json">composer.json</a>、<a href="/Users/jalen/www/local/gtcuser/composer.lock">composer.lock</a>、<a href="/Users/jalen/www/local/gtcuser/docs/%E9%A1%B9%E7%9B%AE%E5%BC%80%E5%8F%91%E8%A7%84%E8%8C%83.md">项目规范</a>、<a href="/Users/jalen/www/local/gtcuser/Dockerfile">Dockerfile</a>、<a href="/Users/jalen/www/local/gtcuser/docker-compose.yml">Compose</a>。</p>
 <h3 id="42-常驻应用启动和端口">4.2 常驻应用启动和端口</h3>
 <p>实际启动链路是：</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">composer start -&gt; 清理 runtime/container -&gt; php bin/hyperf.php start
@@ -401,14 +515,14 @@
 </table>
 <p><code>server.php</code> 使用 <code>SWOOLE_PROCESS</code>，启用协程，配置 CPU 相关 worker 数、4 个 task worker、请求数回收、异步 reload、PID 和日志。静态文件处理关闭，文件访问需要结合 Nginx/OSS 等方案。入口代码将 PHP 默认时区设为 UTC。</p>
 <p>常驻进程的配置、容器和代码在启动时加载，代码发布后需结合缓存处理和 reload/restart。请求数据必须注意协程上下文隔离；数据库/Redis 连接池、各队列进程及后台任务共同占用资源。</p>
-<p>依据：<a href="/Users/lijianlin/www/local/gtcuser/bin/hyperf.php">启动入口</a>、<a href="/Users/lijianlin/www/local/gtcuser/config/autoload/server.php">服务配置</a>。</p>
+<p>依据：<a href="/Users/jalen/www/local/gtcuser/bin/hyperf.php">启动入口</a>、<a href="/Users/jalen/www/local/gtcuser/config/autoload/server.php">服务配置</a>。</p>
 <h3 id="43-分层路由与接口类型">4.3 分层、路由与接口类型</h3>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">app/Http/Admin 或 app/Http/Api -&gt; app/Service -&gt; app/Repository 或 app/Model
 </span></span></code></pre></div><p>主要业务域包括 <code>Trade</code>、<code>Cash</code>、<code>Commission</code>、<code>Follow</code>、<code>Pamm</code>、<code>Risk</code>、<code>SecurityPolicy</code>、<code>IbAccount</code>、<code>crm</code>、<code>member</code> 等。历史代码并不全部严格遵循分层，某些控制器和 Model 仍直接承担查询或业务处理。</p>
 <p>客户侧控制器位于 <code>app/Http/Api/Controller</code>，包含 V1/V2/V3、开放接口、OAuth2、内部接口、设备接口和 Socket.IO。多数使用 Attributes 显式注册路由；V1 常使用 <code>/api/member</code> 等未带版本号的前缀，V2/V3 则有 <code>/api/v2</code>、<code>/api/v3</code>，不能只按文件目录推断 URL。</p>
 <p>MineAdmin 自带的管理接口目录也存在，但 <code>disable_admin_manage</code> 默认为 <code>true</code>，全局 RouterBlack 中间件据此拦截 <code>admin/</code> 请求；注释明确说明当前使用旧版管理后台。具体环境是否覆盖此默认值未验证。</p>
 <p>客户侧 API 成功码通常为 <code>200</code>，与 gtc_admin 常用的 <code>0</code> 不同。返回字段虽均常见 <code>code/message/data</code>，调用方仍必须按接口契约处理，不能直接互换。</p>
-<p>依据：<a href="/Users/lijianlin/www/local/gtcuser/app/Http/Api/Controller/V1/MemberController.php">会员接口</a>、<a href="/Users/lijianlin/www/local/gtcuser/config/autoload/middlewares.php">中间件</a>、<a href="/Users/lijianlin/www/local/gtcuser/config/config.php">后台访问开关</a>、<a href="/Users/lijianlin/www/local/gtcuser/app/Http/Admin/Middleware/RouterBlackMiddleware.php">后台拦截</a>、<a href="/Users/lijianlin/www/local/gtcuser/app/Http/Common/ResultCode.php">响应码</a>。</p>
+<p>依据：<a href="/Users/jalen/www/local/gtcuser/app/Http/Api/Controller/V1/MemberController.php">会员接口</a>、<a href="/Users/jalen/www/local/gtcuser/config/autoload/middlewares.php">中间件</a>、<a href="/Users/jalen/www/local/gtcuser/config/config.php">后台访问开关</a>、<a href="/Users/jalen/www/local/gtcuser/app/Http/Admin/Middleware/RouterBlackMiddleware.php">后台拦截</a>、<a href="/Users/jalen/www/local/gtcuser/app/Http/Common/ResultCode.php">响应码</a>。</p>
 <h3 id="44-队列调度和-websocket">4.4 队列、调度和 WebSocket</h3>
 <ul>
 <li><code>config/autoload/processes.php</code> 注册 CrontabDispatcherProcess 和 AsyncQueue ConsumerProcess，随应用启动。</li>
@@ -420,7 +534,7 @@
 <li><code>app/Process/RemoteEventListenerProcess.php</code> 的 Process 注解当前被注释，不能据文件存在认定 Redis remoteEvent 监听已启动。<code>LogProcess</code> 实现的是日志 Processor，也不是独立常驻进程。</li>
 </ul>
 <p>这说明仅检查 HTTP 健康不足以判断系统功能正常，还需要确认队列消费、调度开关、任务状态、WebSocket 及外部依赖。</p>
-<p>依据：<a href="/Users/lijianlin/www/local/gtcuser/config/autoload/processes.php">进程注册</a>、<a href="/Users/lijianlin/www/local/gtcuser/config/autoload/async_queue.php">队列配置</a>、<a href="/Users/lijianlin/www/local/gtcuser/app/Jobs/CommonTaskJob.php">通用任务 Job</a>、<a href="/Users/lijianlin/www/local/gtcuser/app/Task/TaskTrait.php">任务开关</a>、<a href="/Users/lijianlin/www/local/gtcuser/app/Http/Api/Controller/Ws/WebSocketController.php">Socket.IO 控制器</a>。</p>
+<p>依据：<a href="/Users/jalen/www/local/gtcuser/config/autoload/processes.php">进程注册</a>、<a href="/Users/jalen/www/local/gtcuser/config/autoload/async_queue.php">队列配置</a>、<a href="/Users/jalen/www/local/gtcuser/app/Jobs/CommonTaskJob.php">通用任务 Job</a>、<a href="/Users/jalen/www/local/gtcuser/app/Task/TaskTrait.php">任务开关</a>、<a href="/Users/jalen/www/local/gtcuser/app/Http/Api/Controller/Ws/WebSocketController.php">Socket.IO 控制器</a>。</p>
 <h3 id="45-部署与测试">4.5 部署与测试</h3>
 <table>
   <thead>
@@ -511,7 +625,7 @@
   </tbody>
 </table>
 <p>内部调用依赖 <code>REMOTE_EVENT_URL</code> 和内部 Token 等配置名；gtcuser 使用 <code>InternalTokenMiddleware</code> 校验 <code>Token</code> 请求头。本文不记录任何配置值或凭证。</p>
-<p>依据：<a href="/Users/lijianlin/www/local/gtc_admin/app/common.php:2029">内部 HTTP helper</a>、<a href="/Users/lijianlin/www/local/gtc_admin/app/service/SignalMtAccountDispatchService.php">开户派发</a>、<a href="/Users/lijianlin/www/local/gtc_admin/app/common.php:2510">导出适配</a>、<a href="/Users/lijianlin/www/local/gtcuser/app/Http/Api/Controller/Inner/OptionController.php">OptionController</a>、<a href="/Users/lijianlin/www/local/gtcuser/app/Http/Api/Controller/Inner/DownloadCenterController.php">下载中心入口</a>、<a href="/Users/lijianlin/www/local/gtcuser/app/Http/Api/Controller/Inner/CommonTaskController.php">通用任务入口</a>。</p>
+<p>依据：<a href="/Users/jalen/www/local/gtc_admin/app/common.php:2029">内部 HTTP helper</a>、<a href="/Users/jalen/www/local/gtc_admin/app/service/SignalMtAccountDispatchService.php">开户派发</a>、<a href="/Users/jalen/www/local/gtc_admin/app/common.php:2510">导出适配</a>、<a href="/Users/jalen/www/local/gtcuser/app/Http/Api/Controller/Inner/OptionController.php">OptionController</a>、<a href="/Users/jalen/www/local/gtcuser/app/Http/Api/Controller/Inner/DownloadCenterController.php">下载中心入口</a>、<a href="/Users/jalen/www/local/gtcuser/app/Http/Api/Controller/Inner/CommonTaskController.php">通用任务入口</a>。</p>
 <h3 id="53-共享数据结构与耦合">5.3 共享数据结构与耦合</h3>
 <p>gtc_admin 数据字典包含 425 张表，gtcuser 包含 424 张表，其中 424 个表名重合；gtc_admin 额外有 <code>t_admin_translation_kv</code>。这里比较的是建表名称，不代表全部字段、索引和约束完全一致。</p>
 <p>两个后端都覆盖 <code>t_member</code>、<code>t_member_mtlogin</code>、<code>t_fund_detail</code>、<code>t_sale_commission</code>、KYC、策略、权限、日志和报表等结构，说明存在较强的数据模型关联。物理库、读写库、分析库及 Redis 是否实际共用，仍需部署资料确认。</p>

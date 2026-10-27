@@ -63,6 +63,120 @@
 <link rel="stylesheet" type="text/css" href="https://jianlin-li.github.io/css/styles.dc38388a8f0b890e788bd3a99b7495d14e7d5ac4359ed3b49abeb778497863b284ad4cc7e496ef58c84139295f9bafed82f5a41345eda86bd2d429cccb7c2596.css" integrity="sha512-3Dg4io8LiQ54i9Opm3SV0U59WsQ1ntO0mr63eEl4Y7KErUzH5JbvWMhBOSlfm6/tgvWkE0XtqGvS1CnMy3wllg==" crossorigin="anonymous">
 
 
+
+<style>
+  .post_body .mermaid {
+    overflow-x: auto;
+    margin: 1.5rem 0;
+  }
+
+  .post_body .mermaid svg {
+    min-width: 100%;
+    width: 100%;
+    height: auto;
+    max-width: none;
+  }
+
+  .post_body .mermaid svg[aria-roledescription="flowchart"],
+  .post_body .mermaid svg[aria-roledescription="flowchart-v2"] {
+    --gtc-flowchart-node-fill: #e7f2ff;
+    --gtc-flowchart-node-border: #d4e4f7;
+    --gtc-flowchart-node-text: #1683e8;
+    --gtc-flowchart-line: #b8bec6;
+    --gtc-flowchart-cluster-border: #e7e9ed;
+  }
+
+  .post_body .mermaid svg[aria-roledescription="flowchart"] .node rect,
+  .post_body .mermaid svg[aria-roledescription="flowchart-v2"] .node rect {
+    fill: var(--gtc-flowchart-node-fill);
+    stroke: var(--gtc-flowchart-node-border);
+    rx: 12px;
+    ry: 12px;
+  }
+
+  .post_body .mermaid svg[aria-roledescription="flowchart"] .node polygon,
+  .post_body .mermaid svg[aria-roledescription="flowchart-v2"] .node polygon {
+    fill: #ffffff !important;
+    stroke: var(--gtc-flowchart-node-text) !important;
+    stroke-dasharray: 3 3 !important;
+  }
+
+  .post_body .mermaid svg[aria-roledescription="flowchart"] .node .label,
+  .post_body .mermaid svg[aria-roledescription="flowchart-v2"] .node .label,
+  .post_body .mermaid svg[aria-roledescription="flowchart"] .nodeLabel,
+  .post_body .mermaid svg[aria-roledescription="flowchart-v2"] .nodeLabel {
+    color: var(--gtc-flowchart-node-text);
+    fill: var(--gtc-flowchart-node-text);
+  }
+
+  .post_body .mermaid svg[aria-roledescription="flowchart"] .edgePath path,
+  .post_body .mermaid svg[aria-roledescription="flowchart-v2"] .edgePath path {
+    stroke: var(--gtc-flowchart-line);
+    stroke-width: 1.2px;
+  }
+
+  .post_body .mermaid svg[aria-roledescription="flowchart"] .edgeLabel,
+  .post_body .mermaid svg[aria-roledescription="flowchart-v2"] .edgeLabel {
+    background-color: #ffffff;
+    color: var(--gtc-flowchart-node-text);
+  }
+
+  .post_body .mermaid svg[aria-roledescription="flowchart"] .edgeLabel rect,
+  .post_body .mermaid svg[aria-roledescription="flowchart-v2"] .edgeLabel rect {
+    fill: #ffffff;
+  }
+
+  .post_body .mermaid svg[aria-roledescription="flowchart"] .cluster rect,
+  .post_body .mermaid svg[aria-roledescription="flowchart-v2"] .cluster rect {
+    fill: #ffffff;
+    stroke: var(--gtc-flowchart-cluster-border);
+  }
+
+  .post_body .mermaid svg[aria-roledescription="flowchart"] .cluster text,
+  .post_body .mermaid svg[aria-roledescription="flowchart-v2"] .cluster text {
+    fill: #4b5563;
+  }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11.17.2/dist/mermaid.min.js" crossorigin="anonymous" defer></script>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    if (!window.mermaid) {
+      return;
+    }
+
+    window.mermaid.initialize({
+      startOnLoad: false,
+      securityLevel: "strict",
+      theme: "base",
+      themeVariables: {
+        primaryColor: "#e7f2ff",
+        primaryTextColor: "#1683e8",
+        primaryBorderColor: "#d4e4f7",
+        lineColor: "#b8bec6",
+        secondaryColor: "#ffffff",
+        tertiaryColor: "#ffffff",
+        clusterBkg: "#ffffff",
+        clusterBorder: "#e7e9ed",
+        edgeLabelBackground: "#ffffff",
+        fontFamily: "-apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif"
+      },
+      flowchart: {
+        curve: "linear",
+        nodeSpacing: 34,
+        rankSpacing: 44,
+        padding: 12,
+        subGraphTitleMargin: {
+          top: 12,
+          bottom: 18
+        },
+        htmlLabels: true
+      }
+    });
+    window.mermaid.run({ querySelector: ".mermaid" });
+  });
+</script>
+
+
   </head>
   <body
     data-code="7"
@@ -143,7 +257,7 @@
     <h1 class="post_title">邮件功能技术架构与运行逻辑梳理</h1>
     <div class="post_meta gtc-meta">
       <span class="post_date">
-        2026-10-17
+        2026-10-27
       </span>
       <span>项目：gtc_admin</span>
     </div>
@@ -209,34 +323,34 @@
 <h3 id="21-代码位置索引">2.1 代码位置索引</h3>
 <p><strong><code>gtc_admin</code></strong></p>
 <ul>
-<li>通用发送与旧模板：<code>/Users/lijianlin/www/local/gtc_admin/app/service/InformationService.php</code></li>
-<li>队列 Job：<code>/Users/lijianlin/www/local/gtc_admin/app/jobs/controller/MailJobs.php</code></li>
-<li>模板、批量任务控制器：<code>/Users/lijianlin/www/local/gtc_admin/app/admin/controller/Mail.php</code></li>
-<li>SMTP 配置控制器：<code>/Users/lijianlin/www/local/gtc_admin/app/admin/controller/Mail/MailConfig.php</code></li>
-<li>日志和手工发送：<code>/Users/lijianlin/www/local/gtc_admin/app/admin/controller/Logger.php</code></li>
-<li>队列配置：<code>/Users/lijianlin/www/local/gtc_admin/config/queue.php</code></li>
+<li>通用发送与旧模板：<code>/Users/jalen/www/local/gtc_admin/app/service/InformationService.php</code></li>
+<li>队列 Job：<code>/Users/jalen/www/local/gtc_admin/app/jobs/controller/MailJobs.php</code></li>
+<li>模板、批量任务控制器：<code>/Users/jalen/www/local/gtc_admin/app/admin/controller/Mail.php</code></li>
+<li>SMTP 配置控制器：<code>/Users/jalen/www/local/gtc_admin/app/admin/controller/Mail/MailConfig.php</code></li>
+<li>日志和手工发送：<code>/Users/jalen/www/local/gtc_admin/app/admin/controller/Logger.php</code></li>
+<li>队列配置：<code>/Users/jalen/www/local/gtc_admin/config/queue.php</code></li>
 </ul>
 <p><strong><code>gtcuser</code></strong></p>
 <ul>
-<li>主邮件服务：<code>/Users/lijianlin/www/local/gtcuser/app/Service/Common/EmailService.php</code></li>
-<li>单会员邮件 Job：<code>/Users/lijianlin/www/local/gtcuser/app/Jobs/EmailSend/SendMemberEmailJob.php</code></li>
-<li>系统级邮件 Job：<code>/Users/lijianlin/www/local/gtcuser/app/Jobs/EmailSend/SendSystemEmailJob.php</code></li>
-<li>代理通知 Job：<code>/Users/lijianlin/www/local/gtcuser/app/Jobs/EmailSend/NotifyAgentJob.php</code></li>
-<li>事件通知编排：<code>/Users/lijianlin/www/local/gtcuser/app/Service/Notification/EmailNotificationEventService.php</code></li>
-<li>事件转邮件队列监听器：<code>/Users/lijianlin/www/local/gtcuser/app/Http/Api/Listeners/NotificationListener.php</code></li>
-<li>队列配置：<code>/Users/lijianlin/www/local/gtcuser/config/autoload/async_queue.php</code></li>
-<li>常驻进程注册：<code>/Users/lijianlin/www/local/gtcuser/config/autoload/processes.php</code></li>
-<li>Crontab 开关：<code>/Users/lijianlin/www/local/gtcuser/config/autoload/crontab.php</code></li>
+<li>主邮件服务：<code>/Users/jalen/www/local/gtcuser/app/Service/Common/EmailService.php</code></li>
+<li>单会员邮件 Job：<code>/Users/jalen/www/local/gtcuser/app/Jobs/EmailSend/SendMemberEmailJob.php</code></li>
+<li>系统级邮件 Job：<code>/Users/jalen/www/local/gtcuser/app/Jobs/EmailSend/SendSystemEmailJob.php</code></li>
+<li>代理通知 Job：<code>/Users/jalen/www/local/gtcuser/app/Jobs/EmailSend/NotifyAgentJob.php</code></li>
+<li>事件通知编排：<code>/Users/jalen/www/local/gtcuser/app/Service/Notification/EmailNotificationEventService.php</code></li>
+<li>事件转邮件队列监听器：<code>/Users/jalen/www/local/gtcuser/app/Http/Api/Listeners/NotificationListener.php</code></li>
+<li>队列配置：<code>/Users/jalen/www/local/gtcuser/config/autoload/async_queue.php</code></li>
+<li>常驻进程注册：<code>/Users/jalen/www/local/gtcuser/config/autoload/processes.php</code></li>
+<li>Crontab 开关：<code>/Users/jalen/www/local/gtcuser/config/autoload/crontab.php</code></li>
 </ul>
 <p><strong><code>gtc_admin_vue</code></strong></p>
 <ul>
-<li>新邮件模板管理：<code>/Users/lijianlin/www/local/gtc_admin_vue/src/views/system/newmessagetemplate/index.vue</code></li>
-<li>旧/兼容模板页面：<code>/Users/lijianlin/www/local/gtc_admin_vue/src/views/system/messagemanagement/messagetemplate/index.vue</code></li>
-<li>邮件任务页面：<code>/Users/lijianlin/www/local/gtc_admin_vue/src/views/sendemail/sendemail/index.vue</code></li>
-<li>会员手工发送组件：<code>/Users/lijianlin/www/local/gtc_admin_vue/src/components/member/sendemail.vue</code></li>
-<li>模板 API：<code>/Users/lijianlin/www/local/gtc_admin_vue/src/api/system/messagemanagement/messagetemplate/index.js</code></li>
-<li>SMTP 配置 API：<code>/Users/lijianlin/www/local/gtc_admin_vue/src/api/system/emailservice/sendService.js</code></li>
-<li>批量任务 API：<code>/Users/lijianlin/www/local/gtc_admin_vue/src/api/sendemail/index.js</code></li>
+<li>新邮件模板管理：<code>/Users/jalen/www/local/gtc_admin_vue/src/views/system/newmessagetemplate/index.vue</code></li>
+<li>旧/兼容模板页面：<code>/Users/jalen/www/local/gtc_admin_vue/src/views/system/messagemanagement/messagetemplate/index.vue</code></li>
+<li>邮件任务页面：<code>/Users/jalen/www/local/gtc_admin_vue/src/views/sendemail/sendemail/index.vue</code></li>
+<li>会员手工发送组件：<code>/Users/jalen/www/local/gtc_admin_vue/src/components/member/sendemail.vue</code></li>
+<li>模板 API：<code>/Users/jalen/www/local/gtc_admin_vue/src/api/system/messagemanagement/messagetemplate/index.js</code></li>
+<li>SMTP 配置 API：<code>/Users/jalen/www/local/gtc_admin_vue/src/api/system/emailservice/sendService.js</code></li>
+<li>批量任务 API：<code>/Users/jalen/www/local/gtc_admin_vue/src/api/sendemail/index.js</code></li>
 </ul>
 <h2 id="3-技术栈与配置体系">3. 技术栈与配置体系</h2>
 <h3 id="31-gtc_admin-技术栈">3.1 <code>gtc_admin</code> 技术栈</h3>
@@ -765,48 +879,48 @@
 </table>
 <h2 id="11-端到端流程图">11. 端到端流程图</h2>
 <h3 id="111-gtcuser-会员事件通知">11.1 <code>gtcuser</code> 会员事件通知</h3>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="ln"> 1</span><span class="cl">flowchart LR
-</span></span><span class="line"><span class="ln"> 2</span><span class="cl">    A[业务动作] --&gt; B[EmailNotificationEventService]
-</span></span><span class="line"><span class="ln"> 3</span><span class="cl">    B --&gt; C[EventTrackEvent]
-</span></span><span class="line"><span class="ln"> 4</span><span class="cl">    C --&gt; D[NotificationListener]
-</span></span><span class="line"><span class="ln"> 5</span><span class="cl">    D --&gt; E{代理隔离检查}
-</span></span><span class="line"><span class="ln"> 6</span><span class="cl">    E -- 否 --&gt; X[记录隔离日志并结束]
-</span></span><span class="line"><span class="ln"> 7</span><span class="cl">    E -- 是 --&gt; F[pushQueue notify_normal]
-</span></span><span class="line"><span class="ln"> 8</span><span class="cl">    F --&gt; G[AsyncQueue ConsumerProcess]
-</span></span><span class="line"><span class="ln"> 9</span><span class="cl">    G --&gt; H[SendMemberEmailJob]
-</span></span><span class="line"><span class="ln">10</span><span class="cl">    H --&gt; I[查询会员/邮箱/国家/语言]
-</span></span><span class="line"><span class="ln">11</span><span class="cl">    I --&gt; J[EmailService]
-</span></span><span class="line"><span class="ln">12</span><span class="cl">    J --&gt; K[模板和语言回退]
-</span></span><span class="line"><span class="ln">13</span><span class="cl">    K --&gt; L[变量替换和脱敏日志]
-</span></span><span class="line"><span class="ln">14</span><span class="cl">    L --&gt; M[Symfony Mailer]
-</span></span><span class="line"><span class="ln">15</span><span class="cl">    M --&gt; N[SMTP]
-</span></span><span class="line"><span class="ln">16</span><span class="cl">    M --&gt; O[mail_log 成功/失败]
-</span></span></code></pre></div><h3 id="112-全员通知">11.2 全员通知</h3>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="ln"> 1</span><span class="cl">flowchart LR
-</span></span><span class="line"><span class="ln"> 2</span><span class="cl">    A[公告/活动/直播/课程事件] --&gt; B[approvedNotification]
-</span></span><span class="line"><span class="ln"> 3</span><span class="cl">    B --&gt; C[统计 active member]
-</span></span><span class="line"><span class="ln"> 4</span><span class="cl">    C --&gt; D[写 mail_batch_send]
-</span></span><span class="line"><span class="ln"> 5</span><span class="cl">    D --&gt; E[按 5000 条 chunk 查询]
-</span></span><span class="line"><span class="ln"> 6</span><span class="cl">    E --&gt; F[每会员创建 SendMemberEmailJob]
-</span></span><span class="line"><span class="ln"> 7</span><span class="cl">    F --&gt; G[notify_all Redis 队列]
-</span></span><span class="line"><span class="ln"> 8</span><span class="cl">    G --&gt; H[Consumer 执行]
-</span></span><span class="line"><span class="ln"> 9</span><span class="cl">    H --&gt; I[mailTaskId 校验批次是否取消]
-</span></span><span class="line"><span class="ln">10</span><span class="cl">    I --&gt; J[EmailService -&gt; SMTP]
-</span></span><span class="line"><span class="ln">11</span><span class="cl">    J --&gt; K[mail_log]
-</span></span><span class="line"><span class="ln">12</span><span class="cl">    D --&gt; L[批次状态：推送完成/失败]
-</span></span></code></pre></div><h3 id="113-gtc_admin-延迟远程通知">11.3 <code>gtc_admin</code> 延迟远程通知</h3>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="ln"> 1</span><span class="cl">flowchart LR
-</span></span><span class="line"><span class="ln"> 2</span><span class="cl">    A[课程/代理业务操作] --&gt; B{目标时间}
-</span></span><span class="line"><span class="ln"> 3</span><span class="cl">    B -- 未来 --&gt; C[Queue::later Jobs]
-</span></span><span class="line"><span class="ln"> 4</span><span class="cl">    B -- 已到提醒点且未开始 --&gt; D[Queue::push Jobs]
-</span></span><span class="line"><span class="ln"> 5</span><span class="cl">    B -- 已开始 --&gt; E[不发送]
-</span></span><span class="line"><span class="ln"> 6</span><span class="cl">    C --&gt; F[MailJobs::sendOfRemote]
-</span></span><span class="line"><span class="ln"> 7</span><span class="cl">    D --&gt; F
-</span></span><span class="line"><span class="ln"> 8</span><span class="cl">    F --&gt; G[remoteOption option/memberAuditNotify]
-</span></span><span class="line"><span class="ln"> 9</span><span class="cl">    G --&gt; H[gtcuser 接收端]
-</span></span><span class="line"><span class="ln">10</span><span class="cl">    H --&gt; I[通知服务/SendMemberEmailJob]
-</span></span><span class="line"><span class="ln">11</span><span class="cl">    I --&gt; J[EmailService -&gt; Symfony Mailer -&gt; SMTP]
-</span></span></code></pre></div><h2 id="12-当前风险与待核对项">12. 当前风险与待核对项</h2>
+<div class="mermaid">flowchart LR
+    A[业务动作] --&gt; B[EmailNotificationEventService]
+    B --&gt; C[EventTrackEvent]
+    C --&gt; D[NotificationListener]
+    D --&gt; E{代理隔离检查}
+    E -- 否 --&gt; X[记录隔离日志并结束]
+    E -- 是 --&gt; F[pushQueue notify_normal]
+    F --&gt; G[AsyncQueue ConsumerProcess]
+    G --&gt; H[SendMemberEmailJob]
+    H --&gt; I[查询会员/邮箱/国家/语言]
+    I --&gt; J[EmailService]
+    J --&gt; K[模板和语言回退]
+    K --&gt; L[变量替换和脱敏日志]
+    L --&gt; M[Symfony Mailer]
+    M --&gt; N[SMTP]
+    M --&gt; O[mail_log 成功/失败]</div>
+<h3 id="112-全员通知">11.2 全员通知</h3>
+<div class="mermaid">flowchart LR
+    A[公告/活动/直播/课程事件] --&gt; B[approvedNotification]
+    B --&gt; C[统计 active member]
+    C --&gt; D[写 mail_batch_send]
+    D --&gt; E[按 5000 条 chunk 查询]
+    E --&gt; F[每会员创建 SendMemberEmailJob]
+    F --&gt; G[notify_all Redis 队列]
+    G --&gt; H[Consumer 执行]
+    H --&gt; I[mailTaskId 校验批次是否取消]
+    I --&gt; J[EmailService -&gt; SMTP]
+    J --&gt; K[mail_log]
+    D --&gt; L[批次状态：推送完成/失败]</div>
+<h3 id="113-gtc_admin-延迟远程通知">11.3 <code>gtc_admin</code> 延迟远程通知</h3>
+<div class="mermaid">flowchart LR
+    A[课程/代理业务操作] --&gt; B{目标时间}
+    B -- 未来 --&gt; C[Queue::later Jobs]
+    B -- 已到提醒点且未开始 --&gt; D[Queue::push Jobs]
+    B -- 已开始 --&gt; E[不发送]
+    C --&gt; F[MailJobs::sendOfRemote]
+    D --&gt; F
+    F --&gt; G[remoteOption option/memberAuditNotify]
+    G --&gt; H[gtcuser 接收端]
+    H --&gt; I[通知服务/SendMemberEmailJob]
+    I --&gt; J[EmailService -&gt; Symfony Mailer -&gt; SMTP]</div>
+<h2 id="12-当前风险与待核对项">12. 当前风险与待核对项</h2>
 <ol>
 <li><strong>配置来源并存</strong>：<code>gtc_admin</code> 旧 <code>config_server</code>、<code>t_mail_config</code> 和 <code>gtcuser</code> 环境变量/类型化配置同时存在，需要形成明确的模板到 SMTP 配置映射表。</li>
 <li><strong>批量失败统计疑似反向</strong>：<code>MailJobs::fire()</code> 中 <code>res===true</code> 时增加 <code>fail_num</code>，需要核对发送返回值后修正。</li>
@@ -837,7 +951,7 @@
 </ol>
 <h2 id="14-本次交付说明">14. 本次交付说明</h2>
 <ul>
-<li>新增本文档：<code>/Users/lijianlin/www/local/gtc_admin/docs/邮件功能技术架构与运行逻辑梳理.md</code>。</li>
+<li>新增本文档：<code>/Users/jalen/www/local/gtc_admin/docs/邮件功能技术架构与运行逻辑梳理.md</code>。</li>
 <li>未修改 PHP、Vue、配置或数据库结构。</li>
 <li>文档结论来自当前源码静态分析；没有连接生产 Redis、SMTP、数据库，也没有实际发送测试邮件。</li>
 <li>文档中已将历史实现、疑似统计 bug、日志字段风险和需要通过部署环境确认的内容单独标注。</li>

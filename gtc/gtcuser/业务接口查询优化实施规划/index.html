@@ -1,0 +1,1453 @@
+
+<!DOCTYPE html>
+<html
+  lang="zh-cn"
+  data-figures=""
+  
+    class="page"
+  
+  
+  >
+  <head>
+<title>业务接口查询优化实施规划 | 李建林个人知识库</title>
+<meta charset="utf-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+
+
+
+
+<meta property="og:locale" content="zh-cn" />
+
+<meta property="og:type" content="article">
+<meta name="description" content="gtcuser 业务接口查询优化实施规划
+
+规划日期：2026-10-19。目标分支：feature/v2.20.0/api-query-opt，当前基线：6ced4a219。本轮只形成实施规划，未修改业务代码、SQL 或线上配置。
+依据《三大专项排查报告》和《三大专项开发需求拆分与排期建议》。报告是 …" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:creator" content="">
+<meta name="twitter:title" content="" />
+<meta name="twitter:image" content="https://jianlin-li.github.io/images/thumbnail.png"/>
+<meta property="og:url" content="https://jianlin-li.github.io/gtc/gtcuser/%E4%B8%9A%E5%8A%A1%E6%8E%A5%E5%8F%A3%E6%9F%A5%E8%AF%A2%E4%BC%98%E5%8C%96%E5%AE%9E%E6%96%BD%E8%A7%84%E5%88%92/" />
+<meta property="og:title" content="" />
+<meta property="og:description" content="gtcuser 业务接口查询优化实施规划
+
+规划日期：2026-10-19。目标分支：feature/v2.20.0/api-query-opt，当前基线：6ced4a219。本轮只形成实施规划，未修改业务代码、SQL 或线上配置。
+依据《三大专项排查报告》和《三大专项开发需求拆分与排期建议》。报告是 …" />
+<meta property="og:image" content="https://jianlin-li.github.io/images/thumbnail.png" />
+
+<link rel="apple-touch-icon" sizes="180x180" href="https://jianlin-li.github.io/icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://jianlin-li.github.io/icons/favicon-32x32.png">
+<link rel="manifest" href="https://jianlin-li.github.io/icons/site.webmanifest">
+
+<link rel="canonical" href="https://jianlin-li.github.io/gtc/gtcuser/%E4%B8%9A%E5%8A%A1%E6%8E%A5%E5%8F%A3%E6%9F%A5%E8%AF%A2%E4%BC%98%E5%8C%96%E5%AE%9E%E6%96%BD%E8%A7%84%E5%88%92/">
+
+
+
+<link rel="preload" href="https://jianlin-li.github.io/css/styles.dc38388a8f0b890e788bd3a99b7495d14e7d5ac4359ed3b49abeb778497863b284ad4cc7e496ef58c84139295f9bafed82f5a41345eda86bd2d429cccb7c2596.css" integrity = "sha512-3Dg4io8LiQ54i9Opm3SV0U59WsQ1ntO0mr63eEl4Y7KErUzH5JbvWMhBOSlfm6/tgvWkE0XtqGvS1CnMy3wllg==" as="style" crossorigin="anonymous">
+
+
+
+<link rel="preload" href="https://jianlin-li.github.io/zh-cn/js/bundle.e4e0e4fbe8acb50d7f973828f4138cdbea727800047fc93f9abbd6751e8f3422d6ef193f98da36fdb8488219c25692d73da89480f46abc8421a4ee3526dd6c23.js" as="script" integrity=
+"sha512-5ODk&#43;&#43;istQ1/lzgo9BOM2&#43;pyeAAEf8k/mrvWdR6PNCLW7xk/mNo2/bhIghnCVpLXPaiUgPRqvIQhpO41Jt1sIw==" crossorigin="anonymous">
+
+
+<link rel="stylesheet" type="text/css" href="https://jianlin-li.github.io/css/styles.dc38388a8f0b890e788bd3a99b7495d14e7d5ac4359ed3b49abeb778497863b284ad4cc7e496ef58c84139295f9bafed82f5a41345eda86bd2d429cccb7c2596.css" integrity="sha512-3Dg4io8LiQ54i9Opm3SV0U59WsQ1ntO0mr63eEl4Y7KErUzH5JbvWMhBOSlfm6/tgvWkE0XtqGvS1CnMy3wllg==" crossorigin="anonymous">
+
+
+
+
+  </head>
+  <body
+    data-code="7"
+    data-lines="true"
+    id="documentTop"
+    data-lang="zh-cn"
+  >
+
+<header class="nav_header" >
+  <nav class="nav"><a href='https://jianlin-li.github.io/' class="nav_brand nav_item" title="李建林个人知识库">
+  <img src="https://jianlin-li.github.io/logos/logo.png" class="logo" alt="李建林个人知识库">
+  <div class="nav_close">
+    <div><svg class="icon">
+  <title>open-menu</title>
+  <use xlink:href="#open-menu"></use>
+</svg>
+<svg class="icon">
+  <title>closeme</title>
+  <use xlink:href="#closeme"></use>
+</svg>
+</div>
+  </div>
+</a>
+
+    <div class='nav_body nav_body_left'>
+      
+      
+      
+        
+
+  <div class="nav_parent">
+    <a href="https://jianlin-li.github.io/" class="nav_item" title="首页">首页 </a>
+  </div>
+  <div class="nav_parent">
+    <a href="https://jianlin-li.github.io/archives/" class="nav_item" title="归档">归档 </a>
+  </div>
+  <div class="nav_parent">
+    <a href="https://jianlin-li.github.io/gtc/" class="nav_item" title="GTC 文档">GTC 文档 </a>
+  </div>
+  <div class="nav_parent">
+    <a href="https://jianlin-li.github.io/categories/" class="nav_item" title="分类">分类 </a>
+  </div>
+  <div class="nav_parent">
+    <a href="https://jianlin-li.github.io/tags/" class="nav_item" title="标签">标签 </a>
+  </div>
+  <div class="nav_parent">
+    <a href="https://jianlin-li.github.io/about/" class="nav_item" title="关于">关于 </a>
+  </div>
+      
+<div class='follow'>
+  <a href="https://github.com/JianLin-Li">
+    <svg class="icon">
+  <title>github</title>
+  <use xlink:href="#github"></use>
+</svg>
+
+  </a>
+  <a href="http://local.gitlab.com">
+    <svg class="icon">
+  <title>gitlab</title>
+  <use xlink:href="#gitlab"></use>
+</svg>
+
+  </a>
+<div class="color_mode">
+  <input type="checkbox" class="color_choice" id="mode">
+</div>
+
+</div>
+
+    </div>
+  </nav>
+</header>
+
+    <main><div class="grid-inverse wrap content">
+  <article class="post_content">
+    <p class="gtc-breadcrumb"><a href="/gtc/">GTC 文档归档</a> / gtcuser</p>
+    <h1 class="post_title">业务接口查询优化实施规划</h1>
+    <div class="post_meta gtc-meta">
+      <span class="post_date">
+        2026-10-27
+      </span>
+      <span>项目：gtcuser</span>
+    </div>
+    
+    <div class="post_body">
+      <h1 id="gtcuser-业务接口查询优化实施规划">gtcuser 业务接口查询优化实施规划</h1>
+<blockquote>
+<p>规划日期：2026-10-19。目标分支：<code>feature/v2.20.0/api-query-opt</code>，当前基线：<code>6ced4a219</code>。本轮只形成实施规划，未修改业务代码、SQL 或线上配置。</p>
+<p>依据《三大专项排查报告》和《三大专项开发需求拆分与排期建议》。报告是 2026-10-14 的静态台账；以下编号用于追踪，不等于每项都已在线上造成慢查询，也不等于全部需要改代码。</p>
+</blockquote>
+<h2 id="目标和范围">目标和范围</h2>
+<p>本需求覆盖 N01-N08、N11-N16、N26-N34、N39、N41，以及 S01-S05、S07-S12。目标是在保持接口字段、权限、分页 total、状态、金额精度和服务器归属不变的前提下，减少当前页内可合并的重复读取，并处理经执行计划证实的高成本 SQL。N03/S05、N39/S07、N32/S11 是同一调用链的两类证据，不当作独立接口重复开发；其中 N03 的跨服归属修正与查询批取仍须分别审核。</p>
+<p>当前分支抽查仍能定位 N01 设备日志逐条查询、N02 品种和收藏逐条查询、N03 按 Ticket 查订单、N05 逐策略聚合、N39 会员乘分组的 exists、N32 日回撤逐日读取及 0 值缓存误判、S01 转账候选无界读取。其余编号开始开发前逐条复核入口是否仍可达及是否已被其他改动处理。</p>
+<p>仓库字典显示：<code>t_member_login_log</code> 有 <code>(member_id, device_id, login_status)</code> 索引；<code>t_cross_mt5_orders</code> 的主键是 <code>(Server, Ticket)</code>；<code>t_symbol</code> 未见以 <code>server_id</code> 开头的索引；<code>t_member_group_apply</code> 只有主键。以上均是仓库基线，实施前还需核对目标环境真实 DDL。S08 的当前 <code>OpenGroupListService</code> 使用 <code>SELECTDB</code> 连接，和报告中的 MySQL 描述不一致，应以当前连接、目标库 DDL 和 Profile 为准。</p>
+<h2 id="执行顺序">执行顺序</h2>
+<table>
+  <thead>
+      <tr>
+          <th>阶段</th>
+          <th>覆盖</th>
+          <th>交付判断</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>0. 复核与基线</td>
+          <td>全范围，优先 S01、N02、N01</td>
+          <td>确认入口、调用量、SQL 总耗时、权限与实际 DDL，选定需要实施的项</td>
+      </tr>
+      <tr>
+          <td>1. 首批低风险批量读取</td>
+          <td>N02、N01</td>
+          <td>两个接口可分别提交、分别回归，建立查询次数和结果对照方式</td>
+      </tr>
+      <tr>
+          <td>2. 转账候选查询</td>
+          <td>S01</td>
+          <td>先确认返回范围与前端契约；有界读取方案单独评审，证实高成本时可提前到阶段 1 前实施</td>
+      </tr>
+      <tr>
+          <td>3. 交易、策略与跟单列表</td>
+          <td>N03/S05、N04-N05、N15-N16、N28-N31、N33-N34</td>
+          <td>按实际热点逐接口提交，先解决复合键归属，再优化批量读取</td>
+      </tr>
+      <tr>
+          <td>4. KYC、IB 与会员校验</td>
+          <td>N06-N08、N11-N14、N26-N27、N39/S07、N41</td>
+          <td>保留历史版本、佣金规则、层级权限、禁用决策及配置回退语义</td>
+      </tr>
+      <tr>
+          <td>5. 复杂 SQL 与 SelectDB</td>
+          <td>N32/S11、S02-S04、S08-S10、S12</td>
+          <td>同参数执行计划和总耗时证明收益；无证据或需改产品搜索口径的项暂不改</td>
+      </tr>
+      <tr>
+          <td>6. 联合回归与交付</td>
+          <td>各阶段已实施项</td>
+          <td>分入口验收、检查 SQL 发布材料、记录剩余风险和回滚顺序</td>
+      </tr>
+  </tbody>
+</table>
+<p>阶段顺序不要求把所有编号一次完成。阶段 0 如果发现 S01 在高频场景产生大量无界结果，先处理阶段 2；若暂无证据，先交付 N02、N01。一个接口或一条调用链形成一个可回滚提交，不把本需求做成一次大范围重构。</p>
+<h2 id="小步实施与审核规则">小步实施与审核规则</h2>
+<p>下面的 <code>0.1</code>、<code>1.1</code> 等是<strong>实施和审核单元，不是新的排期需求</strong>。同一阶段的小步也不合并成一次代码修改；同一编号若有两种独立查询（如 N02 的品种与收藏），分别改、分别验。若两个入口共用同一个必须修改的方法，先查全量调用方，一次修改并同时回归所有受影响入口，不人为拆出两个相互依赖的提交。阶段 3-5 的顺序以阶段 0 的实测热点调整，未证实有收益的小步可以记录证据后跳过。</p>
+<p>每个代码小步按以下顺序执行，并在<strong>用户审核本步代码后</strong>才进入下一代码小步：</p>
+<ol>
+<li><strong>改前确认</strong>：固定目标分支和工作区状态；从入口追到 Service、Repository/Model、权限、数据字典和测试，记录一份脱敏请求、原响应及 SQL 次数/耗时。对拟改方法及其底层 Repository/Model、Trait、缓存注解、公共函数搜索所有静态调用方，再检查 DI/事件/任务等间接入口；列出读者、写者、缓存键、响应及副作用。静态检索不能证明不存在动态调用，未知项列为未确认。明确本步只涉及哪些文件、查询及返回字段。</li>
+<li><strong>只改本步</strong>：优先限定在现有业务方法及其直接数据访问层；只处理当前页/当前批的查询。若发现必须改公共基类、共享 helper、接口字段、权限、配置、数据库结构或其他项目，暂停本步并先单独评审影响范围与回滚方案。</li>
+<li><strong>本步验证</strong>：用本机 PHP 8.1 解释器对每个修改的 PHP 文件执行 <code>-l</code>，只运行本步逻辑及实际受影响调用方的 PHPUnit 测试文件/方法，再做必要的隔离环境接口对照；按相同参数比较结果、SQL 指纹次数、数据库总耗时、接口耗时及峰值内存。逐条 SQL 核对实际数据库连接和引擎；不因其他历史测试失败而误判本步，也不因本步测试通过就宣称全量回归通过。测试不能证明性能或环境不具备时，明确写“未验证”。</li>
+<li><strong>交用户审核</strong>：给出本步差异和下表所列交付说明；用户确认后再进入下一步。若结果不一致，停在本步修正或回退，不让问题叠加到后续阶段。</li>
+</ol>
+<p>每步的交付说明固定为：<strong>改了什么</strong>（文件、方法、查询及差异）、<strong>目的是什么</strong>（消除哪次重复读取或哪段高成本扫描）、<strong>影响范围</strong>（入口、字段、权限、数据/配置/前端）、<strong>验证结果</strong>（通过、失败、未运行及证据）、<strong>剩余风险与回滚</strong>。一个小步对应一组易审查的差异；能独立提交时才形成一个独立提交，不以“阶段完成”为理由打包不相关改动。</p>
+<h3 id="hyperf-兼容与性能方案准入">Hyperf 兼容与性能方案准入</h3>
+<p><code>composer.json</code> 声明 PHP <code>&gt;=8.1</code>、Hyperf <code>3.1.*</code>，项目规范要求修改保持 PHP 8.1 兼容。本机 PHP 8.1.34 在 <code>/opt/homebrew/opt/php@8.1/bin/php</code>，已验证可执行 <code>-l</code>；终端默认 <code>php</code> 是 8.5，不能用于证明 8.1 语法兼容。每一步实施时先核对目标部署 PHP/Swoole 与锁定依赖；只使用 PHP 8.1 支持的语法及本仓库 Hyperf 3.1 已提供的 Query Builder、Model、缓存和协程 API。新用框架方法要在当前 <code>vendor</code> 源码或现有用例中确认签名、连接归属、返回类型和异常行为，不凭别的 Laravel/Hyperf 版本经验套用。</p>
+<p>PhpStorm 项目语言级别已配置为 PHP 8.1，PHPUnit 配置指向 <code>phpunit.xml.dist</code> 和本地 <code>vendor/autoload.php</code>；现有“gtcuser 单元测试”运行配置默认覆盖整个 <code>tests/Unit</code>。实际验证本需求时选<strong>本步对应的测试文件或方法</strong>，并补测被修改共享方法的受影响调用方，不直接跑整个目录或全量套件。记录 PhpStorm 实际选用的 PHP 解释器、测试命令/范围和结果。当前本地 <code>vendor/composer/platform_check.php</code> 要求 PHP <code>&gt;=8.2</code>；若用 PHP 8.1 启动现有 vendor 的 PHPUnit 被依赖平台检查拦住，不能绕过检查伪造通过。仍执行 PHP 8.1 语法检查，在兼容的测试解释器下做针对性行为测试，并把“PHP 8.1 下的单元测试未运行”单独列为限制。</p>
+<p>在写代码前，为本步形成候选方案对照：<strong>现状</strong>、<strong>最小局部改法</strong>，必要时再列<strong>索引/缓存/结构方案</strong>。先通过业务结果、权限、并发和缓存语义筛掉不等价方案，再比较性能；不能因为查询次数下降就认定更快。选型至少记录同参数、同权限、同连接引擎的 SQL 次数、扫描/返回行数或 SelectDB 扫描量、数据库总耗时、接口耗时、峰值内存、冷热缓存及 1/10/20 项规模变化。能在隔离环境复测时再比较执行计划和并发下连接池等待；无法取得真实证据的方案保留为假设，不承诺收益。</p>
+<table>
+  <thead>
+      <tr>
+          <th>候选方式</th>
+          <th>可能适合的条件</th>
+          <th>何时不采用或必须另审</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>保留现状</td>
+          <td>接口低频、表小、缓存命中高，实测数据库总成本很低</td>
+          <td>不为了完成报告编号而改代码；记录暂缓证据</td>
+      </tr>
+      <tr>
+          <td>当前页/当前批 <code>whereIn</code> 批取</td>
+          <td>原查询按稳定业务键定位，批次有上限，索引能利用，结果可逐行等价映射</td>
+          <td>键不唯一、<code>first()</code> 无稳定选中行、批取读出远多于所需数据、超大 <code>IN</code> 参数或峰值内存明显上升时暂停；必要时只对当前批分块</td>
+      </tr>
+      <tr>
+          <td>受控集合分组聚合</td>
+          <td>原来逐项 <code>sum/count</code>，且能先用当前页 ID、状态、时间和服务器缩小驱动集</td>
+          <td>需对大表先全量 <code>GROUP BY</code>、金额精度/空值变化、索引不能支持过滤时不采用；与原逐项查询比较总扫描成本</td>
+      </tr>
+      <tr>
+          <td>局部缓存或复用</td>
+          <td>数据允许相同的新鲜度，已有缓存键、TTL 与失效规则可保留</td>
+          <td>登录在线状态、禁用决策、资金候选、KYC 写入、配置即时刷新等不能为减少 SQL 自行延长缓存；跨请求缓存须单独评审</td>
+      </tr>
+      <tr>
+          <td>精确定位/有界搜索、分页</td>
+          <td>原产品契约允许，且筛选范围与权限可证明一致</td>
+          <td>子串搜索改等值/前缀、无界结果改截断或 total 变化均属接口行为修改；先确认前端和产品口径，再独立交付</td>
+      </tr>
+      <tr>
+          <td>新索引或关系结构</td>
+          <td>真实 DDL、选择性与同参数执行计划证明现有方案仍高成本</td>
+          <td>写入放大、DDL 锁、共享数据库其他读写者、SelectDB 物理结构未核实时不落地；独立 SQL、数据字典和回滚方案另审</td>
+      </tr>
+  </tbody>
+</table>
+<p>执行方式遵循本项目分层 <code>app/Http -&gt; app/Service -&gt; app/Repository/Model</code>；用户输入继续参数绑定，动态库名只来自可信配置，MySQL 与 SelectDB 分别验证 SQL 方言和执行计划。测试可沿用 PhpStorm 的 PHPUnit 配置；终端执行时使用项目 <code>co-phpunit</code>/<code>tests/bootstrap.php</code>，且只指定本步测试文件/方法。数据库测试先确认只连对应引擎的隔离环境；代码修改后用上述 PHP 8.1 路径做语法检查，行为测试另按实际解释器如实报告。</p>
+<p>每步代码审核前增加一张<strong>方案选择卡</strong>：原 SQL/调用次数及索引、候选方案与预期代价、为何排除其他方案、实际前后计划/耗时/内存、结果等价证据、PHP/Hyperf 兼容检查、未验证项。业务结果不一致或总成本无稳定改善时，停在本步并保留现状。</p>
+<h3 id="数据库连接边界">数据库连接边界</h3>
+<p>下表仅说明当前代码<strong>选择的逻辑连接</strong>，不把连接名或 <code>mysql</code> 协议驱动当成目标环境物理引擎的证明。<code>config/autoload/databases.php</code> 中 <code>default</code>、<code>selectDB</code>、<code>bigdataDB</code> 是不同连接；<code>selectDB</code> 还配置了不同的读/写目标，读目标注释明确用于 SelectDB。目标环境的真实目标库、表结构和同步时效必须在每步取证时核对，不在文档中记录主机或凭据。</p>
+<table>
+  <thead>
+      <tr>
+          <th>查询范围</th>
+          <th>当前代码连接证据</th>
+          <th>实施限制</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>N01 登录日志、N02 品种/收藏、N03 MT5 订单、N33/N34 收益率总表、N39 分组申请、S04 配置查询</td>
+          <td>对应 Model/Repository 未显式指定连接，按 <code>default</code> 查询；<code>MemberHourCountTotal</code> 的 <code>selectDB</code> 声明是注释，不是生效配置</td>
+          <td>先按默认 MySQL 的实际 DDL/索引审查；不得为借用 SelectDB 读表而改连接或改变数据新鲜度</td>
+      </tr>
+      <tr>
+          <td>N32/S11 日回撤、S03 资金历史、S02 IB 代理搜索、S08 开户组列表、S09 代理账户搜索</td>
+          <td><code>MemberHourCount</code>、<code>FundDetailSelect</code> 显式设 <code>selectDB</code>，其余入口显式 <code>Db::connection(SELECTDB)</code></td>
+          <td>以该方法发出的读 SQL、目标 SelectDB DDL/分区/Tablet/Profile 为准；不能套用 MySQL 字典索引或 MySQL 才有的优化方式</td>
+      </tr>
+      <tr>
+          <td>S01 转账候选、S10 风险组/开户组以及交易账户相关查询</td>
+          <td>默认连接上还可能拼接按服务器选择的 MT 数据库表；同一接口可同时读取默认库、MT 库或 CRM 服务</td>
+          <td>逐条记录查询发生的连接与服务器库名来源；不能把跨库 SQL 随手迁到 <code>selectDB</code>，也不能假定可跨不同连接直接 JOIN 或保持同一事务/实时性</td>
+      </tr>
+      <tr>
+          <td>同一个 Model 的其他方法及报告入口</td>
+          <td><code>MemberHourCount</code> 虽默认使用 <code>selectDB</code>，部分方法显式 <code>setConnection(DEFAULT)</code>；IB 报告其他方法还使用 <code>bigdataDB</code></td>
+          <td>只按<strong>本次修改的方法/SQL</strong>判断，不能按类名、表名或同文件其他查询推断；<code>bigdataDB</code> 与 <code>selectDB</code> 分别取实际计划</td>
+      </tr>
+  </tbody>
+</table>
+<p>每步的 SQL/连接清单必须写明：入口、所在方法、Model 或 <code>Db::connection(...)</code>、实际读/写路由、目标环境的数据库引擎和表、现有过滤条件与索引/分区、同步延迟要求、拟采用方案是否保持原连接。若拟改 SQL 会切换连接、读写目标或跨库数据来源，先独立评审数据一致性、权限、执行计划和回滚，<strong>不当作普通查询优化继续实施</strong>。同参数前后性能对比必须落在同一引擎与等价数据范围；MySQL 用其真实 DDL/索引及 EXPLAIN，SelectDB 用其真实 DDL、分区/Tablet 与 Profile。</p>
+<h3 id="改前影响范围复核结论">改前影响范围复核结论</h3>
+<p>以下是基于 <code>gtcuser</code> 当前 <code>6ced4a219</code> 源码和仓库数据字典的静态复核，<strong>不是线上数据、执行计划或动态调用全覆盖证明</strong>。标为“先停”的项目必须在动代码前解决口径；纯查询优化不能顺手修历史业务规则。</p>
+<table>
+  <thead>
+      <tr>
+          <th>编号/步骤</th>
+          <th>已确认的耦合与逻辑风险</th>
+          <th>改动前必须核对的影响范围</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>N02 / 1.1-1.2</td>
+          <td><code>TradeService::tradeSymbolInfo</code> 的未登录分支直接返回 MT 数据；已登录分支先校验账号归属和本地服务器。<code>t_symbol</code> 字典只有 <code>(symbol,type)</code> 唯一约束，不能保证 <code>(server_id,symbol)</code> 唯一；当前 <code>first()</code> 无显式排序。收藏当前只按 login_id、symbol_id 判断。</td>
+          <td>只改已登录分支的展示查询；先查重复品种和选择结果，不用 <code>keyBy</code> 任意覆盖；收藏批取不得悄悄增加 member_id 条件、改变布尔类型或 SVG/MT 调用。重复行无法确定原选择时先停。</td>
+      </tr>
+      <tr>
+          <td>N01 / 1.3</td>
+          <td><code>loginDevice</code> 取最新成功日志后逐条实时 <code>checkTokenOnline</code>，无日志时还输出一组空字段；日志 <code>id DESC</code> 决定选择。</td>
+          <td>只替换日志读取；设备分页、total、当前设备、token 实时判断、空字段及并发删日志结果逐项对照。不得改通用 <code>MemberLoginLogRepository::findByFilter</code>。</td>
+      </tr>
+      <tr>
+          <td>S01 / 2.1-2.4</td>
+          <td><code>CashService</code> 根据转账开关、团队层级和 CRM 精确手机号结果决定钱包/MT 候选；MT 分支跨服务器拼接 UNION，返回给选收款人的调用方。</td>
+          <td><strong>先停</strong>：确认前端是否要求全量、关键词包含范围和手机号故障返回；限制数量、分页或替换层级关系都属于契约/权限改动，独立评审，不在优化中静默截断。</td>
+      </tr>
+      <tr>
+          <td>N03/S05 / 3.1a-3.1b</td>
+          <td>成交当前按 PositionTicket 查订单，字典订单主键为 <code>(Server,Ticket)</code>；补充 Server 可改变现有 <code>OPEN_TIME</code>，不只是减少 SQL。</td>
+          <td><strong>先停</strong>：用跨服相同 Ticket 证明成交 Server 与订单 Server 的映射；把“修正归属”和“当前页批取”分别列差异和测试，不能把结果变化当作纯性能等价。</td>
+      </tr>
+      <tr>
+          <td>N04-N05、N16 / 3.2-3.4</td>
+          <td>PAMM 审核、策略净值与展示列表各有状态、金额精度和远程 MT 分支；N05 原聚合只算 <code>status=1</code>，N16 原逐条读取的是服务器。</td>
+          <td>各入口分别查条件与查询列；只批取当前页真实需要的数据。缺记录、同策略重复、聚合 0/null、实时净值和远程异常不能因映射/缓存而变。</td>
+      </tr>
+      <tr>
+          <td>N15、N28-N31 / 3.5-3.9</td>
+          <td>兑换和跟单列表按服务器、login、状态等组合键区分；N28 的 <code>findPendingOrApproved</code> 对状态 0/9 用无排序 <code>first()</code>；N28 账户在线状态还依赖 <code>update_time</code> 与当前时间。</td>
+          <td>先检查重复申请、同 login 跨服以及单条查询的选中行；映射不能任意覆盖。保留外部账户、本地账户、申请优先级、在线状态实时计算与远程分支；不能为了批取改共享 Repository 的返回规则。</td>
+      </tr>
+      <tr>
+          <td>N33-N34 / 3.10-3.11</td>
+          <td>两个跟单列表共用带 60 秒 <code>Cacheable</code> 的 <code>MemberHourCountTotal::getEarningRate</code>；公式中 0 入金返回 0，调用方再 <code>sprintf('%.2f')</code>。</td>
+          <td>查所有调用方及缓存键；批量读取不能绕过热缓存后改变新鲜度、公式、精度或返回字符串。共享方法若修改必须同时测两个入口及缓存冷/热场景。</td>
+      </tr>
+      <tr>
+          <td>N06-N08、N27 / 4.1-4.4</td>
+          <td>代理下级计数与佣金规则分别影响层级和金额校验；标题查询的缺失配置和状态也影响错误/展示分支。</td>
+          <td>逐入口保留代理集合去重、深度、有效状态、规则 ID、佣金上下限及异常结果；只在原作用域批取，不改公共佣金计算。</td>
+      </tr>
+      <tr>
+          <td>N11-N14 / 4.5-4.8</td>
+          <td><code>getMyInformationGtc</code> 对已通过会员可能先返回资料快照；<code>buildKycFormDetail</code> 同时用于页面展示和多处认证快照写入。</td>
+          <td><strong>先停</strong>：读路径与写快照路径分别画调用图；优先在展示入口局部预取，不能直接改共享表单构建方法的输出、翻译时机、题目排序或持久化快照结构。任何共享方法变更须覆盖全部写入路径。</td>
+      </tr>
+      <tr>
+          <td>N26 / 4.9</td>
+          <td><code>ConfigServerService::getConfigValue</code> 先服务器配置，缺失才取启用的公共配置，当前 <code>openMtserverlist</code> 逐服务器调用；该公共方法还有独立语义。</td>
+          <td>优先在 <code>openMtserverlist</code> 局部批取，保持“配置存在但值为 0/空”与“配置不存在”的区别；公共回退只按原条件发生，不改全局配置缓存/刷新。</td>
+      </tr>
+      <tr>
+          <td>N39/S07 / 4.10</td>
+          <td><code>IbService::getApplyGroup</code> 是先 <code>exists</code> 再 <code>insert</code> 的写流程，原 <code>LIKE '%组名%'</code> 含数据库排序规则及 <code>%</code>、<code>_</code> 通配语义；精确 CSV 或 PHP 子串判断都不天然等价。</td>
+          <td><strong>先停</strong>：先用隔离数据证明替代查询与原 SQL 对每个会员/分组的判定一致；核对重复/并发申请、状态 0/9、批量插入及重试。不能因读取优化增删申请或扩大授权。</td>
+      </tr>
+      <tr>
+          <td>N41 / 4.11</td>
+          <td>禁用证件会员判断在当前会员状态和各 MT 服务器实时启用状态之间做决定；缺服务器/MT 用户时按保守路径返回。</td>
+          <td><strong>先停</strong>：这是注册/禁用决策，不按普通列表做快照缓存；若批取导致状态变旧或不同库的失败处理变化，保留原查询。</td>
+      </tr>
+      <tr>
+          <td>N32/S11 / 5.1-5.2</td>
+          <td>日回撤按天调用 <code>getDrawdownByTimeBetween</code>；该方法区分历史日和未结束日，计算精度分别不同，历史日缓存 86400 秒且 0 被误判未命中。</td>
+          <td>缓存修复与范围查询分开；保留缓存键/TTL、首尾记录、<code>[start,end)</code>、时区、两种精度及原公式。最大跨度属接口契约，另行确认。</td>
+      </tr>
+      <tr>
+          <td>S02/S08、S03/S09 / 5.3-5.6</td>
+          <td>IB 搜索含祖先权限、数字 ID 子串、文本包含、count 与游标/普通分页；资金历史和账户搜索还含会员/账户范围及 SelectDB 特定条件。</td>
+          <td><strong>先停</strong>：数字 ID 改等值、文本改前缀、增加必填时间或改变 total 都可能减少结果；先做原结果集合与权限对照，再分别取实际连接引擎的计划/Profile，不复制已有动态 SQL 拼接到新查询。</td>
+      </tr>
+      <tr>
+          <td>S04/S10 / 5.7-5.8</td>
+          <td>S04 是 <code>AccountRegisterSettingRepository</code> 的组 CSV 查询和 <code>ConfigMemberNameRepository</code> 的国家代码查询两条链；后者单值精确优先、CSV 回退。S10 的配置组 JOIN 参与账户风险组/开户组判断。</td>
+          <td>配置表大小、候选顺序、server/status/currency、单值优先和刷新时机分别审核。组命中多条时不能用无序 map 改选中记录；关系规范化/DDL 单列。</td>
+      </tr>
+      <tr>
+          <td>S12 / 5.9</td>
+          <td><code>BaseModel::page</code> 的 count 与 offset 是很多入口共用的 total 契约。</td>
+          <td>只选经证实高成本的具体入口；不改公共基类、默认页大小或全局 total 语义。索引/结构变更还须核对共享数据库中的其他写者和读者。</td>
+      </tr>
+  </tbody>
+</table>
+<p>每步审核材料必须附<strong>拟修改方法的调用方清单</strong>：入口与场景、读/写和副作用、是否共享、旧查询选中行规则、缓存/异常/权限、要回归的调用方；发现调用方超出本表或无法证明结果等价时，将该步改为只读取证，重新确定范围后再实施。</p>
+<h3 id="阶段-0复核与建立基线">阶段 0：复核与建立基线</h3>
+<ol>
+<li>从 Controller 到 Service、Repository/Model 确认当前入口、调用方、权限范围、返回字段和分页约定；标出已优化、不可达或仅条件触发的编号。先看 <code>TradeController::tradeSymbolInfo</code>、<code>MemberController::loginDevice</code>、<code>CashService</code> 的候选查询，再扩展到其他入口。</li>
+<li>对相同筛选条件采集 1/10/20 条列表（品种可取 100 条）的脱敏 SQL 指纹、执行次数、数据库总时间、应用耗时、返回行数；区分冷/热缓存、远程 MT 请求和数据库时间。记录调用频率，按总成本而非单次慢 SQL 排序。</li>
+<li>对 MySQL 取真实索引与执行计划；对 SelectDB 取目标表 DDL、分区/Tablet、同次 Query ID/Profile。大表必须记录会员、服务器、login、ticket、状态和时间范围等过滤条件，以及扫描/返回比。仓库字典不代替线上结构。</li>
+<li>形成每个入口的“实施/暂缓/无需改”清单及基线样例。S01 先确认结果规模、查询耗时和调用方是否依赖全量返回；S08 先核对实际连接引擎。</li>
+</ol>
+<p><strong>完成标准</strong>：有可复测的请求参数、权限身份、冷热状态、SQL 证据和原返回结果；不能仅凭代码里有循环或 <code>LIKE</code> 就直接修改。</p>
+<p><strong>审核小步（均为只读，不改业务代码）</strong></p>
+<table>
+  <thead>
+      <tr>
+          <th>小步</th>
+          <th>做什么</th>
+          <th>交给用户审核什么</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>0.1</td>
+          <td>固定分支、入口与调用方清单；逐编号标记仍可达、已解决或条件触发</td>
+          <td>入口/调用链和“实施、暂缓、无需改”的初步判断</td>
+      </tr>
+      <tr>
+          <td>0.2</td>
+          <td>单独采集 N02 的原响应和 1/10/20/100 个品种的查询次数</td>
+          <td>品种、收藏、跨服务器、空值及冷热缓存基线</td>
+      </tr>
+      <tr>
+          <td>0.3</td>
+          <td>单独采集 N01 的原响应和 1/10/20 个设备的查询次数</td>
+          <td>设备字段、在线状态、分页 total 与可复测参数</td>
+      </tr>
+      <tr>
+          <td>0.4</td>
+          <td>单独采集 S01 候选人数、扫描量、权限范围和前端使用方式</td>
+          <td>是否值得提前处理，以及无界查询的真实影响</td>
+      </tr>
+      <tr>
+          <td>0.5</td>
+          <td>按其余入口逐一取 SQL 指纹、真实 MySQL DDL/计划或 SelectDB DDL/Profile</td>
+          <td>每个小步的优先级、索引依据、预计改动边界；没有证据则暂缓</td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="阶段-1先交付两个明确的批量读取">阶段 1：先交付两个明确的批量读取</h3>
+<ul>
+<li><strong>N02 品种与收藏</strong>：<code>TradeService::tradeSymbolInfo</code> 保持现有账户归属、MT 返回及 SVG 批量读取。先用当前服务器 ID 和本次返回的品种集合批取 <code>t_symbol</code>，得到品种 ID 后按当前 login 和这些 ID 批取收藏；在内存中映射 <code>symbol_id</code> 与 <code>is_favorite</code>。核对同名品种跨服务器、无品种记录、重复收藏、未登录分支以及现有返回类型。<code>t_symbol</code> 缺少 <code>server_id</code> 前导索引，先测真实计划，不因批量改写就直接建索引。</li>
+<li><strong>N01 设备日志</strong>：<code>TMemberService::loginDevice</code> 先取得当前会员的当前页设备 ID，再一次取每设备最新成功日志；按原来的 <code>id DESC</code> 规则选记录。缺日志时的空字段、PC/App、在线 token 实时校验、当前设备和分页 total 均保持。候选查询优先利用真实的 <code>(member_id, device_id, login_status)</code> 索引，最新记录分组方式需用执行计划确认。</li>
+</ul>
+<p><strong>完成标准</strong>：分别比较无数据、1/10/20 条及跨服务器/多设备数据，批量读取的 SQL 次数不随列表行数线性增加；返回内容、权限、分页和在线状态与原逻辑一致。两个接口各自补行为测试或隔离库集成测试，并单独提交。</p>
+<p><strong>审核小步</strong></p>
+<table>
+  <thead>
+      <tr>
+          <th>小步</th>
+          <th>最小改动及目的</th>
+          <th>单步验收与停止点</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>1.1 N02 品种</td>
+          <td>仅把当前服务器、本次 MT 返回品种的逐条 <code>t_symbol</code> 查询改为一次批取；其他逻辑保留</td>
+          <td>字典不保证 <code>(server_id,symbol)</code> 唯一；先查重复行及原 <code>first()</code> 选中结果，无法等价则停下。再对照跨服务器、缺失品种、响应顺序及执行计划</td>
+      </tr>
+      <tr>
+          <td>1.2 N02 收藏</td>
+          <td>在 1.1 已审核基础上，仅将当前 login 和本次品种 ID 的逐条收藏 <code>count</code> 改为批取</td>
+          <td>对照已收藏、未收藏、重复收藏及未登录分支；<code>is_favorite</code> 的字段类型和值一致后停下审核</td>
+      </tr>
+      <tr>
+          <td>1.3 N01 设备日志</td>
+          <td>仅对当前会员、当前页设备批取最新成功日志；在线 token 判定和设备分页不动</td>
+          <td>对照最新 <code>id</code>、无日志、PC/App、分页 total 及并发删除；审核通过才进入下一阶段</td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="阶段-2单独处理-s01-转账候选">阶段 2：单独处理 S01 转账候选</h3>
+<p><code>CashService</code> 中钱包候选使用 <code>FIND_IN_SET(path)</code> 加无界 <code>get()</code>，MT 候选也要核对跨服务器查询和返回规模。先量化候选数、扫描数、权限范围、前端是否必须一次拿齐结果。短期可评估精确会员/MT 账号定位、受控返回或分页；层级关系替代属于结构方案，须证明与现有祖先/后代权限完全一致。现有完整手机号精确搜索依赖 CRM Gateway，不能回退成主表手机号模糊查找。</p>
+<p><strong>实施门槛</strong>：如果限制返回数或新增分页会改变已有接口契约，先确认产品与前端的搜索和选择行为，再改接口；不能用无声截断制造“查不到收款人”。验收包含有/无关键词、团队边界、钱包/MT 两类收款人、大团队及 CRM 故障分支。</p>
+<p><strong>审核小步</strong></p>
+<table>
+  <thead>
+      <tr>
+          <th>小步</th>
+          <th>做什么</th>
+          <th>审核关口</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>2.1 S01 取证</td>
+          <td>只读确认钱包与 MT 候选入口、权限集合、前端全量依赖、真实 DDL/计划及结果规模</td>
+          <td>用户先审核候选范围和接口契约；若开销不显著则暂缓代码修改</td>
+      </tr>
+      <tr>
+          <td>2.2 S01 等值定位</td>
+          <td>先只读评估可等值定位的会员或 MT 账号分支；若要优先走精确分支，须证明原权限与包含搜索结果不被缩窄</td>
+          <td>分别对照本人、直属、跨级、数字片段、无关键词和跨服务器结果；结果无法保持一致则不落地</td>
+      </tr>
+      <tr>
+          <td>2.3 S01 有界返回</td>
+          <td>仅在产品及前端明确搜索、选择和分页契约后实施受控返回；钱包和 MT 候选可分别审核</td>
+          <td>不允许静默截断；提交前要有前端兼容与大团队回归证据</td>
+      </tr>
+      <tr>
+          <td>2.4 S01 层级关系</td>
+          <td>仅当 2.1 的计划证明层级扫描仍是热点，再单独评估关系表替代 <code>FIND_IN_SET</code></td>
+          <td>祖先/后代权限逐例相等后，另行审核查询和必要的结构变更；不默认纳入本轮</td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="阶段-3交易策略与跟单列表">阶段 3：交易、策略与跟单列表</h3>
+<ul>
+<li><strong>N03/S05</strong>：先核实成交 <code>Server</code> 到订单 <code>Server</code> 的归属，单独审核按真实 <code>(Server, PositionTicket)</code> 定位订单是否改变开仓时间；之后再对当前页做批取。目标表仓库主键为 <code>(Server, Ticket)</code>，不能把跨服串单修正掩盖在性能改动里。</li>
+<li><strong>N04-N05、N16</strong>：PAMM 审核/展示和策略列表只对当前页策略 ID 预取持仓、附表、服务器及 <code>status=1</code> 的 <code>show_equity</code> 分组汇总。实时净值和远程 MT 调用另计，不用过期缓存替代；保留金额精度、过滤及已存在的分页优化。</li>
+<li><strong>N15、N28-N31、N33-N34</strong>：兑换、账户、跟单列表按 <code>(server, login, exchange, status)</code> 等真实业务复合键预取账户、申请、配置和冷缓存收益率。两个收益率列表入口共用 <code>MemberHourCountTotal::getEarningRate</code>，若改共享方法需一次审核、同时回归两个入口；已批量读取的利润不重复改造，远程请求的耗时与 SQL 分开分析。</li>
+</ul>
+<p><strong>完成标准</strong>：按接口逐项比较列表字段、服务器归属、状态、金额/收益率精度和分页 total；每项都以当前页或当前批为边界，避免批量读取演变成无界读取。</p>
+<p><strong>审核小步（每行单独形成差异和验收记录）</strong></p>
+<table>
+  <thead>
+      <tr>
+          <th>小步</th>
+          <th>最小改动及目的</th>
+          <th>重点核对</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>3.1a N03/S05 归属</td>
+          <td>先确认 <code>PositionTicket</code> 逐条订单查询的真实可达入口；只有确认遗留 Cross 路径仍被调用，才在该局部调用中加入经核实的 Server 维度</td>
+          <td>当前 <code>order_close</code> 的 MT5 本地路径已从 <code>mt4_trades</code> 直接取 <code>PositionID/TimePosition</code>，静态检索未发现 <code>getCorssMt5Close</code> 调用；先核对运行时路由、部署版本和数据编码，不能对未确认入口改代码</td>
+      </tr>
+      <tr>
+          <td>3.1b N03/S05 批取</td>
+          <td>在 3.1a 审核后，仅将当前页逐条订单查询改为按 <code>Server+PositionTicket</code> 批取</td>
+          <td>同参数逐行比较 <code>OPEN_TIME</code>、排序、分页和 SQL 次数；不得再次改变归属或字段</td>
+      </tr>
+      <tr>
+          <td>3.2a N04 持仓</td>
+          <td>PAMM 待审当前页只批取 StrategyCopy 持仓</td>
+          <td><code>OUTALLMONEY</code>、<code>check_status</code>、缺失持仓、金额精度</td>
+      </tr>
+      <tr>
+          <td>3.2b N04 附表</td>
+          <td>在 3.2a 审核后，只批取 StrategyOther 附表</td>
+          <td>相同策略重复出现和缺失附表</td>
+      </tr>
+      <tr>
+          <td>3.3 N05</td>
+          <td>策略列表仅对当前页策略 ID 做原状态口径的分组汇总</td>
+          <td><code>status=1</code>、<code>show_equity</code>、空值与金额精度</td>
+      </tr>
+      <tr>
+          <td>3.4 N16</td>
+          <td>PAMM 展示列表只批取该入口逐条读取的服务器</td>
+          <td>展示过滤、实时净值及远程 MT 结果不变</td>
+      </tr>
+      <tr>
+          <td>3.5a N15 服务器</td>
+          <td>兑换列表当前页先按服务器 ID 批取 MtServer</td>
+          <td>服务器归属、缺失服务器及原错误分支</td>
+      </tr>
+      <tr>
+          <td>3.5b N15 账户</td>
+          <td>在 3.5a 审核后，按服务器/login 复合键批取 CrossMtUsers</td>
+          <td>兑换状态、外部账户分支、金额与远程请求</td>
+      </tr>
+      <tr>
+          <td>3.5c N15 申请</td>
+          <td>若条件分支仍逐条读取 MemberExchangeMtlogin，再仅对当前页业务键批取</td>
+          <td>条件触发范围、缺失申请及原错误分支</td>
+      </tr>
+      <tr>
+          <td>3.6a N28 申请</td>
+          <td>账户列表先按 login/exchange/status 批取跟单申请</td>
+          <td>原 Repository 对状态 0/9 无排序 <code>first()</code>；先查重复申请和原选择规则，不能用无序映射改变 signal_id、状态和分页 total</td>
+      </tr>
+      <tr>
+          <td>3.6b N28 账户</td>
+          <td>在 3.6a 审核后，条件批取 CrossMtUsers</td>
+          <td>账户服务器归属和本地账户校验</td>
+      </tr>
+      <tr>
+          <td>3.7 N29</td>
+          <td><code>followExchangeExtAccount</code> 当前账户集合批取 CrossMtUsers</td>
+          <td>账号类型、状态及缺失账户</td>
+      </tr>
+      <tr>
+          <td>3.8 N30</td>
+          <td><code>exchangeOptMyAccountBalance</code> 仅在缺少 <code>open_account_type</code> 的分支批取 AccountRegisterSetting</td>
+          <td>服务器/组配置和原返回类型</td>
+      </tr>
+      <tr>
+          <td>3.9 N31</td>
+          <td><code>myPubList</code> 当前页批取 MtServer</td>
+          <td>所需服务器完整字段、远程请求及已有利润逻辑</td>
+      </tr>
+      <tr>
+          <td>3.10 N33/N34 共用读取</td>
+          <td>先查 <code>getEarningRate</code> 的全部调用方；若需改共享读取，一次改动后同时回归两个列表</td>
+          <td>冷/热缓存、复合键、收益率精度、缺失数据及其他调用方</td>
+      </tr>
+      <tr>
+          <td>3.11 N33/N34 入口差异</td>
+          <td>仅当共享读取优化后仍有某个入口特有的重复查询，才单独修改该入口</td>
+          <td>与 3.10 分开审核；无剩余问题则跳过</td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="阶段-4kycib-与配置口径">阶段 4：KYC、IB 与配置口径</h3>
+<ul>
+<li><strong>N06、N07-N08、N27</strong>：代理下级数量按当前代理集合聚合；佣金规则/标题按所需规则 ID 批取。保留层级深度、状态、佣金上下限、历史降佣校验及缺失配置表现。</li>
+<li><strong>N11-N14</strong>：KYC 已通过设置、认证内容、表单详情和快照按当前会员、表单与类型集合批取。最新成功内容必须按原 <code>kyc_config_id</code>、成功状态和历史版本规则选取；展示顺序、auto 规则和老用户兼容不变。</li>
+<li><strong>N26</strong>：当前服务器配置批取一次，公共配置只在原优先级下回退，不扩展到其他服务器或改变缓存刷新方式。</li>
+<li><strong>N39/S07</strong>：对本次会员集合和目标分组一次读取候选申请，但必须保持当前 <code>LIKE</code> 子串判定导致的申请结果；精确 CSV 元素匹配是另一项业务规则修正，不能借查询优化顺手更改。仓库 <code>t_member_group_apply</code> 只有主键，是否加 <code>(member_id, status)</code> 索引须根据真实 DDL、选择性与计划单独评审。</li>
+<li><strong>N41</strong>：禁用证件会员检查可在当前批复用账户/服务器读取，但影响禁用决策的最新状态仍在处理前复核；不得为了减少查询数改变权限结果。</li>
+</ul>
+<p><strong>完成标准</strong>：KYC 结论与快照、代理范围、佣金结果、分组授权和禁用决定逐项对照；空配置、历史记录、重复分组及并发状态变化纳入测试。</p>
+<p><strong>审核小步（高风险业务先核对原决策，再改变读取方式）</strong></p>
+<table>
+  <thead>
+      <tr>
+          <th>小步</th>
+          <th>最小改动及目的</th>
+          <th>重点核对</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>4.1 N06</td>
+          <td>仅对当前代理集合批取下级计数</td>
+          <td>层级深度、有效状态、权限范围</td>
+      </tr>
+      <tr>
+          <td>4.2 N07</td>
+          <td>佣金规则循环中的 SaleSetting 按 rule_id 批取</td>
+          <td>错误标题、缺失规则和返回分支</td>
+      </tr>
+      <tr>
+          <td>4.3 N08</td>
+          <td>比例设置循环中的 SaleSetting 按规则 ID 批取</td>
+          <td>佣金上下限与历史降佣校验</td>
+      </tr>
+      <tr>
+          <td>4.4 N27</td>
+          <td><code>commissionMySetting</code> 中按 CLIENT_ID 批取 SaleSetting 标题</td>
+          <td>状态条件、缺失标题和其他入口的共用调用方</td>
+      </tr>
+      <tr>
+          <td>4.5 N11</td>
+          <td>KYC 已通过设置仅在当前会员/表单范围批取</td>
+          <td>通过状态及 auto 规则</td>
+      </tr>
+      <tr>
+          <td>4.6 N12</td>
+          <td>KYC 认证内容按原条件批取</td>
+          <td><code>kyc_config_id</code>、最新成功和历史版本</td>
+      </tr>
+      <tr>
+          <td>4.7 N13</td>
+          <td>优先仅在 KYC 展示入口预取本次表单详情；共享构建方法先不动</td>
+          <td>子类型、展示顺序、auto、翻译与老用户数据；若必须改 <code>buildKycFormDetail</code>，先审核全部快照写入路径</td>
+      </tr>
+      <tr>
+          <td>4.8 N14</td>
+          <td>KYC 快照读取先区分已存快照和旧用户动态组装路径，再按当前会员/类型集合批取</td>
+          <td>快照版本、缺失快照和结论一致性；不得改变已存快照内容或新快照写入格式</td>
+      </tr>
+      <tr>
+          <td>4.9 N26</td>
+          <td>当前服务器配置仅批取本次需要的键</td>
+          <td>公共配置回退优先级和缓存刷新</td>
+      </tr>
+      <tr>
+          <td>4.10 N39/S07</td>
+          <td>先证明候选批取能逐会员、逐分组复现原数据库 <code>LIKE</code> 判定，才考虑改变读取方式</td>
+          <td>这是先查后插入的写流程；PHP 子串或精确 CSV 匹配都不能直接替代原 SQL。对照新增申请、重复/并发、通配符、大小写和授权结果；不能证明等价则暂缓，索引另评审</td>
+      </tr>
+      <tr>
+          <td>4.11 N41</td>
+          <td>当前批复用可共享的账户/服务器读取</td>
+          <td>禁用前最新状态复核、最终禁用决定；有并发差异则保留原查询</td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="阶段-5复杂-sqlselectdb-与分页">阶段 5：复杂 SQL、SelectDB 与分页</h3>
+<ul>
+<li><strong>N32/S11</strong>：先修历史回撤结果为 0 时的缓存命中判断，再确认最大查询跨度的产品口径；按账户、服务器和日期范围取首尾值，保留并列时间选择、时区及原回撤公式。7/30/90 天、零值和当前未结束日期分别测冷/热缓存。目标是 SelectDB，不能用 MySQL 字典索引推断实际性能。</li>
+<li><strong>S02/S08</strong>：IB 关键词搜索先比较数字 ID 精确定位和现有包含搜索的计划及结果。当前 <code>OpenGroupListService</code> 已有最大页大小 100、可选 total 及缓存，不能当作无分页接口重写；它目前走 <code>SELECTDB</code>，需先核对报告引擎差异。前缀或全文搜索若改变中文、大小写和包含匹配语义，另行确认产品口径。</li>
+<li><strong>S03/S09</strong>：SelectDB 资金历史及账户关键词优先按会员/账户、服务器、状态和业务时间范围缩小数据，再看 Profile 决定是否需要检索列或倒排索引。<code>t_fund_detail</code> 属大表；对现有不传时间范围的请求，先核对产品契约与结果规模，再设计有界方案，不能无声截断。分页 total 与筛选范围保持原契约。</li>
+<li><strong>S04/S10</strong>：S04 的开户组和国家代码配置分别量化表规模与匹配成本；S10 再独立量化开户组 CSV JOIN 放大。小表先评估是否无需改动；若需批取或缓存，保持原选中行、单值优先、配置刷新、服务器及币种维度。大规模才单独评估关系规范化。</li>
+<li><strong>S12</strong>：逐个高成本入口拆开测列表查询和 count，确认页大小、offset 与 total 依赖；只优化具体接口，不直接全局改 <code>BaseModel::page</code>。</li>
+</ul>
+<p><strong>完成标准</strong>：每项提供同参数、同连接引擎的前后执行计划、扫描/返回量及数据库总时间。无明显收益的结构修改暂不实施；如确需索引或表结构，新增 <code>scripts/v2.20.0/</code> 下本需求独立版本 SQL，同步 <code>docs/数据字典.sql</code>，说明写入成本、发布及回滚方式。</p>
+<p><strong>审核小步（先取证，再决定是否有代码变更）</strong></p>
+<table>
+  <thead>
+      <tr>
+          <th>小步</th>
+          <th>最小改动及目的</th>
+          <th>审核关口</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>5.1 N32/S11 缓存</td>
+          <td>只修 0 值被误判为未缓存的条件</td>
+          <td>0、非 0、冷/热缓存及返回公式一致；独立审核后才考虑查询改写</td>
+      </tr>
+      <tr>
+          <td>5.2 N32/S11 查询</td>
+          <td>产品确认最大跨度后，仅改同账户、服务器、日期范围内的首尾值读取</td>
+          <td>SelectDB Profile、时区、并列时间、7/30/90 天及未结束日期</td>
+      </tr>
+      <tr>
+          <td>5.3 S02</td>
+          <td>IB 数字 ID 搜索先评估可等值定位的分支</td>
+          <td>原祖先权限、文本包含语义、列表/count 各自耗时</td>
+      </tr>
+      <tr>
+          <td>5.4 S08</td>
+          <td>单独复核 <code>OpenGroupListService</code> 的 SelectDB 查询与已有分页</td>
+          <td>引擎、100 页大小上限、可选 total 和缓存；无明显热点则不改</td>
+      </tr>
+      <tr>
+          <td>5.5 S03</td>
+          <td>资金历史入口先按既有参数中可用的会员/账户、时间缩小范围</td>
+          <td>SelectDB 同次 Profile；新增必填时间或改变包含搜索须先确认契约</td>
+      </tr>
+      <tr>
+          <td>5.6 S09</td>
+          <td>账户关键词入口独立评估等值分支或检索索引</td>
+          <td>账户与服务器归属、原搜索结果及分页 total</td>
+      </tr>
+      <tr>
+          <td>5.7a S04 组配置</td>
+          <td>单独测 <code>AccountRegisterSettingRepository::findActiveByServerAndGroup</code> 的 CSV 匹配与表规模</td>
+          <td>保留 server/status 和 <code>first()</code> 选中行；小表若成本低可不改</td>
+      </tr>
+      <tr>
+          <td>5.7b S04 国家配置</td>
+          <td>单独测 <code>ConfigMemberNameRepository::findFirstByCountryCode</code></td>
+          <td>保留单值精确优先、CSV 回退、大小写/空格处理和配置刷新；不得与 5.7a 合并</td>
+      </tr>
+      <tr>
+          <td>5.8a S10</td>
+          <td><code>MemberMtloginService</code> 入口单独测配置组 JOIN 放大</td>
+          <td><code>account_register_setting</code> 规模、服务器关联语义与 server/status</td>
+      </tr>
+      <tr>
+          <td>5.8b S10</td>
+          <td><code>ExchangeService</code> 入口单独测配置组 JOIN 放大</td>
+          <td>与 5.8a 分别验收；不把一次执行的 UNION 误判为 N+1</td>
+      </tr>
+      <tr>
+          <td>5.9 S12</td>
+          <td>只选一个经证实高成本的列表入口，分别量化列表、count、深分页</td>
+          <td>保持该入口 total 契约；每增加一个入口都重新审核，不改公共 <code>BaseModel::page</code></td>
+      </tr>
+      <tr>
+          <td>5.10 结构变更</td>
+          <td>仅在某一步的真实计划证明必要时，另行交付独立版本 SQL 与数据字典</td>
+          <td>DDL 锁/写入成本、发布顺序、回滚和跨项目调用方先单独评审</td>
+      </tr>
+  </tbody>
+</table>
+<h2 id="统一验证与交付边界">统一验证与交付边界</h2>
+<ol>
+<li>每个小批次先读对应 Controller、Service、Repository/Model、数据字典和已有测试；修改 PHP 后执行 <code>php -l</code> 及针对性行为测试。数据库/SQL 测试只在确认隔离环境后运行；回归覆盖空结果、边界、权限、历史数据、重复调用和冷热缓存。</li>
+<li>分别统计 SQL 指纹次数、数据库总耗时及接口耗时。只有结果一致且相关成本下降才算通过；远程 MT/CRM 时间、连接池等待与 SQL 时间分开记录。</li>
+<li>大表读取先用会员/账户、服务器、ticket、状态和时间缩小范围，再检查真实索引与计划；列表用当前页，聚合只作用于受控 ID 集合。深分页或全量 count 的改动须保持现有 total 契约。</li>
+<li>不改统一返回结构、公共分页基类、全局搜索语义或数据库公共字段。若证据表明必须改这些公共边界，先另行评估影响接口、前端兼容、发布与回滚，再决定是否纳入本分支。</li>
+<li>每一组独立提交、独立回归；问题若已消失、入口不可达或实测成本低，记录证据后关闭该编号，不为了完成编号而改代码。上线时先发布无需 DDL 的接口改动；确需结构变更时按独立 SQL 的依赖顺序执行并保留回滚方案。</li>
+</ol>
+<h3 id="阶段-6联合回归与交付的小步">阶段 6：联合回归与交付的小步</h3>
+<table>
+  <thead>
+      <tr>
+          <th>小步</th>
+          <th>做什么</th>
+          <th>审核材料</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>6.1</td>
+          <td>汇总每个已审核小步的改前/改后响应、SQL 次数与总耗时</td>
+          <td>逐入口结果和未实施编号的原因</td>
+      </tr>
+      <tr>
+          <td>6.2</td>
+          <td>按已修改入口做组合回归，重点覆盖权限、跨服、KYC、资金候选、缓存、分页和错误分支</td>
+          <td>通过/失败/未运行清单，不能用单接口测试替代组合验证</td>
+      </tr>
+      <tr>
+          <td>6.3</td>
+          <td>核对实际代码、独立 SQL、数据字典、配置和部署依赖</td>
+          <td>逐项发布及回滚顺序；未获批准的 DDL 不发布</td>
+      </tr>
+      <tr>
+          <td>6.4</td>
+          <td>最终由用户审核完整差异，再决定合并或发布</td>
+          <td>各小步审查记录、剩余性能风险和回滚方式</td>
+      </tr>
+  </tbody>
+</table>
+<p>当前未取得线上调用量、真实 DDL、MySQL 执行计划及 SelectDB Profile，也未运行隔离库性能基准。因此阶段 3-5 的最终实施顺序要由阶段 0 的数据决定，不能从静态报告直接承诺所有条目都改或指定性能提升百分比。</p>
+
+    </div>
+  </article>
+  
+    
+<aside class="sidebar">
+  <section class="sidebar_inner">
+    <br>
+    
+  
+  <div class="search">
+    <input type="search" class="search_field form_field" placeholder='搜索内容...' id="find" autocomplete="off" data-scope='gtc'>
+    <label for="find" class="search_label"><svg class="icon">
+  <title>search</title>
+  <use xlink:href="#search"></use>
+</svg>
+
+    </label>
+    
+    <div class="search_results results"></div>
+  </div>
+
+        <div class="author_header">
+          <img src="https://jianlin-li.github.io/images/fish-head.png" alt="李建林 photo">
+          <h2>李建林</h2>
+        </div>
+      <div class="author_bio">
+        PHP, Go, MySQL, Redis, RabbitMQ, Elasticsearch, Docker, Kubernetes, Shell
+      </div>
+      <a href='https://jianlin-li.github.io/about/' class="button mt-1" role="button" title='阅读更多'>阅读更多</a>
+
+    
+    <h2 class="mt-4">精选文章</h2>
+    <ul>
+      <li>
+        <a href="https://jianlin-li.github.io/post/jiagou-elk-stack/" class="nav-link" title="架构-使用ELK Stack在本地Macbookpro搭建一套日志收集并且可视化系统">架构-使用ELK Stack在本地Macbookpro搭建一套日志收集并且可视化系统</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/jiagou-prometheus-grafana/" class="nav-link" title="架构-Prometheus&#43;Grafana">架构-Prometheus+Grafana</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/jiagou-cicd-jenkins-argo/" class="nav-link" title="架构-基于JenKins的CI/CD平台之Argo CD">架构-基于JenKins的CI/CD平台之Argo CD</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/jiagou-cicd-jenkins/" class="nav-link" title="架构-基于JenKins的CI/CD平台">架构-基于JenKins的CI/CD平台</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/k8s_review_12/" class="nav-link" title="Kubernetes的知识库-12">Kubernetes的知识库-12</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/k8s_review_11/" class="nav-link" title="Kubernetes的知识库-11">Kubernetes的知识库-11</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/k8s_review_10/" class="nav-link" title="Kubernetes的知识库-10">Kubernetes的知识库-10</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/k8s_review_9/" class="nav-link" title="Kubernetes的知识库-9">Kubernetes的知识库-9</a>
+      </li>
+    </ul>
+    <h2 class="mt-4">最新文章</h2>
+    <ul class="flex-column">
+      <li>
+        <a href="https://jianlin-li.github.io/post/k8s_review_8/" class="nav-link" title="Kubernetes的知识库-8">Kubernetes的知识库-8</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/k8s_review_7/" class="nav-link" title="Kubernetes的知识库-7">Kubernetes的知识库-7</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/k8s_review_6/" class="nav-link" title="Kubernetes的知识库-6">Kubernetes的知识库-6</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/k8s_review_5/" class="nav-link" title="Kubernetes的知识库-5">Kubernetes的知识库-5</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/k8s_review_4/" class="nav-link" title="Kubernetes的知识库-4">Kubernetes的知识库-4</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/k8s_review_3/" class="nav-link" title="Kubernetes的知识库-3">Kubernetes的知识库-3</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/k8s_review_2/" class="nav-link" title="Kubernetes的知识库-2">Kubernetes的知识库-2</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/k8s_review_1/" class="nav-link" title="Kubernetes的知识库-1">Kubernetes的知识库-1</a>
+      </li>
+    </ul>
+    <div>
+      <h2 class="mt-4 taxonomy" id="categories-section">分类</h2>
+      <nav class="tags_nav">
+        <a href='https://jianlin-li.github.io/categories/kubernetes/' class="post_tag button button_translucent" title="kubernetes">
+          KUBERNETES
+          <span class="button_tally">13</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/categories/php%E8%AF%AD%E8%A8%80/' class="post_tag button button_translucent" title="php语言">
+          PHP语言
+          <span class="button_tally">7</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/categories/%E6%9E%B6%E6%9E%84/' class="post_tag button button_translucent" title="架构">
+          架构
+          <span class="button_tally">7</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/categories/go%E8%AF%AD%E8%A8%80/' class="post_tag button button_translucent" title="go语言">
+          GO语言
+          <span class="button_tally">6</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/categories/elasticsearch/' class="post_tag button button_translucent" title="elasticsearch">
+          ELASTICSEARCH
+          <span class="button_tally">5</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/categories/redis/' class="post_tag button button_translucent" title="redis">
+          REDIS
+          <span class="button_tally">5</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/categories/mysql/' class="post_tag button button_translucent" title="mysql">
+          MYSQL
+          <span class="button_tally">4</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/categories/rabbitmq/' class="post_tag button button_translucent" title="rabbitmq">
+          RABBITMQ
+          <span class="button_tally">4</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/categories/ci/cd/' class="post_tag button button_translucent" title="ci/cd">
+          CI/CD
+          <span class="button_tally">2</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/categories/git/' class="post_tag button button_translucent" title="git">
+          GIT
+          <span class="button_tally">2</span>
+        </a>
+        
+        
+        <br>
+        <div class="post_tags_toggle button">所有分类</div>
+        <div class="post_tags">
+          <div class="tags_list">
+            
+            <a href='https://jianlin-li.github.io/categories/argo/' class=" post_tag button button_translucent" data-position=1 title="argo">ARGO<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/centos7/' class=" post_tag button button_translucent" data-position=1 title="centos7">CENTOS7<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/ci/cd/' class=" post_tag button button_translucent" data-position=2 title="ci/cd">CI/CD<span class="button_tally">2</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/c%E8%AF%AD%E8%A8%80/' class=" post_tag button button_translucent" data-position=1 title="c语言">C语言<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/devops/' class=" post_tag button button_translucent" data-position=1 title="devops">DEVOPS<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/docker/' class=" post_tag button button_translucent" data-position=1 title="docker">DOCKER<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/elasticsearch/' class=" post_tag button button_translucent" data-position=5 title="elasticsearch">ELASTICSEARCH<span class="button_tally">5</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/elk/' class=" post_tag button button_translucent" data-position=1 title="elk">ELK<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/git/' class=" post_tag button button_translucent" data-position=2 title="git">GIT<span class="button_tally">2</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/go%E8%AF%AD%E8%A8%80/' class=" post_tag button button_translucent" data-position=6 title="go语言">GO语言<span class="button_tally">6</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/grafana/' class=" post_tag button button_translucent" data-position=1 title="grafana">GRAFANA<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/gtc/' class=" post_tag button button_translucent" data-position=2 title="gtc">GTC<span class="button_tally">2</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/gtcadmin/' class=" post_tag button button_translucent" data-position=1 title="gtcadmin">GTCADMIN<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/gtcuser/' class=" post_tag button button_translucent" data-position=1 title="gtcuser">GTCUSER<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/hugo/' class=" post_tag button button_translucent" data-position=1 title="hugo">HUGO<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/jenkins/' class=" post_tag button button_translucent" data-position=2 title="jenkins">JENKINS<span class="button_tally">2</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/kubernetes/' class=" post_tag button button_translucent" data-position=13 title="kubernetes">KUBERNETES<span class="button_tally">13</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/mkcert/' class=" post_tag button button_translucent" data-position=1 title="mkcert">MKCERT<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/mysql/' class=" post_tag button button_translucent" data-position=4 title="mysql">MYSQL<span class="button_tally">4</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/nginx/' class=" post_tag button button_translucent" data-position=1 title="nginx">NGINX<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/php%E8%AF%AD%E8%A8%80/' class=" post_tag button button_translucent" data-position=7 title="php语言">PHP语言<span class="button_tally">7</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/prometheus/' class=" post_tag button button_translucent" data-position=1 title="prometheus">PROMETHEUS<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/rabbitmq/' class=" post_tag button button_translucent" data-position=4 title="rabbitmq">RABBITMQ<span class="button_tally">4</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/redis/' class=" post_tag button button_translucent" data-position=5 title="redis">REDIS<span class="button_tally">5</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/shell/' class=" post_tag button button_translucent" data-position=2 title="shell">SHELL<span class="button_tally">2</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/web%E6%9C%8D%E5%8A%A1%E5%99%A8/' class=" post_tag button button_translucent" data-position=1 title="web服务器">WEB服务器<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/%E6%9C%AC%E5%9C%B0%E7%8E%AF%E5%A2%83/' class=" post_tag button button_translucent" data-position=2 title="本地环境">本地环境<span class="button_tally">2</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/%E5%A4%8D%E4%B9%A0/' class=" post_tag button button_translucent" data-position=1 title="复习">复习<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/%E5%8D%8E%E5%BE%AE%E4%B8%96%E7%BA%AA/' class=" post_tag button button_translucent" data-position=1 title="华微世纪">华微世纪<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/%E6%9E%B6%E6%9E%84/' class=" post_tag button button_translucent" data-position=7 title="架构">架构<span class="button_tally">7</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/%E6%95%99%E7%A8%8B/' class=" post_tag button button_translucent" data-position=1 title="教程">教程<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/%E8%A7%86%E9%A2%91/' class=" post_tag button button_translucent" data-position=1 title="视频">视频<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/%E4%B9%A6%E7%B1%8D/' class=" post_tag button button_translucent" data-position=1 title="书籍">书籍<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/%E7%AE%97%E6%B3%95/' class=" post_tag button button_translucent" data-position=1 title="算法">算法<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/%E8%87%AA%E7%AD%BE%E5%90%8D%E8%AF%81%E4%B9%A6/' class=" post_tag button button_translucent" data-position=1 title="自签名证书">自签名证书<span class="button_tally">1</span>
+            </a>
+            
+            <div class="tags_sort"><span title="sort alphabetically">[A~Z]</span><span title="sort by count">[0~9]</span>
+            </div>
+            <span class="tags_hide"><svg class="icon">
+            <use xlink:href="#closeme"></use>
+          </svg></span>
+          </div>
+        </div>
+      </nav>
+    </div>
+    <div>
+      <h2 class="mt-4 taxonomy" id="tags-section">标签</h2>
+      <nav class="tags_nav">
+        <a href='https://jianlin-li.github.io/tags/kubernetes/' class="post_tag button button_translucent" title="kubernetes">
+          KUBERNETES
+          <span class="button_tally">13</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/tags/php/' class="post_tag button button_translucent" title="php">
+          PHP
+          <span class="button_tally">7</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/tags/go/' class="post_tag button button_translucent" title="go">
+          GO
+          <span class="button_tally">6</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/tags/elasticsearch/' class="post_tag button button_translucent" title="elasticsearch">
+          ELASTICSEARCH
+          <span class="button_tally">5</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/tags/redis/' class="post_tag button button_translucent" title="redis">
+          REDIS
+          <span class="button_tally">5</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/tags/mysql/' class="post_tag button button_translucent" title="mysql">
+          MYSQL
+          <span class="button_tally">4</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/tags/rabbitmq/' class="post_tag button button_translucent" title="rabbitmq">
+          RABBITMQ
+          <span class="button_tally">4</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/tags/devops/' class="post_tag button button_translucent" title="devops">
+          DEVOPS
+          <span class="button_tally">3</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/tags/ci/cd/' class="post_tag button button_translucent" title="ci/cd">
+          CI/CD
+          <span class="button_tally">2</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/tags/git/' class="post_tag button button_translucent" title="git">
+          GIT
+          <span class="button_tally">2</span>
+        </a>
+        
+        
+        <br>
+        <div class="post_tags_toggle button">所有标签</div>
+        <div class="post_tags">
+          <div class="tags_list">
+            
+            <a href='https://jianlin-li.github.io/tags/argo/' class=" post_tag button button_translucent" data-position=1 title="argo">ARGO<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/centos7/' class=" post_tag button button_translucent" data-position=1 title="centos7">CENTOS7<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/ci/cd/' class=" post_tag button button_translucent" data-position=2 title="ci/cd">CI/CD<span class="button_tally">2</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/c%E8%AF%AD%E8%A8%80/' class=" post_tag button button_translucent" data-position=1 title="c语言">C语言<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/devops/' class=" post_tag button button_translucent" data-position=3 title="devops">DEVOPS<span class="button_tally">3</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/docker/' class=" post_tag button button_translucent" data-position=1 title="docker">DOCKER<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/elasticsearch/' class=" post_tag button button_translucent" data-position=5 title="elasticsearch">ELASTICSEARCH<span class="button_tally">5</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/elk/' class=" post_tag button button_translucent" data-position=1 title="elk">ELK<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/emoji/' class=" post_tag button button_translucent" data-position=1 title="emoji">EMOJI<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/git/' class=" post_tag button button_translucent" data-position=2 title="git">GIT<span class="button_tally">2</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/go/' class=" post_tag button button_translucent" data-position=6 title="go">GO<span class="button_tally">6</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/grafana/' class=" post_tag button button_translucent" data-position=1 title="grafana">GRAFANA<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/gtc/' class=" post_tag button button_translucent" data-position=2 title="gtc">GTC<span class="button_tally">2</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/gtcadmin/' class=" post_tag button button_translucent" data-position=1 title="gtcadmin">GTCADMIN<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/gtcuser/' class=" post_tag button button_translucent" data-position=1 title="gtcuser">GTCUSER<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/hosts/' class=" post_tag button button_translucent" data-position=1 title="hosts">HOSTS<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/hugo/' class=" post_tag button button_translucent" data-position=1 title="hugo">HUGO<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/jenkins/' class=" post_tag button button_translucent" data-position=2 title="jenkins">JENKINS<span class="button_tally">2</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/kubernetes/' class=" post_tag button button_translucent" data-position=13 title="kubernetes">KUBERNETES<span class="button_tally">13</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/markdown/' class=" post_tag button button_translucent" data-position=1 title="markdown">MARKDOWN<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/math/' class=" post_tag button button_translucent" data-position=1 title="math">MATH<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/mkcert/' class=" post_tag button button_translucent" data-position=1 title="mkcert">MKCERT<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/mysql/' class=" post_tag button button_translucent" data-position=4 title="mysql">MYSQL<span class="button_tally">4</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/nginx/' class=" post_tag button button_translucent" data-position=1 title="nginx">NGINX<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/notices/' class=" post_tag button button_translucent" data-position=1 title="notices">NOTICES<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/openstreetmap/' class=" post_tag button button_translucent" data-position=1 title="openstreetmap">OPENSTREETMAP<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/php/' class=" post_tag button button_translucent" data-position=7 title="php">PHP<span class="button_tally">7</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/prometheus/' class=" post_tag button button_translucent" data-position=1 title="prometheus">PROMETHEUS<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/rabbitmq/' class=" post_tag button button_translucent" data-position=4 title="rabbitmq">RABBITMQ<span class="button_tally">4</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/redis/' class=" post_tag button button_translucent" data-position=5 title="redis">REDIS<span class="button_tally">5</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/shell/' class=" post_tag button button_translucent" data-position=2 title="shell">SHELL<span class="button_tally">2</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/sql/' class=" post_tag button button_translucent" data-position=1 title="sql">SQL<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/web%E6%9C%8D%E5%8A%A1%E5%99%A8/' class=" post_tag button button_translucent" data-position=1 title="web服务器">WEB服务器<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/%E6%9C%AC%E5%9C%B0%E7%8E%AF%E5%A2%83/' class=" post_tag button button_translucent" data-position=1 title="本地环境">本地环境<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/%E5%A4%8D%E4%B9%A0/' class=" post_tag button button_translucent" data-position=1 title="复习">复习<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/%E6%95%99%E7%A8%8B/' class=" post_tag button button_translucent" data-position=1 title="教程">教程<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/%E4%B9%B1%E7%A0%81/' class=" post_tag button button_translucent" data-position=1 title="乱码">乱码<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/%E8%A7%86%E9%A2%91/' class=" post_tag button button_translucent" data-position=1 title="视频">视频<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/%E4%B9%A6%E7%B1%8D/' class=" post_tag button button_translucent" data-position=1 title="书籍">书籍<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/%E7%AE%97%E6%B3%95/' class=" post_tag button button_translucent" data-position=1 title="算法">算法<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6/' class=" post_tag button button_translucent" data-position=1 title="主从复制">主从复制<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/%E8%87%AA%E7%AD%BE%E5%90%8D%E8%AF%81%E4%B9%A6/' class=" post_tag button button_translucent" data-position=1 title="自签名证书">自签名证书<span class="button_tally">1</span>
+            </a>
+            
+            <div class="tags_sort"><span title="sort alphabetically">[A~Z]</span><span title="sort by count">[0~9]</span>
+            </div>
+            <span class="tags_hide"><svg class="icon">
+            <use xlink:href="#closeme"></use>
+          </svg></span>
+          </div>
+        </div>
+      </nav>
+    </div>
+  </section>
+</aside>
+
+  
+</div>
+
+<style>
+  .gtc-breadcrumb {
+    margin-bottom: 12px;
+    font-size: 0.9em;
+    opacity: 0.75;
+  }
+
+  .gtc-meta {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+</style>
+    </main><svg width="0" height="0" class="hidden">
+  <symbol viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" id="facebook">
+    <path d="M437 0H75C33.648 0 0 33.648 0 75v362c0 41.352 33.648 75 75 75h151V331h-60v-90h60v-61c0-49.629 40.371-90 90-90h91v90h-91v61h91l-15 90h-76v181h121c41.352 0 75-33.648 75-75V75c0-41.352-33.648-75-75-75zm0 0"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18.001 18.001" id="twitter">
+    <path d="M15.891 4.013c.808-.496 1.343-1.173 1.605-2.034a8.68 8.68 0 0 1-2.351.861c-.703-.756-1.593-1.14-2.66-1.14-1.043 0-1.924.366-2.643 1.078a3.56 3.56 0 0 0-1.076 2.605c0 .309.039.585.117.819-3.076-.105-5.622-1.381-7.628-3.837-.34.601-.51 1.213-.51 1.846 0 1.301.549 2.332 1.645 3.089-.625-.053-1.176-.211-1.645-.47 0 .929.273 1.705.82 2.388a3.623 3.623 0 0 0 2.115 1.291c-.312.08-.641.118-.979.118-.312 0-.533-.026-.664-.083.23.757.664 1.371 1.291 1.841a3.652 3.652 0 0 0 2.152.743C4.148 14.173 2.625 14.69.902 14.69c-.422 0-.721-.006-.902-.038 1.697 1.102 3.586 1.649 5.676 1.649 2.139 0 4.029-.542 5.674-1.626 1.645-1.078 2.859-2.408 3.639-3.974a10.77 10.77 0 0 0 1.172-4.892v-.468a7.788 7.788 0 0 0 1.84-1.921 8.142 8.142 0 0 1-2.11.593z"
+      ></path>
+  </symbol>
+  <symbol aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" id="mail">
+    <path  d="M502.3 190.8c3.9-3.1 9.7-.2 9.7 4.7V400c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V195.6c0-5 5.7-7.8 9.7-4.7 22.4 17.4 52.1 39.5 154.1 113.6 21.1 15.4 56.7 47.8 92.2 47.6 35.7.3 72-32.8 92.3-47.6 102-74.1 131.6-96.3 154-113.7zM256 320c23.2.4 56.6-29.2 73.4-41.4 132.7-96.3 142.8-104.7 173.4-128.7 5.8-4.5 9.2-11.5 9.2-18.9v-19c0-26.5-21.5-48-48-48H48C21.5 64 0 85.5 0 112v19c0 7.4 3.4 14.3 9.2 18.9 30.6 23.9 40.7 32.4 173.4 128.7 16.8 12.2 50.2 41.8 73.4 41.4z"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" id="calendar">
+    <path d="M452 40h-24V0h-40v40H124V0H84v40H60C26.916 40 0 66.916 0 100v352c0 33.084 26.916 60 60 60h392c33.084 0 60-26.916 60-60V100c0-33.084-26.916-60-60-60zm20 412c0 11.028-8.972 20-20 20H60c-11.028 0-20-8.972-20-20V188h432v264zm0-304H40v-48c0-11.028 8.972-20 20-20h24v40h40V80h264v40h40V80h24c11.028 0 20 8.972 20 20v48z"></path>
+    <path d="M76 230h40v40H76zm80 0h40v40h-40zm80 0h40v40h-40zm80 0h40v40h-40zm80 0h40v40h-40zM76 310h40v40H76zm80 0h40v40h-40zm80 0h40v40h-40zm80 0h40v40h-40zM76 390h40v40H76zm80 0h40v40h-40zm80 0h40v40h-40zm80 0h40v40h-40zm80-80h40v40h-40z"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" id="github">
+    <path d="M255.968 5.329C114.624 5.329 0 120.401 0 262.353c0 113.536 73.344 209.856 175.104 243.872 12.8 2.368 17.472-5.568 17.472-12.384 0-6.112-.224-22.272-.352-43.712-71.2 15.52-86.24-34.464-86.24-34.464-11.616-29.696-28.416-37.6-28.416-37.6-23.264-15.936 1.728-15.616 1.728-15.616 25.696 1.824 39.2 26.496 39.2 26.496 22.848 39.264 59.936 27.936 74.528 21.344 2.304-16.608 8.928-27.936 16.256-34.368-56.832-6.496-116.608-28.544-116.608-127.008 0-28.064 9.984-51.008 26.368-68.992-2.656-6.496-11.424-32.64 2.496-68 0 0 21.504-6.912 70.4 26.336 20.416-5.696 42.304-8.544 64.096-8.64 21.728.128 43.648 2.944 64.096 8.672 48.864-33.248 70.336-26.336 70.336-26.336 13.952 35.392 5.184 61.504 2.56 68 16.416 17.984 26.304 40.928 26.304 68.992 0 98.72-59.84 120.448-116.864 126.816 9.184 7.936 17.376 23.616 17.376 47.584 0 34.368-.32 62.08-.32 70.496 0 6.88 4.608 14.88 17.6 12.352C438.72 472.145 512 375.857 512 262.353 512 120.401 397.376 5.329 255.968 5.329z"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 212 212" id="gitlab">
+    <path d="M12.3 74.7h54L43.3 3c-1-3.6-6.4-3.6-7.6 0L12.3 74.8z" />
+    <path d="M12.3 74.7L.5 111c-1 3.2 0 6.8 3 8.8l101.6 74-92.5-119z"/>
+    <path d="M105 193.7l-38.6-119h-54l92.7 119z"/>
+    <path d="M105 193.7l38.7-119H66.4l38.7 119z"/>
+    <path d="M105 193.7l38.7-119H198l-93 119z"/>
+    <path d="M198 74.7l11.6 36.2c1 3 0 6.6-3 8.6l-101.5 74 93-119z"/>
+    <path d="M198 74.7h-54.3L167 3c1.2-3.6 6.4-3.6 7.6 0L198 74.8z"/>
+  </symbol>
+  <symbol viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" id="rss">
+    <circle cx="3.429" cy="20.571" r="3.429"></circle>
+    <path d="M11.429 24h4.57C15.999 15.179 8.821 8.001 0 8v4.572c6.302.001 11.429 5.126 11.429 11.428z"></path>
+    <path d="M24 24C24 10.766 13.234 0 0 0v4.571c10.714 0 19.43 8.714 19.43 19.429z"></path>
+  </symbol>
+  <symbol viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" id="linkedin">
+    <path d="M437 0H75C33.648 0 0 33.648 0 75v362c0 41.352 33.648 75 75 75h362c41.352 0 75-33.648 75-75V75c0-41.352-33.648-75-75-75zM181 406h-60V196h60zm0-240h-60v-60h60zm210 240h-60V286c0-16.54-13.46-30-30-30s-30 13.46-30 30v120h-60V196h60v11.309C286.719 202.422 296.93 196 316 196c40.691.043 75 36.547 75 79.688zm0 0"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 612 612" id="to-top">
+    <path d="M604.501 440.509L325.398 134.956c-5.331-5.357-12.423-7.627-19.386-7.27-6.989-.357-14.056 1.913-19.387 7.27L7.499 440.509c-9.999 10.024-9.999 26.298 0 36.323s26.223 10.024 36.222 0l262.293-287.164L568.28 476.832c9.999 10.024 26.222 10.024 36.221 0 9.999-10.023 9.999-26.298 0-36.323z"></path>
+  </symbol>
+  <symbol viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" id="carly">
+    <path d="M504.971 239.029L448 182.059V84c0-46.317-37.682-84-84-84h-44c-13.255 0-24 10.745-24 24s10.745 24 24 24h44c19.851 0 36 16.149 36 36v108c0 6.365 2.529 12.47 7.029 16.971L454.059 256l-47.029 47.029A24.002 24.002 0 0 0 400 320v108c0 19.851-16.149 36-36 36h-44c-13.255 0-24 10.745-24 24s10.745 24 24 24h44c46.318 0 84-37.683 84-84v-98.059l56.971-56.971c9.372-9.372 9.372-24.568 0-33.941zM112 192V84c0-19.851 16.149-36 36-36h44c13.255 0 24-10.745 24-24S205.255 0 192 0h-44c-46.318 0-84 37.683-84 84v98.059l-56.971 56.97c-9.373 9.373-9.373 24.568 0 33.941L64 329.941V428c0 46.317 37.682 84 84 84h44c13.255 0 24-10.745 24-24s-10.745-24-24-24h-44c-19.851 0-36-16.149-36-36V320c0-6.365-2.529-12.47-7.029-16.971L57.941 256l47.029-47.029A24.002 24.002 0 0 0 112 192z"></path>
+  </symbol>
+  <symbol viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" id="copy">
+    <path d="M23 2.75A2.75 2.75 0 0 0 20.25 0H8.75A2.75 2.75 0 0 0 6 2.75v13.5A2.75 2.75 0 0 0 8.75 19h11.5A2.75 2.75 0 0 0 23 16.25zM18.25 14.5h-7.5a.75.75 0 0 1 0-1.5h7.5a.75.75 0 0 1 0 1.5zm0-3h-7.5a.75.75 0 0 1 0-1.5h7.5a.75.75 0 0 1 0 1.5zm0-3h-7.5a.75.75 0 0 1 0-1.5h7.5a.75.75 0 0 1 0 1.5z"></path>
+    <path d="M8.75 20.5a4.255 4.255 0 0 1-4.25-4.25V2.75c0-.086.02-.166.025-.25H3.75A2.752 2.752 0 0 0 1 5.25v16A2.752 2.752 0 0 0 3.75 24h12a2.752 2.752 0 0 0 2.75-2.75v-.75z"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512.001 512.001" id="closeme">
+    <path d="M284.286 256.002L506.143 34.144c7.811-7.811 7.811-20.475 0-28.285-7.811-7.81-20.475-7.811-28.285 0L256 227.717 34.143 5.859c-7.811-7.811-20.475-7.811-28.285 0-7.81 7.811-7.811 20.475 0 28.285l221.857 221.857L5.858 477.859c-7.811 7.811-7.811 20.475 0 28.285a19.938 19.938 0 0 0 14.143 5.857 19.94 19.94 0 0 0 14.143-5.857L256 284.287l221.857 221.857c3.905 3.905 9.024 5.857 14.143 5.857s10.237-1.952 14.143-5.857c7.811-7.811 7.811-20.475 0-28.285L284.286 256.002z"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" id="open-menu">
+    <path d="M492 236H20c-11.046 0-20 8.954-20 20s8.954 20 20 20h472c11.046 0 20-8.954 20-20s-8.954-20-20-20zm0-160H20C8.954 76 0 84.954 0 96s8.954 20 20 20h472c11.046 0 20-8.954 20-20s-8.954-20-20-20zm0 320H20c-11.046 0-20 8.954-20 20s8.954 20 20 20h472c11.046 0 20-8.954 20-20s-8.954-20-20-20z"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" id="instagram">
+    <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" id=youtube>
+    <path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" id="stackoverflow">
+    <path d="M21 27v-8h3v11H0V19h3v8h18z"></path><path d="M17.1.2L15 1.8l7.9 10.6 2.1-1.6L17.1.2zm3.7 14.7L10.6 6.4l1.7-2 10.2 8.5-1.7 2zM7.2 12.3l12 5.6 1.1-2.4-12-5.6-1.1 2.4zm-1.8 6.8l13.56 1.96.17-2.38-13.26-2.55-.47 2.97zM19 25H5v-3h14v3z"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" id="xing">
+    <path d="M18.188 0c-.517 0-.741.325-.927.66 0 0-7.455 13.224-7.702 13.657.015.024 4.919 9.023 4.919 9.023.17.308.436.66.967.66h3.454c.211 0 .375-.078.463-.22.089-.151.089-.346-.009-.536l-4.879-8.916c-.004-.006-.004-.016 0-.022L22.139.756c.095-.191.097-.387.006-.535C22.056.078 21.894 0 21.686 0h-3.498zM3.648 4.74c-.211 0-.385.074-.473.216-.09.149-.078.339.02.531l2.34 4.05c.004.01.004.016 0 .021L1.86 16.051c-.099.188-.093.381 0 .529.085.142.239.234.45.234h3.461c.518 0 .766-.348.945-.667l3.734-6.609-2.378-4.155c-.172-.315-.434-.659-.962-.659H3.648v.016z"/>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 71 55" id="discord">
+    <path d="M60.1045 4.8978C55.5792 2.8214 50.7265 1.2916 45.6527 0.41542C45.5603 0.39851 45.468 0.440769 45.4204 0.525289C44.7963 1.6353 44.105 3.0834 43.6209 4.2216C38.1637 3.4046 32.7345 3.4046 27.3892 4.2216C26.905 3.0581 26.1886 1.6353 25.5617 0.525289C25.5141 0.443589 25.4218 0.40133 25.3294 0.41542C20.2584 1.2888 15.4057 2.8186 10.8776 4.8978C10.8384 4.9147 10.8048 4.9429 10.7825 4.9795C1.57795 18.7309 -0.943561 32.1443 0.293408 45.3914C0.299005 45.4562 0.335386 45.5182 0.385761 45.5576C6.45866 50.0174 12.3413 52.7249 18.1147 54.5195C18.2071 54.5477 18.305 54.5139 18.3638 54.4378C19.7295 52.5728 20.9469 50.6063 21.9907 48.5383C22.0523 48.4172 21.9935 48.2735 21.8676 48.2256C19.9366 47.4931 18.0979 46.6 16.3292 45.5858C16.1893 45.5041 16.1781 45.304 16.3068 45.2082C16.679 44.9293 17.0513 44.6391 17.4067 44.3461C17.471 44.2926 17.5606 44.2813 17.6362 44.3151C29.2558 49.6202 41.8354 49.6202 53.3179 44.3151C53.3935 44.2785 53.4831 44.2898 53.5502 44.3433C53.9057 44.6363 54.2779 44.9293 54.6529 45.2082C54.7816 45.304 54.7732 45.5041 54.6333 45.5858C52.8646 46.6197 51.0259 47.4931 49.0921 48.2228C48.9662 48.2707 48.9102 48.4172 48.9718 48.5383C50.038 50.6034 51.2554 52.5699 52.5959 54.435C52.6519 54.5139 52.7526 54.5477 52.845 54.5195C58.6464 52.7249 64.529 50.0174 70.6019 45.5576C70.6551 45.5182 70.6887 45.459 70.6943 45.3942C72.1747 30.0791 68.2147 16.7757 60.1968 4.9823C60.1772 4.9429 60.1437 4.9147 60.1045 4.8978ZM23.7259 37.3253C20.2276 37.3253 17.3451 34.1136 17.3451 30.1693C17.3451 26.225 20.1717 23.0133 23.7259 23.0133C27.308 23.0133 30.1626 26.2532 30.1066 30.1693C30.1066 34.1136 27.28 37.3253 23.7259 37.3253ZM47.3178 37.3253C43.8196 37.3253 40.9371 34.1136 40.9371 30.1693C40.9371 26.225 43.7636 23.0133 47.3178 23.0133C50.9 23.0133 53.7545 26.2532 53.6986 30.1693C53.6986 34.1136 50.9 37.3253 47.3178 37.3253Z"/>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 17 18" id="mastodon">
+    <path
+    fill="#ffffff"
+    d="m 15.054695,9.8859583 c -0.22611,1.1632697 -2.02517,2.4363497 -4.09138,2.6830797 -1.0774504,0.12856 -2.1382704,0.24673 -3.2694704,0.19484 -1.84996,-0.0848 -3.30971,-0.44157 -3.30971,-0.44157 0,0.1801 0.0111,0.35157 0.0333,0.51194 0.24051,1.82571 1.81034,1.93508 3.29737,1.98607 1.50088,0.0514 2.8373104,-0.37004 2.8373104,-0.37004 l 0.0617,1.35686 c 0,0 -1.0498104,0.56374 -2.9199404,0.66742 -1.03124,0.0567 -2.3117,-0.0259 -3.80308,-0.42069 -3.23454998,-0.85613 -3.79081998,-4.304 -3.87592998,-7.8024197 -0.026,-1.03871 -0.01,-2.01815 -0.01,-2.83732 0,-3.57732 2.34385998,-4.62587996 2.34385998,-4.62587996 1.18184,-0.54277 3.20976,-0.77101 5.318,-0.7882499985409 h 0.0518 C 9.8267646,0.01719834 11.856025,0.24547834 13.037775,0.78824834 c 0,0 2.34377,1.04855996 2.34377,4.62587996 0,0 0.0294,2.63937 -0.32687,4.47183"/>
+ <path
+    fill="#000000"
+    d="m 12.616925,5.6916583 v 4.3315297 h -1.71607 V 5.8189683 c 0,-0.88624 -0.37289,-1.33607 -1.1187604,-1.33607 -0.82467,0 -1.23799,0.53361 -1.23799,1.58875 v 2.30122 h -1.70594 v -2.30122 c 0,-1.05514 -0.4134,-1.58875 -1.23808,-1.58875 -0.74587,0 -1.11876,0.44983 -1.11876,1.33607 v 4.2042197 h -1.71607 V 5.6916583 c 0,-0.88527 0.22541,-1.58876 0.67817,-2.10922 0.46689,-0.52047 1.07833,-0.78727 1.83735,-0.78727 0.87816,0 1.54317,0.33752 1.98288,1.01267 l 0.42744,0.71655 0.42753,-0.71655 c 0.43961,-0.67515 1.10463,-1.01267 1.9828704,-1.01267 0.75893,0 1.37037,0.2668 1.83735,0.78727 0.45268,0.52046 0.67808,1.22395 0.67808,2.10922"/>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 530" id="bluesky" >
+    <path d="m135.72 44.03c66.496 49.921 138.02 151.14 164.28 205.46 26.262-54.316 97.782-155.54 164.28-205.46 47.98-36.021 125.72-63.892 125.72 24.795 0 17.712-10.155 148.79-16.111 170.07-20.703 73.984-96.144 92.854-163.25 81.433 117.3 19.964 147.14 86.092 82.697 152.22-122.39 125.59-175.91-31.511-189.63-71.766-2.514-7.3797-3.6904-10.832-3.7077-7.8964-0.0174-2.9357-1.1937 0.51669-3.7077 7.8964-13.714 40.255-67.233 197.36-189.63 71.766-64.444-66.128-34.605-132.26 82.697-152.22-67.108 11.421-142.55-7.4491-163.25-81.433-5.9562-21.282-16.111-152.36-16.111-170.07 0-88.687 77.742-60.816 125.72-24.795z"/>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" id="ko-fi">
+    <path fill="#ffffff" d="M4.5,9.8527H32.7947a0,0,0,0,1,0,0v19.225a9.07,9.07,0,0,1-9.07,9.07H13.57a9.07,9.07,0,0,1-9.07-9.07V9.8527A0,0,0,0,1,4.5,9.8527Z"/>
+    <path fill="#000000" d="M12.197,25.9493l6.45,6.45,6.45-6.45a8.2,8.2,0,0,0,2.4016-5.798h0a4.5082,4.5082,0,0,0-4.212-4.5459,4.4262,4.4262,0,0,0-4.64,4.4209,4.4261,4.4261,0,0,0-4.64-4.4209,4.5082,4.5082,0,0,0-4.212,4.5459h0A8.2,8.2,0,0,0,12.197,25.9493Z"/>
+    <path fill="#ffffff" d="M32.7947,9.8527H35.73a7.77,7.77,0,0,1,0,15.5394H32.7947"/>
+  </svg>
+  </symbol>
+</svg>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha512-aOFyMMzZF7l7ei3vOKgQiRhZnYqk9YC/uMzl4T0j5N5D3Kul+QAFU8ssENDRMAqr/lxDOjMF69dSYJ8HYqY+WQ==" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" integrity="sha512-UPFOadao2nEorjtjl0xUTtN3w20Ja143UPEU6EyJ1mi5MB2bDtMkiWmqGDqi47xNLB5z1dy31GKJDEWhjUJFiQ==" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" integrity="sha512-YJVxTjqttjsU3cSvaTRqsSl0wbRgZUNF+NGGCgto/MUbIvaLdXQzGTCQu4CvyJZbZctgflVB0PXw9LLmTWm5/w==" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
+<footer class="footer">
+  <div class="footer_inner wrap pale">
+    <img src='https://jianlin-li.github.io/icons/apple-touch-icon.png' class="icon icon_2 transparent" alt="Copyright © 1989–2025, 李建林 ">
+    <p>Copyright&nbsp;1989-&nbsp;<span class="year"></span>&nbsp;COPYRIGHT © 1989–2025, 李建林 . All Rights Reserved</p><a class="to_top" href="#documentTop">
+  <svg class="icon">
+  <title>to-top</title>
+  <use xlink:href="#to-top"></use>
+</svg>
+
+</a>
+
+  </div>
+</footer>
+
+<script type="text/javascript" src="https://jianlin-li.github.io/zh-cn/js/bundle.e4e0e4fbe8acb50d7f973828f4138cdbea727800047fc93f9abbd6751e8f3422d6ef193f98da36fdb8488219c25692d73da89480f46abc8421a4ee3526dd6c23.js" integrity="sha512-5ODk&#43;&#43;istQ1/lzgo9BOM2&#43;pyeAAEf8k/mrvWdR6PNCLW7xk/mNo2/bhIghnCVpLXPaiUgPRqvIQhpO41Jt1sIw==" crossorigin="anonymous"></script>
+
+  <script src="https://jianlin-li.github.io/js/search.min.4c2b0421d128bbd7c43fc7d662fb5dfd8e439c60ee92c900a26d72d9c3271d2256f5bac9f6f919cddfd55101e9272898716cbb3381b4360bf43a66a5f7664f54.js"></script>
+
+  </body>
+</html>

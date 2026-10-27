@@ -1,0 +1,1334 @@
+
+<!DOCTYPE html>
+<html
+  lang="zh-cn"
+  data-figures=""
+  
+    class="page"
+  
+  
+  >
+  <head>
+<title>出入金业务全景 | 李建林个人知识库</title>
+<meta charset="utf-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+
+
+
+
+<meta property="og:locale" content="zh-cn" />
+
+<meta property="og:type" content="article">
+<meta name="description" content="出入金业务全景（从零理解到排查订单）
+
+基于 2026-10-27 的 gtc_admin、gtcuser、gtc_admin_vue 当前源码与 docs/数据字典.sql 梳理。本文描述代码设计与可见行为，不代表生产环境已启用所有渠道、定时任务或审核开关，也不代替支付机构/银行的结算凭证。客户 App/H5 前端源 …" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:creator" content="">
+<meta name="twitter:title" content="" />
+<meta name="twitter:image" content="https://jianlin-li.github.io/images/thumbnail.png"/>
+<meta property="og:url" content="https://jianlin-li.github.io/gtc/gtc_admin/%E5%87%BA%E5%85%A5%E9%87%91%E4%B8%9A%E5%8A%A1%E5%85%A8%E6%99%AF/" />
+<meta property="og:title" content="" />
+<meta property="og:description" content="出入金业务全景（从零理解到排查订单）
+
+基于 2026-10-27 的 gtc_admin、gtcuser、gtc_admin_vue 当前源码与 docs/数据字典.sql 梳理。本文描述代码设计与可见行为，不代表生产环境已启用所有渠道、定时任务或审核开关，也不代替支付机构/银行的结算凭证。客户 App/H5 前端源 …" />
+<meta property="og:image" content="https://jianlin-li.github.io/images/thumbnail.png" />
+
+<link rel="apple-touch-icon" sizes="180x180" href="https://jianlin-li.github.io/icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://jianlin-li.github.io/icons/favicon-32x32.png">
+<link rel="manifest" href="https://jianlin-li.github.io/icons/site.webmanifest">
+
+<link rel="canonical" href="https://jianlin-li.github.io/gtc/gtc_admin/%E5%87%BA%E5%85%A5%E9%87%91%E4%B8%9A%E5%8A%A1%E5%85%A8%E6%99%AF/">
+
+
+
+<link rel="preload" href="https://jianlin-li.github.io/css/styles.dc38388a8f0b890e788bd3a99b7495d14e7d5ac4359ed3b49abeb778497863b284ad4cc7e496ef58c84139295f9bafed82f5a41345eda86bd2d429cccb7c2596.css" integrity = "sha512-3Dg4io8LiQ54i9Opm3SV0U59WsQ1ntO0mr63eEl4Y7KErUzH5JbvWMhBOSlfm6/tgvWkE0XtqGvS1CnMy3wllg==" as="style" crossorigin="anonymous">
+
+
+
+<link rel="preload" href="https://jianlin-li.github.io/zh-cn/js/bundle.e4e0e4fbe8acb50d7f973828f4138cdbea727800047fc93f9abbd6751e8f3422d6ef193f98da36fdb8488219c25692d73da89480f46abc8421a4ee3526dd6c23.js" as="script" integrity=
+"sha512-5ODk&#43;&#43;istQ1/lzgo9BOM2&#43;pyeAAEf8k/mrvWdR6PNCLW7xk/mNo2/bhIghnCVpLXPaiUgPRqvIQhpO41Jt1sIw==" crossorigin="anonymous">
+
+
+<link rel="stylesheet" type="text/css" href="https://jianlin-li.github.io/css/styles.dc38388a8f0b890e788bd3a99b7495d14e7d5ac4359ed3b49abeb778497863b284ad4cc7e496ef58c84139295f9bafed82f5a41345eda86bd2d429cccb7c2596.css" integrity="sha512-3Dg4io8LiQ54i9Opm3SV0U59WsQ1ntO0mr63eEl4Y7KErUzH5JbvWMhBOSlfm6/tgvWkE0XtqGvS1CnMy3wllg==" crossorigin="anonymous">
+
+
+
+
+  </head>
+  <body
+    data-code="7"
+    data-lines="true"
+    id="documentTop"
+    data-lang="zh-cn"
+  >
+
+<header class="nav_header" >
+  <nav class="nav"><a href='https://jianlin-li.github.io/' class="nav_brand nav_item" title="李建林个人知识库">
+  <img src="https://jianlin-li.github.io/logos/logo.png" class="logo" alt="李建林个人知识库">
+  <div class="nav_close">
+    <div><svg class="icon">
+  <title>open-menu</title>
+  <use xlink:href="#open-menu"></use>
+</svg>
+<svg class="icon">
+  <title>closeme</title>
+  <use xlink:href="#closeme"></use>
+</svg>
+</div>
+  </div>
+</a>
+
+    <div class='nav_body nav_body_left'>
+      
+      
+      
+        
+
+  <div class="nav_parent">
+    <a href="https://jianlin-li.github.io/" class="nav_item" title="首页">首页 </a>
+  </div>
+  <div class="nav_parent">
+    <a href="https://jianlin-li.github.io/archives/" class="nav_item" title="归档">归档 </a>
+  </div>
+  <div class="nav_parent">
+    <a href="https://jianlin-li.github.io/gtc/" class="nav_item" title="GTC 文档">GTC 文档 </a>
+  </div>
+  <div class="nav_parent">
+    <a href="https://jianlin-li.github.io/categories/" class="nav_item" title="分类">分类 </a>
+  </div>
+  <div class="nav_parent">
+    <a href="https://jianlin-li.github.io/tags/" class="nav_item" title="标签">标签 </a>
+  </div>
+  <div class="nav_parent">
+    <a href="https://jianlin-li.github.io/about/" class="nav_item" title="关于">关于 </a>
+  </div>
+      
+<div class='follow'>
+  <a href="https://github.com/JianLin-Li">
+    <svg class="icon">
+  <title>github</title>
+  <use xlink:href="#github"></use>
+</svg>
+
+  </a>
+  <a href="http://local.gitlab.com">
+    <svg class="icon">
+  <title>gitlab</title>
+  <use xlink:href="#gitlab"></use>
+</svg>
+
+  </a>
+<div class="color_mode">
+  <input type="checkbox" class="color_choice" id="mode">
+</div>
+
+</div>
+
+    </div>
+  </nav>
+</header>
+
+    <main><div class="grid-inverse wrap content">
+  <article class="post_content">
+    <p class="gtc-breadcrumb"><a href="/gtc/">GTC 文档归档</a> / gtc_admin</p>
+    <h1 class="post_title">出入金业务全景</h1>
+    <div class="post_meta gtc-meta">
+      <span class="post_date">
+        2026-10-27
+      </span>
+      <span>项目：gtc_admin</span>
+    </div>
+    
+    <div class="post_body">
+      <h1 id="出入金业务全景从零理解到排查订单">出入金业务全景（从零理解到排查订单）</h1>
+<blockquote>
+<p>基于 2026-10-27 的 <code>gtc_admin</code>、<code>gtcuser</code>、<code>gtc_admin_vue</code> 当前源码与 <code>docs/数据字典.sql</code> 梳理。本文描述<strong>代码设计与可见行为</strong>，不代表生产环境已启用所有渠道、定时任务或审核开关，也不代替支付机构/银行的结算凭证。客户 App/H5 前端源码不在本次三个仓库的分析范围内，因此客户界面仅按其后端 API 推断。未连接生产数据库，未发起真实支付或出金。</p>
+</blockquote>
+<p><strong>阅读范围</strong>：第 1-6 节建立概念并说明主流程；第 7-9 节用于订单排查；文末 A-F 专题补充客户提交前准备、三套规则、后台人工操作、赠金与内部划转、数据口径及未证实的运行条件。要判断“一笔钱到底完成没有”，优先看第 5 节的多层证据，而不是只看页面状态。</p>
+<h2 id="1-先理解业务">1. 先理解业务</h2>
+<p><strong>入金</strong>：客户从平台外部（银行卡、转账、加密货币、第三方支付等）把钱付进平台，平台确认收到后，将相应金额记到客户的<strong>钱包余额</strong>或指定的 <strong>MT4/MT5 交易账户</strong>。客户点“入金”只是创建订单；支付成功、平台内部入账、MT 入账可以发生在不同时间。</p>
+<p><strong>出金</strong>：客户申请把平台内的钱转到平台外部的银行账户或链上地址。系统先校验资格，并从钱包或 MT 账户扣钱；然后经过风控、人工审核（如需要）和第三方代付，最终确认外部支付成功。<strong>申请时扣钱不等于收款人已经收到钱</strong>。</p>
+<p>最容易混淆的四种“钱”或记录：</p>
+<table>
+  <thead>
+      <tr>
+          <th>概念</th>
+          <th>在本系统中的含义</th>
+          <th>主要证据</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>客户钱包余额</td>
+          <td>主要客户侧入出金使用 <code>t_member.amount</code>（默认系统币种按代码为 USD）</td>
+          <td><code>t_member</code>、<code>t_member_amount_log</code></td>
+      </tr>
+      <tr>
+          <td>MT 余额</td>
+          <td>MT4/MT5 交易账户的余额，由 MT 远程接口读写</td>
+          <td>MT ticket、<code>t_member_mtlogin</code>、<code>t_member_mt_forward_log</code></td>
+      </tr>
+      <tr>
+          <td>订单</td>
+          <td>业务申请及处理状态；入金 <code>t_pay_result</code>，出金 <code>t_withdraw</code></td>
+          <td><code>order_id</code>、<code>status</code>、时间字段</td>
+      </tr>
+      <tr>
+          <td>资金明细</td>
+          <td>资金从哪里到哪里、变动多少、展示状态</td>
+          <td><code>t_fund_detail</code></td>
+      </tr>
+  </tbody>
+</table>
+<p><code>t_wallet</code> 是<strong>入金支付渠道配置</strong>，并非客户余额；<code>t_member_wallet</code> 是另一个分类型钱包实体，不能把它与此处使用的 <code>t_member.amount</code> 混为一谈。见<a href="/Users/jalen/www/local/gtc_admin/docs/%E6%95%B0%E6%8D%AE%E5%AD%97%E5%85%B8.sql">数据字典</a>中的 <code>t_wallet</code>、<code>t_member_wallet</code> 与<a href="/Users/jalen/www/local/gtcuser/app/Repository/member/TMemberRepository.php">余额变动实现</a>。</p>
+<p>一个只用于理解的简化例子（假设汇率为 1、手续费固定 2 USD，实际金额由配置、汇率和通道步长决定）：客户希望入账 100 USD，支付总额约 102 USD，支付成功后钱包增加 100 USD。客户申请从钱包出金 100 USD、手续费 2 USD，则钱包先减少 100 USD，外部预计到账约 98 USD；只有第三方确认成功，才算整笔出金完成。</p>
+<h2 id="2-系统地图与边界">2. 系统地图与边界</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln"> 1</span><span class="cl">客户 / App / H5
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl">  │  查询可用渠道、提交申请、查看历史
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl">  ▼
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl">gtcuser (Hyperf，客户 API + 核心资金服务)
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl">  ├─ 入金：订单 → 支付通道 → 验签回调 → 钱包入账 → 可选转入 MT
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">  ├─ 出金：资格/密码/地址/额度检查 → 钱包或 MT 扣款 → 风控/代付
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl">  ├─ 代付回调、返款、MT 结果核查和定时补偿
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl">  └─ 共享 CRM 业务表、MT 远程接口、第三方支付/代付
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">             ▲
+</span></span><span class="line"><span class="ln">10</span><span class="cl">             │ 内部接口（InternalTokenMiddleware）
+</span></span><span class="line"><span class="ln">11</span><span class="cl">gtc_admin (ThinkPHP，后台 API) ◀─ gtc_admin_vue (后台页面)
+</span></span><span class="line"><span class="ln">12</span><span class="cl">  ├─ 通道与费率配置、入金/出金列表和领取
+</span></span><span class="line"><span class="ln">13</span><span class="cl">  ├─ 审核、驳回、返款、人工调整、资金明细
+</span></span><span class="line"><span class="ln">14</span><span class="cl">  └─ 出入金报表和导出
+</span></span></code></pre></div><p>客户接口位于 <a href="/Users/jalen/www/local/gtcuser/app/Http/Api/Controller/V1/PayController.php"><code>PayController</code></a>；第三方通知入口位于 <a href="/Users/jalen/www/local/gtcuser/app/Http/Api/Controller/V1/NotifyController.php"><code>NotifyController</code></a>；后台调用客户服务的接口位于 <a href="/Users/jalen/www/local/gtcuser/app/Http/Api/Controller/Inner/OptionController.php"><code>OptionController</code></a>，类级别使用 <code>InternalTokenMiddleware</code>。后台页面实际调用的接口见<a href="/Users/jalen/www/local/gtc_admin_vue/src/api/cash/addmoney/index.js">入金 API 映射</a>与<a href="/Users/jalen/www/local/gtc_admin_vue/src/api/cash/outmoney/index.js">出金 API 映射</a>。本文不把代码中尚未确认部署的旧接口、注释接口视为当前主路径。</p>
+<h3 id="21-功能入口">2.1 功能入口</h3>
+<table>
+  <thead>
+      <tr>
+          <th>操作</th>
+          <th>当前主要入口</th>
+          <th>作用</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>客户查看/发起入金</td>
+          <td><code>POST /api/pay/get_pay</code>、<code>/api/pay/pay</code>、<code>/api/pay/pay_history</code></td>
+          <td>看可用渠道、创建订单、查询历史</td>
+      </tr>
+      <tr>
+          <td>客户查看/发起出金</td>
+          <td><code>POST /api/pay/pay_out_channle</code>、<code>/api/pay/get_out_html</code>、<code>/api/pay/withdraw</code>、<code>/api/pay/withdraw_log</code></td>
+          <td>看通道与第三方页面、提交申请、查询历史</td>
+      </tr>
+      <tr>
+          <td>支付/代付通知</td>
+          <td><code>POST /api/notify/gtcpay</code>、<code>/api/notify/gtc_out_notify</code></td>
+          <td>接收第三方结果</td>
+      </tr>
+      <tr>
+          <td>后台入金</td>
+          <td><code>/admin/deposit/index</code>、<code>/admin/Capital.Deposit/examineDeposit</code>、<code>/rejectDeposit</code></td>
+          <td>列表、审核、拒绝</td>
+      </tr>
+      <tr>
+          <td>后台出金</td>
+          <td><code>/admin/withdraw/index</code>、<code>/admin/Capital.Withdraw/examineWithdraw</code>、<code>/rejectWithdraw</code>、<code>/refundWithdraw</code></td>
+          <td>列表、审核、拒绝/返款</td>
+      </tr>
+      <tr>
+          <td>后台其他入口</td>
+          <td><code>/admin/member/inmoney</code>、<code>/admin/withdraw/doout</code>、<code>/admin/Capital.FundDetail/listData</code></td>
+          <td>管理员手工入/出金、资金明细</td>
+      </tr>
+  </tbody>
+</table>
+<p>后台代码中的 <code>Cash</code>、<code>Withdraw</code> 还保留历史处理方法。<strong>是否被当前页面使用，应以页面 API 映射和具体部署版本为准</strong>；例如当前列表页面的审核按钮调用 <code>Capital.*</code>，不是旧 <code>cash/deposit_visit</code> 或 <code>withdraw/visit</code>。管理端菜单权限由后台基类和具体节点控制，资金审核还要求管理员身份及验证码，不能只凭页面按钮可见判断有权操作。</p>
+<h2 id="3-入金从申请到入账">3. 入金：从申请到入账</h2>
+<h3 id="31-客户创建订单">3.1 客户创建订单</h3>
+<ol>
+<li><code>/api/pay/get_pay</code> 从 <code>t_wallet</code> 获取启用的入金渠道，按监管类型、居住/国籍、IB、标签、客户名单、KYC/地址证明等条件过滤，并提供费率和汇率信息。最终可用渠道随客户与配置而变。</li>
+<li><code>/api/pay/pay</code> 校验渠道 ID、金额、风控权限和重复提交。<code>PayService::payPay()</code> 校验国家业务权限、客户禁入金状态、渠道是否启用、金额范围；如指定 MT 账户，还校验会员绑定、账户禁入金和服务器可用性。大额未完成 KYC 的申请被拦截。</li>
+<li>系统把客户希望入账的 USD 金额放入 <code>t_pay_result.amount</code>，按下单时 <code>in_rate</code> 换算支付币种金额，加上入金手续费，再应用渠道金额步长/取整规则，将应付总额写入 <code>money</code>。新订单 <code>status=0</code>，<code>order_id</code> 唯一。</li>
+<li>同时建立 <code>t_fund_detail</code> 的 <code>type=pay_result</code> 记录，接收侧初始为 <code>to_status=review</code>。它是<strong>待处理资金展示记录，不是已收款证据</strong>。线上渠道继续调用相应支付类创建支付订单；<code>remit</code> 线下转账返回线下处理类型。</li>
+</ol>
+<p>核心实现：<a href="/Users/jalen/www/local/gtcuser/app/Http/Api/Controller/V1/PayController.php">客户入口</a>、<a href="/Users/jalen/www/local/gtcuser/app/Service/crm/PayService.php">入金服务 <code>payPay</code></a>、<a href="/Users/jalen/www/local/gtcuser/app/Service/crm/FundDetailService.php">资金明细 <code>payLog</code></a>。</p>
+<h3 id="32-第三方支付成功与内部入账">3.2 第三方支付成功与内部入账</h3>
+<p>第三方调用 <code>/api/notify/gtcpay</code> 后，服务根据订单找支付类、校验签名、支付结果及通道查询结果，再进入 <code>payCallbackNext()</code>。该方法先写 <code>t_pay_notify_order</code>，其 <code>(paytype,payno)</code> 唯一键用于抵挡重复成功通知；用<strong>订单保存的汇率</strong>换算实际回调金额，扣除入金手续费。随后在事务中把 <code>t_pay_result.status</code> 置为 <code>9</code>，通过 <code>TMemberRepository::addMoney()</code> 增加 <code>t_member.amount</code> 并写 <code>t_member_amount_log</code>。若入账失败，事务回滚并向通道回复失败。</p>
+<p>如果客户选了 MT，支付成功后会先经过钱包，再调用 <code>Transfer::despoitMt()</code>：该流程扣钱包、向 MT 发起入账、记录转账。MT 明确失败时资金留在钱包并记失败状态；MT 响应不确定时 <code>mt_recharge_status=-1</code>，需要核查，不能仅凭支付订单 <code>status=9</code> 宣称 MT 已到账。<code>PayResultPendingCheckTask</code> 对近期结果未知订单查询 MT 入账记录，确认后才更新 MT 状态。没有指定 MT 的订单则直接留在钱包。成功处理还会尝试标记首次正常入金，并发送事件/通知；通知失败不改变已提交的资金事务。</p>
+<p>线下汇款由后台审核通过后调用内部 <code>remoteDeposit</code>，最终复用 <code>payCallbackNext()</code> 入账。后台拒绝时将订单及资金明细标为拒绝。后台另有 <code>/admin/member/inmoney</code> 人工入金路径，它直接调余额变动并建立成功订单，不应与“客户已通过第三方付款”视为同一业务来源。</p>
+<p>关键来源：<a href="/Users/jalen/www/local/gtcuser/app/Service/crm/PayService.php">支付回调</a>、<a href="/Users/jalen/www/local/gtcuser/app/Common/Lib/Transfer/Transfer.php">MT 划转</a>、<a href="/Users/jalen/www/local/gtcuser/app/Task/PayResultPendingCheckTask.php">MT 未知结果核查</a>、<a href="/Users/jalen/www/local/gtc_admin/app/admin/controller/Capital/Deposit.php">后台入金审核</a>、<a href="/Users/jalen/www/local/gtc_admin/app/admin/controller/Member.php">人工入金</a>。</p>
+<h3 id="33-入金状态如何读">3.3 入金状态如何读</h3>
+<table>
+  <thead>
+      <tr>
+          <th>字段</th>
+          <th>值</th>
+          <th>业务含义</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>pay_result.status</code></td>
+          <td><code>0</code> / <code>9</code> / <code>-1</code></td>
+          <td>待支付或待审核 / 平台入金处理成功 / 失败或拒绝</td>
+      </tr>
+      <tr>
+          <td><code>pay_result.mt_recharge_status</code></td>
+          <td><code>0</code> / <code>1</code> / <code>-1</code> / <code>2</code></td>
+          <td>待 MT 充值 / MT 成功 / MT 返回不确定、待查 / MT 充值异常后转钱包；<code>2</code> 为代码实际写入值，数据字典注释尚未覆盖</td>
+      </tr>
+      <tr>
+          <td><code>fund_detail.to_status</code></td>
+          <td><code>review</code> / <code>finish</code> / <code>reject</code></td>
+          <td>接收侧资金明细展示进度；需要结合订单与余额/MT 记录</td>
+      </tr>
+  </tbody>
+</table>
+<p>尤其要区分：<code>pay_result.status=9</code> 说明支付回调或人工审核已执行平台入账流程；<strong>指定 MT 的目标是否最终入账，仍需查 <code>mt_recharge_status</code>、转账日志和 MT ticket</strong>。</p>
+<h2 id="4-出金申请扣款审核代付返款">4. 出金：申请扣款、审核、代付、返款</h2>
+<h3 id="41-客户提交申请并先扣款">4.1 客户提交申请并先扣款</h3>
+<ol>
+<li>客户查看出金通道。<code>t_withdraw_channle</code> 决定币种/类型/启用状态/国家/标签/IB 限制，第三方页面可返回渠道子信息。客户输入金额、来源钱包或 MT、收款地址/卡信息和资金密码。</li>
+<li><code>/api/pay/withdraw</code> 校验资金权限、安全策略、国家限制、跟单限制、KYC、冷静期、未完成订单、金额、密码、收款地址和绑定关系。<code>Resubmit</code>、<code>t_withdraw_add</code> 每会员每分钟唯一约束，以及订单状态检查共同抑制重复提交。IP/地址 24 小时重复使用会增加风险标记；某些限制由配置决定。</li>
+<li><code>get_currency_data()</code> 按 <code>out_rate</code> / <code>www_rate</code> 换算扣款币种、外部到账币种和 USD 手续费，写入 <code>apply_amount</code>、<code>apply_currency</code>、<code>withdraw_amount</code>、<code>number</code>、<code>fee</code> 等字段；不能只拿一个 <code>amount</code> 字段对账。</li>
+<li>钱包来源：事务中插入 <code>t_withdraw(status=0)</code>，立即从 <code>t_member.amount</code> 扣 <code>apply_amount</code>，写余额日志、<code>t_fund_detail</code>、<code>t_withdraw_step</code>。MT 来源：先建立订单，再调用 MT 扣款；明确扣款失败的订单拒绝，扣款结果不确定的订单保留待审核并标异常供人工核实。</li>
+</ol>
+<p>因此 <code>status=0</code> 是<strong>出金待审核</strong>，通常已经发生客户侧扣款或正在确认 MT 扣款，绝不能理解为“还没有动钱”。来源：<a href="/Users/jalen/www/local/gtcuser/app/Http/Api/Controller/V1/PayController.php">客户出金入口</a>、<a href="/Users/jalen/www/local/gtcuser/app/Service/crm/PayService.php">提交与两种扣款路径</a>、<a href="/Users/jalen/www/local/gtcuser/app/Repository/member/TMemberRepository.php">钱包余额写入</a>。</p>
+<h3 id="42-风控与代付">4.2 风控与代付</h3>
+<p>提交成功后异步监听器读取订单、执行出金规则、代理风险和可选 AI 检查；满足条件才自动调用第三方代付 <code>approve()</code>。被规则阻断的订单留待人工处理。后台“审核通过”通过内部 <code>remoteWithdraw</code> 再触发同一异步代付链路，<strong>接口返回审核请求成功不等于第三方已经支付</strong>。</p>
+<p>第三方受理后常见 <code>withdraw.status=2</code>（提交成功，待最终结果）、<code>pay_status=0</code>（尚未确认支付）。第三方明确拒绝或提交失败可见 <code>status=3</code>、<code>pay_status=-1</code>；收到签名通过的成功回调后写 <code>t_withdraw_notify</code> 唯一订单记录，订单改 <code>status=9</code>，资金明细完成。成功回调丢失时，每 30 分钟的 <code>WithdrawPayoutReconcileTask</code> 会在<strong>任务已启用</strong>条件下查询创建满 10 分钟、14 天内、<code>status=2/pay_status=0</code> 的订单，第三方确认成功才补标 <code>9/9</code>。定时任务是否运行受 <code>BASE_CRONTAB</code> 控制，需核对部署。</p>
+<p>注意：异步监听器在申请阶段就可能把 <code>fund_detail</code> 更新为 <code>finish</code>；因此 <code>fund_detail.status/to_status=finish</code> <strong>不能单独证明外部已打款</strong>。判断外部代付必须优先看 <code>withdraw.status</code>、<code>pay_status</code>、第三方查询/回调及实际结算凭证。来源：<a href="/Users/jalen/www/local/gtcuser/app/Http/Api/Listeners/WithdrawSubmitAccessEvent.php">出金异步监听器</a>、<a href="/Users/jalen/www/local/gtcuser/app/Common/Lib/Withdraw/GtcOutPay.php">第三方代付适配</a>、<a href="/Users/jalen/www/local/gtcuser/app/Service/crm/PayService.php">代付回调</a>、<a href="/Users/jalen/www/local/gtcuser/app/Task/WithdrawPayoutReconcileTask.php">成功回调补偿</a>。</p>
+<h3 id="43-拒绝与返款不是同一个动作">4.3 拒绝与返款不是同一个动作</h3>
+<p>后台拒绝或“一键返款”经内部 <code>remoteWithdraw</code> 调用 <code>WithdrawRefundService</code>。服务先查原始扣款证据：钱包看余额扣款日志，MT 看 MT 扣款结果；原始扣款未确认时<strong>只拒绝，不额外返钱</strong>。确认原扣款后检查退款金额与原扣款一致、领取唯一幂等操作键，并退回钱包或原 MT 账户，写退款明细和操作日志。MT 返款结果不确定时保留人工核查，延时任务只查结果，不再发起第二笔返款。</p>
+<p>一键返款仅允许 <code>status=3</code> 且 <code>pay_status∈{-1,0}</code>，或 <code>status=2</code> 且 <code>pay_status=-1</code>。返款服务的代码说明明确采用<strong>财务人工确认可返款</strong>，返款前不查询第三方出金状态；因此必须先核对第三方实际未付款。<code>status=-1/-2/-3</code> 的具体“拒绝/自动返款/人工返款”含义见下表，但是否真的发生资金返还，还要看退款操作日志、余额/MT 正向记录。来源：<a href="/Users/jalen/www/local/gtc_admin/app/admin/controller/Capital/Withdraw.php">后台拒绝/返款</a>、<a href="/Users/jalen/www/local/gtcuser/app/Service/Trade/WithdrawRefundService.php">退款服务</a>。</p>
+<h3 id="44-出金状态速查">4.4 出金状态速查</h3>
+<table>
+  <thead>
+      <tr>
+          <th><code>withdraw.status</code></th>
+          <th>含义</th>
+          <th>下一步要核对什么</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>0</code></td>
+          <td>待审核</td>
+          <td>原始扣款、风险结果、是否需人工处理</td>
+      </tr>
+      <tr>
+          <td><code>1</code></td>
+          <td>审核通过/待第三方提交</td>
+          <td>异步事件与第三方受理结果</td>
+      </tr>
+      <tr>
+          <td><code>2</code></td>
+          <td>已向第三方提交</td>
+          <td><code>pay_status</code>、回调/查询，不能认定到账</td>
+      </tr>
+      <tr>
+          <td><code>3</code></td>
+          <td>第三方提交或处理失败</td>
+          <td>是否已确认未支付、是否需返款</td>
+      </tr>
+      <tr>
+          <td><code>9</code></td>
+          <td>出金成功</td>
+          <td>回调/对账记录、第三方结算结果</td>
+      </tr>
+      <tr>
+          <td><code>-1</code></td>
+          <td>审核拒绝</td>
+          <td>是否有原始扣款；若有，核实退回记录</td>
+      </tr>
+      <tr>
+          <td><code>-2</code></td>
+          <td>已自动返款</td>
+          <td>退款日志、钱包/MT 正向记录</td>
+      </tr>
+      <tr>
+          <td><code>-3</code></td>
+          <td>已人工返款</td>
+          <td>退款日志、钱包/MT 正向记录</td>
+      </tr>
+  </tbody>
+</table>
+<p><code>pay_status</code> 是<strong>独立的支付维度</strong>：<code>0</code> 未支付/待确认，<code>-1</code> 已拒绝，<code>9</code> 支付成功。后台还提供人工修改订单状态及支付状态的入口；人工标记只能说明系统记录被修改，不能代替第三方凭证。状态定义见<a href="/Users/jalen/www/local/gtcuser/app/Model/Enums/Crm/WithdrawStatusEnum.php">枚举</a>、<a href="/Users/jalen/www/local/gtc_admin/docs/%E6%95%B0%E6%8D%AE%E5%AD%97%E5%85%B8.sql">数据字典</a>及<a href="/Users/jalen/www/local/gtc_admin/app/admin/controller/Capital/Withdraw.php">后台修改入口</a>。</p>
+<h2 id="5-金额与单据怎样对上">5. 金额与单据怎样对上</h2>
+<table>
+  <thead>
+      <tr>
+          <th>字段/表</th>
+          <th>读法</th>
+          <th>常见误区</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>pay_result.amount</code></td>
+          <td>最终平台入账的 USD 金额；回调时可能按实付金额重新计算</td>
+          <td>不等于客户实际支付的通道币种金额</td>
+      </tr>
+      <tr>
+          <td><code>pay_result.money/currency</code></td>
+          <td>客户支付的金额/币种</td>
+          <td>不要与 <code>amount</code> 直接相加</td>
+      </tr>
+      <tr>
+          <td><code>pay_result.fee/exchange_rate</code></td>
+          <td>USD 手续费与下单保存的支付换算汇率</td>
+          <td>实际通道结算还需第三方单据确认</td>
+      </tr>
+      <tr>
+          <td><code>withdraw.apply_amount/apply_currency</code></td>
+          <td>从客户钱包或 MT 扣掉的金额/币种</td>
+          <td>不等于外部到账金额</td>
+      </tr>
+      <tr>
+          <td><code>withdraw.withdraw_amount</code></td>
+          <td>折算的系统币种金额（USD）</td>
+          <td>不等于 <code>number</code></td>
+      </tr>
+      <tr>
+          <td><code>withdraw.number/currency</code></td>
+          <td>预期第三方渠道币种到账金额，已扣手续费</td>
+          <td>不是客户来源账户的扣款额</td>
+      </tr>
+      <tr>
+          <td><code>withdraw.fee/channle_rate</code></td>
+          <td>手续费（USD）/出金换算率</td>
+          <td>不能忽略币种、取整与汇率方向</td>
+      </tr>
+      <tr>
+          <td><code>fund_detail.type_id</code></td>
+          <td>通常存业务 <code>order_id</code>，配合 <code>type=pay_result/withdraw</code> 查明细</td>
+          <td>字段注释称“主键 ID”，此两条流程实际用订单号</td>
+      </tr>
+  </tbody>
+</table>
+<p>排查一笔订单，建议以<strong>订单号 + 会员 ID</strong>关联：<code>t_pay_result</code> 或 <code>t_withdraw</code> → <code>t_fund_detail(type,type_id)</code> → <code>t_member_amount_log</code>（钱包）或 MT ticket/转账日志 → 第三方通知和查询结果。余额日志没有统一的订单外键，不能仅凭同金额断定属于同一订单；须结合时间、类型及其他证据。多币种时在每一步写明币种，切勿把 USD、通道法币、USDT 和 MT 账户币种混算。</p>
+<h2 id="6-后台页面报表与权限">6. 后台页面、报表与权限</h2>
+<table>
+  <thead>
+      <tr>
+          <th>页面/功能</th>
+          <th>核心数据</th>
+          <th>使用目的</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>入金列表</td>
+          <td><code>t_pay_result</code></td>
+          <td>按订单看申请、支付、审核、目标 MT、渠道、金额、下载</td>
+      </tr>
+      <tr>
+          <td>出金列表</td>
+          <td><code>t_withdraw</code></td>
+          <td>看风险/对账/支付双状态、领取、审核、拒绝、返款、备注</td>
+      </tr>
+      <tr>
+          <td>资金明细</td>
+          <td><code>t_fund_detail</code></td>
+          <td>看来源/去向、金额变动和显示状态</td>
+      </tr>
+      <tr>
+          <td>入金通道/出金通道</td>
+          <td><code>t_wallet</code> / <code>t_withdraw_channle</code></td>
+          <td>控制渠道可用性和客户范围</td>
+      </tr>
+      <tr>
+          <td>出入金报表</td>
+          <td><code>t_dim_member_currency_report</code>、<code>t_dim_member_mt_report</code></td>
+          <td>按日、账户类型、国家汇总入金/出金/净入金</td>
+      </tr>
+  </tbody>
+</table>
+<p>报表中的<strong>净入金 = 入金 - 出金</strong>；它是预聚合报表口径，不等于某一笔订单的余额，也不是“平台现金利润”。订单列表、资金明细和日报可能因计数口径、时间维度、补偿/调整或数据同步时差而不一致，核对时先锁定同一日期/时区与会员范围。当前列表使用 UTC+3 过滤/展示申请与审核时间；后台具体展示规则见<a href="/Users/jalen/www/local/gtc_admin/app/admin/controller/Deposit.php">入金列表</a>、<a href="/Users/jalen/www/local/gtc_admin/app/admin/controller/Withdraw.php">出金列表</a>，报表聚合见<a href="/Users/jalen/www/local/gtc_admin/app/service/ReportCenter/DwReportService.php">出入金报表服务</a>。</p>
+<p>后台资金操作涉及菜单权限、数据范围、管理员身份、Google 验证码、操作日志及部分幂等锁；客户出金涉及资金密码、安全策略与地址绑定。不同入口的校验并不完全相同，例如管理员手工入金和普通客户在线入金是两套路径，不能套用同一审批解释。</p>
+<h2 id="7-用一张清单排查钱去哪了">7. 用一张清单排查“钱去哪了”</h2>
+<ol>
+<li><strong>确认业务类型</strong>：客户在线入金、线下汇款、管理员手工入金、客户出金、管理员手工扣款，还是站内转账/赠金/补偿？先看订单表、<code>deposit_type/withdraw_type</code> 和 <code>fund_detail.type</code>；<code>deposit_type=0</code>、<code>withdraw_type=0</code> 才是配置中的普通入/出金分类，不能把所有正负余额变动都算成外部出入金。</li>
+<li><strong>锁定订单</strong>：使用 <code>member_id + order_id</code> 查申请时间、来源账户、目标账户、币种、金额、主状态与 <code>pay_status/mt_recharge_status</code>。不要只按昵称或金额搜索。</li>
+<li><strong>确认外部事实</strong>：入金查支付通知、签名/查询校验、第三方交易号；出金查第三方受理、回调/查询、银行或链上结算凭证。内部“成功”状态不是最终外部凭证。</li>
+<li><strong>确认内部余额</strong>：钱包核对 <code>t_member.amount</code> 与 <code>t_member_amount_log</code> 的增减；MT 核对 ticket、MT 余额变动及 <code>t_member_mt_forward_log</code>。若结果未知，先查第三方/MT，不要重发扣款或返款。</li>
+<li><strong>确认展示/审计</strong>：再看 <code>t_fund_detail</code>、<code>pay_result_step/withdraw_step</code>、<code>withdraw_result_step</code>、<code>withdraw_refund_op_log</code>、后台操作日志。区分操作备注、资金变动与支付结果。</li>
+<li><strong>确认是否补偿/人工改状态</strong>：看定时任务是否启用、补偿结果、人工状态操作记录，最后才解释报表差异。</li>
+</ol>
+<p><code>t_fund_detail</code>、<code>t_member_amount_log</code> 等是大表。线上排查应以具体会员/订单/时间窗口查，结合<a href="/Users/jalen/www/local/gtc_admin/docs/%E6%95%B0%E6%8D%AE%E5%AD%97%E5%85%B8.sql">数据字典</a>中的 <code>type_id</code>、<code>member_id</code>、<code>create_time</code> 等现有索引；避免无条件全表 <code>count/sum</code>。<code>t_fund_detail</code> 只有单列 <code>type_id</code> 与 <code>type</code> 索引，没有文档化的 <code>(type,type_id)</code> 联合索引；排查时坚持精确订单号，性能仍需用生产执行计划确认。本文未执行 SQL，也未验证生产数据量或执行计划。</p>
+<h2 id="8-源码可见的待核对事项">8. 源码可见的待核对事项</h2>
+<p>以下是<strong>代码行为或接口契约需核实的点</strong>，不直接推断生产事故：</p>
+<ol>
+<li>后台 <code>Capital.Deposit::manualDeposit()</code> 向 <code>adminManualDeposit</code> 发送 <code>deposit_id</code>，而内部接口验证 <code>payResultId</code> 和 <code>adminid</code>；这两个方法的参数契约不一致。当前主列表“手动入金”另走 <code>/admin/member/inmoney</code>，不能把两个动作混为一谈。</li>
+<li><code>Capital.Deposit::rejectDeposit()</code> 先本地改 <code>status=-1</code>，再请求内部拒绝接口；远程失败时本地状态已修改。遇到异常订单应同时核对两端日志、<code>fund_detail</code> 与通知，不能只看后台返回文案。</li>
+<li><code>Capital.Withdraw::updateStatus()</code> 可人工更新订单/支付状态，订单状态分支还会改资金明细展示状态；这不等于执行了客户余额退款或第三方实际支付。</li>
+<li>出金监听器可能在第三方代付前把资金明细更新为 <code>finish</code>；按第 4 节的多证据顺序判断实际出金结果。</li>
+<li>报表来自预聚合维度表；其生产同步链、日切时区、补偿分类口径需与数据平台确认。本文只确认后台查询与展示代码，不把报表字段名推断成银行清算口径。</li>
+<li><code>payCallbackNext()</code> 在币种/汇率校验和余额入账事务<strong>之前</strong>写 <code>t_pay_notify_order</code> 的唯一记录。若后续步骤失败，同一订单的重试可能因唯一键失败而无法自动重新入账。出现“第三方已收款但平台未入账”时，应核对通知记录、订单状态和失败日志，由财务/研发确认处理方式，不能直接再发起加款。</li>
+</ol>
+<h2 id="9-建议的学习顺序">9. 建议的学习顺序</h2>
+<p>先记住“<strong>订单、客户余额、MT 余额、第三方支付结果是四层事实</strong>”。接着用一笔测试环境的入金单和一笔出金单按第 7 节逐字段走一遍，分别画出申请、内部扣/加款、外部确认的时间线。再阅读<a href="/Users/jalen/www/local/gtcuser/app/Service/crm/PayService.php">入金服务</a>、<a href="/Users/jalen/www/local/gtcuser/app/Http/Api/Listeners/WithdrawSubmitAccessEvent.php">出金异步处理</a>、<a href="/Users/jalen/www/local/gtcuser/app/Service/Trade/WithdrawRefundService.php">返款服务</a>，最后再看后台页面及日报。这样遇到“已扣款但未到账”“订单成功但 MT 未入账”“失败后为何还未返款”时，可以先确定卡在哪一层，再决定是否人工处理。</p>
+<h3 id="主要源码索引">主要源码索引</h3>
+<ul>
+<li>数据结构：<a href="/Users/jalen/www/local/gtc_admin/docs/%E6%95%B0%E6%8D%AE%E5%AD%97%E5%85%B8.sql">数据字典</a>中的 <code>t_pay_result</code>、<code>t_withdraw</code>、<code>t_fund_detail</code>、<code>t_member_amount_log</code>、<code>t_wallet</code>、<code>t_withdraw_channle</code>、<code>t_pay_notify_order</code>、<code>t_withdraw_notify</code>、<code>t_withdraw_refund_op_log</code>。</li>
+<li>客户申请与核心逻辑：<a href="/Users/jalen/www/local/gtcuser/app/Http/Api/Controller/V1/PayController.php">PayController</a>、<a href="/Users/jalen/www/local/gtcuser/app/Service/crm/PayService.php">PayService</a>、<a href="/Users/jalen/www/local/gtcuser/app/Service/crm/FundDetailService.php">FundDetailService</a>。</li>
+<li>第三方/异步：<a href="/Users/jalen/www/local/gtcuser/app/Http/Api/Controller/V1/NotifyController.php">NotifyController</a>、<a href="/Users/jalen/www/local/gtcuser/app/Common/Lib/Withdraw/GtcOutPay.php">GtcOutPay</a>、<a href="/Users/jalen/www/local/gtcuser/app/Http/Api/Listeners/WithdrawSubmitAccessEvent.php">出金监听器</a>、<a href="/Users/jalen/www/local/gtcuser/app/Task/PayResultPendingCheckTask.php">MT 入账核查任务</a>、<a href="/Users/jalen/www/local/gtcuser/app/Task/WithdrawPayoutReconcileTask.php">出金成功补偿任务</a>。</li>
+<li>后台操作：<a href="/Users/jalen/www/local/gtc_admin/app/admin/controller/Deposit.php">入金列表</a>、<a href="/Users/jalen/www/local/gtc_admin/app/admin/controller/Capital/Deposit.php">入金审核</a>、<a href="/Users/jalen/www/local/gtc_admin/app/admin/controller/Withdraw.php">出金列表与人工出金</a>、<a href="/Users/jalen/www/local/gtc_admin/app/admin/controller/Capital/Withdraw.php">出金审核/返款</a>、<a href="/Users/jalen/www/local/gtc_admin/app/admin/controller/Capital/FundDetail.php">资金明细</a>、<a href="/Users/jalen/www/local/gtc_admin/app/admin/controller/Report/DwReport.php">出入金报表</a>。</li>
+</ul>
+<h2 id="a-功能覆盖矩阵先分清外部资金与账户内搬运">A. 功能覆盖矩阵：先分清“外部资金”与“账户内搬运”</h2>
+<table>
+  <thead>
+      <tr>
+          <th>场景</th>
+          <th>起点与终点</th>
+          <th>主入口/记录</th>
+          <th>是否可直接视为外部资金进出</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>客户在线入金</td>
+          <td>客户外部支付渠道 → 平台钱包 → 可选 MT</td>
+          <td><code>/api/pay/pay</code>、<code>t_pay_result</code></td>
+          <td>支付机构确认之前不算已收款；MT 是后续内部划转</td>
+      </tr>
+      <tr>
+          <td>客户线下汇款</td>
+          <td>客户银行汇款 → 财务核验 → 平台钱包/MT</td>
+          <td><code>remit</code> 订单、后台入金审核</td>
+          <td>必须结合银行到账证据；审核按钮本身不是银行流水</td>
+      </tr>
+      <tr>
+          <td>后台人工入金</td>
+          <td>管理员操作 → 钱包/MT</td>
+          <td><code>/admin/member/inmoney</code>、<code>t_pay_result</code></td>
+          <td>是内部记账入口，实际外部收款来源需另核</td>
+      </tr>
+      <tr>
+          <td>客户出金</td>
+          <td>钱包或 MT → 平台代付 → 客户银行/链上</td>
+          <td><code>/api/pay/withdraw</code>、<code>t_withdraw</code></td>
+          <td>扣客户余额仅是第一步；第三方成功也需与结算凭证区分</td>
+      </tr>
+      <tr>
+          <td>后台人工出金</td>
+          <td>管理员扣钱包/MT → 人工业务处理</td>
+          <td><code>/admin/withdraw/doout</code>、<code>t_withdraw</code></td>
+          <td>代码直接建 <code>status=9</code> 订单，不能据此推定外部银行已打款</td>
+      </tr>
+      <tr>
+          <td>拒绝与返款</td>
+          <td>平台内原扣款账户恢复</td>
+          <td><code>WithdrawRefundService</code>、<code>t_withdraw_refund_op_log</code></td>
+          <td>是撤销内部扣款，不是一次新的外部入金</td>
+      </tr>
+      <tr>
+          <td>自有账户/下级账户转账</td>
+          <td>钱包、MT 或其他内部账户之间</td>
+          <td><code>CashController</code> / <code>CashService</code>、转账日志</td>
+          <td>资金在系统内移动，通常不应当作新增外部存款或支付</td>
+      </tr>
+      <tr>
+          <td>入金赠金</td>
+          <td>规则命中 → 信用额度/赠金记录</td>
+          <td><code>DepositSuccessfulEventListener</code>、<code>DepositBonusService</code>、<code>t_credit_record</code></td>
+          <td>赠金不是客户实际支付金额，也不必然可直接提现</td>
+      </tr>
+  </tbody>
+</table>
+<p>后台配置的用途分类还包括入金的代理补助、费用支持、订单补偿、退款、转账、调整，以及出金的订单调整、扣款、转账、调整，见<a href="/Users/jalen/www/local/gtc_admin/config/fund.php:3">用途配置</a>。因此比较“订单总额”“客户钱包余额变化”“日报净入金”时，必须先固定分类和完成状态，不能把 <code>t_pay_result</code> 与 <code>t_withdraw</code> 全部行简单相减。</p>
+<h2 id="b-客户提交出金前到底做了什么">B. 客户提交出金前到底做了什么</h2>
+<h3 id="b1-选渠道选来源账户取第三方页面">B.1 选渠道、选来源账户、取第三方页面</h3>
+<p><code>/api/pay/pay_out_channle</code> 返回客户可见出金通道，还经过 App 审核版本过滤；<code>/api/pay/get_out_html</code> 先确认渠道启用，再调用配置的第三方出金适配器 <code>getOutInfo()</code> 准备页面/地址数据。这一步是在<strong>准备支付申请</strong>，没有创建已成功代付事实。<a href="/Users/jalen/www/local/gtcuser/app/Http/Api/Controller/V1/PayController.php:155">客户 API</a>、<a href="/Users/jalen/www/local/gtcuser/app/Service/crm/PayService.php:624">页面准备</a>、<a href="/Users/jalen/www/local/gtcuser/app/Common/Lib/Withdraw/GtcOutPay.php:98">代付适配器</a>。</p>
+<p><code>/api/pay/opt_accounts</code> 实际调用 <code>optAccounts()</code>，把符合条件的真实 MT 账户与 <code>t_member.amount</code> 主钱包作为可选来源；它的 <code>opt_type</code> 决定用途。代码中另有 <code>optAccountsExtend()</code> 会读取投资者/合作伙伴钱包，但当前这个 API 不调用它，不能据此断言客户出金页面一定可以从这些钱包出金。<a href="/Users/jalen/www/local/gtcuser/app/Http/Api/Controller/V1/PayController.php:199">账户选择入口</a>、<a href="/Users/jalen/www/local/gtcuser/app/Service/crm/PayService.php:670">账户组装</a>。</p>
+<h3 id="b2-收款方式绑定与冷却时间">B.2 收款方式绑定与冷却时间</h3>
+<p>银行卡/链上地址属于客户维护的收款资料，不等于平台钱包。<code>withdraw_channel_check</code> 查询是否有绑定记录，并在配置 <code>WITHDRAW_HOUR_LIMIT</code> 命中且曾绑定过时给出 24 小时相关时间；<code>withdraw_channel_risk_check</code> 按银行、加密钱包或国际电汇及绑定历史计算规则冷却信息。<strong>这两个查询接口用于页面预检</strong>，提交时 <code>withdrawGtc()</code> 还会调用 <code>validateWithdrawAddressBinding()</code> 强校验。因此“所有出金一律绑定后等待 24 小时”是不准确的，实际等待由配置、启用规则、通道及首次/修改/再次绑定情形共同决定。<a href="/Users/jalen/www/local/gtcuser/app/Service/crm/PayService.php:1837">预检</a>、<a href="/Users/jalen/www/local/gtcuser/app/Service/crm/PayService.php:2089">提交强校验</a>、<a href="/Users/jalen/www/local/gtcuser/app/Service/Withdraw/RiskWithdrawLimitRuleService.php:36">冷却规则</a>。</p>
+<p>收款资料的校验也不完全一致：在当前提交代码中，链上地址要与该会员未删除的绑定记录匹配；银行卡绑定匹配代码被注释，银行/国际电汇如提供姓名则执行姓名校验。第三方页面可能另有表单要求，需以其实际返回及生产配置核对。<a href="/Users/jalen/www/local/gtcuser/app/Service/crm/PayService.php:2030">提交校验</a>。</p>
+<h3 id="b3-三套出金规则不要混用">B.3 三套“出金规则”不要混用</h3>
+<table>
+  <thead>
+      <tr>
+          <th>规则表/配置</th>
+          <th>控制的问题</th>
+          <th>实际调用位置</th>
+          <th>对订单的影响</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>t_risk_withdraw_limit_rule</code></td>
+          <td>修改/非首次绑定收款方式后的等待时间</td>
+          <td><code>withdrawChannelRiskCheck()</code>、提交时的 <code>validateWithdrawAddressBinding()</code></td>
+          <td>冷却期内拦截提交；不是代付审批结果</td>
+      </tr>
+      <tr>
+          <td><code>t_risk_withdraw_rule</code> + 命中记录表</td>
+          <td>客户订单是否可走自动代付</td>
+          <td><code>WithdrawSubmitAccessEvent</code> → <code>RiskWithdrawRuleService</code></td>
+          <td>总开关和优先级规则决定自动或人工处理；命中记 <code>t_risk_withdraw_rule_record</code></td>
+      </tr>
+      <tr>
+          <td><code>t_withdraw_rule</code> + <code>t_withdraw_rule_config</code></td>
+          <td>按星期、市场交易时段、大数据事件、节假日计算 MT 持仓可出金额系数</td>
+          <td><code>CashService</code> 账户列表 → <code>RuleService</code></td>
+          <td>计算 <code>available</code> / <code>withdraw_prop</code>；在本次追踪的 <code>PayService::withdrawGtcMt()</code> 中未见再次直接调用这套 <code>RuleService</code>，最终仍有 MT 余额及赠金相关校验</td>
+      </tr>
+  </tbody>
+</table>
+<p>第二套规则受 <code>IS_AUTO_WITHDRAW_ENABLE</code> 总开关控制，启用规则按优先级检查 <code>all/any</code> 条件。当前代码里命中的 <code>pass</code> 允许继续自动处理；命中的其他动作进入异常/人工路径。表结构虽允许 <code>reject</code>，但直接拒绝分支在代码中被注释，<strong>不能把规则配置的 <code>reject</code> 等同于立即拒单并返款</strong>。<a href="/Users/jalen/www/local/gtcuser/app/Service/Withdraw/RiskWithdrawRuleService.php:21">自动风控</a>、<a href="/Users/jalen/www/local/gtc_admin/docs/%E6%95%B0%E6%8D%AE%E5%AD%97%E5%85%B8.sql:6020">规则表</a>、<a href="/Users/jalen/www/local/gtcuser/app/Service/Cash/CashService.php:833">可出金额计算</a>、<a href="/Users/jalen/www/local/gtcuser/app/Service/crm/PayService.php:2359">提交时 MT 校验</a>。</p>
+<h2 id="c-审核台的动作与真实资金效果">C. 审核台的动作与真实资金效果</h2>
+<p>后台出金页的实际 API 包括详情、领取前检查、领取、审核、拒绝、一键返款、保存审核资料、备注、人工出金和人工状态修改；旧的 <code>/admin/withdraw/visit</code> 在页面 API 映射中已被注释。<a href="/Users/jalen/www/local/gtc_admin_vue/src/api/cash/outmoney/index.js:90">前端 API 映射</a>。</p>
+<ol>
+<li><strong>领取</strong>：<code>check_apply_visit</code> 返回领取检查数据；<code>apply_visit</code> 在订单尚未终结、且未被其他管理员领取时写 <code>visit_status=1</code>、<code>adminid</code>、操作时间及备注。它不扣款，也不代付。代码为先读后按 <code>id</code> 更新；并发领取是否可能覆盖，需结合线上权限和并发测试确认。<a href="/Users/jalen/www/local/gtc_admin/app/admin/controller/Withdraw.php:307">领取实现</a>。</li>
+<li><strong>审核通过</strong>：管理员及验证码校验后调用内部 <code>option/remoteWithdraw</code>，记录操作日志。客户服务的异步链还会查第三方当前订单、代理风险及可选 AI 建议，再尝试 <code>approve()</code>；后台调用成功不代表第三方最终成功。<a href="/Users/jalen/www/local/gtc_admin/app/admin/controller/Capital/Withdraw.php:42">审核</a>、<a href="/Users/jalen/www/local/gtcuser/app/Http/Api/Listeners/WithdrawSubmitAccessEvent.php:95">异步链</a>。</li>
+<li><strong>拒绝/一键返款</strong>：两者共用远程拒绝/返款业务服务，但入口、允许状态与验证条件不同。无原扣款证据时不能凭“拒绝”额外加钱；原扣款或 MT 结果不明时须先核查。返款操作键及正向余额/MT 记录比页面提示更能证明已退。<a href="/Users/jalen/www/local/gtc_admin/app/admin/controller/Capital/Withdraw.php:124">审核与返款入口</a>、<a href="/Users/jalen/www/local/gtcuser/app/Service/Trade/WithdrawRefundService.php">退款服务</a>。</li>
+<li><strong>人工改状态</strong>：<code>updateStatus</code> 限定订单创建 7 天内及特定来源状态，写 <code>t_withdraw</code>、<code>t_withdraw_step</code>、操作日志，并同步改 <code>t_fund_detail.status</code>；还可单独改 <code>pay_status</code>。它不调用余额加减或第三方代付，因而不能把人工状态 <code>9</code> 当成到账凭证。<a href="/Users/jalen/www/local/gtc_admin/app/admin/controller/Capital/Withdraw.php:301">状态修改</a>。</li>
+<li><strong>后台人工出金</strong>：<code>doout</code> 要求管理员、验证码、会员身份/账户匹配、正金额、备注和幂等锁；扣主钱包或 MT 后直接创建 <code>status=9</code> 的出金订单，手续费为 0。它是管理员内部扣款处理路径，是否另有线下支付要查财务证据，不能按普通客户代付流程解释。<a href="/Users/jalen/www/local/gtc_admin/app/admin/controller/Withdraw.php:733">人工出金</a>。</li>
+</ol>
+<p>后台人工入金 <code>/admin/member/inmoney</code> 也要求管理员与验证码，校验会员、通道金额范围、备注、MT 绑定和真实服务器，先加主钱包，再写成功入金订单；若目标为 MT，另尝试划转，失败时记录留在钱包。它与客户支付回调产生的入金单来源不同。<a href="/Users/jalen/www/local/gtc_admin_vue/src/api/cash/addmoney/index.js:90">后台页面</a>、<a href="/Users/jalen/www/local/gtc_admin/app/admin/controller/Member.php:4631">人工入金</a>。</p>
+<h2 id="d-一笔订单还存在多条独立状态轴">D. 一笔订单还存在多条独立状态轴</h2>
+<table>
+  <thead>
+      <tr>
+          <th>状态轴</th>
+          <th>记录了什么</th>
+          <th>不能替代什么</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>入金 <code>pay_result.status</code></td>
+          <td>平台订单是否完成入账处理</td>
+          <td>MT 实际入账和银行/支付机构结算凭证</td>
+      </tr>
+      <tr>
+          <td>入金 <code>mt_recharge_status</code> 与 MT ticket</td>
+          <td>目标交易账户后续入账结果</td>
+          <td>外部付款来源及赠金发放情况</td>
+      </tr>
+      <tr>
+          <td>出金 <code>withdraw.status</code></td>
+          <td>申请、审核、提交、完成、拒绝/返款的业务阶段</td>
+          <td>原扣款是否确定、第三方是否结算</td>
+      </tr>
+      <tr>
+          <td>出金 <code>pay_status</code></td>
+          <td>代付确认维度：待确认、失败、成功</td>
+          <td>钱包/MT 原扣款及退款动作</td>
+      </tr>
+      <tr>
+          <td><code>risk_check_status/result</code></td>
+          <td>自动风控检查及其结果</td>
+          <td>人工审核意见、第三方支付结果</td>
+      </tr>
+      <tr>
+          <td><code>reconcile_status/result</code></td>
+          <td>表结构预留的对账维度</td>
+          <td>本次在两个后端仓库没有找到明确写入链，不能据字段存在推定对账任务已运行</td>
+      </tr>
+      <tr>
+          <td><code>fund_detail.status/to_status</code></td>
+          <td>客户和后台资金明细的展示状态</td>
+          <td>外部实际收付凭证；出金申请监听器可提前写 <code>finish</code></td>
+      </tr>
+      <tr>
+          <td><code>withdraw_refund_op_log</code></td>
+          <td>一次性退款领取、处理中/成功/失败、目标账户与结果</td>
+          <td>第三方是否已付款，仍要先由财务核实</td>
+      </tr>
+  </tbody>
+</table>
+<p>客户从 MT 出金时，代码先创建订单，再调用 MT 扣款；明确失败会拒绝订单，远程结果不确定则保留待审核并写异常风控结果，且不会自动发起后续代付事件。先确认 MT ticket/交易记录，才决定是否返款，避免把“超时”误判为“肯定没扣钱”。<a href="/Users/jalen/www/local/gtcuser/app/Service/crm/PayService.php:2359">MT 扣款分支</a>、<a href="/Users/jalen/www/local/gtcuser/app/Service/crm/PayService.php:2580">未知结果分支</a>。</p>
+<h2 id="e-入金成功后的延伸业务与报表来源">E. 入金成功后的延伸业务与报表来源</h2>
+<p><code>payCallbackNext()</code> 在钱包入账提交后发送 <code>DepositSuccessful</code> 或 <code>DepositFirstSuccessful</code> 的 <code>EventTrackEvent</code>；对应监听器通过异步队列调用 <code>DepositBonusService</code>。符合配置的规则可以创建 <code>t_credit_record</code> 和赠金资金明细；仅当 <code>IsAuto=1</code> 才继续尝试自动发放。赠金成败与原始支付订单成功是两层事实。监听器中的“首入自动开户并转入 MT”调用目前被注释，不能写成现行流程。<a href="/Users/jalen/www/local/gtcuser/app/Service/crm/PayService.php:1742">事件派发</a>、<a href="/Users/jalen/www/local/gtcuser/app/Http/Api/Listeners/DepositSuccessfulEventListener.php:37">监听器</a>、<a href="/Users/jalen/www/local/gtcuser/app/Service/crm/DepositBonusService.php:27">赠金服务</a>。</p>
+<p>另有 <code>PaySuccessListener</code> 监听 <code>PaySuccessEvent</code>、<code>DepositRejectEventListener</code> 类等代码，但本次在三仓主入金回调链中没有找到 <code>PaySuccessEvent</code> 的派发，且后者的监听列表为空。它们<strong>不应直接并入第 3 节的已确认主链</strong>；是否由其他部署入口触发，需要另有调用或运行日志证明。<a href="/Users/jalen/www/local/gtcuser/app/Http/Api/Listeners/PaySuccessListener.php:29">PaySuccess 监听器</a>、<a href="/Users/jalen/www/local/gtcuser/app/Http/Api/Listeners/DepositRejectEventListener.php:21">拒绝监听器</a>。</p>
+<p>出入金报表后台从 SelectDB 的 <code>t_dim_member_currency_report</code> 与 <code>t_dim_member_mt_report</code> 读取按日预聚合数据：前者提供总计及钱包口径，后者提供 MT4/MT5 口径，服务层再合并展示并计算净额。原始订单表、余额日志和报表表不是同一数据层，不能要求逐行一一对应。本次搜索未定位这两张维度表的生产写入/ETL 程序，也未验证数据日切、更新延迟或“补偿入金”分类映射；这些必须向数据平台/生产配置确认。<a href="/Users/jalen/www/local/gtc_admin/app/service/ReportCenter/DwReportService.php:17">报表服务</a>、<a href="/Users/jalen/www/local/gtc_admin/config/fund.php:3">用途分类</a>。</p>
+<h3 id="e1-通道配置为什么不等于客户可见">E.1 通道配置为什么不等于客户可见</h3>
+<p>后台 <code>withdraw.channel</code> 页面可以查询、保存、启停出金通道，并维护币种、类型、国家白名单、禁用标签和禁用代理；<code>t_withdraw_channle.status=1</code> 只是基础条件。客户侧 <code>payPayOutChannle()</code> 还连接汇率表、按第三方返回的可用币种过滤，并检查客户国家、标签和代理路径；App 审核版本会在 API 层再过滤一次。入金也要同时满足 <code>t_wallet</code> 配置、客户条件、KYC/POA 要求和对应支付类可用性。因此排查“后台有通道，客户看不到”应逐层查配置、客户身份、汇率、第三方响应和客户端版本，不能直接修改订单状态。<a href="/Users/jalen/www/local/gtc_admin/app/admin/controller/withdraw/Channel.php:31">后台出金通道</a>、<a href="/Users/jalen/www/local/gtcuser/app/Service/crm/PayService.php:547">客户出金过滤</a>、<a href="/Users/jalen/www/local/gtcuser/app/Service/crm/PayService.php:469">入金支付类校验</a>。</p>
+<h2 id="f-三种典型疑难单及核对顺序">F. 三种典型疑难单及核对顺序</h2>
+<table>
+  <thead>
+      <tr>
+          <th>现象</th>
+          <th>先查</th>
+          <th>再查</th>
+          <th>不能直接做的事</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>客户说已支付，平台入金仍 <code>0</code></td>
+          <td>支付机构订单、签名/通知、<code>t_pay_notify_order</code>、回调错误日志</td>
+          <td><code>t_pay_result</code>、钱包余额日志、MT 划转</td>
+          <td>不核实外部收款就人工加款；通知唯一记录已存在时盲目重放</td>
+      </tr>
+      <tr>
+          <td>客户钱包已扣，出金仍 <code>0/2</code></td>
+          <td><code>t_withdraw</code> 的 <code>status/pay_status</code>、风控结果和代付受理/查询</td>
+          <td>第三方结算、<code>t_withdraw_notify</code>、定时补偿执行记录</td>
+          <td>把“内部已扣”当“客户已收到”或提前返款</td>
+      </tr>
+      <tr>
+          <td>出金拒绝但客户说未退回</td>
+          <td>原扣款日志或 MT ticket、<code>t_withdraw_refund_op_log</code></td>
+          <td>正向钱包日志/MT 返款 ticket、资金明细</td>
+          <td>只凭 <code>status=-1</code> 认定已经退钱；MT 结果未知时再次发起返款</td>
+      </tr>
+  </tbody>
+</table>
+<p>当前能确认的是代码中的保护、状态和查询路径；<strong>仍需生产侧给出</strong>：实际启用的入/出金通道和支付适配器、第三方结算/回调凭证、<code>BASE_CRONTAB</code> 与队列运行状态、自动出金开关及三类规则的现值、日报 ETL 与日切时区、人工入出金的财务复核制度。没有这些证据，就不能对“某一笔真实订单已最终到账”作结论。</p>
+
+    </div>
+  </article>
+  
+    
+<aside class="sidebar">
+  <section class="sidebar_inner">
+    <br>
+    
+  
+  <div class="search">
+    <input type="search" class="search_field form_field" placeholder='搜索内容...' id="find" autocomplete="off" data-scope='gtc'>
+    <label for="find" class="search_label"><svg class="icon">
+  <title>search</title>
+  <use xlink:href="#search"></use>
+</svg>
+
+    </label>
+    
+    <div class="search_results results"></div>
+  </div>
+
+        <div class="author_header">
+          <img src="https://jianlin-li.github.io/images/fish-head.png" alt="李建林 photo">
+          <h2>李建林</h2>
+        </div>
+      <div class="author_bio">
+        PHP, Go, MySQL, Redis, RabbitMQ, Elasticsearch, Docker, Kubernetes, Shell
+      </div>
+      <a href='https://jianlin-li.github.io/about/' class="button mt-1" role="button" title='阅读更多'>阅读更多</a>
+
+    
+    <h2 class="mt-4">精选文章</h2>
+    <ul>
+      <li>
+        <a href="https://jianlin-li.github.io/post/jiagou-elk-stack/" class="nav-link" title="架构-使用ELK Stack在本地Macbookpro搭建一套日志收集并且可视化系统">架构-使用ELK Stack在本地Macbookpro搭建一套日志收集并且可视化系统</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/jiagou-prometheus-grafana/" class="nav-link" title="架构-Prometheus&#43;Grafana">架构-Prometheus+Grafana</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/jiagou-cicd-jenkins-argo/" class="nav-link" title="架构-基于JenKins的CI/CD平台之Argo CD">架构-基于JenKins的CI/CD平台之Argo CD</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/jiagou-cicd-jenkins/" class="nav-link" title="架构-基于JenKins的CI/CD平台">架构-基于JenKins的CI/CD平台</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/k8s_review_12/" class="nav-link" title="Kubernetes的知识库-12">Kubernetes的知识库-12</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/k8s_review_11/" class="nav-link" title="Kubernetes的知识库-11">Kubernetes的知识库-11</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/k8s_review_10/" class="nav-link" title="Kubernetes的知识库-10">Kubernetes的知识库-10</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/k8s_review_9/" class="nav-link" title="Kubernetes的知识库-9">Kubernetes的知识库-9</a>
+      </li>
+    </ul>
+    <h2 class="mt-4">最新文章</h2>
+    <ul class="flex-column">
+      <li>
+        <a href="https://jianlin-li.github.io/post/k8s_review_8/" class="nav-link" title="Kubernetes的知识库-8">Kubernetes的知识库-8</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/k8s_review_7/" class="nav-link" title="Kubernetes的知识库-7">Kubernetes的知识库-7</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/k8s_review_6/" class="nav-link" title="Kubernetes的知识库-6">Kubernetes的知识库-6</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/k8s_review_5/" class="nav-link" title="Kubernetes的知识库-5">Kubernetes的知识库-5</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/k8s_review_4/" class="nav-link" title="Kubernetes的知识库-4">Kubernetes的知识库-4</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/k8s_review_3/" class="nav-link" title="Kubernetes的知识库-3">Kubernetes的知识库-3</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/k8s_review_2/" class="nav-link" title="Kubernetes的知识库-2">Kubernetes的知识库-2</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/k8s_review_1/" class="nav-link" title="Kubernetes的知识库-1">Kubernetes的知识库-1</a>
+      </li>
+    </ul>
+    <div>
+      <h2 class="mt-4 taxonomy" id="categories-section">分类</h2>
+      <nav class="tags_nav">
+        <a href='https://jianlin-li.github.io/categories/kubernetes/' class="post_tag button button_translucent" title="kubernetes">
+          KUBERNETES
+          <span class="button_tally">13</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/categories/php%E8%AF%AD%E8%A8%80/' class="post_tag button button_translucent" title="php语言">
+          PHP语言
+          <span class="button_tally">7</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/categories/%E6%9E%B6%E6%9E%84/' class="post_tag button button_translucent" title="架构">
+          架构
+          <span class="button_tally">7</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/categories/go%E8%AF%AD%E8%A8%80/' class="post_tag button button_translucent" title="go语言">
+          GO语言
+          <span class="button_tally">6</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/categories/elasticsearch/' class="post_tag button button_translucent" title="elasticsearch">
+          ELASTICSEARCH
+          <span class="button_tally">5</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/categories/redis/' class="post_tag button button_translucent" title="redis">
+          REDIS
+          <span class="button_tally">5</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/categories/mysql/' class="post_tag button button_translucent" title="mysql">
+          MYSQL
+          <span class="button_tally">4</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/categories/rabbitmq/' class="post_tag button button_translucent" title="rabbitmq">
+          RABBITMQ
+          <span class="button_tally">4</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/categories/ci/cd/' class="post_tag button button_translucent" title="ci/cd">
+          CI/CD
+          <span class="button_tally">2</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/categories/git/' class="post_tag button button_translucent" title="git">
+          GIT
+          <span class="button_tally">2</span>
+        </a>
+        
+        
+        <br>
+        <div class="post_tags_toggle button">所有分类</div>
+        <div class="post_tags">
+          <div class="tags_list">
+            
+            <a href='https://jianlin-li.github.io/categories/argo/' class=" post_tag button button_translucent" data-position=1 title="argo">ARGO<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/centos7/' class=" post_tag button button_translucent" data-position=1 title="centos7">CENTOS7<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/ci/cd/' class=" post_tag button button_translucent" data-position=2 title="ci/cd">CI/CD<span class="button_tally">2</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/c%E8%AF%AD%E8%A8%80/' class=" post_tag button button_translucent" data-position=1 title="c语言">C语言<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/devops/' class=" post_tag button button_translucent" data-position=1 title="devops">DEVOPS<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/docker/' class=" post_tag button button_translucent" data-position=1 title="docker">DOCKER<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/elasticsearch/' class=" post_tag button button_translucent" data-position=5 title="elasticsearch">ELASTICSEARCH<span class="button_tally">5</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/elk/' class=" post_tag button button_translucent" data-position=1 title="elk">ELK<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/git/' class=" post_tag button button_translucent" data-position=2 title="git">GIT<span class="button_tally">2</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/go%E8%AF%AD%E8%A8%80/' class=" post_tag button button_translucent" data-position=6 title="go语言">GO语言<span class="button_tally">6</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/grafana/' class=" post_tag button button_translucent" data-position=1 title="grafana">GRAFANA<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/gtc/' class=" post_tag button button_translucent" data-position=2 title="gtc">GTC<span class="button_tally">2</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/gtcadmin/' class=" post_tag button button_translucent" data-position=1 title="gtcadmin">GTCADMIN<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/gtcuser/' class=" post_tag button button_translucent" data-position=1 title="gtcuser">GTCUSER<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/hugo/' class=" post_tag button button_translucent" data-position=1 title="hugo">HUGO<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/jenkins/' class=" post_tag button button_translucent" data-position=2 title="jenkins">JENKINS<span class="button_tally">2</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/kubernetes/' class=" post_tag button button_translucent" data-position=13 title="kubernetes">KUBERNETES<span class="button_tally">13</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/mkcert/' class=" post_tag button button_translucent" data-position=1 title="mkcert">MKCERT<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/mysql/' class=" post_tag button button_translucent" data-position=4 title="mysql">MYSQL<span class="button_tally">4</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/nginx/' class=" post_tag button button_translucent" data-position=1 title="nginx">NGINX<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/php%E8%AF%AD%E8%A8%80/' class=" post_tag button button_translucent" data-position=7 title="php语言">PHP语言<span class="button_tally">7</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/prometheus/' class=" post_tag button button_translucent" data-position=1 title="prometheus">PROMETHEUS<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/rabbitmq/' class=" post_tag button button_translucent" data-position=4 title="rabbitmq">RABBITMQ<span class="button_tally">4</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/redis/' class=" post_tag button button_translucent" data-position=5 title="redis">REDIS<span class="button_tally">5</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/shell/' class=" post_tag button button_translucent" data-position=2 title="shell">SHELL<span class="button_tally">2</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/web%E6%9C%8D%E5%8A%A1%E5%99%A8/' class=" post_tag button button_translucent" data-position=1 title="web服务器">WEB服务器<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/%E6%9C%AC%E5%9C%B0%E7%8E%AF%E5%A2%83/' class=" post_tag button button_translucent" data-position=2 title="本地环境">本地环境<span class="button_tally">2</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/%E5%A4%8D%E4%B9%A0/' class=" post_tag button button_translucent" data-position=1 title="复习">复习<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/%E5%8D%8E%E5%BE%AE%E4%B8%96%E7%BA%AA/' class=" post_tag button button_translucent" data-position=1 title="华微世纪">华微世纪<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/%E6%9E%B6%E6%9E%84/' class=" post_tag button button_translucent" data-position=7 title="架构">架构<span class="button_tally">7</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/%E6%95%99%E7%A8%8B/' class=" post_tag button button_translucent" data-position=1 title="教程">教程<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/%E8%A7%86%E9%A2%91/' class=" post_tag button button_translucent" data-position=1 title="视频">视频<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/%E4%B9%A6%E7%B1%8D/' class=" post_tag button button_translucent" data-position=1 title="书籍">书籍<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/%E7%AE%97%E6%B3%95/' class=" post_tag button button_translucent" data-position=1 title="算法">算法<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/%E8%87%AA%E7%AD%BE%E5%90%8D%E8%AF%81%E4%B9%A6/' class=" post_tag button button_translucent" data-position=1 title="自签名证书">自签名证书<span class="button_tally">1</span>
+            </a>
+            
+            <div class="tags_sort"><span title="sort alphabetically">[A~Z]</span><span title="sort by count">[0~9]</span>
+            </div>
+            <span class="tags_hide"><svg class="icon">
+            <use xlink:href="#closeme"></use>
+          </svg></span>
+          </div>
+        </div>
+      </nav>
+    </div>
+    <div>
+      <h2 class="mt-4 taxonomy" id="tags-section">标签</h2>
+      <nav class="tags_nav">
+        <a href='https://jianlin-li.github.io/tags/kubernetes/' class="post_tag button button_translucent" title="kubernetes">
+          KUBERNETES
+          <span class="button_tally">13</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/tags/php/' class="post_tag button button_translucent" title="php">
+          PHP
+          <span class="button_tally">7</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/tags/go/' class="post_tag button button_translucent" title="go">
+          GO
+          <span class="button_tally">6</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/tags/elasticsearch/' class="post_tag button button_translucent" title="elasticsearch">
+          ELASTICSEARCH
+          <span class="button_tally">5</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/tags/redis/' class="post_tag button button_translucent" title="redis">
+          REDIS
+          <span class="button_tally">5</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/tags/mysql/' class="post_tag button button_translucent" title="mysql">
+          MYSQL
+          <span class="button_tally">4</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/tags/rabbitmq/' class="post_tag button button_translucent" title="rabbitmq">
+          RABBITMQ
+          <span class="button_tally">4</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/tags/devops/' class="post_tag button button_translucent" title="devops">
+          DEVOPS
+          <span class="button_tally">3</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/tags/ci/cd/' class="post_tag button button_translucent" title="ci/cd">
+          CI/CD
+          <span class="button_tally">2</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/tags/git/' class="post_tag button button_translucent" title="git">
+          GIT
+          <span class="button_tally">2</span>
+        </a>
+        
+        
+        <br>
+        <div class="post_tags_toggle button">所有标签</div>
+        <div class="post_tags">
+          <div class="tags_list">
+            
+            <a href='https://jianlin-li.github.io/tags/argo/' class=" post_tag button button_translucent" data-position=1 title="argo">ARGO<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/centos7/' class=" post_tag button button_translucent" data-position=1 title="centos7">CENTOS7<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/ci/cd/' class=" post_tag button button_translucent" data-position=2 title="ci/cd">CI/CD<span class="button_tally">2</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/c%E8%AF%AD%E8%A8%80/' class=" post_tag button button_translucent" data-position=1 title="c语言">C语言<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/devops/' class=" post_tag button button_translucent" data-position=3 title="devops">DEVOPS<span class="button_tally">3</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/docker/' class=" post_tag button button_translucent" data-position=1 title="docker">DOCKER<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/elasticsearch/' class=" post_tag button button_translucent" data-position=5 title="elasticsearch">ELASTICSEARCH<span class="button_tally">5</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/elk/' class=" post_tag button button_translucent" data-position=1 title="elk">ELK<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/emoji/' class=" post_tag button button_translucent" data-position=1 title="emoji">EMOJI<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/git/' class=" post_tag button button_translucent" data-position=2 title="git">GIT<span class="button_tally">2</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/go/' class=" post_tag button button_translucent" data-position=6 title="go">GO<span class="button_tally">6</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/grafana/' class=" post_tag button button_translucent" data-position=1 title="grafana">GRAFANA<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/gtc/' class=" post_tag button button_translucent" data-position=2 title="gtc">GTC<span class="button_tally">2</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/gtcadmin/' class=" post_tag button button_translucent" data-position=1 title="gtcadmin">GTCADMIN<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/gtcuser/' class=" post_tag button button_translucent" data-position=1 title="gtcuser">GTCUSER<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/hosts/' class=" post_tag button button_translucent" data-position=1 title="hosts">HOSTS<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/hugo/' class=" post_tag button button_translucent" data-position=1 title="hugo">HUGO<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/jenkins/' class=" post_tag button button_translucent" data-position=2 title="jenkins">JENKINS<span class="button_tally">2</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/kubernetes/' class=" post_tag button button_translucent" data-position=13 title="kubernetes">KUBERNETES<span class="button_tally">13</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/markdown/' class=" post_tag button button_translucent" data-position=1 title="markdown">MARKDOWN<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/math/' class=" post_tag button button_translucent" data-position=1 title="math">MATH<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/mkcert/' class=" post_tag button button_translucent" data-position=1 title="mkcert">MKCERT<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/mysql/' class=" post_tag button button_translucent" data-position=4 title="mysql">MYSQL<span class="button_tally">4</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/nginx/' class=" post_tag button button_translucent" data-position=1 title="nginx">NGINX<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/notices/' class=" post_tag button button_translucent" data-position=1 title="notices">NOTICES<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/openstreetmap/' class=" post_tag button button_translucent" data-position=1 title="openstreetmap">OPENSTREETMAP<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/php/' class=" post_tag button button_translucent" data-position=7 title="php">PHP<span class="button_tally">7</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/prometheus/' class=" post_tag button button_translucent" data-position=1 title="prometheus">PROMETHEUS<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/rabbitmq/' class=" post_tag button button_translucent" data-position=4 title="rabbitmq">RABBITMQ<span class="button_tally">4</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/redis/' class=" post_tag button button_translucent" data-position=5 title="redis">REDIS<span class="button_tally">5</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/shell/' class=" post_tag button button_translucent" data-position=2 title="shell">SHELL<span class="button_tally">2</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/sql/' class=" post_tag button button_translucent" data-position=1 title="sql">SQL<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/web%E6%9C%8D%E5%8A%A1%E5%99%A8/' class=" post_tag button button_translucent" data-position=1 title="web服务器">WEB服务器<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/%E6%9C%AC%E5%9C%B0%E7%8E%AF%E5%A2%83/' class=" post_tag button button_translucent" data-position=1 title="本地环境">本地环境<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/%E5%A4%8D%E4%B9%A0/' class=" post_tag button button_translucent" data-position=1 title="复习">复习<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/%E6%95%99%E7%A8%8B/' class=" post_tag button button_translucent" data-position=1 title="教程">教程<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/%E4%B9%B1%E7%A0%81/' class=" post_tag button button_translucent" data-position=1 title="乱码">乱码<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/%E8%A7%86%E9%A2%91/' class=" post_tag button button_translucent" data-position=1 title="视频">视频<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/%E4%B9%A6%E7%B1%8D/' class=" post_tag button button_translucent" data-position=1 title="书籍">书籍<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/%E7%AE%97%E6%B3%95/' class=" post_tag button button_translucent" data-position=1 title="算法">算法<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6/' class=" post_tag button button_translucent" data-position=1 title="主从复制">主从复制<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/%E8%87%AA%E7%AD%BE%E5%90%8D%E8%AF%81%E4%B9%A6/' class=" post_tag button button_translucent" data-position=1 title="自签名证书">自签名证书<span class="button_tally">1</span>
+            </a>
+            
+            <div class="tags_sort"><span title="sort alphabetically">[A~Z]</span><span title="sort by count">[0~9]</span>
+            </div>
+            <span class="tags_hide"><svg class="icon">
+            <use xlink:href="#closeme"></use>
+          </svg></span>
+          </div>
+        </div>
+      </nav>
+    </div>
+  </section>
+</aside>
+
+  
+</div>
+
+<style>
+  .gtc-breadcrumb {
+    margin-bottom: 12px;
+    font-size: 0.9em;
+    opacity: 0.75;
+  }
+
+  .gtc-meta {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+</style>
+    </main><svg width="0" height="0" class="hidden">
+  <symbol viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" id="facebook">
+    <path d="M437 0H75C33.648 0 0 33.648 0 75v362c0 41.352 33.648 75 75 75h151V331h-60v-90h60v-61c0-49.629 40.371-90 90-90h91v90h-91v61h91l-15 90h-76v181h121c41.352 0 75-33.648 75-75V75c0-41.352-33.648-75-75-75zm0 0"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18.001 18.001" id="twitter">
+    <path d="M15.891 4.013c.808-.496 1.343-1.173 1.605-2.034a8.68 8.68 0 0 1-2.351.861c-.703-.756-1.593-1.14-2.66-1.14-1.043 0-1.924.366-2.643 1.078a3.56 3.56 0 0 0-1.076 2.605c0 .309.039.585.117.819-3.076-.105-5.622-1.381-7.628-3.837-.34.601-.51 1.213-.51 1.846 0 1.301.549 2.332 1.645 3.089-.625-.053-1.176-.211-1.645-.47 0 .929.273 1.705.82 2.388a3.623 3.623 0 0 0 2.115 1.291c-.312.08-.641.118-.979.118-.312 0-.533-.026-.664-.083.23.757.664 1.371 1.291 1.841a3.652 3.652 0 0 0 2.152.743C4.148 14.173 2.625 14.69.902 14.69c-.422 0-.721-.006-.902-.038 1.697 1.102 3.586 1.649 5.676 1.649 2.139 0 4.029-.542 5.674-1.626 1.645-1.078 2.859-2.408 3.639-3.974a10.77 10.77 0 0 0 1.172-4.892v-.468a7.788 7.788 0 0 0 1.84-1.921 8.142 8.142 0 0 1-2.11.593z"
+      ></path>
+  </symbol>
+  <symbol aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" id="mail">
+    <path  d="M502.3 190.8c3.9-3.1 9.7-.2 9.7 4.7V400c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V195.6c0-5 5.7-7.8 9.7-4.7 22.4 17.4 52.1 39.5 154.1 113.6 21.1 15.4 56.7 47.8 92.2 47.6 35.7.3 72-32.8 92.3-47.6 102-74.1 131.6-96.3 154-113.7zM256 320c23.2.4 56.6-29.2 73.4-41.4 132.7-96.3 142.8-104.7 173.4-128.7 5.8-4.5 9.2-11.5 9.2-18.9v-19c0-26.5-21.5-48-48-48H48C21.5 64 0 85.5 0 112v19c0 7.4 3.4 14.3 9.2 18.9 30.6 23.9 40.7 32.4 173.4 128.7 16.8 12.2 50.2 41.8 73.4 41.4z"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" id="calendar">
+    <path d="M452 40h-24V0h-40v40H124V0H84v40H60C26.916 40 0 66.916 0 100v352c0 33.084 26.916 60 60 60h392c33.084 0 60-26.916 60-60V100c0-33.084-26.916-60-60-60zm20 412c0 11.028-8.972 20-20 20H60c-11.028 0-20-8.972-20-20V188h432v264zm0-304H40v-48c0-11.028 8.972-20 20-20h24v40h40V80h264v40h40V80h24c11.028 0 20 8.972 20 20v48z"></path>
+    <path d="M76 230h40v40H76zm80 0h40v40h-40zm80 0h40v40h-40zm80 0h40v40h-40zm80 0h40v40h-40zM76 310h40v40H76zm80 0h40v40h-40zm80 0h40v40h-40zm80 0h40v40h-40zM76 390h40v40H76zm80 0h40v40h-40zm80 0h40v40h-40zm80 0h40v40h-40zm80-80h40v40h-40z"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" id="github">
+    <path d="M255.968 5.329C114.624 5.329 0 120.401 0 262.353c0 113.536 73.344 209.856 175.104 243.872 12.8 2.368 17.472-5.568 17.472-12.384 0-6.112-.224-22.272-.352-43.712-71.2 15.52-86.24-34.464-86.24-34.464-11.616-29.696-28.416-37.6-28.416-37.6-23.264-15.936 1.728-15.616 1.728-15.616 25.696 1.824 39.2 26.496 39.2 26.496 22.848 39.264 59.936 27.936 74.528 21.344 2.304-16.608 8.928-27.936 16.256-34.368-56.832-6.496-116.608-28.544-116.608-127.008 0-28.064 9.984-51.008 26.368-68.992-2.656-6.496-11.424-32.64 2.496-68 0 0 21.504-6.912 70.4 26.336 20.416-5.696 42.304-8.544 64.096-8.64 21.728.128 43.648 2.944 64.096 8.672 48.864-33.248 70.336-26.336 70.336-26.336 13.952 35.392 5.184 61.504 2.56 68 16.416 17.984 26.304 40.928 26.304 68.992 0 98.72-59.84 120.448-116.864 126.816 9.184 7.936 17.376 23.616 17.376 47.584 0 34.368-.32 62.08-.32 70.496 0 6.88 4.608 14.88 17.6 12.352C438.72 472.145 512 375.857 512 262.353 512 120.401 397.376 5.329 255.968 5.329z"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 212 212" id="gitlab">
+    <path d="M12.3 74.7h54L43.3 3c-1-3.6-6.4-3.6-7.6 0L12.3 74.8z" />
+    <path d="M12.3 74.7L.5 111c-1 3.2 0 6.8 3 8.8l101.6 74-92.5-119z"/>
+    <path d="M105 193.7l-38.6-119h-54l92.7 119z"/>
+    <path d="M105 193.7l38.7-119H66.4l38.7 119z"/>
+    <path d="M105 193.7l38.7-119H198l-93 119z"/>
+    <path d="M198 74.7l11.6 36.2c1 3 0 6.6-3 8.6l-101.5 74 93-119z"/>
+    <path d="M198 74.7h-54.3L167 3c1.2-3.6 6.4-3.6 7.6 0L198 74.8z"/>
+  </symbol>
+  <symbol viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" id="rss">
+    <circle cx="3.429" cy="20.571" r="3.429"></circle>
+    <path d="M11.429 24h4.57C15.999 15.179 8.821 8.001 0 8v4.572c6.302.001 11.429 5.126 11.429 11.428z"></path>
+    <path d="M24 24C24 10.766 13.234 0 0 0v4.571c10.714 0 19.43 8.714 19.43 19.429z"></path>
+  </symbol>
+  <symbol viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" id="linkedin">
+    <path d="M437 0H75C33.648 0 0 33.648 0 75v362c0 41.352 33.648 75 75 75h362c41.352 0 75-33.648 75-75V75c0-41.352-33.648-75-75-75zM181 406h-60V196h60zm0-240h-60v-60h60zm210 240h-60V286c0-16.54-13.46-30-30-30s-30 13.46-30 30v120h-60V196h60v11.309C286.719 202.422 296.93 196 316 196c40.691.043 75 36.547 75 79.688zm0 0"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 612 612" id="to-top">
+    <path d="M604.501 440.509L325.398 134.956c-5.331-5.357-12.423-7.627-19.386-7.27-6.989-.357-14.056 1.913-19.387 7.27L7.499 440.509c-9.999 10.024-9.999 26.298 0 36.323s26.223 10.024 36.222 0l262.293-287.164L568.28 476.832c9.999 10.024 26.222 10.024 36.221 0 9.999-10.023 9.999-26.298 0-36.323z"></path>
+  </symbol>
+  <symbol viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" id="carly">
+    <path d="M504.971 239.029L448 182.059V84c0-46.317-37.682-84-84-84h-44c-13.255 0-24 10.745-24 24s10.745 24 24 24h44c19.851 0 36 16.149 36 36v108c0 6.365 2.529 12.47 7.029 16.971L454.059 256l-47.029 47.029A24.002 24.002 0 0 0 400 320v108c0 19.851-16.149 36-36 36h-44c-13.255 0-24 10.745-24 24s10.745 24 24 24h44c46.318 0 84-37.683 84-84v-98.059l56.971-56.971c9.372-9.372 9.372-24.568 0-33.941zM112 192V84c0-19.851 16.149-36 36-36h44c13.255 0 24-10.745 24-24S205.255 0 192 0h-44c-46.318 0-84 37.683-84 84v98.059l-56.971 56.97c-9.373 9.373-9.373 24.568 0 33.941L64 329.941V428c0 46.317 37.682 84 84 84h44c13.255 0 24-10.745 24-24s-10.745-24-24-24h-44c-19.851 0-36-16.149-36-36V320c0-6.365-2.529-12.47-7.029-16.971L57.941 256l47.029-47.029A24.002 24.002 0 0 0 112 192z"></path>
+  </symbol>
+  <symbol viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" id="copy">
+    <path d="M23 2.75A2.75 2.75 0 0 0 20.25 0H8.75A2.75 2.75 0 0 0 6 2.75v13.5A2.75 2.75 0 0 0 8.75 19h11.5A2.75 2.75 0 0 0 23 16.25zM18.25 14.5h-7.5a.75.75 0 0 1 0-1.5h7.5a.75.75 0 0 1 0 1.5zm0-3h-7.5a.75.75 0 0 1 0-1.5h7.5a.75.75 0 0 1 0 1.5zm0-3h-7.5a.75.75 0 0 1 0-1.5h7.5a.75.75 0 0 1 0 1.5z"></path>
+    <path d="M8.75 20.5a4.255 4.255 0 0 1-4.25-4.25V2.75c0-.086.02-.166.025-.25H3.75A2.752 2.752 0 0 0 1 5.25v16A2.752 2.752 0 0 0 3.75 24h12a2.752 2.752 0 0 0 2.75-2.75v-.75z"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512.001 512.001" id="closeme">
+    <path d="M284.286 256.002L506.143 34.144c7.811-7.811 7.811-20.475 0-28.285-7.811-7.81-20.475-7.811-28.285 0L256 227.717 34.143 5.859c-7.811-7.811-20.475-7.811-28.285 0-7.81 7.811-7.811 20.475 0 28.285l221.857 221.857L5.858 477.859c-7.811 7.811-7.811 20.475 0 28.285a19.938 19.938 0 0 0 14.143 5.857 19.94 19.94 0 0 0 14.143-5.857L256 284.287l221.857 221.857c3.905 3.905 9.024 5.857 14.143 5.857s10.237-1.952 14.143-5.857c7.811-7.811 7.811-20.475 0-28.285L284.286 256.002z"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" id="open-menu">
+    <path d="M492 236H20c-11.046 0-20 8.954-20 20s8.954 20 20 20h472c11.046 0 20-8.954 20-20s-8.954-20-20-20zm0-160H20C8.954 76 0 84.954 0 96s8.954 20 20 20h472c11.046 0 20-8.954 20-20s-8.954-20-20-20zm0 320H20c-11.046 0-20 8.954-20 20s8.954 20 20 20h472c11.046 0 20-8.954 20-20s-8.954-20-20-20z"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" id="instagram">
+    <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" id=youtube>
+    <path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" id="stackoverflow">
+    <path d="M21 27v-8h3v11H0V19h3v8h18z"></path><path d="M17.1.2L15 1.8l7.9 10.6 2.1-1.6L17.1.2zm3.7 14.7L10.6 6.4l1.7-2 10.2 8.5-1.7 2zM7.2 12.3l12 5.6 1.1-2.4-12-5.6-1.1 2.4zm-1.8 6.8l13.56 1.96.17-2.38-13.26-2.55-.47 2.97zM19 25H5v-3h14v3z"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" id="xing">
+    <path d="M18.188 0c-.517 0-.741.325-.927.66 0 0-7.455 13.224-7.702 13.657.015.024 4.919 9.023 4.919 9.023.17.308.436.66.967.66h3.454c.211 0 .375-.078.463-.22.089-.151.089-.346-.009-.536l-4.879-8.916c-.004-.006-.004-.016 0-.022L22.139.756c.095-.191.097-.387.006-.535C22.056.078 21.894 0 21.686 0h-3.498zM3.648 4.74c-.211 0-.385.074-.473.216-.09.149-.078.339.02.531l2.34 4.05c.004.01.004.016 0 .021L1.86 16.051c-.099.188-.093.381 0 .529.085.142.239.234.45.234h3.461c.518 0 .766-.348.945-.667l3.734-6.609-2.378-4.155c-.172-.315-.434-.659-.962-.659H3.648v.016z"/>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 71 55" id="discord">
+    <path d="M60.1045 4.8978C55.5792 2.8214 50.7265 1.2916 45.6527 0.41542C45.5603 0.39851 45.468 0.440769 45.4204 0.525289C44.7963 1.6353 44.105 3.0834 43.6209 4.2216C38.1637 3.4046 32.7345 3.4046 27.3892 4.2216C26.905 3.0581 26.1886 1.6353 25.5617 0.525289C25.5141 0.443589 25.4218 0.40133 25.3294 0.41542C20.2584 1.2888 15.4057 2.8186 10.8776 4.8978C10.8384 4.9147 10.8048 4.9429 10.7825 4.9795C1.57795 18.7309 -0.943561 32.1443 0.293408 45.3914C0.299005 45.4562 0.335386 45.5182 0.385761 45.5576C6.45866 50.0174 12.3413 52.7249 18.1147 54.5195C18.2071 54.5477 18.305 54.5139 18.3638 54.4378C19.7295 52.5728 20.9469 50.6063 21.9907 48.5383C22.0523 48.4172 21.9935 48.2735 21.8676 48.2256C19.9366 47.4931 18.0979 46.6 16.3292 45.5858C16.1893 45.5041 16.1781 45.304 16.3068 45.2082C16.679 44.9293 17.0513 44.6391 17.4067 44.3461C17.471 44.2926 17.5606 44.2813 17.6362 44.3151C29.2558 49.6202 41.8354 49.6202 53.3179 44.3151C53.3935 44.2785 53.4831 44.2898 53.5502 44.3433C53.9057 44.6363 54.2779 44.9293 54.6529 45.2082C54.7816 45.304 54.7732 45.5041 54.6333 45.5858C52.8646 46.6197 51.0259 47.4931 49.0921 48.2228C48.9662 48.2707 48.9102 48.4172 48.9718 48.5383C50.038 50.6034 51.2554 52.5699 52.5959 54.435C52.6519 54.5139 52.7526 54.5477 52.845 54.5195C58.6464 52.7249 64.529 50.0174 70.6019 45.5576C70.6551 45.5182 70.6887 45.459 70.6943 45.3942C72.1747 30.0791 68.2147 16.7757 60.1968 4.9823C60.1772 4.9429 60.1437 4.9147 60.1045 4.8978ZM23.7259 37.3253C20.2276 37.3253 17.3451 34.1136 17.3451 30.1693C17.3451 26.225 20.1717 23.0133 23.7259 23.0133C27.308 23.0133 30.1626 26.2532 30.1066 30.1693C30.1066 34.1136 27.28 37.3253 23.7259 37.3253ZM47.3178 37.3253C43.8196 37.3253 40.9371 34.1136 40.9371 30.1693C40.9371 26.225 43.7636 23.0133 47.3178 23.0133C50.9 23.0133 53.7545 26.2532 53.6986 30.1693C53.6986 34.1136 50.9 37.3253 47.3178 37.3253Z"/>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 17 18" id="mastodon">
+    <path
+    fill="#ffffff"
+    d="m 15.054695,9.8859583 c -0.22611,1.1632697 -2.02517,2.4363497 -4.09138,2.6830797 -1.0774504,0.12856 -2.1382704,0.24673 -3.2694704,0.19484 -1.84996,-0.0848 -3.30971,-0.44157 -3.30971,-0.44157 0,0.1801 0.0111,0.35157 0.0333,0.51194 0.24051,1.82571 1.81034,1.93508 3.29737,1.98607 1.50088,0.0514 2.8373104,-0.37004 2.8373104,-0.37004 l 0.0617,1.35686 c 0,0 -1.0498104,0.56374 -2.9199404,0.66742 -1.03124,0.0567 -2.3117,-0.0259 -3.80308,-0.42069 -3.23454998,-0.85613 -3.79081998,-4.304 -3.87592998,-7.8024197 -0.026,-1.03871 -0.01,-2.01815 -0.01,-2.83732 0,-3.57732 2.34385998,-4.62587996 2.34385998,-4.62587996 1.18184,-0.54277 3.20976,-0.77101 5.318,-0.7882499985409 h 0.0518 C 9.8267646,0.01719834 11.856025,0.24547834 13.037775,0.78824834 c 0,0 2.34377,1.04855996 2.34377,4.62587996 0,0 0.0294,2.63937 -0.32687,4.47183"/>
+ <path
+    fill="#000000"
+    d="m 12.616925,5.6916583 v 4.3315297 h -1.71607 V 5.8189683 c 0,-0.88624 -0.37289,-1.33607 -1.1187604,-1.33607 -0.82467,0 -1.23799,0.53361 -1.23799,1.58875 v 2.30122 h -1.70594 v -2.30122 c 0,-1.05514 -0.4134,-1.58875 -1.23808,-1.58875 -0.74587,0 -1.11876,0.44983 -1.11876,1.33607 v 4.2042197 h -1.71607 V 5.6916583 c 0,-0.88527 0.22541,-1.58876 0.67817,-2.10922 0.46689,-0.52047 1.07833,-0.78727 1.83735,-0.78727 0.87816,0 1.54317,0.33752 1.98288,1.01267 l 0.42744,0.71655 0.42753,-0.71655 c 0.43961,-0.67515 1.10463,-1.01267 1.9828704,-1.01267 0.75893,0 1.37037,0.2668 1.83735,0.78727 0.45268,0.52046 0.67808,1.22395 0.67808,2.10922"/>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 530" id="bluesky" >
+    <path d="m135.72 44.03c66.496 49.921 138.02 151.14 164.28 205.46 26.262-54.316 97.782-155.54 164.28-205.46 47.98-36.021 125.72-63.892 125.72 24.795 0 17.712-10.155 148.79-16.111 170.07-20.703 73.984-96.144 92.854-163.25 81.433 117.3 19.964 147.14 86.092 82.697 152.22-122.39 125.59-175.91-31.511-189.63-71.766-2.514-7.3797-3.6904-10.832-3.7077-7.8964-0.0174-2.9357-1.1937 0.51669-3.7077 7.8964-13.714 40.255-67.233 197.36-189.63 71.766-64.444-66.128-34.605-132.26 82.697-152.22-67.108 11.421-142.55-7.4491-163.25-81.433-5.9562-21.282-16.111-152.36-16.111-170.07 0-88.687 77.742-60.816 125.72-24.795z"/>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" id="ko-fi">
+    <path fill="#ffffff" d="M4.5,9.8527H32.7947a0,0,0,0,1,0,0v19.225a9.07,9.07,0,0,1-9.07,9.07H13.57a9.07,9.07,0,0,1-9.07-9.07V9.8527A0,0,0,0,1,4.5,9.8527Z"/>
+    <path fill="#000000" d="M12.197,25.9493l6.45,6.45,6.45-6.45a8.2,8.2,0,0,0,2.4016-5.798h0a4.5082,4.5082,0,0,0-4.212-4.5459,4.4262,4.4262,0,0,0-4.64,4.4209,4.4261,4.4261,0,0,0-4.64-4.4209,4.5082,4.5082,0,0,0-4.212,4.5459h0A8.2,8.2,0,0,0,12.197,25.9493Z"/>
+    <path fill="#ffffff" d="M32.7947,9.8527H35.73a7.77,7.77,0,0,1,0,15.5394H32.7947"/>
+  </svg>
+  </symbol>
+</svg>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha512-aOFyMMzZF7l7ei3vOKgQiRhZnYqk9YC/uMzl4T0j5N5D3Kul+QAFU8ssENDRMAqr/lxDOjMF69dSYJ8HYqY+WQ==" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" integrity="sha512-UPFOadao2nEorjtjl0xUTtN3w20Ja143UPEU6EyJ1mi5MB2bDtMkiWmqGDqi47xNLB5z1dy31GKJDEWhjUJFiQ==" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" integrity="sha512-YJVxTjqttjsU3cSvaTRqsSl0wbRgZUNF+NGGCgto/MUbIvaLdXQzGTCQu4CvyJZbZctgflVB0PXw9LLmTWm5/w==" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
+<footer class="footer">
+  <div class="footer_inner wrap pale">
+    <img src='https://jianlin-li.github.io/icons/apple-touch-icon.png' class="icon icon_2 transparent" alt="Copyright © 1989–2025, 李建林 ">
+    <p>Copyright&nbsp;1989-&nbsp;<span class="year"></span>&nbsp;COPYRIGHT © 1989–2025, 李建林 . All Rights Reserved</p><a class="to_top" href="#documentTop">
+  <svg class="icon">
+  <title>to-top</title>
+  <use xlink:href="#to-top"></use>
+</svg>
+
+</a>
+
+  </div>
+</footer>
+
+<script type="text/javascript" src="https://jianlin-li.github.io/zh-cn/js/bundle.e4e0e4fbe8acb50d7f973828f4138cdbea727800047fc93f9abbd6751e8f3422d6ef193f98da36fdb8488219c25692d73da89480f46abc8421a4ee3526dd6c23.js" integrity="sha512-5ODk&#43;&#43;istQ1/lzgo9BOM2&#43;pyeAAEf8k/mrvWdR6PNCLW7xk/mNo2/bhIghnCVpLXPaiUgPRqvIQhpO41Jt1sIw==" crossorigin="anonymous"></script>
+
+  <script src="https://jianlin-li.github.io/js/search.min.4c2b0421d128bbd7c43fc7d662fb5dfd8e439c60ee92c900a26d72d9c3271d2256f5bac9f6f919cddfd55101e9272898716cbb3381b4360bf43a66a5f7664f54.js"></script>
+
+  </body>
+</html>

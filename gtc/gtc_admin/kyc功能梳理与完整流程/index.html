@@ -1,0 +1,1795 @@
+
+<!DOCTYPE html>
+<html
+  lang="zh-cn"
+  data-figures=""
+  
+    class="page"
+  
+  
+  >
+  <head>
+<title>Kyc功能梳理与完整流程 | 李建林个人知识库</title>
+<meta charset="utf-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+
+
+
+
+<meta property="og:locale" content="zh-cn" />
+
+<meta property="og:type" content="article">
+<meta name="description" content="KYC 功能梳理与完整流程
+适用读者：刚接触项目的产品、运营、审核人员和开发人员。梳理日期：2026-10-27。
+本文依据当前工作区的 gtc_admin 后台后端、gtc_admin_vue 后台前端，以及 gtcuser 客户侧后端代码整理。没有读取生产数据库，也没有调用第三方认证服务；“当前实现”指本地代码实现 …" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:creator" content="">
+<meta name="twitter:title" content="" />
+<meta name="twitter:image" content="https://jianlin-li.github.io/images/thumbnail.png"/>
+<meta property="og:url" content="https://jianlin-li.github.io/gtc/gtc_admin/kyc%E5%8A%9F%E8%83%BD%E6%A2%B3%E7%90%86%E4%B8%8E%E5%AE%8C%E6%95%B4%E6%B5%81%E7%A8%8B/" />
+<meta property="og:title" content="" />
+<meta property="og:description" content="KYC 功能梳理与完整流程
+适用读者：刚接触项目的产品、运营、审核人员和开发人员。梳理日期：2026-10-27。
+本文依据当前工作区的 gtc_admin 后台后端、gtc_admin_vue 后台前端，以及 gtcuser 客户侧后端代码整理。没有读取生产数据库，也没有调用第三方认证服务；“当前实现”指本地代码实现 …" />
+<meta property="og:image" content="https://jianlin-li.github.io/images/thumbnail.png" />
+
+<link rel="apple-touch-icon" sizes="180x180" href="https://jianlin-li.github.io/icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://jianlin-li.github.io/icons/favicon-32x32.png">
+<link rel="manifest" href="https://jianlin-li.github.io/icons/site.webmanifest">
+
+<link rel="canonical" href="https://jianlin-li.github.io/gtc/gtc_admin/kyc%E5%8A%9F%E8%83%BD%E6%A2%B3%E7%90%86%E4%B8%8E%E5%AE%8C%E6%95%B4%E6%B5%81%E7%A8%8B/">
+
+
+
+<link rel="preload" href="https://jianlin-li.github.io/css/styles.dc38388a8f0b890e788bd3a99b7495d14e7d5ac4359ed3b49abeb778497863b284ad4cc7e496ef58c84139295f9bafed82f5a41345eda86bd2d429cccb7c2596.css" integrity = "sha512-3Dg4io8LiQ54i9Opm3SV0U59WsQ1ntO0mr63eEl4Y7KErUzH5JbvWMhBOSlfm6/tgvWkE0XtqGvS1CnMy3wllg==" as="style" crossorigin="anonymous">
+
+
+
+<link rel="preload" href="https://jianlin-li.github.io/zh-cn/js/bundle.e4e0e4fbe8acb50d7f973828f4138cdbea727800047fc93f9abbd6751e8f3422d6ef193f98da36fdb8488219c25692d73da89480f46abc8421a4ee3526dd6c23.js" as="script" integrity=
+"sha512-5ODk&#43;&#43;istQ1/lzgo9BOM2&#43;pyeAAEf8k/mrvWdR6PNCLW7xk/mNo2/bhIghnCVpLXPaiUgPRqvIQhpO41Jt1sIw==" crossorigin="anonymous">
+
+
+<link rel="stylesheet" type="text/css" href="https://jianlin-li.github.io/css/styles.dc38388a8f0b890e788bd3a99b7495d14e7d5ac4359ed3b49abeb778497863b284ad4cc7e496ef58c84139295f9bafed82f5a41345eda86bd2d429cccb7c2596.css" integrity="sha512-3Dg4io8LiQ54i9Opm3SV0U59WsQ1ntO0mr63eEl4Y7KErUzH5JbvWMhBOSlfm6/tgvWkE0XtqGvS1CnMy3wllg==" crossorigin="anonymous">
+
+
+
+<style>
+  .post_body .mermaid {
+    overflow-x: auto;
+    margin: 1.5rem 0;
+  }
+
+  .post_body .mermaid svg {
+    min-width: 100%;
+    width: 100%;
+    height: auto;
+    max-width: none;
+  }
+
+  .post_body .mermaid svg[aria-roledescription="flowchart"],
+  .post_body .mermaid svg[aria-roledescription="flowchart-v2"] {
+    --gtc-flowchart-node-fill: #e7f2ff;
+    --gtc-flowchart-node-border: #d4e4f7;
+    --gtc-flowchart-node-text: #1683e8;
+    --gtc-flowchart-line: #b8bec6;
+    --gtc-flowchart-cluster-border: #e7e9ed;
+  }
+
+  .post_body .mermaid svg[aria-roledescription="flowchart"] .node rect,
+  .post_body .mermaid svg[aria-roledescription="flowchart-v2"] .node rect {
+    fill: var(--gtc-flowchart-node-fill);
+    stroke: var(--gtc-flowchart-node-border);
+    rx: 12px;
+    ry: 12px;
+  }
+
+  .post_body .mermaid svg[aria-roledescription="flowchart"] .node polygon,
+  .post_body .mermaid svg[aria-roledescription="flowchart-v2"] .node polygon {
+    fill: #ffffff !important;
+    stroke: var(--gtc-flowchart-node-text) !important;
+    stroke-dasharray: 3 3 !important;
+  }
+
+  .post_body .mermaid svg[aria-roledescription="flowchart"] .node .label,
+  .post_body .mermaid svg[aria-roledescription="flowchart-v2"] .node .label,
+  .post_body .mermaid svg[aria-roledescription="flowchart"] .nodeLabel,
+  .post_body .mermaid svg[aria-roledescription="flowchart-v2"] .nodeLabel {
+    color: var(--gtc-flowchart-node-text);
+    fill: var(--gtc-flowchart-node-text);
+  }
+
+  .post_body .mermaid svg[aria-roledescription="flowchart"] .edgePath path,
+  .post_body .mermaid svg[aria-roledescription="flowchart-v2"] .edgePath path {
+    stroke: var(--gtc-flowchart-line);
+    stroke-width: 1.2px;
+  }
+
+  .post_body .mermaid svg[aria-roledescription="flowchart"] .edgeLabel,
+  .post_body .mermaid svg[aria-roledescription="flowchart-v2"] .edgeLabel {
+    background-color: #ffffff;
+    color: var(--gtc-flowchart-node-text);
+  }
+
+  .post_body .mermaid svg[aria-roledescription="flowchart"] .edgeLabel rect,
+  .post_body .mermaid svg[aria-roledescription="flowchart-v2"] .edgeLabel rect {
+    fill: #ffffff;
+  }
+
+  .post_body .mermaid svg[aria-roledescription="flowchart"] .cluster rect,
+  .post_body .mermaid svg[aria-roledescription="flowchart-v2"] .cluster rect {
+    fill: #ffffff;
+    stroke: var(--gtc-flowchart-cluster-border);
+  }
+
+  .post_body .mermaid svg[aria-roledescription="flowchart"] .cluster text,
+  .post_body .mermaid svg[aria-roledescription="flowchart-v2"] .cluster text {
+    fill: #4b5563;
+  }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11.17.2/dist/mermaid.min.js" crossorigin="anonymous" defer></script>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    if (!window.mermaid) {
+      return;
+    }
+
+    window.mermaid.initialize({
+      startOnLoad: false,
+      securityLevel: "strict",
+      theme: "base",
+      themeVariables: {
+        primaryColor: "#e7f2ff",
+        primaryTextColor: "#1683e8",
+        primaryBorderColor: "#d4e4f7",
+        lineColor: "#b8bec6",
+        secondaryColor: "#ffffff",
+        tertiaryColor: "#ffffff",
+        clusterBkg: "#ffffff",
+        clusterBorder: "#e7e9ed",
+        edgeLabelBackground: "#ffffff",
+        fontFamily: "-apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif"
+      },
+      flowchart: {
+        curve: "linear",
+        nodeSpacing: 34,
+        rankSpacing: 44,
+        padding: 12,
+        subGraphTitleMargin: {
+          top: 12,
+          bottom: 18
+        },
+        htmlLabels: true
+      }
+    });
+    window.mermaid.run({ querySelector: ".mermaid" });
+  });
+</script>
+
+
+  </head>
+  <body
+    data-code="7"
+    data-lines="true"
+    id="documentTop"
+    data-lang="zh-cn"
+  >
+
+<header class="nav_header" >
+  <nav class="nav"><a href='https://jianlin-li.github.io/' class="nav_brand nav_item" title="李建林个人知识库">
+  <img src="https://jianlin-li.github.io/logos/logo.png" class="logo" alt="李建林个人知识库">
+  <div class="nav_close">
+    <div><svg class="icon">
+  <title>open-menu</title>
+  <use xlink:href="#open-menu"></use>
+</svg>
+<svg class="icon">
+  <title>closeme</title>
+  <use xlink:href="#closeme"></use>
+</svg>
+</div>
+  </div>
+</a>
+
+    <div class='nav_body nav_body_left'>
+      
+      
+      
+        
+
+  <div class="nav_parent">
+    <a href="https://jianlin-li.github.io/" class="nav_item" title="首页">首页 </a>
+  </div>
+  <div class="nav_parent">
+    <a href="https://jianlin-li.github.io/archives/" class="nav_item" title="归档">归档 </a>
+  </div>
+  <div class="nav_parent">
+    <a href="https://jianlin-li.github.io/gtc/" class="nav_item" title="GTC 文档">GTC 文档 </a>
+  </div>
+  <div class="nav_parent">
+    <a href="https://jianlin-li.github.io/categories/" class="nav_item" title="分类">分类 </a>
+  </div>
+  <div class="nav_parent">
+    <a href="https://jianlin-li.github.io/tags/" class="nav_item" title="标签">标签 </a>
+  </div>
+  <div class="nav_parent">
+    <a href="https://jianlin-li.github.io/about/" class="nav_item" title="关于">关于 </a>
+  </div>
+      
+<div class='follow'>
+  <a href="https://github.com/JianLin-Li">
+    <svg class="icon">
+  <title>github</title>
+  <use xlink:href="#github"></use>
+</svg>
+
+  </a>
+  <a href="http://local.gitlab.com">
+    <svg class="icon">
+  <title>gitlab</title>
+  <use xlink:href="#gitlab"></use>
+</svg>
+
+  </a>
+<div class="color_mode">
+  <input type="checkbox" class="color_choice" id="mode">
+</div>
+
+</div>
+
+    </div>
+  </nav>
+</header>
+
+    <main><div class="grid-inverse wrap content">
+  <article class="post_content">
+    <p class="gtc-breadcrumb"><a href="/gtc/">GTC 文档归档</a> / gtc_admin</p>
+    <h1 class="post_title">Kyc功能梳理与完整流程</h1>
+    <div class="post_meta gtc-meta">
+      <span class="post_date">
+        2026-10-27
+      </span>
+      <span>项目：gtc_admin</span>
+    </div>
+    
+    <div class="post_body">
+      <h1 id="kyc-功能梳理与完整流程">KYC 功能梳理与完整流程</h1>
+<p>适用读者：刚接触项目的产品、运营、审核人员和开发人员。梳理日期：2026-10-27。</p>
+<p>本文依据当前工作区的 <code>gtc_admin</code> 后台后端、<code>gtc_admin_vue</code> 后台前端，以及 <code>gtcuser</code> 客户侧后端代码整理。没有读取生产数据库，也没有调用第三方认证服务；“当前实现”指本地代码实现，不代表生产已部署或启用全部能力。<strong>未修改业务代码，仅新增说明文档和流程图。</strong></p>
+<h2 id="1-kyc-到底是什么">1. KYC 到底是什么</h2>
+<p>KYC 是 <strong>Know Your Customer</strong>，中文通常叫“了解你的客户”或“客户身份尽职调查”。在这个项目里，它是一套客户资料收集、身份验证、资料审核、协议签署和认证结果管理功能。</p>
+<p>可以用一个例子理解：客户注册了账号，只能说明系统建立了一个账号；完成 KYC，则表示客户按当前分配的认证方案提交了要求的材料，并且这些必需项目的最新记录全部审核通过。</p>
+<p>它主要回答几个问题：</p>
+<table>
+  <thead>
+      <tr>
+          <th>要回答的问题</th>
+          <th>项目中对应的功能</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>客户是谁、怎样联系</td>
+          <td>个人信息／公司信息</td>
+      </tr>
+      <tr>
+          <td>证件和身份是否符合认证要求</td>
+          <td>身份信息、证件资料、按渠道进行人脸／证件验证</td>
+      </tr>
+      <tr>
+          <td>客户的财务和交易背景是什么</td>
+          <td>可配置问卷，如收入、资产、就业、交易经验</td>
+      </tr>
+      <tr>
+          <td>客户是否确认协议</td>
+          <td>客户协议确认、签署 PDF、签署记录</td>
+      </tr>
+      <tr>
+          <td>客户住在哪里</td>
+          <td>地址证明及地址资料</td>
+      </tr>
+      <tr>
+          <td>哪些资料通过了、谁审的、为什么拒绝</td>
+          <td>各表单记录、审核人、审核时间、审核方式、驳回原因</td>
+      </tr>
+      <tr>
+          <td>是否可以使用受 KYC 限制的业务</td>
+          <td>支付通道、部分出金、活动赠金、部分代理／PAMM 接口的校验</td>
+      </tr>
+  </tbody>
+</table>
+<p>KYC 与反洗钱合规有关，但不能由此推断项目已经实现所有反洗钱、制裁名单、政治人物筛查等能力。本文只把已定位到的实现纳入流程。</p>
+<h2 id="2-先认识三个角色和四个层次">2. 先认识三个角色和四个层次</h2>
+<p>三个主要角色是：<strong>客户</strong>负责填写和提交，<strong>后台审核人员</strong>负责查看、修改、通过或驳回，<strong>第三方认证平台</strong>按配置完成证件、人脸或地址验证，系统再把结果同步回来。</p>
+<p>四个层次必须分清：</p>
+<table>
+  <thead>
+      <tr>
+          <th>层次</th>
+          <th>通俗解释</th>
+          <th>关键数据</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>监管类型</td>
+          <td>客户归属的一类业务监管标签，供筛选及关联业务规则使用；具体名称由项目配置</td>
+          <td><code>kyc_regulatory_type</code>、<code>member_other.kyc_regulatory_type_id</code></td>
+      </tr>
+      <tr>
+          <td>KYC 规则／方案</td>
+          <td>一套认证要求：适用个人还是企业、关联哪些国家、需要哪些表单、怎样审核</td>
+          <td><code>kyc_setting</code>、<code>member.kyc_id</code></td>
+      </tr>
+      <tr>
+          <td>表单／审核项目</td>
+          <td>方案内的一项要求，如身份信息、问卷、客户协议</td>
+          <td><code>system_form</code>、<code>system_form_detail</code></td>
+      </tr>
+      <tr>
+          <td>客户的一次提交</td>
+          <td>客户对某张表单提交的一份资料及其审核结果</td>
+          <td><code>kyc_user_content</code></td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>“监管类型”和“KYC 规则”不是同一条数据。</strong> 规则关联监管类型；会员当前规则保存在 <code>member.kyc_id</code>，会员业务使用的监管类型保存在 <code>member_other.kyc_regulatory_type_id</code>。这里的“监管”也不等于系统已经向某个监管机关发起认证请求。</p>
+<p>尤其注意三个看起来很像的 ID：</p>
+<ul>
+<li><code>member.kyc_id</code>：KYC 规则 ID，对应 <code>kyc_setting.id</code>。</li>
+<li><code>kyc_user_content.kyc_config_id</code>：这次提交所属的 KYC 规则 ID。</li>
+<li><code>kyc_user_content.kyc_id</code>：这条提交记录自身的 ID。它不是 KYC 规则 ID。</li>
+</ul>
+<h2 id="3-完整业务总流程图">3. 完整业务总流程图</h2>
+<p>这是项目主流程的业务视图。各认证项目来自当前规则，按配置展示；图中的循环表示逐项处理，不表示后端强制所有客户按固定的五步顺序执行。</p>
+<div class="mermaid">flowchart TB
+    subgraph CFG[阶段 A：后台准备认证方案]
+        A1[维护监管类型] --&gt; A2[建立表单模板：题目、必填项、排序、协议]
+        A2 --&gt; A3[建立 KYC 规则：个人或企业、审核项目、人工或自动]
+        A3 --&gt; A4[自动规则配置渠道和默认项：Sumsub、IDwise、ZOLOZ]
+        A4 --&gt; A5[关联国家：个人规则与企业规则分别维护]
+    end
+    subgraph START[阶段 B：给客户分配方案]
+        B1[客户注册或后台调整未通过客户的规则] --&gt; B2[按国家、个人或企业身份匹配启用规则]
+        B2 --&gt; B3{是否找到规则？}
+        B3 --&gt;|否| B4[无法取得认证表单；联系管理员核对配置]
+        B3 --&gt;|是| B5[保存会员当前 KYC 规则；加载审核项目]
+    end
+    A5 --&gt; B1
+    B5 --&gt; C1
+    subgraph SUBMIT[阶段 C：客户填写并提交项目]
+        C1[选择一项：基本信息、身份、问卷、协议或地址]
+        C1 --&gt; C2{保存草稿还是提交？}
+        C2 --&gt;|草稿| C3[单项状态 0；尚未正式进入审核]
+        C2 --&gt;|提交| C4[校验必填和格式；协议项目生成签署文件及记录]
+        C4 --&gt; C5{个人且规则开启自动？}
+        C5 --&gt;|否：人工规则或企业| C6[单项状态 1；后台人工审核]
+        C5 --&gt;|是| C7{项目类型}
+        C7 --&gt;|基本信息、问卷、客户协议| C8[系统直接通过；审核方式 auto]
+        C7 --&gt;|身份信息| C9[所选第三方进行身份或证件验证]
+        C7 --&gt;|地址证明| C10{地址验证渠道}
+        C10 --&gt;|Sumsub 或 IDwise| C11[第三方进行地址验证]
+        C10 --&gt;|ZOLOZ 路线| C6
+    end
+    C6 --&gt; D1
+    C9 --&gt; D2
+    C11 --&gt; D2
+    subgraph REVIEW[阶段 D：审核和结果同步]
+        D1[审核员核对资料，选择通过或驳回] --&gt; D3{单项结果}
+        D2[回调或主动查询／定时任务获取结果；校验本地业务条件] --&gt; D3
+        D3 --&gt;|通过| D4[单项状态 9；同步适用的会员资料与文件]
+        D3 --&gt;|拒绝| D5[单项状态 -1；保存驳回原因]
+        D3 --&gt;|未完成或同步未成功| D6[保持当前待处理状态；继续验证或排查同步]
+        D5 --&gt; D7[客户重新提交：保留旧记录，新建草稿；三方业务编号递增]
+        D5 --&gt; D8[后台修改被驳回资料：转回待审核，审核方式 manual]
+    end
+    C8 --&gt; E1
+    D4 --&gt; E1
+    D5 --&gt; E1
+    subgraph DONE[阶段 E：汇总会员整体状态和后续业务]
+        E1[按当前规则内启用表单的最新记录，重算会员总状态]
+        E1 --&gt; E2{所有必需项目是否全部通过？}
+        E2 --&gt;|否| E3[未提交 0／进行中 1／未认证 2；按未完成项目继续处理]
+        E2 --&gt;|是| E4[整体 KYC 状态 9；Iscertified 为 1]
+        E4 --&gt; E5[保存通过档案快照、同步监管类型、发送成功通知]
+        E5 --&gt; E6[进入后续业务；仍按各业务规则检查 KYC、POA 和其他条件]
+    end
+    D4 -.后台再次驳回须谷歌验证码.-&gt; D5</div>
+<p>图中“草稿”“重新提交”“后台修订”“继续补齐”都需要回到对应填写／审核阶段，回路细节见下方单项状态图。</p>
+<h3 id="31-阶段-a后台配置">3.1 阶段 A：后台配置</h3>
+<p>后台需要准备以下内容：</p>
+<ol>
+<li>监管类型：维护用于规则及客户归类的类型字典。</li>
+<li>表单模板：维护题目、字段类型、选项、是否必填、排序、协议文件等。</li>
+<li>KYC 规则：选个人／企业、关联监管类型、选审核项目、启用人工或自动审核。</li>
+<li>第三方渠道：自动规则可配置多个认证渠道，并指定默认项；Sumsub 配验证等级，IDwise 配流程 ID。</li>
+<li>国家关联：同一个国家的个人和企业可以配置不同规则。国家关联在专门页面维护，不由规则保存接口直接修改。</li>
+</ol>
+<p>一条规则不能重复选择相同 <code>form_type</code> 的表单。变更规则的关键配置且已存在进行中／未认证客户时，后台会提示确认，因为变更可能改变客户需要完成的项目。</p>
+<p>对应代码：<a href="/Users/jalen/www/local/gtc_admin/app/admin/controller/Kyc.php:87">规则保存</a>、<a href="/Users/jalen/www/local/gtc_admin/app/admin/controller/Kyc.php:2256">国家关联入口</a>、<a href="/Users/jalen/www/local/gtc_admin_vue/src/views/kyc/setting/index.vue:131">后台规则页面</a>。</p>
+<h3 id="32-阶段-b注册和规则分配">3.2 阶段 B：注册和规则分配</h3>
+<p>客户侧注册流程会按客户国家和 <code>is_company</code> 匹配启用的规则，并保存 <code>member.kyc_id</code>。找不到匹配规则时，分配函数返回失败；之后读取 KYC 表单可能提示国家暂不支持、联系管理员。</p>
+<p>后台可以调整尚未整体通过客户的 KYC 规则，调整后重算总状态。<code>setUserKyc</code> 对总状态已经为 9 的客户直接拒绝调整。</p>
+<p>注册时还会初始化会员监管类型；这一步存在默认值和国家兼容规则，所以“已分配监管类型”不意味着“已经通过 KYC”。全部通过后系统会再同步当前认证方案的监管类型。</p>
+<p>对应代码：<a href="/Users/jalen/www/local/gtcuser/app/Service/member/TMemberService.php:2705">注册后分配规则</a>、<a href="/Users/jalen/www/local/gtcuser/app/Repository/crm/KycSettingRepository.php:107">国家匹配</a>、<a href="/Users/jalen/www/local/gtc_admin/app/admin/controller/Kyc.php:1826">后台调整规则</a>。</p>
+<h2 id="4-各阶段到底收什么做什么怎样通过">4. 各阶段到底收什么、做什么、怎样通过</h2>
+<p>系统的主表单类型是下列五类。<strong>数值是表单分类编号，不是会员当前走到第几步。</strong> 规则可以只选其中一部分；实际标题、问题和必填条件从数据库模板读取。</p>
+<table>
+  <thead>
+      <tr>
+          <th><code>form_type</code></th>
+          <th>阶段</th>
+          <th>功能与常见材料</th>
+          <th>人工规则／企业账户</th>
+          <th>个人自动规则</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>1</td>
+          <td>个人信息／公司信息</td>
+          <td>姓名、联系资料；企业可有公司名称、注册国家等，以模板为准</td>
+          <td>正式提交后待人工审核</td>
+          <td>系统直接通过，方式为 <code>auto</code></td>
+      </tr>
+      <tr>
+          <td>2</td>
+          <td>身份信息／实名认证</td>
+          <td>证件类型、号码、正反面、姓名、生日、国家；第三方可采集人脸和识别证件</td>
+          <td>待人工审核；企业材料按实际模板</td>
+          <td>Sumsub、IDwise、ZOLOZ 之一验证，再同步本地结果</td>
+      </tr>
+      <tr>
+          <td>3</td>
+          <td>问卷调查</td>
+          <td>收入、资产、就业、交易经验、风险认知等可配置问题</td>
+          <td>待人工审核</td>
+          <td>提交校验通过后由系统直接通过；不能据此推断有问卷风险评分拦截</td>
+      </tr>
+      <tr>
+          <td>4</td>
+          <td>客户协议</td>
+          <td>读取协议模板，确认后生成带签署信息的 PDF，并记录签署行为</td>
+          <td>生成签署文件后待人工审核</td>
+          <td>生成签署文件后系统直接通过</td>
+      </tr>
+      <tr>
+          <td>5</td>
+          <td>地址证明</td>
+          <td>居住国家、地址、邮编、证明类型和日期、证明文件等，以模板为准</td>
+          <td>待人工审核</td>
+          <td>Sumsub／IDwise 可验证；ZOLOZ 不提供本项目的地址认证分支，提交后仍是待审</td>
+      </tr>
+  </tbody>
+</table>
+<p>依据：<a href="/Users/jalen/www/local/gtcuser/app/Model/Enums/Crm/FormTypesEnum.php:26">表单类型枚举</a>、<a href="/Users/jalen/www/local/gtcuser/app/Service/crm/KycService.php:2400">正式提交分流</a>、<a href="/Users/jalen/www/local/gtcuser/app/Service/crm/KycService.php:2818">第三方链接分流</a>。</p>
+<h3 id="41-身份验证与地址验证的细分图">4.1 身份验证与地址验证的细分图</h3>
+<div class="mermaid">flowchart TB
+    A[处理身份信息或地址证明] --&gt; B{企业账户或人工规则？}
+    B --&gt;|是| M[资料提交为待审 1；后台审核]
+    B --&gt;|否：个人自动规则| C{本次验证项目}
+    C --&gt;|身份信息| I{选用的认证渠道}
+    I --&gt;|Sumsub| S1[使用配置的 level_name；获取 WebSDK 链接]
+    I --&gt;|IDwise| W1[使用配置的 flow_id；取得 journey_id 和认证链接]
+    I --&gt;|ZOLOZ| Z1[按配置选择证件或身份验证；取得 transactionId]
+    C --&gt;|地址证明| P{可用地址渠道}
+    P --&gt;|Sumsub| S2[使用地址验证等级；提交地址材料]
+    P --&gt;|IDwise| W2[按流程配置提交地址材料]
+    P --&gt;|ZOLOZ 路线| M
+    S1 --&gt; S3[客户完成第三方页面操作]
+    S2 --&gt; S3
+    S3 --&gt; S4[接收已完成的 Webhook；或客户主动刷新 Sumsub 结果]
+    S4 --&gt; S5{第三方结果}
+    S5 --&gt;|GREEN| S6[按身份／地址子项读取本次资料和文件]
+    S5 --&gt;|RED| R[保存相关项目的驳回结果与原因]
+    S5 --&gt;|未完成| WAIT[继续等待；第三方页面关闭不等于本地通过]
+    W1 --&gt; W3[客户完成 IDwise 认证]
+    W2 --&gt; W3
+    W3 --&gt; W4[Finished Journey 回调；查询完整旅程结果]
+    W4 --&gt; W5[分别校验身份、地址的文件结果及规则；身份还检查已返回的人脸结果]
+    W5 --&gt;|通过| L
+    W5 --&gt;|未通过或 Refer 等| R
+    W4 --&gt;|Incomplete| WAIT
+    W3 -.第三方后台人工改判.-&gt; W6[Updated Journey：处理 Approve 的已审核步骤]
+    W6 --&gt; W7[匹配同一旅程的驳回记录；提取必要资料后同步通过]
+    W7 --&gt; L
+    Z1 --&gt; Z2[客户完成 ZOLOZ 操作]
+    Z2 --&gt; Z3[启用的 ZolozTask 定时查询近 24 小时未缓存结果]
+    Z3 --&gt;|Success| L
+    Z3 --&gt;|Fail| R
+    Z3 --&gt;|InProcess 或无结果| WAIT
+    S6 --&gt; L[执行本地资料校验、保存证件／地址资料及文件]
+    L --&gt; K{本地条件是否满足？}
+    K --&gt;|否，如证件绑定数量超限| R
+    K --&gt;|是| PASS[对应项目状态 9；重算整体状态]
+    M --&gt;|通过| PASS
+    M --&gt;|驳回| R
+    R --&gt; RETRY[客户重提或后台修订，再次进入审核]</div>
+<p>这里有几条实际限制：</p>
+<ul>
+<li>企业账户在 <code>kycFormDataSave</code> 中直接退出，不发起这一套第三方自动认证；即便规则页面能填写自动配置，也不能据此认为企业已接通自动流程。</li>
+<li>Sumsub 结果以本地同步为准。Webhook 入口只处理审核完成事件；主动刷新还区分待审核、查询失败、同步失败等结果。</li>
+<li>Sumsub 的整体 <code>RED</code> 会进入整体拒绝处理；当前实现会对结果中存在的身份／地址项调用拒绝逻辑，不能假设另一子项一定保留通过。</li>
+<li>IDwise 的 <code>Complete</code> 不会直接把所有 KYC 项目全部置为通过；系统还检查每份文件的 <code>validation_outcome</code>、<code>has_passed_rules</code>，以及已返回的人脸结果等。</li>
+<li>IDwise 的 <code>Refer</code> 在当前项目按未通过路径处理，不是本地“已通过”。<code>Updated Journey</code> 另有第三方人工复核通过的处理。</li>
+<li>ZOLOZ 的定时任务依赖 <code>BASE_CRONTAB</code>；代码配置为每分钟第 40 秒触发，扫描近 24 小时未缓存的相关结果。任务未运行时，不应假设结果必然自动落库。</li>
+<li>本地仍会校验同一证件允许绑定的账号数量。第三方通过，仍可能因为本地规则不满足而驳回。</li>
+</ul>
+<p>对应代码：<a href="/Users/jalen/www/local/gtcuser/app/Http/Api/Controller/V1/KYCController.php:323">Sumsub 回调入口</a>、<a href="/Users/jalen/www/local/gtcuser/app/Service/Kyc/SumsubService.php:110">Sumsub 结果服务</a>、<a href="/Users/jalen/www/local/gtcuser/app/Service/crm/KycService.php:3105">主动刷新</a>、<a href="/Users/jalen/www/local/gtcuser/app/Service/crm/KycService.php:3385">IDwise 回调</a>、<a href="/Users/jalen/www/local/gtcuser/app/Service/crm/KycService.php:4097">IDwise 第三方人工复核</a>、<a href="/Users/jalen/www/local/gtcuser/app/Task/KycTask/ZolozTask.php:12">ZOLOZ 定时任务</a>。</p>
+<h2 id="5-状态流转必须分成两套看">5. 状态流转：必须分成两套看</h2>
+<h3 id="51-单个项目的状态">5.1 单个项目的状态</h3>
+<p>单项状态保存在 <code>kyc_user_content.kyc_status</code>。</p>
+<table>
+  <thead>
+      <tr>
+          <th>数值</th>
+          <th>含义</th>
+          <th>典型触发</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>0</td>
+          <td>草稿／暂存；无记录时页面也可能显示未提交</td>
+          <td>客户暂存、待审撤回、驳回后创建新草稿</td>
+      </tr>
+      <tr>
+          <td>1</td>
+          <td>待审核</td>
+          <td>人工审核项目正式提交、第三方创建的待处理记录</td>
+      </tr>
+      <tr>
+          <td>-1</td>
+          <td>已驳回</td>
+          <td>人工拒绝、第三方拒绝、本地条件不满足；重复提交的旧草稿／待审记录也可能被标记为驳回</td>
+      </tr>
+      <tr>
+          <td>9</td>
+          <td>已通过</td>
+          <td>人工通过、系统直接通过、第三方结果成功同步</td>
+      </tr>
+  </tbody>
+</table>
+<div class="mermaid">flowchart TB
+    N[尚无提交记录] --&gt;|暂存| D[草稿 0]
+    N --&gt;|正式提交人工审核项目| P[待审核 1]
+    D --&gt;|正式提交| P
+    D --&gt;|个人自动规则的基本信息／问卷／协议提交| A[通过 9]
+    D --&gt;|第三方结果同步通过| A
+    D --&gt;|第三方结果同步拒绝| R[驳回 -1]
+    N --&gt;|个人自动规则的基本信息／问卷／协议提交| A
+    P --&gt;|后台通过或三方成功同步| A
+    P --&gt;|后台或第三方拒绝| R
+    P --&gt;|客户撤回| D
+    R --&gt;|客户重提：保留原记录，复制一条新记录| D
+    R --&gt;|后台修改并保存：修改原记录| P
+    A --&gt;|后台填写原因并验证谷歌验证码| R
+    A --&gt;|后台编辑资料| A
+    A -.部分第三方认证发现姓名变更且旧协议已通过.-&gt; C[客户协议被驳回：实名不一致，需要重新签署]
+    C --&gt;|客户重提，生成新草稿| D</div>
+<p>流转细节：</p>
+<ol>
+<li><strong>暂存</strong>：保存未完成内容；已有待审或通过记录时，暂存接口通常直接返回，避免覆盖正在处理或已通过资料。</li>
+<li><strong>正式提交</strong>：生成一条新提交记录，保存当时题目快照；同一表单旧的草稿／待审记录被标记为“用户重复填写”，以保留历史。</li>
+<li><strong>客户撤回</strong>：现有 <code>cancelInfo</code> 仅把待审记录改为草稿；已通过记录不能通过这个入口撤回。该方法没有调用总状态刷新，见第 11 节。</li>
+<li><strong>客户重提</strong>：只接受当前规则下属于本人的驳回记录。复制为新草稿，清空驳回及审核信息，保留原记录；第三方业务编号递增。协议重提还会移除新草稿中的旧签署链接，要求重新确认签署。</li>
+<li><strong>后台修改驳回资料</strong>：修改原记录，状态从 -1 回到 1，审核方式改为 <code>manual</code>，并重算总状态。</li>
+<li><strong>后台修改通过资料</strong>：当前保存接口不会一律退回待审；原状态为 9 时仍可保持 9。不能把“编辑过”直接理解为“已重新审核”。</li>
+<li><strong>已通过再驳回</strong>：后台支持 9 → -1，必须填写原因，并额外验证谷歌验证码；同时把相关已签署协议置为作废，再重算总状态。</li>
+<li><strong>姓名变化需要重签</strong>：部分第三方身份同步会调用 <code>reSign</code>，在旧协议状态为通过时把客户协议置为驳回，原因是“实名不一致，需要重新签署”。这是有条件的现有实现，不保证所有姓名编辑入口都会执行。</li>
+</ol>
+<p>对应代码：<a href="/Users/jalen/www/local/gtcuser/app/Service/crm/KycService.php:2622">暂存／撤回／重提</a>、<a href="/Users/jalen/www/local/gtc_admin/app/admin/controller/Kyc.php:1963">后台修改</a>、<a href="/Users/jalen/www/local/gtc_admin/app/admin/controller/Kyc.php:1727">后台驳回</a>、<a href="/Users/jalen/www/local/gtcuser/app/Service/crm/KycService.php:532">姓名变更重签</a>。</p>
+<h3 id="52-会员整体-kyc-状态">5.2 会员整体 KYC 状态</h3>
+<p>整体状态保存在 <code>member.kyc_status</code>。当前主流程用的是 <strong>0／1／2／9</strong>，不是“第 1 步、第 2 步、第 3 步”。</p>
+<p>计算时只看：<strong>该会员当前 KYC 规则 → 规则包含且仍启用的表单 → 每张表单最新一条提交记录</strong>。历史规则里的通过记录，不能自动替代当前规则里的必需项目；同一项目曾经通过，也不能覆盖最新的驳回或待审记录。</p>
+<table>
+  <thead>
+      <tr>
+          <th>总状态</th>
+          <th>当前计算条件</th>
+          <th>例子：假设规则要求五项</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>0 未提交</td>
+          <td>没有任何非草稿提交；或缺少会员／规则／有效表单</td>
+          <td>五项都没填，或只有草稿</td>
+      </tr>
+      <tr>
+          <td>1 进行中</td>
+          <td>已有正式提交，但未满足“全部通过”或“全部有最终结果”</td>
+          <td>四项通过、一项待审；一项驳回、另一项还未提交</td>
+      </tr>
+      <tr>
+          <td>2 未认证</td>
+          <td>所有必需项都有最新记录，且全部是 9 或 -1，其中至少一项 -1</td>
+          <td>四项通过、一项驳回；五项全部驳回</td>
+      </tr>
+      <tr>
+          <td>9 已认证</td>
+          <td>所有必需项目的最新记录全部为 9</td>
+          <td>五项全部通过</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>“有一项被驳回”不一定立刻变成总状态 2。</strong> 如果还有项目没交、是草稿或待审，总状态仍然可能是 1。</p>
+<div class="mermaid">flowchart TB
+    A[发生提交、审核、重提等主流程动作] --&gt; B[取得当前规则中的启用表单和各自最新记录]
+    B --&gt; C{规则或有效表单缺失？}
+    C --&gt;|是| Z[总状态 0：未提交]
+    C --&gt;|否| D{是否存在非草稿提交？}
+    D --&gt;|否| Z
+    D --&gt;|是| E{所有必需项目均为 9？}
+    E --&gt;|是| P[总状态 9：已认证；Iscertified 为 1]
+    E --&gt;|否| F{每项都有记录，且全部为 9 或 -1？}
+    F --&gt;|是| U[总状态 2：未认证]
+    F --&gt;|否| G[总状态 1：进行中]
+    Z --&gt; N[总状态为 0／1／2 时，Iscertified 为 0]
+    U --&gt; N
+    G --&gt; N</div>
+<p>依据：<a href="/Users/jalen/www/local/gtc_admin/app/service/kyc/KycOverallStatusService.php:32">后台总状态服务</a>、<a href="/Users/jalen/www/local/gtcuser/app/Service/Kyc/KycOverallStatusService.php:44">客户侧总状态服务</a>。上述是总状态服务的正常计算口径，历史强制通过入口有例外。</p>
+<h2 id="6-后台人工审核具体做什么">6. 后台人工审核具体做什么</h2>
+<p>审核人员进入客户 KYC 审核列表，读取该客户当前规则下的项目及已提交内容。最新待审列表按当前规则、有效表单和 <code>is_last=1</code> 的待审记录确定待办客户，并应用管理员／客户层级的数据范围。</p>
+<p>通过单项时：</p>
+<ol>
+<li>检查提交记录存在、处于待审核 1，并校验操作人的客户数据权限。</li>
+<li>根据表单内容校验手机号、证件及证件绑定数量等适用规则。</li>
+<li>同步适用的会员姓名、生日、证件类型、号码、地址、证件图片等；敏感字段通过统一服务写入。</li>
+<li>身份表单中的国家用于更新 <code>nationality</code>（国籍）；地址表单中的国家用于更新 <code>country</code>（居住国家）；企业基本信息的注册国家按现有 <code>country</code> 字段处理。</li>
+<li>写入单项通过状态 9、审核人、审核时间、方式 <code>manual</code>，重算整体状态。</li>
+<li>数据库提交后，适用时同步 MT 资料、发送单项通过通知；全部通过时还有整体成功及监管类型变化通知。</li>
+</ol>
+<p>驳回单项时：</p>
+<ol>
+<li>对待审 1 或已通过 9 的资料执行拒绝；已通过再拒绝额外验证谷歌验证码。</li>
+<li>必须填写驳回原因，保存状态 -1、审核人、时间和方式 <code>manual</code>。</li>
+<li>将匹配该会员及表单的 KYC 协议记录置为作废，刷新总状态。</li>
+<li>发送资料拒绝通知，客户根据原因修订或重新提交。</li>
+</ol>
+<p>后台通知、MT 同步属于审核结果后的副作用；外部通知或同步失败的排查，应与数据库里的审核结果分开判断。</p>
+<p>依据：<a href="/Users/jalen/www/local/gtc_admin/app/admin/controller/Kyc.php:1199">通过入口</a>、<a href="/Users/jalen/www/local/gtc_admin/app/admin/controller/Kyc.php:1727">驳回入口</a>、<a href="/Users/jalen/www/local/gtc_admin/app/service/kyc/KycReviewListService.php:63">待审列表</a>。</p>
+<h2 id="7-全部通过以后发生什么">7. 全部通过以后发生什么</h2>
+<p>主流程达到总状态 9 后，会执行以下动作：</p>
+<ul>
+<li>会员标记为 KYC 已认证；<code>Iscertified</code> 置为 1。</li>
+<li>保存通过档案快照，记录这次通过关联的表单及通过记录 ID。</li>
+<li>同步当前 KYC 规则关联的会员监管类型；发生变化时按实现发送相关通知。</li>
+<li>发送认证成功通知，相关实现会整理已签署协议链接。</li>
+<li>后续业务读取认证结果；是否能操作仍取决于对应业务的其他条件。</li>
+</ul>
+<p>项目有两种容易混淆的“快照”：</p>
+<table>
+  <thead>
+      <tr>
+          <th>快照</th>
+          <th>用途</th>
+          <th>不能误解为</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>kyc_form_detail_snapshot</code></td>
+          <td>一次提交时的题目／字段结构，避免后续模板变更影响查看历史资料</td>
+          <td>当前模板里后来新增的字段都已由旧客户填写</td>
+      </tr>
+      <tr>
+          <td><code>member_other.kyc_profile_snapshot</code></td>
+          <td>全部通过时的表单列表和通过记录引用，供档案展示</td>
+          <td>所有答案被永久冻结、不能再改；客户侧读取仍会加载实时答案和文件信息</td>
+      </tr>
+  </tbody>
+</table>
+<p>依据：<a href="/Users/jalen/www/local/gtc_admin/app/service/KycService.php:283">后台全部通过处理</a>、<a href="/Users/jalen/www/local/gtcuser/app/Service/crm/KycService.php:2918">客户侧全部通过处理</a>、<a href="/Users/jalen/www/local/gtcuser/app/Service/crm/KycService.php:1698">档案快照读取</a>。</p>
+<h2 id="8-独立-poa与-kyc-地址项目相邻但不是同一流程">8. 独立 POA：与 KYC 地址项目相邻，但不是同一流程</h2>
+<p>POA 是地址证明。当前项目同时保留两种来源：KYC 中 <code>form_type=5</code> 的地址表单，以及客户详情里后台新增的独立地址证明 <code>address_proof</code>。</p>
+<div class="mermaid">flowchart TB
+    A[客户详情：地址证明] --&gt; B[KYC 地址表单的历史记录]
+    A --&gt; C[后台新增独立地址证明]
+    C --&gt; D[校验国家、地址、文件、日期等；校验总文件额度]
+    D --&gt; E[按幂等键防重复；写入独立 address_proof 表]
+    E --&gt; F[后台新增记录直接为已通过 9]
+    B --&gt; G[详情列表统一展示；两种来源独立保存]
+    F --&gt; G
+    G --&gt; H{独立 POA 或 KYC 地址表单任一存在通过记录？}
+    H --&gt;|是| V[支付侧 hasValidPoa 为 true]
+    H --&gt;|否| N[两边都没有通过记录；POA 校验不通过]
+    E -.不替代 KYC 必需表单，也不直接更新整体 KYC 状态.-&gt; X[整体认证仍按当前规则各表单最新记录计算]</div>
+<p>关键规则：</p>
+<ul>
+<li>后台新增独立地址证明，当前实现直接保存为已通过 9，并记录后台审核人和时间；不是先进入另一张待审队列。</li>
+<li>独立 POA 和历史 KYC 地址记录合并展示，但不互相覆盖，也不互相转换为同一条数据。</li>
+<li>相关新增、编辑和客户侧地址提交路径共用每客户 <strong>15 个文件</strong>的额度规则。计数不是简单计算记录条数：多文件记录按文件数计，历史通过记录及当前规则最新待审记录等有专门口径。</li>
+<li>支付侧 <code>hasValidPoa</code> 判断：独立 POA 或 KYC 地址表单，任一存在通过记录即可。它不等同于整体 KYC 的“当前规则最新项目全部通过”判断。</li>
+<li>因此可能出现“已有有效 POA，但整体 KYC 未通过”，也可能在当前规则不要求地址表单时“整体 KYC 通过，但没有满足独立 POA 门禁的材料”。</li>
+</ul>
+<p>依据：<a href="/Users/jalen/www/local/gtc_admin/app/admin/service/AddressProofReviewService.php:126">地址证明新增服务</a>、<a href="/Users/jalen/www/local/gtc_admin/app/admin/service/AddressProofReviewService.php:543">直接保存通过状态</a>、<a href="/Users/jalen/www/local/gtcuser/app/Service/crm/PayService.php:328">支付 POA 判断</a>。</p>
+<h2 id="9-kyc-对哪些业务产生影响">9. KYC 对哪些业务产生影响</h2>
+<table>
+  <thead>
+      <tr>
+          <th>业务</th>
+          <th>当前定位到的使用方式</th>
+          <th>阅读时应注意</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>入金通道</td>
+          <td>通道 <code>iskyc</code> 控制是否要求 KYC，<code>requires_poa</code> 另外要求有效地址证明</td>
+          <td>还会叠加国家、国籍、监管类型、标签等条件；不能只看总状态</td>
+      </tr>
+      <tr>
+          <td>出金</td>
+          <td>客户侧 <code>PayService</code> 定位到的出金路径直接要求 <code>member.kyc_status=9</code></td>
+          <td>不代表所有支付／出金入口都共用完全相同规则</td>
+      </tr>
+      <tr>
+          <td>活动赠金</td>
+          <td><code>require_kyc=1</code> 时，未通过的参与记录进入待赠金状态，不在该次操作里发放</td>
+          <td>KYC 通过不等于这一步必然立即自动补发，仍要看后续活动发放触发</td>
+      </tr>
+      <tr>
+          <td>代理功能</td>
+          <td>代理统计入口使用 KYC 中间件</td>
+          <td>中间件校验之外还有代理身份和数据权限</td>
+      </tr>
+      <tr>
+          <td>PAMM 协议</td>
+          <td><code>sign_lpoa</code> 接口使用 KYC 中间件</td>
+          <td>PAMM 不等于 KYC 阶段，LPOA 也不是地址证明 POA</td>
+      </tr>
+      <tr>
+          <td>客户列表、档案、CRM 同步</td>
+          <td>展示及筛选 KYC 总状态、单项状态、监管类型和审核时间等</td>
+          <td>对外展示可能把内部状态映射成另一套数值或 Verified／Unverified 文案</td>
+      </tr>
+  </tbody>
+</table>
+<p>支付身份信息返回中的 <code>kyc_status</code> 还存在映射：内部总状态 9 → 支付字段 2，内部 1 → 支付字段 1，其余 → 0。看到支付接口的 2，不应直接当成 <code>member.kyc_status=2</code> 的“未认证”。</p>
+<p>项目还保留 <code>DespoitKycMiddleware</code>，但本次没有定位到控制器实际挂载它；不能据该类的存在就断言所有入金都执行其“15 天”逻辑。</p>
+<p>依据：<a href="/Users/jalen/www/local/gtcuser/app/Service/crm/PayService.php:119">入金通道</a>、<a href="/Users/jalen/www/local/gtcuser/app/Service/crm/PayService.php:356">支付状态映射</a>、<a href="/Users/jalen/www/local/gtcuser/app/Service/crm/PayService.php:1975">出金 KYC 校验</a>、<a href="/Users/jalen/www/local/gtcuser/app/Service/crm/MemberMtloginService.php:834">活动赠金校验</a>、<a href="/Users/jalen/www/local/gtcuser/app/Http/Api/Controller/V1/AgentController.php:114">代理入口</a>、<a href="/Users/jalen/www/local/gtcuser/app/Http/Api/Controller/V1/PammController.php:977">PAMM 签署</a>。</p>
+<h2 id="10-常见英文缩写和专有名词">10. 常见英文、缩写和专有名词</h2>
+<table>
+  <thead>
+      <tr>
+          <th>名称</th>
+          <th>英文全称／原意</th>
+          <th>在这里怎样理解</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>KYC</td>
+          <td>Know Your Customer</td>
+          <td>了解客户、验证资料和身份的整个认证流程</td>
+      </tr>
+      <tr>
+          <td>KYB</td>
+          <td>Know Your Business</td>
+          <td>企业尽职调查的行业称呼；本项目用 <code>is_company</code> 区分企业 KYC，不表示另有独立 KYB 模块</td>
+      </tr>
+      <tr>
+          <td>AML</td>
+          <td>Anti-Money Laundering</td>
+          <td>反洗钱；KYC 是相关基础环节，本文未确认完整 AML 筛查流程</td>
+      </tr>
+      <tr>
+          <td>ID</td>
+          <td>Identification／Identifier，随语境变化</td>
+          <td>ID Document 指身份证明文件；member_id、applicantId 等指系统编号</td>
+      </tr>
+      <tr>
+          <td>POA</td>
+          <td>Proof of Address</td>
+          <td>地址证明，如可接受的账单或证明文件；具体可用种类以模板／第三方配置为准</td>
+      </tr>
+      <tr>
+          <td>POR</td>
+          <td>Proof of Residence</td>
+          <td>居住证明；Sumsub 代码中的 <code>PROOF_OF_RESIDENCE</code> 属于地址认证</td>
+      </tr>
+      <tr>
+          <td>POI</td>
+          <td>Proof of Identity</td>
+          <td>身份证明的行业用语；项目身份阶段对应 <code>IDENTITY</code>／<code>ID Document</code></td>
+      </tr>
+      <tr>
+          <td>OCR</td>
+          <td>Optical Character Recognition</td>
+          <td>光学字符识别，把证件图片中的姓名、号码等识别成文字</td>
+      </tr>
+      <tr>
+          <td>DOB</td>
+          <td>Date of Birth</td>
+          <td>出生日期；第三方资料中的 <code>dob</code> 对应生日</td>
+      </tr>
+      <tr>
+          <td>SDK／WebSDK</td>
+          <td>Software Development Kit／网页端开发工具包</td>
+          <td>第三方提供的网页认证界面／接入工具；客户在其中上传材料、完成验证</td>
+      </tr>
+      <tr>
+          <td>H5</td>
+          <td>通常指 HTML5 移动网页</td>
+          <td>这里通常指手机也能打开的第三方认证页面，并不是某项审核状态</td>
+      </tr>
+      <tr>
+          <td>API</td>
+          <td>Application Programming Interface</td>
+          <td>系统间或前后端调用的接口</td>
+      </tr>
+      <tr>
+          <td>Webhook</td>
+          <td>事件触发的 HTTP 回调</td>
+          <td>第三方完成审核后主动通知本项目；与客户手动刷新结果不同</td>
+      </tr>
+      <tr>
+          <td>CRM</td>
+          <td>Customer Relationship Management</td>
+          <td>客户关系管理；本项目的客户资料及管理业务</td>
+      </tr>
+      <tr>
+          <td>MT4／MT5</td>
+          <td>MetaTrader 4／MetaTrader 5</td>
+          <td>交易平台；审核通过后适用资料变更会同步到相关 MT 账号</td>
+      </tr>
+      <tr>
+          <td>IB</td>
+          <td>Introducing Broker</td>
+          <td>介绍经纪商，通常对应代理业务；不是身份信息阶段</td>
+      </tr>
+      <tr>
+          <td>PAMM</td>
+          <td>Percentage Allocation Management Module</td>
+          <td>按比例分配管理的投资账户／资管业务，与 KYC 是关联业务关系</td>
+      </tr>
+      <tr>
+          <td>LPOA</td>
+          <td>Limited Power of Attorney</td>
+          <td>有限授权委托书；PAMM 里的授权协议，不是地址证明 POA</td>
+      </tr>
+      <tr>
+          <td>FX</td>
+          <td>Foreign Exchange</td>
+          <td>外汇；问卷中的交易经验可能涉及</td>
+      </tr>
+      <tr>
+          <td>CFD</td>
+          <td>Contract for Difference</td>
+          <td>差价合约；问卷可能询问相关产品经验</td>
+      </tr>
+      <tr>
+          <td>PDF</td>
+          <td>Portable Document Format</td>
+          <td>协议签署后生成的文档格式</td>
+      </tr>
+      <tr>
+          <td>OSS</td>
+          <td>Object Storage Service</td>
+          <td>对象存储服务，保存证件、地址证明、协议等文件</td>
+      </tr>
+      <tr>
+          <td>JSON</td>
+          <td>JavaScript Object Notation</td>
+          <td>一种结构化数据格式，存表单答案、审核渠道配置和快照</td>
+      </tr>
+      <tr>
+          <td>UUID</td>
+          <td>Universally Unique Identifier</td>
+          <td>通用唯一标识，常用于记录、签署事件等编号</td>
+      </tr>
+      <tr>
+          <td>ISO 国家码</td>
+          <td>International Organization for Standardization 的国家编码体系</td>
+          <td>用于不同系统间传递国家；注意两位码、三位码、英文国家名不是同一种值</td>
+      </tr>
+      <tr>
+          <td>2FA</td>
+          <td>Two-Factor Authentication</td>
+          <td>双因素认证；这里已通过再驳回使用谷歌验证码作为额外验证</td>
+      </tr>
+      <tr>
+          <td>Sumsub／IDwise／ZOLOZ</td>
+          <td>第三方平台品牌名称</td>
+          <td>不必把整个品牌名按缩写逐字展开；它们是可配置认证供应商</td>
+      </tr>
+      <tr>
+          <td>Applicant／applicantId</td>
+          <td>申请人／申请人编号</td>
+          <td>第三方系统中的认证申请主体及编号，不是本地 KYC 规则编号</td>
+      </tr>
+      <tr>
+          <td>level_name</td>
+          <td>验证等级／验证方案名称</td>
+          <td>Sumsub 中决定认证要求；在本项目配置中也兼作 IDwise 的流程 ID 字段</td>
+      </tr>
+      <tr>
+          <td>flow_id</td>
+          <td>流程编号</td>
+          <td>IDwise 平台中预先配置的认证流程编号</td>
+      </tr>
+      <tr>
+          <td>Journey／journey_id</td>
+          <td>一次认证旅程／编号</td>
+          <td>IDwise 中一次完整认证会话，包含身份、地址等步骤及结果</td>
+      </tr>
+      <tr>
+          <td>transactionId／bizId</td>
+          <td>交易编号／业务编号</td>
+          <td>ZOLOZ 相关认证会话和业务追踪编号；这里不是资金交易订单</td>
+      </tr>
+      <tr>
+          <td>externalUserId／referenceNo</td>
+          <td>外部用户编号／引用编号</td>
+          <td>本项目传给第三方的业务标识；重提时可能带递增序号，不能总当作纯会员 ID</td>
+      </tr>
+      <tr>
+          <td>manual／auto</td>
+          <td>人工／自动</td>
+          <td><code>manual</code> 是人工审核；<code>auto</code> 常是本地系统直接通过，不等于 Sumsub 等第三方审核</td>
+      </tr>
+      <tr>
+          <td>GREEN／RED</td>
+          <td>第三方审核结果字符串</td>
+          <td>Sumsub 的通过／拒绝结果，不是页面颜色本身，也不是会员总状态数值</td>
+      </tr>
+      <tr>
+          <td>Complete／Incomplete／Refer／Rejected</td>
+          <td>完成／未完成／需进一步处理／拒绝</td>
+          <td>IDwise 结果值；本项目会读取文件及规则结果，Refer 按未通过路径处理</td>
+      </tr>
+      <tr>
+          <td>幂等</td>
+          <td>同一操作重复执行仍保持同一业务效果</td>
+          <td>如重复新增 POA 不能产生多条同样材料；三方重复回调也应避免重复处理</td>
+      </tr>
+      <tr>
+          <td>快照</td>
+          <td>某时点保存的结构或引用</td>
+          <td>用于还原当时表单及通过档案；具体是否包含答案要看快照类型</td>
+      </tr>
+  </tbody>
+</table>
+<h2 id="11-现状中的历史兼容与待验证边界">11. 现状中的历史兼容与待验证边界</h2>
+<p>下面这些差异会影响理解，不能只看名称或旧注释：</p>
+<ol>
+<li><strong>旧会员状态枚举仍存在。</strong> 客户侧 <code>KycStatusEnum</code> 还列出问卷 1、基本信息 2、上传证件 3 等历史步骤；当前总状态 Service 已改成 0／1／2／9。理解主流程以新 Service 为准，不套用旧步骤含义。</li>
+<li><strong>旧状态汇总表不是统一事实来源。</strong> 后台 <code>KycMemberStatus</code> 的更新方法明确标记废弃，但客户侧部分旧逻辑仍写入它，姓名变化重签也会读取它。当前整体认证的判断来源是当前规则下的最新 <code>kyc_user_content</code>。</li>
+<li><strong>撤回后的整体状态有同步缺口。</strong> 客户侧 <code>cancelInfo</code> 把单项 1 改为 0，但该方法没有直接调用整体状态重算；实际页面／业务何时反映变化需联调验证。</li>
+<li><strong>保留历史强制通过接口。</strong> <code>admin_kyc_status</code> 把部分状态 0 的记录改为 9，然后直接写 <code>member.kyc_status=9</code>，只刷新汇总，没有走正常的全部必需项目校验及完整副作用。它不是建议学习或使用的标准审核路径；是否仍可由当前页面调用，需核实部署菜单和权限。</li>
+<li><strong>ZOLOZ 字符串有历史拼写差异。</strong> 客户侧结果处理存在 <code>zolzo</code>，配置及渠道列表使用 <code>zoloz</code>；可能影响渠道识别、展示或重提路径，需单独验证，本文未修复。</li>
+<li><strong>数据字典与部分当前代码存在差异。</strong> 当前待审查询和客户端提交用到 <code>kyc_user_content.is_last</code>，本地数据字典该表尚未列出此字段；地址证明代码也使用 <code>address_country_code</code>，该表的本地字典未列出。实际表结构及对应发布脚本是否部署，需要核对实际环境。</li>
+<li><strong>文档／注释不一定等于实现。</strong> 例如 Sumsub 整体拒绝的注释与当前方法具体分支不完全一致；本文按方法实际分支描述。档案展示还存在老用户／旧规则兼容逻辑，不能把展示结果直接当作当前总状态计算依据。</li>
+<li><strong>评分规则页面属于历史注册申请关联能力。</strong> 后台 <code>scorelist/scoresave</code> 维护 <code>user_reg_apply_score</code>，<code>MemberRegApply::excuteStatus</code> 是历史注册申请评分处理，且注释表明当前审批接口不调用。没有证据把它画成现行 KYC 问卷的必经自动评分流程。</li>
+<li><strong>自动渠道能力与实际启用范围未核实。</strong> 具体国家、方案、第三方等级、人脸要求、文件时效、后台菜单、任务和通知开关依赖数据库及运行配置；本文没有连接生产确认。</li>
+</ol>
+<p>依据：<a href="/Users/jalen/www/local/gtcuser/app/Model/Enums/Crm/KycStatusEnum.php:26">旧枚举</a>、<a href="/Users/jalen/www/local/gtc_admin/app/admin/model/KycMemberStatus.php:33">后台废弃状态模型</a>、<a href="/Users/jalen/www/local/gtcuser/app/Service/crm/KycService.php:2682">撤回入口</a>、<a href="/Users/jalen/www/local/gtc_admin/app/admin/controller/Kyc.php:2228">历史强制通过</a>、<a href="/Users/jalen/www/local/gtc_admin/app/admin/model/MemberRegApply.php:101">历史评分处理</a>。</p>
+<h2 id="12-面向开发的入口和数据速查">12. 面向开发的入口和数据速查</h2>
+<h3 id="121-关键页面与接口">12.1 关键页面与接口</h3>
+<table>
+  <thead>
+      <tr>
+          <th>使用者</th>
+          <th>功能</th>
+          <th>当前定位到的入口</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>后台</td>
+          <td>KYC 规则维护</td>
+          <td><code>src/views/kyc/setting/index.vue</code> → <code>/admin/kyc/setting</code>、<code>save_setting</code></td>
+      </tr>
+      <tr>
+          <td>后台</td>
+          <td>国家关联</td>
+          <td><code>src/views/kyc/country_relation/index.vue</code> → <code>/admin/kyc/get_kyc_country_list</code>、<code>save_country_kyc_relation</code></td>
+      </tr>
+      <tr>
+          <td>后台</td>
+          <td>表单模板</td>
+          <td><code>src/views/kyc/template/</code> 及系统表单页面 → <code>SystemForm</code> 控制器</td>
+      </tr>
+      <tr>
+          <td>后台</td>
+          <td>KYC 审核</td>
+          <td><code>src/views/member/checkkyc/index.vue</code> → <code>/admin/kyc/kyc_list</code></td>
+      </tr>
+      <tr>
+          <td>后台</td>
+          <td>取得项目／资料</td>
+          <td><code>/admin/kyc/get_kyc_project</code>、<code>show_kyc_list</code></td>
+      </tr>
+      <tr>
+          <td>后台</td>
+          <td>通过／驳回／编辑</td>
+          <td><code>/admin/kyc/visit_kyc</code>、<code>kyc_reject</code>、<code>saveinfo</code></td>
+      </tr>
+      <tr>
+          <td>后台</td>
+          <td>客户详情独立地址证明</td>
+          <td><code>/admin/address_proof_review/index</code>、<code>add</code></td>
+      </tr>
+      <tr>
+          <td>客户</td>
+          <td>加载本人 KYC</td>
+          <td><code>POST /api/kyc/myinfo</code></td>
+      </tr>
+      <tr>
+          <td>客户</td>
+          <td>正式提交／暂存</td>
+          <td><code>POST /api/kyc/saveinfo</code>，<code>stash</code> 表示暂存</td>
+      </tr>
+      <tr>
+          <td>客户</td>
+          <td>撤回／驳回重提</td>
+          <td><code>POST /api/kyc/cancelinfo</code>、<code>resubmitinfo</code></td>
+      </tr>
+      <tr>
+          <td>客户</td>
+          <td>获取第三方链接</td>
+          <td><code>POST /api/kyc/kyc_link</code></td>
+      </tr>
+      <tr>
+          <td>客户</td>
+          <td>Sumsub 主动刷新</td>
+          <td><code>POST /api/kyc/refresh_kyc_info</code></td>
+      </tr>
+      <tr>
+          <td>第三方</td>
+          <td>审核回调</td>
+          <td><code>POST /api/kyc/kyc_webhook</code>、<code>idwise_kyc_webhook</code></td>
+      </tr>
+      <tr>
+          <td>定时任务</td>
+          <td>ZOLOZ 结果同步</td>
+          <td><code>App\Task\KycTask\ZolozTask</code>；后台另保留 <code>risk/Kyc/kyc_command</code> 历史轮询入口</td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="122-关键表与字段">12.2 关键表与字段</h3>
+<table>
+  <thead>
+      <tr>
+          <th>数据</th>
+          <th>用途</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>t_kyc_setting</code></td>
+          <td>KYC 规则；<code>form_id</code> 表单集合，<code>auto</code> 审核开关，<code>audit_method_json</code> 多渠道配置</td>
+      </tr>
+      <tr>
+          <td><code>t_kyc_regulatory_type</code></td>
+          <td>监管类型字典</td>
+      </tr>
+      <tr>
+          <td><code>t_system_form</code></td>
+          <td>表单模板及类型；<code>form_type</code> 是业务分类；<code>type</code> 另用于通过通知分类，两者不能混用</td>
+      </tr>
+      <tr>
+          <td><code>t_system_form_detail</code></td>
+          <td>题目、字段名、必填、选项、排序、只读等配置</td>
+      </tr>
+      <tr>
+          <td><code>t_system_form_type</code></td>
+          <td>表单／子步骤分类及旧状态 key 映射</td>
+      </tr>
+      <tr>
+          <td><code>t_kyc_user_content</code></td>
+          <td>每次表单提交、答案 JSON、单项状态、审核信息、三方旅程及题目快照</td>
+      </tr>
+      <tr>
+          <td><code>t_member</code></td>
+          <td>当前 KYC 规则、整体状态、<code>Iscertified</code> 及认证同步的会员资料</td>
+      </tr>
+      <tr>
+          <td><code>t_member_other</code></td>
+          <td>监管类型、通过档案快照、证件图片及敏感信息的相关存储字段</td>
+      </tr>
+      <tr>
+          <td><code>t_kyc_member_summary</code></td>
+          <td>一人一行的最后申请／审核信息，供列表筛选；它不决定整体状态</td>
+      </tr>
+      <tr>
+          <td><code>t_contract_agreements</code></td>
+          <td>KYC 协议签署与作废记录</td>
+      </tr>
+      <tr>
+          <td><code>t_address_proof</code></td>
+          <td>独立 POA，和 KYC 地址表单分开存储</td>
+      </tr>
+      <tr>
+          <td><code>t_identify</code></td>
+          <td>ZOLOZ 验证业务、会话与结果同步相关记录</td>
+      </tr>
+      <tr>
+          <td><code>t_kyc_level</code></td>
+          <td>保留的国家与认证等级映射维护能力；当前客户侧认证还要结合规则的多渠道配置</td>
+      </tr>
+      <tr>
+          <td><code>t_kyc_member_status</code></td>
+          <td>旧分项状态表，当前存在历史兼容使用，不作为整体状态的统一判定依据</td>
+      </tr>
+  </tbody>
+</table>
+<p>表结构依据：<a href="/Users/jalen/www/local/gtc_admin/docs/%E6%95%B0%E6%8D%AE%E5%AD%97%E5%85%B8.sql:2616">数据字典 KYC 部分</a>、<a href="/Users/jalen/www/local/gtc_admin/docs/%E6%95%B0%E6%8D%AE%E5%AD%97%E5%85%B8.sql:2969">会员字段</a>、<a href="/Users/jalen/www/local/gtc_admin/docs/%E6%95%B0%E6%8D%AE%E5%AD%97%E5%85%B8.sql:7583">表单定义</a>。</p>
+<h3 id="123-推荐阅读代码的顺序">12.3 推荐阅读代码的顺序</h3>
+<ol>
+<li>先读两端 <code>KycOverallStatusService</code>，掌握“整体通过”的唯一正常口径。</li>
+<li>再读客户侧 <code>saveInfoGtc</code>、<code>stashInfoGtc</code>、<code>resubmitKycInfo</code>，理解提交、草稿和重提。</li>
+<li>读后台 <code>visit_kyc</code>、<code>kyc_reject</code>、<code>saveinfo</code>，理解人工审核和资料修改。</li>
+<li>读 <code>kycFormDataSave</code> 和 Sumsub／IDwise／ZOLOZ 的结果处理，理解第三方分支。</li>
+<li>读全部通过处理、快照、独立 POA 和支付门禁，理解认证如何影响后续业务。</li>
+</ol>
+<p>注意后台有两个名字相同的 Service：<code>app\service\KycService</code> 负责本地 KYC 业务；<code>app\service\kyc\KycService</code> 负责第三方客户端封装等能力。客户侧主业务则在 <code>App\Service\crm\KycService</code>，是另一个项目的类。</p>
+<h2 id="13-本次校验与可执行的后续核对顺序">13. 本次校验与可执行的后续核对顺序</h2>
+<p>本次通过静态阅读交叉核对了前端 API、控制器、Service、Model／Repository、事件及定时任务、相关公共函数、配置项名称和数据字典。未修改 PHP 文件，未运行会启动应用或连接数据库的命令，也未执行真实审核、第三方回调或文件上传。</p>
+<p>若需要把这份说明进一步验证成某个实际环境的操作手册，按下面顺序进行：</p>
+<ol>
+<li>在测试环境核对启用规则、国家关联、个人／企业方案、当前模板和可见菜单。</li>
+<li>使用测试客户各跑一遍人工规则和个人自动规则；企业单独验证人工路径。</li>
+<li>对五类项目分别验证草稿、提交、通过、驳回、重提；尤其检查一项拒绝但其他项目未完成时总状态仍为 1。</li>
+<li>用第三方测试配置验证正常回调、重复回调、主动刷新、IDwise 人工改判和 ZOLOZ 任务运行；核对本地资料、文件与总状态。</li>
+<li>验证协议重提和姓名变化重签、已通过再驳回、后台编辑通过资料的实际页面行为。</li>
+<li>验证独立 POA、15 个文件额度及支付通道的 KYC／POA 两个门禁，最后核对测试环境实际表结构与字典差异。</li>
+</ol>
+<p>这些是后续联调顺序，不是本次已经执行的行为测试。</p>
+
+    </div>
+  </article>
+  
+    
+<aside class="sidebar">
+  <section class="sidebar_inner">
+    <br>
+    
+  
+  <div class="search">
+    <input type="search" class="search_field form_field" placeholder='搜索内容...' id="find" autocomplete="off" data-scope='gtc'>
+    <label for="find" class="search_label"><svg class="icon">
+  <title>search</title>
+  <use xlink:href="#search"></use>
+</svg>
+
+    </label>
+    
+    <div class="search_results results"></div>
+  </div>
+
+        <div class="author_header">
+          <img src="https://jianlin-li.github.io/images/fish-head.png" alt="李建林 photo">
+          <h2>李建林</h2>
+        </div>
+      <div class="author_bio">
+        PHP, Go, MySQL, Redis, RabbitMQ, Elasticsearch, Docker, Kubernetes, Shell
+      </div>
+      <a href='https://jianlin-li.github.io/about/' class="button mt-1" role="button" title='阅读更多'>阅读更多</a>
+
+    
+    <h2 class="mt-4">精选文章</h2>
+    <ul>
+      <li>
+        <a href="https://jianlin-li.github.io/post/jiagou-elk-stack/" class="nav-link" title="架构-使用ELK Stack在本地Macbookpro搭建一套日志收集并且可视化系统">架构-使用ELK Stack在本地Macbookpro搭建一套日志收集并且可视化系统</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/jiagou-prometheus-grafana/" class="nav-link" title="架构-Prometheus&#43;Grafana">架构-Prometheus+Grafana</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/jiagou-cicd-jenkins-argo/" class="nav-link" title="架构-基于JenKins的CI/CD平台之Argo CD">架构-基于JenKins的CI/CD平台之Argo CD</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/jiagou-cicd-jenkins/" class="nav-link" title="架构-基于JenKins的CI/CD平台">架构-基于JenKins的CI/CD平台</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/k8s_review_12/" class="nav-link" title="Kubernetes的知识库-12">Kubernetes的知识库-12</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/k8s_review_11/" class="nav-link" title="Kubernetes的知识库-11">Kubernetes的知识库-11</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/k8s_review_10/" class="nav-link" title="Kubernetes的知识库-10">Kubernetes的知识库-10</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/k8s_review_9/" class="nav-link" title="Kubernetes的知识库-9">Kubernetes的知识库-9</a>
+      </li>
+    </ul>
+    <h2 class="mt-4">最新文章</h2>
+    <ul class="flex-column">
+      <li>
+        <a href="https://jianlin-li.github.io/post/k8s_review_8/" class="nav-link" title="Kubernetes的知识库-8">Kubernetes的知识库-8</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/k8s_review_7/" class="nav-link" title="Kubernetes的知识库-7">Kubernetes的知识库-7</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/k8s_review_6/" class="nav-link" title="Kubernetes的知识库-6">Kubernetes的知识库-6</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/k8s_review_5/" class="nav-link" title="Kubernetes的知识库-5">Kubernetes的知识库-5</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/k8s_review_4/" class="nav-link" title="Kubernetes的知识库-4">Kubernetes的知识库-4</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/k8s_review_3/" class="nav-link" title="Kubernetes的知识库-3">Kubernetes的知识库-3</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/k8s_review_2/" class="nav-link" title="Kubernetes的知识库-2">Kubernetes的知识库-2</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/k8s_review_1/" class="nav-link" title="Kubernetes的知识库-1">Kubernetes的知识库-1</a>
+      </li>
+    </ul>
+    <div>
+      <h2 class="mt-4 taxonomy" id="categories-section">分类</h2>
+      <nav class="tags_nav">
+        <a href='https://jianlin-li.github.io/categories/kubernetes/' class="post_tag button button_translucent" title="kubernetes">
+          KUBERNETES
+          <span class="button_tally">13</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/categories/php%E8%AF%AD%E8%A8%80/' class="post_tag button button_translucent" title="php语言">
+          PHP语言
+          <span class="button_tally">7</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/categories/%E6%9E%B6%E6%9E%84/' class="post_tag button button_translucent" title="架构">
+          架构
+          <span class="button_tally">7</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/categories/go%E8%AF%AD%E8%A8%80/' class="post_tag button button_translucent" title="go语言">
+          GO语言
+          <span class="button_tally">6</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/categories/elasticsearch/' class="post_tag button button_translucent" title="elasticsearch">
+          ELASTICSEARCH
+          <span class="button_tally">5</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/categories/redis/' class="post_tag button button_translucent" title="redis">
+          REDIS
+          <span class="button_tally">5</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/categories/mysql/' class="post_tag button button_translucent" title="mysql">
+          MYSQL
+          <span class="button_tally">4</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/categories/rabbitmq/' class="post_tag button button_translucent" title="rabbitmq">
+          RABBITMQ
+          <span class="button_tally">4</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/categories/ci/cd/' class="post_tag button button_translucent" title="ci/cd">
+          CI/CD
+          <span class="button_tally">2</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/categories/git/' class="post_tag button button_translucent" title="git">
+          GIT
+          <span class="button_tally">2</span>
+        </a>
+        
+        
+        <br>
+        <div class="post_tags_toggle button">所有分类</div>
+        <div class="post_tags">
+          <div class="tags_list">
+            
+            <a href='https://jianlin-li.github.io/categories/argo/' class=" post_tag button button_translucent" data-position=1 title="argo">ARGO<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/centos7/' class=" post_tag button button_translucent" data-position=1 title="centos7">CENTOS7<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/ci/cd/' class=" post_tag button button_translucent" data-position=2 title="ci/cd">CI/CD<span class="button_tally">2</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/c%E8%AF%AD%E8%A8%80/' class=" post_tag button button_translucent" data-position=1 title="c语言">C语言<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/devops/' class=" post_tag button button_translucent" data-position=1 title="devops">DEVOPS<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/docker/' class=" post_tag button button_translucent" data-position=1 title="docker">DOCKER<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/elasticsearch/' class=" post_tag button button_translucent" data-position=5 title="elasticsearch">ELASTICSEARCH<span class="button_tally">5</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/elk/' class=" post_tag button button_translucent" data-position=1 title="elk">ELK<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/git/' class=" post_tag button button_translucent" data-position=2 title="git">GIT<span class="button_tally">2</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/go%E8%AF%AD%E8%A8%80/' class=" post_tag button button_translucent" data-position=6 title="go语言">GO语言<span class="button_tally">6</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/grafana/' class=" post_tag button button_translucent" data-position=1 title="grafana">GRAFANA<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/gtc/' class=" post_tag button button_translucent" data-position=2 title="gtc">GTC<span class="button_tally">2</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/gtcadmin/' class=" post_tag button button_translucent" data-position=1 title="gtcadmin">GTCADMIN<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/gtcuser/' class=" post_tag button button_translucent" data-position=1 title="gtcuser">GTCUSER<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/hugo/' class=" post_tag button button_translucent" data-position=1 title="hugo">HUGO<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/jenkins/' class=" post_tag button button_translucent" data-position=2 title="jenkins">JENKINS<span class="button_tally">2</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/kubernetes/' class=" post_tag button button_translucent" data-position=13 title="kubernetes">KUBERNETES<span class="button_tally">13</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/mkcert/' class=" post_tag button button_translucent" data-position=1 title="mkcert">MKCERT<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/mysql/' class=" post_tag button button_translucent" data-position=4 title="mysql">MYSQL<span class="button_tally">4</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/nginx/' class=" post_tag button button_translucent" data-position=1 title="nginx">NGINX<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/php%E8%AF%AD%E8%A8%80/' class=" post_tag button button_translucent" data-position=7 title="php语言">PHP语言<span class="button_tally">7</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/prometheus/' class=" post_tag button button_translucent" data-position=1 title="prometheus">PROMETHEUS<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/rabbitmq/' class=" post_tag button button_translucent" data-position=4 title="rabbitmq">RABBITMQ<span class="button_tally">4</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/redis/' class=" post_tag button button_translucent" data-position=5 title="redis">REDIS<span class="button_tally">5</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/shell/' class=" post_tag button button_translucent" data-position=2 title="shell">SHELL<span class="button_tally">2</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/web%E6%9C%8D%E5%8A%A1%E5%99%A8/' class=" post_tag button button_translucent" data-position=1 title="web服务器">WEB服务器<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/%E6%9C%AC%E5%9C%B0%E7%8E%AF%E5%A2%83/' class=" post_tag button button_translucent" data-position=2 title="本地环境">本地环境<span class="button_tally">2</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/%E5%A4%8D%E4%B9%A0/' class=" post_tag button button_translucent" data-position=1 title="复习">复习<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/%E5%8D%8E%E5%BE%AE%E4%B8%96%E7%BA%AA/' class=" post_tag button button_translucent" data-position=1 title="华微世纪">华微世纪<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/%E6%9E%B6%E6%9E%84/' class=" post_tag button button_translucent" data-position=7 title="架构">架构<span class="button_tally">7</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/%E6%95%99%E7%A8%8B/' class=" post_tag button button_translucent" data-position=1 title="教程">教程<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/%E8%A7%86%E9%A2%91/' class=" post_tag button button_translucent" data-position=1 title="视频">视频<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/%E4%B9%A6%E7%B1%8D/' class=" post_tag button button_translucent" data-position=1 title="书籍">书籍<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/%E7%AE%97%E6%B3%95/' class=" post_tag button button_translucent" data-position=1 title="算法">算法<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/%E8%87%AA%E7%AD%BE%E5%90%8D%E8%AF%81%E4%B9%A6/' class=" post_tag button button_translucent" data-position=1 title="自签名证书">自签名证书<span class="button_tally">1</span>
+            </a>
+            
+            <div class="tags_sort"><span title="sort alphabetically">[A~Z]</span><span title="sort by count">[0~9]</span>
+            </div>
+            <span class="tags_hide"><svg class="icon">
+            <use xlink:href="#closeme"></use>
+          </svg></span>
+          </div>
+        </div>
+      </nav>
+    </div>
+    <div>
+      <h2 class="mt-4 taxonomy" id="tags-section">标签</h2>
+      <nav class="tags_nav">
+        <a href='https://jianlin-li.github.io/tags/kubernetes/' class="post_tag button button_translucent" title="kubernetes">
+          KUBERNETES
+          <span class="button_tally">13</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/tags/php/' class="post_tag button button_translucent" title="php">
+          PHP
+          <span class="button_tally">7</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/tags/go/' class="post_tag button button_translucent" title="go">
+          GO
+          <span class="button_tally">6</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/tags/elasticsearch/' class="post_tag button button_translucent" title="elasticsearch">
+          ELASTICSEARCH
+          <span class="button_tally">5</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/tags/redis/' class="post_tag button button_translucent" title="redis">
+          REDIS
+          <span class="button_tally">5</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/tags/mysql/' class="post_tag button button_translucent" title="mysql">
+          MYSQL
+          <span class="button_tally">4</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/tags/rabbitmq/' class="post_tag button button_translucent" title="rabbitmq">
+          RABBITMQ
+          <span class="button_tally">4</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/tags/devops/' class="post_tag button button_translucent" title="devops">
+          DEVOPS
+          <span class="button_tally">3</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/tags/ci/cd/' class="post_tag button button_translucent" title="ci/cd">
+          CI/CD
+          <span class="button_tally">2</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/tags/git/' class="post_tag button button_translucent" title="git">
+          GIT
+          <span class="button_tally">2</span>
+        </a>
+        
+        
+        <br>
+        <div class="post_tags_toggle button">所有标签</div>
+        <div class="post_tags">
+          <div class="tags_list">
+            
+            <a href='https://jianlin-li.github.io/tags/argo/' class=" post_tag button button_translucent" data-position=1 title="argo">ARGO<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/centos7/' class=" post_tag button button_translucent" data-position=1 title="centos7">CENTOS7<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/ci/cd/' class=" post_tag button button_translucent" data-position=2 title="ci/cd">CI/CD<span class="button_tally">2</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/c%E8%AF%AD%E8%A8%80/' class=" post_tag button button_translucent" data-position=1 title="c语言">C语言<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/devops/' class=" post_tag button button_translucent" data-position=3 title="devops">DEVOPS<span class="button_tally">3</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/docker/' class=" post_tag button button_translucent" data-position=1 title="docker">DOCKER<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/elasticsearch/' class=" post_tag button button_translucent" data-position=5 title="elasticsearch">ELASTICSEARCH<span class="button_tally">5</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/elk/' class=" post_tag button button_translucent" data-position=1 title="elk">ELK<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/emoji/' class=" post_tag button button_translucent" data-position=1 title="emoji">EMOJI<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/git/' class=" post_tag button button_translucent" data-position=2 title="git">GIT<span class="button_tally">2</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/go/' class=" post_tag button button_translucent" data-position=6 title="go">GO<span class="button_tally">6</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/grafana/' class=" post_tag button button_translucent" data-position=1 title="grafana">GRAFANA<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/gtc/' class=" post_tag button button_translucent" data-position=2 title="gtc">GTC<span class="button_tally">2</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/gtcadmin/' class=" post_tag button button_translucent" data-position=1 title="gtcadmin">GTCADMIN<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/gtcuser/' class=" post_tag button button_translucent" data-position=1 title="gtcuser">GTCUSER<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/hosts/' class=" post_tag button button_translucent" data-position=1 title="hosts">HOSTS<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/hugo/' class=" post_tag button button_translucent" data-position=1 title="hugo">HUGO<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/jenkins/' class=" post_tag button button_translucent" data-position=2 title="jenkins">JENKINS<span class="button_tally">2</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/kubernetes/' class=" post_tag button button_translucent" data-position=13 title="kubernetes">KUBERNETES<span class="button_tally">13</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/markdown/' class=" post_tag button button_translucent" data-position=1 title="markdown">MARKDOWN<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/math/' class=" post_tag button button_translucent" data-position=1 title="math">MATH<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/mkcert/' class=" post_tag button button_translucent" data-position=1 title="mkcert">MKCERT<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/mysql/' class=" post_tag button button_translucent" data-position=4 title="mysql">MYSQL<span class="button_tally">4</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/nginx/' class=" post_tag button button_translucent" data-position=1 title="nginx">NGINX<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/notices/' class=" post_tag button button_translucent" data-position=1 title="notices">NOTICES<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/openstreetmap/' class=" post_tag button button_translucent" data-position=1 title="openstreetmap">OPENSTREETMAP<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/php/' class=" post_tag button button_translucent" data-position=7 title="php">PHP<span class="button_tally">7</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/prometheus/' class=" post_tag button button_translucent" data-position=1 title="prometheus">PROMETHEUS<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/rabbitmq/' class=" post_tag button button_translucent" data-position=4 title="rabbitmq">RABBITMQ<span class="button_tally">4</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/redis/' class=" post_tag button button_translucent" data-position=5 title="redis">REDIS<span class="button_tally">5</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/shell/' class=" post_tag button button_translucent" data-position=2 title="shell">SHELL<span class="button_tally">2</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/sql/' class=" post_tag button button_translucent" data-position=1 title="sql">SQL<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/web%E6%9C%8D%E5%8A%A1%E5%99%A8/' class=" post_tag button button_translucent" data-position=1 title="web服务器">WEB服务器<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/%E6%9C%AC%E5%9C%B0%E7%8E%AF%E5%A2%83/' class=" post_tag button button_translucent" data-position=1 title="本地环境">本地环境<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/%E5%A4%8D%E4%B9%A0/' class=" post_tag button button_translucent" data-position=1 title="复习">复习<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/%E6%95%99%E7%A8%8B/' class=" post_tag button button_translucent" data-position=1 title="教程">教程<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/%E4%B9%B1%E7%A0%81/' class=" post_tag button button_translucent" data-position=1 title="乱码">乱码<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/%E8%A7%86%E9%A2%91/' class=" post_tag button button_translucent" data-position=1 title="视频">视频<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/%E4%B9%A6%E7%B1%8D/' class=" post_tag button button_translucent" data-position=1 title="书籍">书籍<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/%E7%AE%97%E6%B3%95/' class=" post_tag button button_translucent" data-position=1 title="算法">算法<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6/' class=" post_tag button button_translucent" data-position=1 title="主从复制">主从复制<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/%E8%87%AA%E7%AD%BE%E5%90%8D%E8%AF%81%E4%B9%A6/' class=" post_tag button button_translucent" data-position=1 title="自签名证书">自签名证书<span class="button_tally">1</span>
+            </a>
+            
+            <div class="tags_sort"><span title="sort alphabetically">[A~Z]</span><span title="sort by count">[0~9]</span>
+            </div>
+            <span class="tags_hide"><svg class="icon">
+            <use xlink:href="#closeme"></use>
+          </svg></span>
+          </div>
+        </div>
+      </nav>
+    </div>
+  </section>
+</aside>
+
+  
+</div>
+
+<style>
+  .gtc-breadcrumb {
+    margin-bottom: 12px;
+    font-size: 0.9em;
+    opacity: 0.75;
+  }
+
+  .gtc-meta {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+</style>
+    </main><svg width="0" height="0" class="hidden">
+  <symbol viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" id="facebook">
+    <path d="M437 0H75C33.648 0 0 33.648 0 75v362c0 41.352 33.648 75 75 75h151V331h-60v-90h60v-61c0-49.629 40.371-90 90-90h91v90h-91v61h91l-15 90h-76v181h121c41.352 0 75-33.648 75-75V75c0-41.352-33.648-75-75-75zm0 0"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18.001 18.001" id="twitter">
+    <path d="M15.891 4.013c.808-.496 1.343-1.173 1.605-2.034a8.68 8.68 0 0 1-2.351.861c-.703-.756-1.593-1.14-2.66-1.14-1.043 0-1.924.366-2.643 1.078a3.56 3.56 0 0 0-1.076 2.605c0 .309.039.585.117.819-3.076-.105-5.622-1.381-7.628-3.837-.34.601-.51 1.213-.51 1.846 0 1.301.549 2.332 1.645 3.089-.625-.053-1.176-.211-1.645-.47 0 .929.273 1.705.82 2.388a3.623 3.623 0 0 0 2.115 1.291c-.312.08-.641.118-.979.118-.312 0-.533-.026-.664-.083.23.757.664 1.371 1.291 1.841a3.652 3.652 0 0 0 2.152.743C4.148 14.173 2.625 14.69.902 14.69c-.422 0-.721-.006-.902-.038 1.697 1.102 3.586 1.649 5.676 1.649 2.139 0 4.029-.542 5.674-1.626 1.645-1.078 2.859-2.408 3.639-3.974a10.77 10.77 0 0 0 1.172-4.892v-.468a7.788 7.788 0 0 0 1.84-1.921 8.142 8.142 0 0 1-2.11.593z"
+      ></path>
+  </symbol>
+  <symbol aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" id="mail">
+    <path  d="M502.3 190.8c3.9-3.1 9.7-.2 9.7 4.7V400c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V195.6c0-5 5.7-7.8 9.7-4.7 22.4 17.4 52.1 39.5 154.1 113.6 21.1 15.4 56.7 47.8 92.2 47.6 35.7.3 72-32.8 92.3-47.6 102-74.1 131.6-96.3 154-113.7zM256 320c23.2.4 56.6-29.2 73.4-41.4 132.7-96.3 142.8-104.7 173.4-128.7 5.8-4.5 9.2-11.5 9.2-18.9v-19c0-26.5-21.5-48-48-48H48C21.5 64 0 85.5 0 112v19c0 7.4 3.4 14.3 9.2 18.9 30.6 23.9 40.7 32.4 173.4 128.7 16.8 12.2 50.2 41.8 73.4 41.4z"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" id="calendar">
+    <path d="M452 40h-24V0h-40v40H124V0H84v40H60C26.916 40 0 66.916 0 100v352c0 33.084 26.916 60 60 60h392c33.084 0 60-26.916 60-60V100c0-33.084-26.916-60-60-60zm20 412c0 11.028-8.972 20-20 20H60c-11.028 0-20-8.972-20-20V188h432v264zm0-304H40v-48c0-11.028 8.972-20 20-20h24v40h40V80h264v40h40V80h24c11.028 0 20 8.972 20 20v48z"></path>
+    <path d="M76 230h40v40H76zm80 0h40v40h-40zm80 0h40v40h-40zm80 0h40v40h-40zm80 0h40v40h-40zM76 310h40v40H76zm80 0h40v40h-40zm80 0h40v40h-40zm80 0h40v40h-40zM76 390h40v40H76zm80 0h40v40h-40zm80 0h40v40h-40zm80 0h40v40h-40zm80-80h40v40h-40z"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" id="github">
+    <path d="M255.968 5.329C114.624 5.329 0 120.401 0 262.353c0 113.536 73.344 209.856 175.104 243.872 12.8 2.368 17.472-5.568 17.472-12.384 0-6.112-.224-22.272-.352-43.712-71.2 15.52-86.24-34.464-86.24-34.464-11.616-29.696-28.416-37.6-28.416-37.6-23.264-15.936 1.728-15.616 1.728-15.616 25.696 1.824 39.2 26.496 39.2 26.496 22.848 39.264 59.936 27.936 74.528 21.344 2.304-16.608 8.928-27.936 16.256-34.368-56.832-6.496-116.608-28.544-116.608-127.008 0-28.064 9.984-51.008 26.368-68.992-2.656-6.496-11.424-32.64 2.496-68 0 0 21.504-6.912 70.4 26.336 20.416-5.696 42.304-8.544 64.096-8.64 21.728.128 43.648 2.944 64.096 8.672 48.864-33.248 70.336-26.336 70.336-26.336 13.952 35.392 5.184 61.504 2.56 68 16.416 17.984 26.304 40.928 26.304 68.992 0 98.72-59.84 120.448-116.864 126.816 9.184 7.936 17.376 23.616 17.376 47.584 0 34.368-.32 62.08-.32 70.496 0 6.88 4.608 14.88 17.6 12.352C438.72 472.145 512 375.857 512 262.353 512 120.401 397.376 5.329 255.968 5.329z"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 212 212" id="gitlab">
+    <path d="M12.3 74.7h54L43.3 3c-1-3.6-6.4-3.6-7.6 0L12.3 74.8z" />
+    <path d="M12.3 74.7L.5 111c-1 3.2 0 6.8 3 8.8l101.6 74-92.5-119z"/>
+    <path d="M105 193.7l-38.6-119h-54l92.7 119z"/>
+    <path d="M105 193.7l38.7-119H66.4l38.7 119z"/>
+    <path d="M105 193.7l38.7-119H198l-93 119z"/>
+    <path d="M198 74.7l11.6 36.2c1 3 0 6.6-3 8.6l-101.5 74 93-119z"/>
+    <path d="M198 74.7h-54.3L167 3c1.2-3.6 6.4-3.6 7.6 0L198 74.8z"/>
+  </symbol>
+  <symbol viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" id="rss">
+    <circle cx="3.429" cy="20.571" r="3.429"></circle>
+    <path d="M11.429 24h4.57C15.999 15.179 8.821 8.001 0 8v4.572c6.302.001 11.429 5.126 11.429 11.428z"></path>
+    <path d="M24 24C24 10.766 13.234 0 0 0v4.571c10.714 0 19.43 8.714 19.43 19.429z"></path>
+  </symbol>
+  <symbol viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" id="linkedin">
+    <path d="M437 0H75C33.648 0 0 33.648 0 75v362c0 41.352 33.648 75 75 75h362c41.352 0 75-33.648 75-75V75c0-41.352-33.648-75-75-75zM181 406h-60V196h60zm0-240h-60v-60h60zm210 240h-60V286c0-16.54-13.46-30-30-30s-30 13.46-30 30v120h-60V196h60v11.309C286.719 202.422 296.93 196 316 196c40.691.043 75 36.547 75 79.688zm0 0"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 612 612" id="to-top">
+    <path d="M604.501 440.509L325.398 134.956c-5.331-5.357-12.423-7.627-19.386-7.27-6.989-.357-14.056 1.913-19.387 7.27L7.499 440.509c-9.999 10.024-9.999 26.298 0 36.323s26.223 10.024 36.222 0l262.293-287.164L568.28 476.832c9.999 10.024 26.222 10.024 36.221 0 9.999-10.023 9.999-26.298 0-36.323z"></path>
+  </symbol>
+  <symbol viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" id="carly">
+    <path d="M504.971 239.029L448 182.059V84c0-46.317-37.682-84-84-84h-44c-13.255 0-24 10.745-24 24s10.745 24 24 24h44c19.851 0 36 16.149 36 36v108c0 6.365 2.529 12.47 7.029 16.971L454.059 256l-47.029 47.029A24.002 24.002 0 0 0 400 320v108c0 19.851-16.149 36-36 36h-44c-13.255 0-24 10.745-24 24s10.745 24 24 24h44c46.318 0 84-37.683 84-84v-98.059l56.971-56.971c9.372-9.372 9.372-24.568 0-33.941zM112 192V84c0-19.851 16.149-36 36-36h44c13.255 0 24-10.745 24-24S205.255 0 192 0h-44c-46.318 0-84 37.683-84 84v98.059l-56.971 56.97c-9.373 9.373-9.373 24.568 0 33.941L64 329.941V428c0 46.317 37.682 84 84 84h44c13.255 0 24-10.745 24-24s-10.745-24-24-24h-44c-19.851 0-36-16.149-36-36V320c0-6.365-2.529-12.47-7.029-16.971L57.941 256l47.029-47.029A24.002 24.002 0 0 0 112 192z"></path>
+  </symbol>
+  <symbol viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" id="copy">
+    <path d="M23 2.75A2.75 2.75 0 0 0 20.25 0H8.75A2.75 2.75 0 0 0 6 2.75v13.5A2.75 2.75 0 0 0 8.75 19h11.5A2.75 2.75 0 0 0 23 16.25zM18.25 14.5h-7.5a.75.75 0 0 1 0-1.5h7.5a.75.75 0 0 1 0 1.5zm0-3h-7.5a.75.75 0 0 1 0-1.5h7.5a.75.75 0 0 1 0 1.5zm0-3h-7.5a.75.75 0 0 1 0-1.5h7.5a.75.75 0 0 1 0 1.5z"></path>
+    <path d="M8.75 20.5a4.255 4.255 0 0 1-4.25-4.25V2.75c0-.086.02-.166.025-.25H3.75A2.752 2.752 0 0 0 1 5.25v16A2.752 2.752 0 0 0 3.75 24h12a2.752 2.752 0 0 0 2.75-2.75v-.75z"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512.001 512.001" id="closeme">
+    <path d="M284.286 256.002L506.143 34.144c7.811-7.811 7.811-20.475 0-28.285-7.811-7.81-20.475-7.811-28.285 0L256 227.717 34.143 5.859c-7.811-7.811-20.475-7.811-28.285 0-7.81 7.811-7.811 20.475 0 28.285l221.857 221.857L5.858 477.859c-7.811 7.811-7.811 20.475 0 28.285a19.938 19.938 0 0 0 14.143 5.857 19.94 19.94 0 0 0 14.143-5.857L256 284.287l221.857 221.857c3.905 3.905 9.024 5.857 14.143 5.857s10.237-1.952 14.143-5.857c7.811-7.811 7.811-20.475 0-28.285L284.286 256.002z"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" id="open-menu">
+    <path d="M492 236H20c-11.046 0-20 8.954-20 20s8.954 20 20 20h472c11.046 0 20-8.954 20-20s-8.954-20-20-20zm0-160H20C8.954 76 0 84.954 0 96s8.954 20 20 20h472c11.046 0 20-8.954 20-20s-8.954-20-20-20zm0 320H20c-11.046 0-20 8.954-20 20s8.954 20 20 20h472c11.046 0 20-8.954 20-20s-8.954-20-20-20z"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" id="instagram">
+    <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" id=youtube>
+    <path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" id="stackoverflow">
+    <path d="M21 27v-8h3v11H0V19h3v8h18z"></path><path d="M17.1.2L15 1.8l7.9 10.6 2.1-1.6L17.1.2zm3.7 14.7L10.6 6.4l1.7-2 10.2 8.5-1.7 2zM7.2 12.3l12 5.6 1.1-2.4-12-5.6-1.1 2.4zm-1.8 6.8l13.56 1.96.17-2.38-13.26-2.55-.47 2.97zM19 25H5v-3h14v3z"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" id="xing">
+    <path d="M18.188 0c-.517 0-.741.325-.927.66 0 0-7.455 13.224-7.702 13.657.015.024 4.919 9.023 4.919 9.023.17.308.436.66.967.66h3.454c.211 0 .375-.078.463-.22.089-.151.089-.346-.009-.536l-4.879-8.916c-.004-.006-.004-.016 0-.022L22.139.756c.095-.191.097-.387.006-.535C22.056.078 21.894 0 21.686 0h-3.498zM3.648 4.74c-.211 0-.385.074-.473.216-.09.149-.078.339.02.531l2.34 4.05c.004.01.004.016 0 .021L1.86 16.051c-.099.188-.093.381 0 .529.085.142.239.234.45.234h3.461c.518 0 .766-.348.945-.667l3.734-6.609-2.378-4.155c-.172-.315-.434-.659-.962-.659H3.648v.016z"/>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 71 55" id="discord">
+    <path d="M60.1045 4.8978C55.5792 2.8214 50.7265 1.2916 45.6527 0.41542C45.5603 0.39851 45.468 0.440769 45.4204 0.525289C44.7963 1.6353 44.105 3.0834 43.6209 4.2216C38.1637 3.4046 32.7345 3.4046 27.3892 4.2216C26.905 3.0581 26.1886 1.6353 25.5617 0.525289C25.5141 0.443589 25.4218 0.40133 25.3294 0.41542C20.2584 1.2888 15.4057 2.8186 10.8776 4.8978C10.8384 4.9147 10.8048 4.9429 10.7825 4.9795C1.57795 18.7309 -0.943561 32.1443 0.293408 45.3914C0.299005 45.4562 0.335386 45.5182 0.385761 45.5576C6.45866 50.0174 12.3413 52.7249 18.1147 54.5195C18.2071 54.5477 18.305 54.5139 18.3638 54.4378C19.7295 52.5728 20.9469 50.6063 21.9907 48.5383C22.0523 48.4172 21.9935 48.2735 21.8676 48.2256C19.9366 47.4931 18.0979 46.6 16.3292 45.5858C16.1893 45.5041 16.1781 45.304 16.3068 45.2082C16.679 44.9293 17.0513 44.6391 17.4067 44.3461C17.471 44.2926 17.5606 44.2813 17.6362 44.3151C29.2558 49.6202 41.8354 49.6202 53.3179 44.3151C53.3935 44.2785 53.4831 44.2898 53.5502 44.3433C53.9057 44.6363 54.2779 44.9293 54.6529 45.2082C54.7816 45.304 54.7732 45.5041 54.6333 45.5858C52.8646 46.6197 51.0259 47.4931 49.0921 48.2228C48.9662 48.2707 48.9102 48.4172 48.9718 48.5383C50.038 50.6034 51.2554 52.5699 52.5959 54.435C52.6519 54.5139 52.7526 54.5477 52.845 54.5195C58.6464 52.7249 64.529 50.0174 70.6019 45.5576C70.6551 45.5182 70.6887 45.459 70.6943 45.3942C72.1747 30.0791 68.2147 16.7757 60.1968 4.9823C60.1772 4.9429 60.1437 4.9147 60.1045 4.8978ZM23.7259 37.3253C20.2276 37.3253 17.3451 34.1136 17.3451 30.1693C17.3451 26.225 20.1717 23.0133 23.7259 23.0133C27.308 23.0133 30.1626 26.2532 30.1066 30.1693C30.1066 34.1136 27.28 37.3253 23.7259 37.3253ZM47.3178 37.3253C43.8196 37.3253 40.9371 34.1136 40.9371 30.1693C40.9371 26.225 43.7636 23.0133 47.3178 23.0133C50.9 23.0133 53.7545 26.2532 53.6986 30.1693C53.6986 34.1136 50.9 37.3253 47.3178 37.3253Z"/>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 17 18" id="mastodon">
+    <path
+    fill="#ffffff"
+    d="m 15.054695,9.8859583 c -0.22611,1.1632697 -2.02517,2.4363497 -4.09138,2.6830797 -1.0774504,0.12856 -2.1382704,0.24673 -3.2694704,0.19484 -1.84996,-0.0848 -3.30971,-0.44157 -3.30971,-0.44157 0,0.1801 0.0111,0.35157 0.0333,0.51194 0.24051,1.82571 1.81034,1.93508 3.29737,1.98607 1.50088,0.0514 2.8373104,-0.37004 2.8373104,-0.37004 l 0.0617,1.35686 c 0,0 -1.0498104,0.56374 -2.9199404,0.66742 -1.03124,0.0567 -2.3117,-0.0259 -3.80308,-0.42069 -3.23454998,-0.85613 -3.79081998,-4.304 -3.87592998,-7.8024197 -0.026,-1.03871 -0.01,-2.01815 -0.01,-2.83732 0,-3.57732 2.34385998,-4.62587996 2.34385998,-4.62587996 1.18184,-0.54277 3.20976,-0.77101 5.318,-0.7882499985409 h 0.0518 C 9.8267646,0.01719834 11.856025,0.24547834 13.037775,0.78824834 c 0,0 2.34377,1.04855996 2.34377,4.62587996 0,0 0.0294,2.63937 -0.32687,4.47183"/>
+ <path
+    fill="#000000"
+    d="m 12.616925,5.6916583 v 4.3315297 h -1.71607 V 5.8189683 c 0,-0.88624 -0.37289,-1.33607 -1.1187604,-1.33607 -0.82467,0 -1.23799,0.53361 -1.23799,1.58875 v 2.30122 h -1.70594 v -2.30122 c 0,-1.05514 -0.4134,-1.58875 -1.23808,-1.58875 -0.74587,0 -1.11876,0.44983 -1.11876,1.33607 v 4.2042197 h -1.71607 V 5.6916583 c 0,-0.88527 0.22541,-1.58876 0.67817,-2.10922 0.46689,-0.52047 1.07833,-0.78727 1.83735,-0.78727 0.87816,0 1.54317,0.33752 1.98288,1.01267 l 0.42744,0.71655 0.42753,-0.71655 c 0.43961,-0.67515 1.10463,-1.01267 1.9828704,-1.01267 0.75893,0 1.37037,0.2668 1.83735,0.78727 0.45268,0.52046 0.67808,1.22395 0.67808,2.10922"/>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 530" id="bluesky" >
+    <path d="m135.72 44.03c66.496 49.921 138.02 151.14 164.28 205.46 26.262-54.316 97.782-155.54 164.28-205.46 47.98-36.021 125.72-63.892 125.72 24.795 0 17.712-10.155 148.79-16.111 170.07-20.703 73.984-96.144 92.854-163.25 81.433 117.3 19.964 147.14 86.092 82.697 152.22-122.39 125.59-175.91-31.511-189.63-71.766-2.514-7.3797-3.6904-10.832-3.7077-7.8964-0.0174-2.9357-1.1937 0.51669-3.7077 7.8964-13.714 40.255-67.233 197.36-189.63 71.766-64.444-66.128-34.605-132.26 82.697-152.22-67.108 11.421-142.55-7.4491-163.25-81.433-5.9562-21.282-16.111-152.36-16.111-170.07 0-88.687 77.742-60.816 125.72-24.795z"/>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" id="ko-fi">
+    <path fill="#ffffff" d="M4.5,9.8527H32.7947a0,0,0,0,1,0,0v19.225a9.07,9.07,0,0,1-9.07,9.07H13.57a9.07,9.07,0,0,1-9.07-9.07V9.8527A0,0,0,0,1,4.5,9.8527Z"/>
+    <path fill="#000000" d="M12.197,25.9493l6.45,6.45,6.45-6.45a8.2,8.2,0,0,0,2.4016-5.798h0a4.5082,4.5082,0,0,0-4.212-4.5459,4.4262,4.4262,0,0,0-4.64,4.4209,4.4261,4.4261,0,0,0-4.64-4.4209,4.5082,4.5082,0,0,0-4.212,4.5459h0A8.2,8.2,0,0,0,12.197,25.9493Z"/>
+    <path fill="#ffffff" d="M32.7947,9.8527H35.73a7.77,7.77,0,0,1,0,15.5394H32.7947"/>
+  </svg>
+  </symbol>
+</svg>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha512-aOFyMMzZF7l7ei3vOKgQiRhZnYqk9YC/uMzl4T0j5N5D3Kul+QAFU8ssENDRMAqr/lxDOjMF69dSYJ8HYqY+WQ==" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" integrity="sha512-UPFOadao2nEorjtjl0xUTtN3w20Ja143UPEU6EyJ1mi5MB2bDtMkiWmqGDqi47xNLB5z1dy31GKJDEWhjUJFiQ==" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" integrity="sha512-YJVxTjqttjsU3cSvaTRqsSl0wbRgZUNF+NGGCgto/MUbIvaLdXQzGTCQu4CvyJZbZctgflVB0PXw9LLmTWm5/w==" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
+<footer class="footer">
+  <div class="footer_inner wrap pale">
+    <img src='https://jianlin-li.github.io/icons/apple-touch-icon.png' class="icon icon_2 transparent" alt="Copyright © 1989–2025, 李建林 ">
+    <p>Copyright&nbsp;1989-&nbsp;<span class="year"></span>&nbsp;COPYRIGHT © 1989–2025, 李建林 . All Rights Reserved</p><a class="to_top" href="#documentTop">
+  <svg class="icon">
+  <title>to-top</title>
+  <use xlink:href="#to-top"></use>
+</svg>
+
+</a>
+
+  </div>
+</footer>
+
+<script type="text/javascript" src="https://jianlin-li.github.io/zh-cn/js/bundle.e4e0e4fbe8acb50d7f973828f4138cdbea727800047fc93f9abbd6751e8f3422d6ef193f98da36fdb8488219c25692d73da89480f46abc8421a4ee3526dd6c23.js" integrity="sha512-5ODk&#43;&#43;istQ1/lzgo9BOM2&#43;pyeAAEf8k/mrvWdR6PNCLW7xk/mNo2/bhIghnCVpLXPaiUgPRqvIQhpO41Jt1sIw==" crossorigin="anonymous"></script>
+
+  <script src="https://jianlin-li.github.io/js/search.min.4c2b0421d128bbd7c43fc7d662fb5dfd8e439c60ee92c900a26d72d9c3271d2256f5bac9f6f919cddfd55101e9272898716cbb3381b4360bf43a66a5f7664f54.js"></script>
+
+  </body>
+</html>
