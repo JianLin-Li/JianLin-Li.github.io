@@ -249,7 +249,7 @@
     <h1 class="post_title">Kyc功能梳理与完整流程</h1>
     <div class="post_meta gtc-meta">
       <span class="post_date">
-        2026-10-27
+        2026-10-28
       </span>
       <span>项目：gtc_admin</span>
     </div>
@@ -257,7 +257,8 @@
     <div class="post_body">
       <h1 id="kyc-功能梳理与完整流程">KYC 功能梳理与完整流程</h1>
 <p>适用读者：刚接触项目的产品、运营、审核人员和开发人员。梳理日期：2026-10-27。</p>
-<p>本文依据当前工作区的 <code>gtc_admin</code> 后台后端、<code>gtc_admin_vue</code> 后台前端，以及 <code>gtcuser</code> 客户侧后端代码整理。没有读取生产数据库，也没有调用第三方认证服务；“当前实现”指本地代码实现，不代表生产已部署或启用全部能力。<strong>未修改业务代码，仅新增说明文档和流程图。</strong></p>
+<p>本文依据当前工作区的 <code>gtc_admin</code> 后台后端、<code>gtc_admin_vue</code> 后台前端，以及 <code>gtcuser</code> 客户侧后端代码整理。没有读取生产数据库，也没有调用第三方认证服务；“当前实现”指本地代码实现，不代表生产已部署或启用全部能力。<strong>未修改业务代码；本次在原文档上补充数据表、调用链、异常分支和流程图。</strong></p>
+<p>阅读建议：先看第 3～8 节理解业务，再看第 12 节的逐表说明、操作读写矩阵和表关系图。图中 <code>R</code> 表示读取、<code>W</code> 表示新增／修改，<code>R/W</code> 表示两者都有；均使用实际 <code>t_</code> 表名。一次动作是否访问辅助表，以分支和配置为准。</p>
 <h2 id="1-kyc-到底是什么">1. KYC 到底是什么</h2>
 <p>KYC 是 <strong>Know Your Customer</strong>，中文通常叫“了解你的客户”或“客户身份尽职调查”。在这个项目里，它是一套客户资料收集、身份验证、资料审核、协议签署和认证结果管理功能。</p>
 <p>可以用一个例子理解：客户注册了账号，只能说明系统建立了一个账号；完成 KYC，则表示客户按当前分配的认证方案提交了要求的材料，并且这些必需项目的最新记录全部审核通过。</p>
@@ -345,58 +346,44 @@
 <h2 id="3-完整业务总流程图">3. 完整业务总流程图</h2>
 <p>这是项目主流程的业务视图。各认证项目来自当前规则，按配置展示；图中的循环表示逐项处理，不表示后端强制所有客户按固定的五步顺序执行。</p>
 <div class="mermaid">flowchart TB
-    subgraph CFG[阶段 A：后台准备认证方案]
-        A1[维护监管类型] --&gt; A2[建立表单模板：题目、必填项、排序、协议]
-        A2 --&gt; A3[建立 KYC 规则：个人或企业、审核项目、人工或自动]
-        A3 --&gt; A4[自动规则配置渠道和默认项：Sumsub、IDwise、ZOLOZ]
-        A4 --&gt; A5[关联国家：个人规则与企业规则分别维护]
+    subgraph CFG[阶段 A：后台准备]
+        A1[&#34;维护监管类型&lt;br/&gt;R/W t_kyc_regulatory_type&#34;] --&gt; A2[&#34;维护五类表单、字段、协议模板&lt;br/&gt;R/W t_system_form、t_system_form_detail&lt;br/&gt;R t_system_form_type&#34;]
+        A2 --&gt; A3[&#34;建立个人／企业规则和审核渠道&lt;br/&gt;R/W t_kyc_setting&#34;]
+        A3 --&gt; A4[&#34;按国家关联个人／企业规则&lt;br/&gt;R t_country；W t_kyc_setting.country_list&#34;]
     end
-    subgraph START[阶段 B：给客户分配方案]
-        B1[客户注册或后台调整未通过客户的规则] --&gt; B2[按国家、个人或企业身份匹配启用规则]
-        B2 --&gt; B3{是否找到规则？}
-        B3 --&gt;|否| B4[无法取得认证表单；联系管理员核对配置]
-        B3 --&gt;|是| B5[保存会员当前 KYC 规则；加载审核项目]
+    A4 --&gt; B1
+    subgraph START[阶段 B：分配方案]
+        B1[&#34;注册时匹配国家和个人／企业身份&lt;br/&gt;R t_kyc_setting、t_country&#34;] --&gt; B2{找到启用规则？}
+        B2 --&gt;|否| B3[无法加载要求；核对国家关联]
+        B2 --&gt;|是| B4[&#34;保存会员当前方案；加载必需表单&lt;br/&gt;W t_member.kyc_id&lt;br/&gt;R t_system_form、t_system_form_detail&#34;]
     end
-    A5 --&gt; B1
-    B5 --&gt; C1
-    subgraph SUBMIT[阶段 C：客户填写并提交项目]
-        C1[选择一项：基本信息、身份、问卷、协议或地址]
-        C1 --&gt; C2{保存草稿还是提交？}
-        C2 --&gt;|草稿| C3[单项状态 0；尚未正式进入审核]
-        C2 --&gt;|提交| C4[校验必填和格式；协议项目生成签署文件及记录]
-        C4 --&gt; C5{个人且规则开启自动？}
-        C5 --&gt;|否：人工规则或企业| C6[单项状态 1；后台人工审核]
-        C5 --&gt;|是| C7{项目类型}
-        C7 --&gt;|基本信息、问卷、客户协议| C8[系统直接通过；审核方式 auto]
-        C7 --&gt;|身份信息| C9[所选第三方进行身份或证件验证]
-        C7 --&gt;|地址证明| C10{地址验证渠道}
-        C10 --&gt;|Sumsub 或 IDwise| C11[第三方进行地址验证]
-        C10 --&gt;|ZOLOZ 路线| C6
+    B4 --&gt; C1
+    subgraph FILL[阶段 C：填写、上传和签署]
+        C1[&#34;逐项填写；按需上传附件&lt;br/&gt;R 模板；R/W t_kyc_user_content&lt;br/&gt;上传路径可写 t_attach、t_mine_attachment&#34;] --&gt; C2{保存方式}
+        C2 --&gt;|草稿| C3[&#34;W t_kyc_user_content：0&lt;br/&gt;尚未正式提交&#34;]
+        C2 --&gt;|正式提交| C4[&#34;校验并新建提交、题目快照&lt;br/&gt;W t_kyc_user_content；协议额外写&lt;br/&gt;t_contract_agreements、t_member_security_activity&#34;]
+        C4 --&gt; C5{审核路线}
     end
-    C6 --&gt; D1
-    C9 --&gt; D2
-    C11 --&gt; D2
-    subgraph REVIEW[阶段 D：审核和结果同步]
-        D1[审核员核对资料，选择通过或驳回] --&gt; D3{单项结果}
-        D2[回调或主动查询／定时任务获取结果；校验本地业务条件] --&gt; D3
-        D3 --&gt;|通过| D4[单项状态 9；同步适用的会员资料与文件]
-        D3 --&gt;|拒绝| D5[单项状态 -1；保存驳回原因]
-        D3 --&gt;|未完成或同步未成功| D6[保持当前待处理状态；继续验证或排查同步]
-        D5 --&gt; D7[客户重新提交：保留旧记录，新建草稿；三方业务编号递增]
-        D5 --&gt; D8[后台修改被驳回资料：转回待审核，审核方式 manual]
+    C5 --&gt;|人工规则／企业／需人工的地址项| D1
+    C5 --&gt;|个人自动：基本信息、问卷、协议| D3
+    C5 --&gt;|个人自动：身份／可用地址渠道| D2
+    subgraph REVIEW[阶段 D：单项审核]
+        D1[&#34;人工核对、通过／驳回&lt;br/&gt;R 当前资料、权限和字典&lt;br/&gt;W t_kyc_user_content；按字段更新会员资料&#34;]
+        D2[&#34;第三方链接、回调、刷新或轮询&lt;br/&gt;R/W t_kyc_user_content；R t_kyc_member_other&lt;br/&gt;ZOLOZ 另 R/W t_identify&#34;]
+        D3[&#34;本地自动通过或审核结果落库&lt;br/&gt;W t_kyc_user_content：9／-1&lt;br/&gt;通过按需 W t_member、t_member_other&#34;]
+        D1 --&gt; D3
+        D2 --&gt; D3
+        D2 --&gt;|未完成／同步失败| WAIT[继续认证或排查；不能据此判定通过]
+        D3 --&gt;|拒绝后重提| RETRY[&#34;保留原记录，新建草稿 0&lt;br/&gt;W t_kyc_user_content、t_kyc_member_other&#34;]
     end
-    C8 --&gt; E1
-    D4 --&gt; E1
-    D5 --&gt; E1
-    subgraph DONE[阶段 E：汇总会员整体状态和后续业务]
-        E1[按当前规则内启用表单的最新记录，重算会员总状态]
-        E1 --&gt; E2{所有必需项目是否全部通过？}
-        E2 --&gt;|否| E3[未提交 0／进行中 1／未认证 2；按未完成项目继续处理]
-        E2 --&gt;|是| E4[整体 KYC 状态 9；Iscertified 为 1]
-        E4 --&gt; E5[保存通过档案快照、同步监管类型、发送成功通知]
-        E5 --&gt; E6[进入后续业务；仍按各业务规则检查 KYC、POA 和其他条件]
-    end
-    D4 -.后台再次驳回须谷歌验证码.-&gt; D5</div>
+    D3 --&gt; E1
+    subgraph RESULT[阶段 E：汇总、归档和业务使用]
+        E1[&#34;读取当前规则、启用表单及最新记录&lt;br/&gt;R t_member、t_kyc_setting&lt;br/&gt;t_system_form、t_kyc_user_content&#34;] --&gt; E2[&#34;刷新整体 0／1／2／9 和 Iscertified&lt;br/&gt;W t_member、t_kyc_member_summary&#34;]
+        E2 --&gt; E3{本次是否进入全部通过处理？}
+        E3 --&gt;|否| E4[按尚未完成／驳回项目继续]
+        E3 --&gt;|是| E5[&#34;保存档案快照、同步监管类型&lt;br/&gt;W t_member_other；按入口触发通知／补发赠金&#34;]
+        E5 --&gt; E6[&#34;后续业务读取 KYC／POA&lt;br/&gt;R t_member、t_member_other、t_address_proof&lt;br/&gt;及 t_kyc_user_content；支付另读 t_wallet&#34;]
+    end</div>
 <p>图中“草稿”“重新提交”“后台修订”“继续补齐”都需要回到对应填写／审核阶段，回路细节见下方单项状态图。</p>
 <h3 id="31-阶段-a后台配置">3.1 阶段 A：后台配置</h3>
 <p>后台需要准备以下内容：</p>
@@ -464,49 +451,39 @@
       </tr>
   </tbody>
 </table>
+<p>企业还有一处容易混淆的实现：当方案 <code>auto=1</code> 且提交企业基本信息中的 <code>company_country</code> 时，提交方法可能先把公司注册国家写入 <code>t_member.country</code>；这不改变“企业单项仍为待人工审核”的结论。不能用某个会员资料字段已更新，反推表单已通过。</p>
 <p>依据：<a href="/Users/jalen/www/local/gtcuser/app/Model/Enums/Crm/FormTypesEnum.php:26">表单类型枚举</a>、<a href="/Users/jalen/www/local/gtcuser/app/Service/crm/KycService.php:2400">正式提交分流</a>、<a href="/Users/jalen/www/local/gtcuser/app/Service/crm/KycService.php:2818">第三方链接分流</a>。</p>
 <h3 id="41-身份验证与地址验证的细分图">4.1 身份验证与地址验证的细分图</h3>
 <div class="mermaid">flowchart TB
-    A[处理身份信息或地址证明] --&gt; B{企业账户或人工规则？}
-    B --&gt;|是| M[资料提交为待审 1；后台审核]
-    B --&gt;|否：个人自动规则| C{本次验证项目}
-    C --&gt;|身份信息| I{选用的认证渠道}
-    I --&gt;|Sumsub| S1[使用配置的 level_name；获取 WebSDK 链接]
-    I --&gt;|IDwise| W1[使用配置的 flow_id；取得 journey_id 和认证链接]
-    I --&gt;|ZOLOZ| Z1[按配置选择证件或身份验证；取得 transactionId]
-    C --&gt;|地址证明| P{可用地址渠道}
-    P --&gt;|Sumsub| S2[使用地址验证等级；提交地址材料]
-    P --&gt;|IDwise| W2[按流程配置提交地址材料]
-    P --&gt;|ZOLOZ 路线| M
-    S1 --&gt; S3[客户完成第三方页面操作]
-    S2 --&gt; S3
-    S3 --&gt; S4[接收已完成的 Webhook；或客户主动刷新 Sumsub 结果]
-    S4 --&gt; S5{第三方结果}
-    S5 --&gt;|GREEN| S6[按身份／地址子项读取本次资料和文件]
-    S5 --&gt;|RED| R[保存相关项目的驳回结果与原因]
-    S5 --&gt;|未完成| WAIT[继续等待；第三方页面关闭不等于本地通过]
-    W1 --&gt; W3[客户完成 IDwise 认证]
-    W2 --&gt; W3
-    W3 --&gt; W4[Finished Journey 回调；查询完整旅程结果]
-    W4 --&gt; W5[分别校验身份、地址的文件结果及规则；身份还检查已返回的人脸结果]
-    W5 --&gt;|通过| L
-    W5 --&gt;|未通过或 Refer 等| R
-    W4 --&gt;|Incomplete| WAIT
-    W3 -.第三方后台人工改判.-&gt; W6[Updated Journey：处理 Approve 的已审核步骤]
-    W6 --&gt; W7[匹配同一旅程的驳回记录；提取必要资料后同步通过]
-    W7 --&gt; L
-    Z1 --&gt; Z2[客户完成 ZOLOZ 操作]
-    Z2 --&gt; Z3[启用的 ZolozTask 定时查询近 24 小时未缓存结果]
-    Z3 --&gt;|Success| L
-    Z3 --&gt;|Fail| R
-    Z3 --&gt;|InProcess 或无结果| WAIT
-    S6 --&gt; L[执行本地资料校验、保存证件／地址资料及文件]
-    L --&gt; K{本地条件是否满足？}
-    K --&gt;|否，如证件绑定数量超限| R
-    K --&gt;|是| PASS[对应项目状态 9；重算整体状态]
-    M --&gt;|通过| PASS
-    M --&gt;|驳回| R
-    R --&gt; RETRY[客户重提或后台修订，再次进入审核]</div>
+    A[&#34;身份／地址认证&lt;br/&gt;R t_member、t_kyc_setting&lt;br/&gt;t_system_form、t_kyc_user_content&#34;] --&gt; B{企业或人工规则？}
+    B --&gt;|是| M[&#34;提交待审 1，走后台&lt;br/&gt;W t_kyc_user_content&#34;]
+    B --&gt;|否| C{认证渠道及项目}
+    C --&gt;|Sumsub 身份／地址| S1[&#34;读等级和业务编号，取得链接&lt;br/&gt;R t_kyc_setting、t_kyc_member_other&#34;]
+    C --&gt;|IDwise 身份／地址| W1[&#34;读 flow_id、业务编号，创建旅程&lt;br/&gt;R t_kyc_setting、t_kyc_member_other&lt;br/&gt;可 W t_kyc_user_content.journey_id&#34;]
+    C --&gt;|ZOLOZ 身份| Z1[&#34;建立会话，取得 transactionId&lt;br/&gt;R/W t_identify&lt;br/&gt;客户侧 bizId 使用雪花编号&#34;]
+    C --&gt;|ZOLOZ 路线的地址| M
+    S1 --&gt; S2[客户完成认证；已完成回调或主动刷新]
+    S2 --&gt; S3{Sumsub 结果}
+    S3 --&gt;|GREEN| S4[取身份／地址子项、申请人、文件]
+    S3 --&gt;|RED| R[&#34;相关单项拒绝，保存原因&lt;br/&gt;W t_kyc_user_content：-1&#34;]
+    S3 --&gt;|未完成| WAIT[保持待处理；等待或重试同步]
+    W1 --&gt; W2[客户完成；Finished Journey 查询完整结果]
+    W2 --&gt;|Incomplete| WAIT
+    W2 --&gt; W3[文件结果、规则、人脸及必要字段校验]
+    W3 --&gt;|通过| L
+    W3 --&gt;|不通过／Refer 等| R
+    W2 -.第三方人工改判.-&gt; W4[Updated Journey 的 Approve&lt;br/&gt;匹配同一 journey_id 下的驳回记录]
+    W4 --&gt; L
+    Z1 --&gt; Z2[&#34;ZolozTask 查询近 24 小时未缓存会话&lt;br/&gt;R/W t_identify：结果、图片数据、has_cached&#34;]
+    Z2 --&gt;|InProcess| WAIT
+    Z2 --&gt;|Fail| R
+    Z2 --&gt;|Success| L
+    S4 --&gt; L[&#34;文件转存对象存储、本地证件绑定等校验&lt;br/&gt;W t_kyc_user_content.kyc_content&lt;br/&gt;ZOLOZ 图片路径可额外写附件两表&#34;]
+    L --&gt; K{本地条件满足？}
+    K --&gt;|否| R
+    K --&gt;|是| P[&#34;单项 9；同步资料及整体处理&lt;br/&gt;W t_kyc_user_content、t_member&lt;br/&gt;按分支 W t_member_other；汇总见第 5.3 节&#34;]
+    M --&gt;|人工通过| P
+    M --&gt;|人工驳回| R</div>
 <p>这里有几条实际限制：</p>
 <ul>
 <li>企业账户在 <code>kycFormDataSave</code> 中直接退出，不发起这一套第三方自动认证；即便规则页面能填写自动配置，也不能据此认为企业已接通自动流程。</li>
@@ -520,7 +497,7 @@
 <p>对应代码：<a href="/Users/jalen/www/local/gtcuser/app/Http/Api/Controller/V1/KYCController.php:323">Sumsub 回调入口</a>、<a href="/Users/jalen/www/local/gtcuser/app/Service/Kyc/SumsubService.php:110">Sumsub 结果服务</a>、<a href="/Users/jalen/www/local/gtcuser/app/Service/crm/KycService.php:3105">主动刷新</a>、<a href="/Users/jalen/www/local/gtcuser/app/Service/crm/KycService.php:3385">IDwise 回调</a>、<a href="/Users/jalen/www/local/gtcuser/app/Service/crm/KycService.php:4097">IDwise 第三方人工复核</a>、<a href="/Users/jalen/www/local/gtcuser/app/Task/KycTask/ZolozTask.php:12">ZOLOZ 定时任务</a>。</p>
 <h2 id="5-状态流转必须分成两套看">5. 状态流转：必须分成两套看</h2>
 <h3 id="51-单个项目的状态">5.1 单个项目的状态</h3>
-<p>单项状态保存在 <code>kyc_user_content.kyc_status</code>。</p>
+<p>单项状态保存在 <code>t_kyc_user_content.kyc_status</code>。审核历史与答案通常在同一条提交记录上：<code>kyc_visit_user</code> 是审核人，<code>kyc_visit_time</code> 是审核时间，<code>kyc_audit_method</code> 是审核方式，<code>kyc_replay</code> 是驳回／回复原因，<code>reject_check_type</code> 保存三方拒绝类型。不能只查 <code>t_kyc_member_log</code> 来找所有日常审核历史。</p>
 <table>
   <thead>
       <tr>
@@ -553,22 +530,23 @@
   </tbody>
 </table>
 <div class="mermaid">flowchart TB
-    N[尚无提交记录] --&gt;|暂存| D[草稿 0]
-    N --&gt;|正式提交人工审核项目| P[待审核 1]
-    D --&gt;|正式提交| P
-    D --&gt;|个人自动规则的基本信息／问卷／协议提交| A[通过 9]
-    D --&gt;|第三方结果同步通过| A
-    D --&gt;|第三方结果同步拒绝| R[驳回 -1]
-    N --&gt;|个人自动规则的基本信息／问卷／协议提交| A
-    P --&gt;|后台通过或三方成功同步| A
-    P --&gt;|后台或第三方拒绝| R
-    P --&gt;|客户撤回| D
-    R --&gt;|客户重提：保留原记录，复制一条新记录| D
-    R --&gt;|后台修改并保存：修改原记录| P
-    A --&gt;|后台填写原因并验证谷歌验证码| R
-    A --&gt;|后台编辑资料| A
-    A -.部分第三方认证发现姓名变更且旧协议已通过.-&gt; C[客户协议被驳回：实名不一致，需要重新签署]
-    C --&gt;|客户重提，生成新草稿| D</div>
+    N[&#34;尚无记录&lt;br/&gt;R t_member、t_kyc_setting、表单模板&#34;] --&gt;|暂存| D[&#34;草稿 0&lt;br/&gt;W t_kyc_user_content&#34;]
+    N --&gt;|人工项目正式提交| P[&#34;待审 1&lt;br/&gt;W t_kyc_user_content&#34;]
+    D --&gt;|正式提交：新建记录，旧待处理记录退役| P
+    N --&gt;|个人自动 1／3／4 类提交| A[&#34;通过 9&lt;br/&gt;W t_kyc_user_content&lt;br/&gt;按资料 W t_member、t_member_other&#34;]
+    D --&gt;|本地自动或第三方成功| A
+    D --&gt;|第三方拒绝| R[&#34;驳回 -1&lt;br/&gt;W t_kyc_user_content：原因、审核信息&#34;]
+    P --&gt;|人工或第三方通过| A
+    P --&gt;|人工或第三方拒绝| R
+    P --&gt;|客户撤回：仅改单项，未直接重算整体| D
+    R --&gt;|客户重提| COPY[&#34;保留原记录，复制新草稿&lt;br/&gt;W t_kyc_user_content、t_kyc_member_other&lt;br/&gt;协议清除新草稿中的旧链接&#34;]
+    COPY --&gt; D
+    R --&gt;|后台编辑原记录，审核方式 manual| P
+    A --&gt;|后台编辑可保持 9| A
+    A --&gt;|后台原因＋谷歌验证码| VOID[&#34;驳回并作废匹配签署协议&lt;br/&gt;W t_kyc_user_content：-1&lt;br/&gt;W t_contract_agreements.status：-1&#34;]
+    VOID --&gt; R
+    A -.部分第三方姓名变化且旧 contract 为 9.-&gt; SIGN[&#34;R t_kyc_member_status&lt;br/&gt;W 协议表单 t_kyc_user_content：-1&lt;br/&gt;客户需要重新签署&#34;]
+    SIGN --&gt; COPY</div>
 <p>流转细节：</p>
 <ol>
 <li><strong>暂存</strong>：保存未完成内容；已有待审或通过记录时，暂存接口通常直接返回，避免覆盖正在处理或已通过资料。</li>
@@ -617,20 +595,50 @@
 </table>
 <p><strong>“有一项被驳回”不一定立刻变成总状态 2。</strong> 如果还有项目没交、是草稿或待审，总状态仍然可能是 1。</p>
 <div class="mermaid">flowchart TB
-    A[发生提交、审核、重提等主流程动作] --&gt; B[取得当前规则中的启用表单和各自最新记录]
-    B --&gt; C{规则或有效表单缺失？}
-    C --&gt;|是| Z[总状态 0：未提交]
-    C --&gt;|否| D{是否存在非草稿提交？}
+    A[提交／审核／重提等入口调用刷新] --&gt; B[&#34;R t_member.kyc_id → t_kyc_setting.form_id&lt;br/&gt;R t_system_form：只取启用表单&lt;br/&gt;R t_kyc_user_content：按当前方案每表单最大 kyc_id&#34;]
+    B --&gt; C{方案／有效表单缺失？}
+    C --&gt;|是| Z[整体 0：未提交]
+    C --&gt;|否| D{存在非草稿记录？}
     D --&gt;|否| Z
-    D --&gt;|是| E{所有必需项目均为 9？}
-    E --&gt;|是| P[总状态 9：已认证；Iscertified 为 1]
-    E --&gt;|否| F{每项都有记录，且全部为 9 或 -1？}
-    F --&gt;|是| U[总状态 2：未认证]
-    F --&gt;|否| G[总状态 1：进行中]
-    Z --&gt; N[总状态为 0／1／2 时，Iscertified 为 0]
-    U --&gt; N
-    G --&gt; N</div>
+    D --&gt;|是| E{每个必需项目均为 9？}
+    E --&gt;|是| P[整体 9：已认证]
+    E --&gt;|否| F{每项有记录且全为 9 或 -1？}
+    F --&gt;|是| U[整体 2：未认证]
+    F --&gt;|否| G[整体 1：进行中]
+    Z --&gt; W[&#34;W t_member.kyc_status、Iscertified&lt;br/&gt;仅整体 9 时 Iscertified 为 1&lt;br/&gt;刷新还 W t_kyc_member_summary&#34;]
+    P --&gt; W
+    U --&gt; W
+    G --&gt; W
+    W -.调用方另行执行全部通过业务时.-&gt; S[&#34;W t_member_other：档案快照、监管类型&lt;br/&gt;读取签署协议并触发通知；具体入口见第 7 节&#34;]</div>
 <p>依据：<a href="/Users/jalen/www/local/gtc_admin/app/service/kyc/KycOverallStatusService.php:32">后台总状态服务</a>、<a href="/Users/jalen/www/local/gtcuser/app/Service/Kyc/KycOverallStatusService.php:44">客户侧总状态服务</a>。上述是总状态服务的正常计算口径，历史强制通过入口有例外。</p>
+<h3 id="53-算状态写状态全部通过后处理是三件事">5.3 “算状态”“写状态”“全部通过后处理”是三件事</h3>
+<table>
+  <thead>
+      <tr>
+          <th>调用</th>
+          <th>读写范围</th>
+          <th>业务含义</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>getMemberOverallStatus</code></td>
+          <td>R 会员、规则、启用表单、最新提交</td>
+          <td>只计算返回值，不因此写库、归档或发通知</td>
+      </tr>
+      <tr>
+          <td><code>refreshMemberOverallStatus</code></td>
+          <td>上述读取；W <code>t_member.kyc_status/Iscertified</code>、<code>t_kyc_member_summary</code></td>
+          <td>刷新结果及列表汇总；不会自行运行完整的通过后处理</td>
+      </tr>
+      <tr>
+          <td>后台 <code>check_user_kyc_status</code>／客户侧 <code>checkUserKycStatus</code></td>
+          <td>判断全部通过后，写快照、监管类型并触发相应副作用</td>
+          <td>由具体调用方进入；两端实现存在差异</td>
+      </tr>
+  </tbody>
+</table>
+<p>客户侧 <code>checkUserKycStatus</code> 的“全部通过”分支直接写会员并执行归档、通知，没有在该分支内部调用汇总刷新；正式提交入口随后还有一次 <code>refreshMemberOverallStatus</code>，其他入口需分别核对。因此 <code>t_kyc_member_summary</code> 是可重建的列表缓存数据，不能反过来决定是否已认证，也不能假定所有第三方最终通过入口都已同步更新最后审核时间。</p>
 <h2 id="6-后台人工审核具体做什么">6. 后台人工审核具体做什么</h2>
 <p>审核人员进入客户 KYC 审核列表，读取该客户当前规则下的项目及已提交内容。最新待审列表按当前规则、有效表单和 <code>is_last=1</code> 的待审记录确定待办客户，并应用管理员／客户层级的数据范围。</p>
 <p>通过单项时：</p>
@@ -652,12 +660,13 @@
 <p>后台通知、MT 同步属于审核结果后的副作用；外部通知或同步失败的排查，应与数据库里的审核结果分开判断。</p>
 <p>依据：<a href="/Users/jalen/www/local/gtc_admin/app/admin/controller/Kyc.php:1199">通过入口</a>、<a href="/Users/jalen/www/local/gtc_admin/app/admin/controller/Kyc.php:1727">驳回入口</a>、<a href="/Users/jalen/www/local/gtc_admin/app/service/kyc/KycReviewListService.php:63">待审列表</a>。</p>
 <h2 id="7-全部通过以后发生什么">7. 全部通过以后发生什么</h2>
-<p>主流程达到总状态 9 后，会执行以下动作：</p>
+<p>主流程通过“全部通过处理”入口确认总状态为 9 后，会执行以下动作（只调用状态刷新，不会自动获得下列全部副作用）：</p>
 <ul>
 <li>会员标记为 KYC 已认证；<code>Iscertified</code> 置为 1。</li>
 <li>保存通过档案快照，记录这次通过关联的表单及通过记录 ID。</li>
 <li>同步当前 KYC 规则关联的会员监管类型；发生变化时按实现发送相关通知。</li>
-<li>发送认证成功通知，相关实现会整理已签署协议链接。</li>
+<li>尝试发送认证成功通知，整理 <code>t_contract_agreements</code> 中 <code>type=3/status=2</code> 的协议链接及 <code>t_system_form_detail</code> 标题；是否实际送达还取决于通知类型支持、模板、邮件配置和队列。</li>
+<li>后台成功通知方法会先调用活动赠金补发入口；客户侧同名业务的成功分支没有同样的直接补发调用。补发仍需满足活动、参与记录、MT 账号等条件，详见第 12.5 节。</li>
 <li>后续业务读取认证结果；是否能操作仍取决于对应业务的其他条件。</li>
 </ul>
 <p>项目有两种容易混淆的“快照”：</p>
@@ -686,17 +695,17 @@
 <h2 id="8-独立-poa与-kyc-地址项目相邻但不是同一流程">8. 独立 POA：与 KYC 地址项目相邻，但不是同一流程</h2>
 <p>POA 是地址证明。当前项目同时保留两种来源：KYC 中 <code>form_type=5</code> 的地址表单，以及客户详情里后台新增的独立地址证明 <code>address_proof</code>。</p>
 <div class="mermaid">flowchart TB
-    A[客户详情：地址证明] --&gt; B[KYC 地址表单的历史记录]
-    A --&gt; C[后台新增独立地址证明]
-    C --&gt; D[校验国家、地址、文件、日期等；校验总文件额度]
-    D --&gt; E[按幂等键防重复；写入独立 address_proof 表]
-    E --&gt; F[后台新增记录直接为已通过 9]
-    B --&gt; G[详情列表统一展示；两种来源独立保存]
-    F --&gt; G
-    G --&gt; H{独立 POA 或 KYC 地址表单任一存在通过记录？}
-    H --&gt;|是| V[支付侧 hasValidPoa 为 true]
-    H --&gt;|否| N[两边都没有通过记录；POA 校验不通过]
-    E -.不替代 KYC 必需表单，也不直接更新整体 KYC 状态.-&gt; X[整体认证仍按当前规则各表单最新记录计算]</div>
+    A[客户详情地址证明] --&gt; B[&#34;读取 KYC 地址历史&lt;br/&gt;R t_kyc_user_content＋t_system_form：form_type=5&#34;]
+    A --&gt; C[后台新增独立 POA]
+    C --&gt; D[&#34;校验资料、文件数和幂等键&lt;br/&gt;R t_country、t_member、t_attach&lt;br/&gt;R t_address_proof、KYC 地址历史&#34;]
+    D --&gt; E[&#34;锁会员行后核对额度并插入&lt;br/&gt;W t_address_proof：review_status=9&lt;br/&gt;保存审核人、时间；幂等键防重复&#34;]
+    B --&gt; G[两种来源合并展示，各自独立保存]
+    E --&gt; G
+    G --&gt; H{独立 POA 或 KYC 地址历史有已通过记录？}
+    H --&gt;|是| V[支付侧 hasValidPoa=true]
+    H --&gt;|否／查询异常| N[POA 校验不通过]
+    E -.不会代替当前方案必需地址表单.-&gt; X[&#34;不写 t_member.kyc_status&lt;br/&gt;不把记录搬进 t_kyc_user_content&#34;]
+    V --&gt; PAY[&#34;支付另读 t_wallet.requires_poa、iskyc&lt;br/&gt;以及会员国籍、居住地、监管类型&#34;]</div>
 <p>关键规则：</p>
 <ul>
 <li>后台新增独立地址证明，当前实现直接保存为已通过 9，并记录后台审核人和时间；不是先进入另一张待审队列。</li>
@@ -728,8 +737,8 @@
       </tr>
       <tr>
           <td>活动赠金</td>
-          <td><code>require_kyc=1</code> 时，未通过的参与记录进入待赠金状态，不在该次操作里发放</td>
-          <td>KYC 通过不等于这一步必然立即自动补发，仍要看后续活动发放触发</td>
+          <td><code>require_kyc=1</code> 时未通过不能发；后台全部通过处理会调用补发入口</td>
+          <td>客户侧成功入口没有同样的直接调用；补发还受活动和账号等条件限制，见第 12.5 节</td>
       </tr>
       <tr>
           <td>代理功能</td>
@@ -877,6 +886,66 @@
           <td>一种结构化数据格式，存表单答案、审核渠道配置和快照</td>
       </tr>
       <tr>
+          <td>SQL／MySQL</td>
+          <td>Structured Query Language／数据库产品名称</td>
+          <td>SQL 用于操作关系数据，MySQL 是本项目使用的数据库；表关系图不表示一定有数据库外键约束</td>
+      </tr>
+      <tr>
+          <td>PK／FK</td>
+          <td>Primary Key／Foreign Key</td>
+          <td>主键唯一识别一行；外键表达关联。本文箭头主要是代码逻辑关联，不能直接认定有 FK 约束</td>
+      </tr>
+      <tr>
+          <td>CSV</td>
+          <td>Comma-Separated Values</td>
+          <td>逗号分隔的值；如方案 <code>form_id</code> 保存多个 ID，而不是独立关系表</td>
+      </tr>
+      <tr>
+          <td>R／W</td>
+          <td>Read／Write</td>
+          <td>流程图中表示读表／写表；W 包括新增、修改或作废</td>
+      </tr>
+      <tr>
+          <td>HMAC</td>
+          <td>Hash-based Message Authentication Code</td>
+          <td>基于密钥的消息认证码；这里作为敏感字段精确匹配索引，和可解密的密文分开</td>
+      </tr>
+      <tr>
+          <td>HTTP／HTTPS</td>
+          <td>Hypertext Transfer Protocol／其安全传输形式</td>
+          <td>接口和回调使用的网络协议；HTTPS 对传输加密，不代表落库数据已加密</td>
+      </tr>
+      <tr>
+          <td>URL</td>
+          <td>Uniform Resource Locator</td>
+          <td>资源定位地址；数据库里的文件 URL 指向实际文件</td>
+      </tr>
+      <tr>
+          <td>SMTP</td>
+          <td>Simple Mail Transfer Protocol</td>
+          <td>简单邮件传输协议；发送日志 Sent 表示发件传输受理，不保证收件人已收到或阅读</td>
+      </tr>
+      <tr>
+          <td>IP</td>
+          <td>Internet Protocol</td>
+          <td>网络协议；日志中的 IP 地址用于记录请求来源</td>
+      </tr>
+      <tr>
+          <td>Redis／队列</td>
+          <td>缓存系统品牌／异步任务机制</td>
+          <td>用于缓存、任务排队等；不是本节的 MySQL 业务表，也不是独立 KYC 审核状态</td>
+      </tr>
+      <tr>
+          <td>Snowflake／雪花 ID</td>
+          <td>分布式唯一编号算法</td>
+          <td>当前客户侧 ZOLOZ 业务编号使用的生成方式，与后台旧 <code>identify_sn</code> 判重表不同</td>
+      </tr>
+      <tr>
+          <td>Credit</td>
+          <td>信用金</td>
+          <td>MT 中的信用额度／信用金操作，与客户现金余额不是同一个概念；活动补发使用该类操作</td>
+      </tr>
+      <tr>
           <td>UUID</td>
           <td>Universally Unique Identifier</td>
           <td>通用唯一标识，常用于记录、签署事件等编号</td>
@@ -961,7 +1030,7 @@
 <li><strong>撤回后的整体状态有同步缺口。</strong> 客户侧 <code>cancelInfo</code> 把单项 1 改为 0，但该方法没有直接调用整体状态重算；实际页面／业务何时反映变化需联调验证。</li>
 <li><strong>保留历史强制通过接口。</strong> <code>admin_kyc_status</code> 把部分状态 0 的记录改为 9，然后直接写 <code>member.kyc_status=9</code>，只刷新汇总，没有走正常的全部必需项目校验及完整副作用。它不是建议学习或使用的标准审核路径；是否仍可由当前页面调用，需核实部署菜单和权限。</li>
 <li><strong>ZOLOZ 字符串有历史拼写差异。</strong> 客户侧结果处理存在 <code>zolzo</code>，配置及渠道列表使用 <code>zoloz</code>；可能影响渠道识别、展示或重提路径，需单独验证，本文未修复。</li>
-<li><strong>数据字典与部分当前代码存在差异。</strong> 当前待审查询和客户端提交用到 <code>kyc_user_content.is_last</code>，本地数据字典该表尚未列出此字段；地址证明代码也使用 <code>address_country_code</code>，该表的本地字典未列出。实际表结构及对应发布脚本是否部署，需要核对实际环境。</li>
+<li><strong>两端数据字典及脚本没有完全同步。</strong> 不仅有 <code>is_last</code>、<code>address_country_code</code>，还涉及第三方重提附表、邮件发送追踪、监管类型管理字段及支付 POA 开关等，具体差异和证据见第 12.7 节。代码或建表脚本存在，不等于目标环境已经具备结构。</li>
 <li><strong>文档／注释不一定等于实现。</strong> 例如 Sumsub 整体拒绝的注释与当前方法具体分支不完全一致；本文按方法实际分支描述。档案展示还存在老用户／旧规则兼容逻辑，不能把展示结果直接当作当前总状态计算依据。</li>
 <li><strong>评分规则页面属于历史注册申请关联能力。</strong> 后台 <code>scorelist/scoresave</code> 维护 <code>user_reg_apply_score</code>，<code>MemberRegApply::excuteStatus</code> 是历史注册申请评分处理，且注释表明当前审批接口不调用。没有证据把它画成现行 KYC 问卷的必经自动评分流程。</li>
 <li><strong>自动渠道能力与实际启用范围未核实。</strong> 具体国家、方案、第三方等级、人脸要求、文件时效、后台菜单、任务和通知开关依赖数据库及运行配置；本文没有连接生产确认。</li>
@@ -1050,75 +1119,594 @@
       </tr>
   </tbody>
 </table>
-<h3 id="122-关键表与字段">12.2 关键表与字段</h3>
+<h3 id="122-涉及哪些表逐表说明与使用边界">12.2 涉及哪些表：逐表说明与使用边界</h3>
+<p>下表中的名称均按项目 <code>t_</code> 前缀还原。<strong>核心事实来源是提交明细，会员主表保存当前整体结果，汇总表用于列表，附表分别保存档案、会话、签署或审计信息。</strong> 表名相似，不代表保存同一份数据。</p>
+<p>本节覆盖已追踪的 KYC 入口及直接依赖、通知／文件链路、独立 POA、历史兼容入口和明确的下游副作用。权限、邮件和活动表是公共依赖；并非每个客户每次认证都会访问全部表。结构以后台数据字典为主，客户侧字典和发布脚本补证；差异集中列在第 12.7 节。</p>
+<h4 id="1221-规则模板提交与会员状态">12.2.1 规则、模板、提交与会员状态</h4>
 <table>
   <thead>
       <tr>
-          <th>数据</th>
-          <th>用途</th>
+          <th>表</th>
+          <th>保存什么、关键字段与关联</th>
+          <th>谁在何时读写</th>
       </tr>
   </thead>
   <tbody>
       <tr>
-          <td><code>t_kyc_setting</code></td>
-          <td>KYC 规则；<code>form_id</code> 表单集合，<code>auto</code> 审核开关，<code>audit_method_json</code> 多渠道配置</td>
+          <td><code>t_kyc_regulatory_type</code></td>
+          <td>监管类型字典。<code>id/title/is_default/deleted</code>；当前管理代码还使用 <code>status/remark/created_by/updated_by</code>，后台字典尚未完整列出</td>
+          <td>后台维护；规则保存校验类型是否有效；注册初始化、通过后同步、列表展示及支付类型限制读取</td>
       </tr>
       <tr>
-          <td><code>t_kyc_regulatory_type</code></td>
-          <td>监管类型字典</td>
+          <td><code>t_kyc_setting</code></td>
+          <td>认证方案。<code>id/title/is_company/auto/status/server_id</code>；<code>country_list</code> 是国家名称集合，<code>form_id</code> 是逗号分隔的模板 ID 集合；<code>kyc_regulatory_type_id</code> 关联监管字典；<code>audit_method_json</code> 保存多渠道，旧 <code>kyc_channel/level_name</code> 兼容默认项</td>
+          <td>后台创建、编辑、启停及关联国家时写；注册分配、客户加载、第三方启动、审核和整体计算时读。没有单独的“国家与 KYC 关系表”</td>
       </tr>
       <tr>
           <td><code>t_system_form</code></td>
-          <td>表单模板及类型；<code>form_type</code> 是业务分类；<code>type</code> 另用于通过通知分类，两者不能混用</td>
+          <td>表单头。<code>id/title/uuid/form_type/type/status/sort</code>。<code>form_type=1…5</code> 是业务分类；<code>type</code> 是另外一套通知分类</td>
+          <td>后台模板维护写；方案选项目、客户填报、审核、快照、整体状态读取。它不是客户填写的答案</td>
       </tr>
       <tr>
           <td><code>t_system_form_detail</code></td>
-          <td>题目、字段名、必填、选项、排序、只读等配置</td>
+          <td>模板题目／字段。<code>id/form_id/field/title/type/extra/required/sort/step_id/status/data_type/readonly</code>；<code>field</code> 对应答案 JSON 的 key；协议题目的 <code>extra/desc</code> 用于原文件与签署配置</td>
+          <td>后台维护写；展示、校验、题目快照、协议生成、通知标题读取。<code>form_id</code> 指向 <code>t_system_form.id</code></td>
       </tr>
       <tr>
           <td><code>t_system_form_type</code></td>
-          <td>表单／子步骤分类及旧状态 key 映射</td>
+          <td>业务分类／子步骤字典。<code>id/pid/type_name/key/sort</code>；表单分类及字段 <code>data_type</code> 关联这里，<code>key</code> 也被旧分项状态写入逻辑使用</td>
+          <td>模板页、客户页和审核详情读取；不能与 <code>t_system_form.type</code> 的通知分类混用</td>
       </tr>
       <tr>
           <td><code>t_kyc_user_content</code></td>
-          <td>每次表单提交、答案 JSON、单项状态、审核信息、三方旅程及题目快照</td>
+          <td><strong>一次表单提交及其结果</strong>。主键 <code>kyc_id</code>；<code>kyc_member_id→member.id</code>，<code>kyc_config_id→kyc_setting.id</code>，<code>form_id→system_form.id</code>；<code>kyc_content</code> 为答案／文件 URL 的 JSON。另有单项状态、审核人／时间／方式、原因、<code>journey_id</code>、题目快照；当前代码使用 <code>is_last</code></td>
+          <td>客户草稿、提交、重提、后台编辑／审核和第三方结果处理写；客户详情、审核列表、整体计算、地址证明文件计数读。一位会员对同一表单可以保留多条历史记录</td>
       </tr>
       <tr>
           <td><code>t_member</code></td>
-          <td>当前 KYC 规则、整体状态、<code>Iscertified</code> 及认证同步的会员资料</td>
+          <td>会员资料及当前结果。<code>id</code>；<code>kyc_id</code> 是当前方案 ID；<code>kyc_status</code> 是整体 0/1/2/9；<code>Iscertified</code> 是认证标志。姓名、生日、国籍 <code>nationality</code>、居住国 <code>country</code>、地址、证件类型等按表单同步；<code>phone/identity</code> 仍有兼容明文</td>
+          <td>注册／规则调整写方案；审核和同步写资料；状态刷新写整体结果；下游业务读。这里的 <code>kyc_id</code> 绝不能拿来当提交记录主键</td>
       </tr>
       <tr>
           <td><code>t_member_other</code></td>
-          <td>监管类型、通过档案快照、证件图片及敏感信息的相关存储字段</td>
+          <td><strong>会员扩展资料，一人最多一行</strong>，字典有 <code>member_id</code> 唯一键。保存证件正反面 <code>front/back</code>、业务监管类型 <code>kyc_regulatory_type_id</code>、通过档案引用 <code>kyc_profile_snapshot</code>；敏感字段的密文及 HMAC 索引也在这里</td>
+          <td>身份图片同步、统一敏感字段服务、注册／全部通过监管同步、归档写；展示、精确检索、通知语言和支付限制读。不是每次提交都写它，也不能整行替换清空其他模块字段</td>
       </tr>
       <tr>
           <td><code>t_kyc_member_summary</code></td>
-          <td>一人一行的最后申请／审核信息，供列表筛选；它不决定整体状态</td>
+          <td><strong>会员级列表汇总，一人一行</strong>。<code>member_id</code> 唯一；最后申请时间、最后审核人、最后审核时间；有相应筛选索引</td>
+          <td><code>refreshMemberOverallStatus</code> 联动更新，后台审核列表读取。不是完整审核流水，不保存所有状态，也不是是否通过的判定来源；最后申请时间从当前方案有创建时间的记录中选取，可能包括草稿</td>
       </tr>
       <tr>
-          <td><code>t_contract_agreements</code></td>
-          <td>KYC 协议签署与作废记录</td>
-      </tr>
-      <tr>
-          <td><code>t_address_proof</code></td>
-          <td>独立 POA，和 KYC 地址表单分开存储</td>
-      </tr>
-      <tr>
-          <td><code>t_identify</code></td>
-          <td>ZOLOZ 验证业务、会话与结果同步相关记录</td>
-      </tr>
-      <tr>
-          <td><code>t_kyc_level</code></td>
-          <td>保留的国家与认证等级映射维护能力；当前客户侧认证还要结合规则的多渠道配置</td>
-      </tr>
-      <tr>
-          <td><code>t_kyc_member_status</code></td>
-          <td>旧分项状态表，当前存在历史兼容使用，不作为整体状态的统一判定依据</td>
+          <td><code>t_kyc_member_other</code></td>
+          <td><strong>第三方业务编号附表</strong>，不是 <code>t_member_other</code>。客户侧模型字段 <code>member_id/kyc_link_json/create_time/update_time</code>，JSON 按渠道保存 <code>business_id</code>；发布脚本有 <code>member_id</code> 唯一键</td>
+          <td>发起 Sumsub／IDwise 时读取编号，无数据兼容直接用会员 ID；驳回重提时递增为 <code>会员ID_N</code> 并写入。当前重提方法也可能为 <code>manual/auto</code> 建条目，但这些条目不代表实际创建了第三方会话</td>
       </tr>
   </tbody>
 </table>
-<p>表结构依据：<a href="/Users/jalen/www/local/gtc_admin/docs/%E6%95%B0%E6%8D%AE%E5%AD%97%E5%85%B8.sql:2616">数据字典 KYC 部分</a>、<a href="/Users/jalen/www/local/gtc_admin/docs/%E6%95%B0%E6%8D%AE%E5%AD%97%E5%85%B8.sql:2969">会员字段</a>、<a href="/Users/jalen/www/local/gtc_admin/docs/%E6%95%B0%E6%8D%AE%E5%AD%97%E5%85%B8.sql:7583">表单定义</a>。</p>
-<h3 id="123-推荐阅读代码的顺序">12.3 推荐阅读代码的顺序</h3>
+<p>证据：<a href="/Users/jalen/www/local/gtc_admin/docs/%E6%95%B0%E6%8D%AE%E5%AD%97%E5%85%B8.sql:2672">方案与监管结构</a>、<a href="/Users/jalen/www/local/gtc_admin/docs/%E6%95%B0%E6%8D%AE%E5%AD%97%E5%85%B8.sql:2699">提交明细结构</a>、<a href="/Users/jalen/www/local/gtc_admin/docs/%E6%95%B0%E6%8D%AE%E5%AD%97%E5%85%B8.sql:3863">扩展资料结构</a>、<a href="/Users/jalen/www/local/gtc_admin/docs/%E6%95%B0%E6%8D%AE%E5%AD%97%E5%85%B8.sql:7583">表单结构</a>、<a href="/Users/jalen/www/local/gtc_admin/app/service/kyc/KycMemberSummaryService.php:20">列表汇总算法</a>、<a href="/Users/jalen/www/local/gtcuser/app/Model/crm/KycMemberOther.php:26">三方附表模型</a>、<a href="/Users/jalen/www/local/gtcuser/app/Service/crm/KycService.php:4377">编号读取／递增</a>。</p>
+<h4 id="1222-协议文件身份会话和独立-poa">12.2.2 协议、文件、身份会话和独立 POA</h4>
+<table>
+  <thead>
+      <tr>
+          <th>表</th>
+          <th>保存什么、关键字段与关联</th>
+          <th>在流程中的作用</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>t_contract_agreements</code></td>
+          <td>协议签署记录。<code>member_id</code> 关联会员；KYC 使用 <code>type=3</code>，<code>model_id</code> <strong>在这条路径中是表单 ID</strong>，<code>form_detail_id</code> 是协议题目 ID；<code>uuid/url/complete_time/status/create_status</code> 保存文件、时间和生成／签署结果</td>
+          <td><code>saveInfoGtc</code> 遇到 <code>type=agrement</code> 字段时生成 PDF，并新增 <code>status=2</code> 已签署记录；人工拒绝时把匹配会员＋表单＋KYC 类型的记录置 <code>-1</code>；成功通知读取签署链接。不是只对应某一条 <code>kyc_user_content.kyc_id</code>，表里没有这条提交主键的直接关联列</td>
+      </tr>
+      <tr>
+          <td><code>t_member_security_activity</code></td>
+          <td>客户安全活动记录。<code>member_id</code>、<code>activity_type</code>、<code>activity_id</code>、<code>activity_uuid</code>、IP／设备、<code>status</code> 等</td>
+          <td>KYC 协议签署时新增活动，<code>activity_id</code> 是上表协议主键、UUID 与协议一致。用于追踪签署行为，不是 KYC 单项审核状态，也不是活动赠金的 <code>t_activity_user</code></td>
+      </tr>
+      <tr>
+          <td><code>t_attach</code></td>
+          <td>业务附件索引。<code>id/user_id/name/savepath/type/size/extension/create_time</code> 等</td>
+          <td>客户通用上传接口新增；记录原始文件名与路径，地址证明通过它补齐原文件名。ZOLOZ 图片的 <code>uploadBase64</code> 也写入。<code>user_id</code> 是上传归属，文件 URL 通常再存进答案 JSON／独立 POA；不保证有外键直连某条提交</td>
+      </tr>
+      <tr>
+          <td><code>t_mine_attachment</code></td>
+          <td>上传组件的物理文件元数据。<code>hash</code> 唯一、<code>storage_mode/storage_path/object_name/origin_name/url/created_by</code> 等</td>
+          <td><code>AttachmentService</code> 先按文件 hash 去重，再写元数据；与 <code>t_attach</code> 是两层记录。通用上传和 ZOLOZ 图片路径经过该 Service；Sumsub／IDwise 直接调用 <code>UploadInterface</code> 的转存路径未直接新增这两张附件表，不能假定所有 KYC 文件都有两表记录</td>
+      </tr>
+      <tr>
+          <td><code>t_identify</code></td>
+          <td>ZOLOZ 认证业务会话。<code>member_id/bizId/transactionId/type/identify_type/bussiness_type</code>，结果码、<code>business_result</code>、证件／人脸提取结果、<code>url/has_cached</code> 等；字典有 <code>bizId</code> 唯一键和 transactionId 索引</td>
+          <td>启动时创建并补会话 URL，查询结果时更新，任务按最近 24 小时等条件取未缓存会话，再同步单项并标缓存。它还服务出金认证；不是 Sumsub／IDwise 的通用会话表</td>
+      </tr>
+      <tr>
+          <td><code>t_address_proof</code></td>
+          <td><strong>独立地址证明</strong>。<code>member_id/proof_file/proof_file_name/proof_type/proof_date/address_country/postal_code/detail_address</code>；<code>review_status/review_user_id/review_time</code>；<code>idempotency_key</code> 唯一。代码还用 <code>address_country_code</code></td>
+          <td>后台 <code>add</code> 新增并直接通过 9；详情和文件额度读取；支付 POA 门禁读取。没有 <code>kyc_config_id/form_id</code>，不加入当前必需表单的整体计算</td>
+      </tr>
+      <tr>
+          <td><code>t_country</code></td>
+          <td>国家字典。<code>name/code/iso/mark/lang</code> 等；国籍／居住地用途属性也在该公共字典</td>
+          <td>国家关联合法性、国家名称／代码转换、身份国籍与地址居住国同步、通知语言、POA 输入读取。修改客户国家，不等于修改国家字典本身</td>
+      </tr>
+      <tr>
+          <td><code>t_config_member_name</code></td>
+          <td>国家姓名显示规则。<code>country_code/name_sort/separator/status</code></td>
+          <td>同步 first/last 姓名时读取，用于决定先姓后名及连接方式；不保存认证结果</td>
+      </tr>
+      <tr>
+          <td><code>t_admin_translation_kv</code></td>
+          <td>管理端配置文本的多语言缓存。<code>source_hash/source_text/target_lang/translated_text/status</code> 等；原文 hash＋目标语言唯一</td>
+          <td>规则／表单／监管标题展示读取；保存相关配置后通过客户侧翻译入口异步补充。它翻译配置文本，不审核客户身份</td>
+      </tr>
+      <tr>
+          <td><code>t_config</code>、<code>t_config_server</code></td>
+          <td>公共配置、服务器覆盖配置</td>
+          <td>按路径读取证件绑定上限 <code>ID_OF_USER_NUM</code>、站点链接、MT 同步开关／字段、邮件兜底等；不保存本次申请状态。部分三方配置来自配置文件／运行变量，不能将它们都归到这两表</td>
+      </tr>
+  </tbody>
+</table>
+<p>证据：<a href="/Users/jalen/www/local/gtcuser/app/Service/crm/KycService.php:2453">协议保存与安全活动</a>、<a href="/Users/jalen/www/local/gtcuser/app/Model/Agreement/Agreements.php:34">协议模型实际表名</a>、<a href="/Users/jalen/www/local/gtcuser/app/Http/Api/Controller/V1/UploadController.php:86">通用上传</a>、<a href="/Users/jalen/www/local/gtcuser/app/Service/AttachmentService.php:36">上传去重</a>、<a href="/Users/jalen/www/local/gtcuser/app/Service/crm/KycService.php:690">Sumsub 转存</a>、<a href="/Users/jalen/www/local/gtcuser/app/Service/crm/KycService.php:4020">IDwise 转存</a>、<a href="/Users/jalen/www/local/gtcuser/app/Common/Lib/Identify/IdentifyBase.php:124">ZOLOZ 会话创建</a>、<a href="/Users/jalen/www/local/gtc_admin/app/admin/service/AddressProofReviewService.php:126">独立 POA 新增</a>、<a href="/Users/jalen/www/local/gtc_admin/app/service/AdminTranslationKvService.php:27">配置文本翻译</a>。</p>
+<p><strong>文件本体一般在 OSS／对象存储，不在 MySQL 附件行里。</strong> 数据库保存文件路径、名称、归属和引用。协议生成直接调用上传接口，也不能据此认为一定经过 <code>AttachmentService</code> 写附件两表。不要把文件上传完成理解成资料已提交，更不能理解成审核通过。</p>
+<h4 id="1223-通知与后台审计">12.2.3 通知与后台审计</h4>
+<table>
+  <thead>
+      <tr>
+          <th>表</th>
+          <th>关键内容</th>
+          <th>触发和边界</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>t_mail_template</code></td>
+          <td>模板 <code>name/title/content/status</code>、发送配置类型等</td>
+          <td>KYC 单项通过、拒绝、全部通过等邮件读取相应模板；模板不存在或关闭会影响发送，不撤销数据库审核结果</td>
+      </tr>
+      <tr>
+          <td><code>t_mail_template_lang</code></td>
+          <td><code>template_id/lang/title/content</code>；模板＋语言唯一</td>
+          <td>按客户语言／国家语言读取翻译模板；没有可用版本时按邮件服务规则回退</td>
+      </tr>
+      <tr>
+          <td><code>t_mail_config</code></td>
+          <td>发件配置类型、启用状态、权重等</td>
+          <td>客户侧邮件服务选择配置；没有合适配置时可回退公共配置。本文不列出具体账号或凭据</td>
+      </tr>
+      <tr>
+          <td><code>t_mail_log</code></td>
+          <td>模板名、创建时间、状态、错误等发送日志</td>
+          <td>邮件执行阶段写入。日常单客 KYC 通知不是“邮件批量任务”，不能把所有 <code>mail_batch_*</code> 表当作本流程必写表</td>
+      </tr>
+      <tr>
+          <td><code>t_mail_send_log</code></td>
+          <td>新的发送追踪表：<code>send_id/member_id/trigger_type/status/provider_message_id/sent_at/template_name/mail_config_id</code></td>
+          <td>当前客户侧代码为整体成功／拒绝等特定模板写 <code>kyc_success/kyc_failed</code> 追踪；并非每种单项通过模板都有这条记录。<code>Sent</code> 表示 SMTP 已接受，不等于最终送达。后台字典缺此表，客户侧字典和发布脚本有定义</td>
+      </tr>
+      <tr>
+          <td><code>t_modify_operation_logs</code></td>
+          <td>客户资料／审核操作审计：客户、操作者、原因、时间、<code>change_data</code> 等</td>
+          <td><code>visit_kyc/kyc_reject</code> 的 <code>ModifyReason</code> 中间件在成功响应且有 <code>changed_fields</code> 时写；与提交记录中的审核字段互补，不是三方回调的通用流水</td>
+      </tr>
+      <tr>
+          <td><code>t_system_operation_logs</code></td>
+          <td>配置层结构化审计：操作类型、配置项、变更前后值、操作人及执行结果</td>
+          <td>KYC 规则关键变更、国家关系、监管类型管理等调用专用服务写入。不是单个客户提交答案的存储表</td>
+      </tr>
+      <tr>
+          <td><code>t_operation_log</code></td>
+          <td>带 <code>LogOperation</code> 注解的接口请求／响应及设备摘要</td>
+          <td>配置保存、国家关联等已标注接口经中间件写；不要认为所有 KYC API 都会写这张表</td>
+      </tr>
+      <tr>
+          <td><code>t_logger</code></td>
+          <td>后台公共访问日志：访问者、路径、请求摘要、时间等</td>
+          <td>后台基类公共入口记录访问，不代表业务审核已成功；代码里的 <code>Log::info</code> 或客户侧 <code>logger()</code> 也不当然写入这张 MySQL 表</td>
+      </tr>
+  </tbody>
+</table>
+<p>证据：<a href="/Users/jalen/www/local/gtc_admin/app/service/KycService.php:892">后台审核通知中转</a>、<a href="/Users/jalen/www/local/gtcuser/app/Http/Api/Controller/Inner/OptionController.php:1111">客户侧接收入口</a>、<a href="/Users/jalen/www/local/gtcuser/app/Http/Api/Listeners/NotificationListener.php:42">通知监听和入队</a>、<a href="/Users/jalen/www/local/gtcuser/app/Jobs/EmailSend/SendMemberEmailJob.php:73">邮件任务</a>、<a href="/Users/jalen/www/local/gtcuser/app/Service/Common/EmailService.php:259">邮件执行／日志</a>、<a href="/Users/jalen/www/local/gtcuser/app/Service/Notification/MailSendTrackingService.php:17">追踪模板范围</a>、<a href="/Users/jalen/www/local/gtc_admin/app/admin/middleware/ModifyReasonMiddleware.php:218">资料变更日志中间件</a>、<a href="/Users/jalen/www/local/gtc_admin/app/admin/middleware/LogOperationMiddleware.php:108">接口操作日志</a>、<a href="/Users/jalen/www/local/gtc_admin/app/admin/service/SystemOperationLogService.php:593">配置审计</a>、<a href="/Users/jalen/www/local/gtc_admin/app/admin/controller/BaseController.php:405">公共访问日志</a>。</p>
+<h4 id="1224-权限和下游读取副作用">12.2.4 权限和下游读取／副作用</h4>
+<table>
+  <thead>
+      <tr>
+          <th>表</th>
+          <th>与 KYC 的关系</th>
+          <th>是否属于 KYC 主状态写入</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>t_role_user</code>、<code>t_role</code>、<code>t_access</code>、<code>t_menu</code></td>
+          <td>后台公共权限链：管理员的角色、角色能访问的节点、节点对应接口。KYC 页及操作也受此控制</td>
+          <td>否；使用 KYC 不会创建一套新角色或自动给审核权限</td>
+      </tr>
+      <tr>
+          <td><code>t_member_root_path</code></td>
+          <td>非全局管理员的客户层级范围；待审列表按会员路径限制可见客户</td>
+          <td>否；KYC 列表主要读取它，不应理解为审核能修改客户归属</td>
+      </tr>
+      <tr>
+          <td><code>t_wallet</code></td>
+          <td>支付通道规则：<code>iskyc</code>、代码使用的 <code>requires_poa</code>、国家及监管类型限制。监管类型删除检查也会读取其引用</td>
+          <td>否；KYC 通过不会自动修改通道配置</td>
+      </tr>
+      <tr>
+          <td><code>t_activity</code></td>
+          <td>活动是否要求 KYC <code>require_kyc</code>、有效期、信用金数额、默认组等</td>
+          <td>否；活动业务读取认证状态，后台通过后还可能调用补发</td>
+      </tr>
+      <tr>
+          <td><code>t_activity_user</code></td>
+          <td>会员参与活动、MT 账号、是否已发及 <code>give_time/amount/status/content</code></td>
+          <td><strong>条件写入</strong>：补发校验成功并完成 MT 信用金操作后更新；初次开户等待 KYC 也可能标记待发</td>
+      </tr>
+      <tr>
+          <td><code>t_member_mtlogin</code>、<code>t_mt_server</code></td>
+          <td>会员交易账号和服务器；人工审核后的资料同步读取，活动补发也读取</td>
+          <td>本文核对的资料同步方法读取本地表后调用外部 MT 更新，不把 KYC 状态写成交易账号状态</td>
+      </tr>
+      <tr>
+          <td><code>t_fund_detail</code></td>
+          <td>资金业务明细</td>
+          <td><strong>条件写入</strong>：后台全部通过触发活动补发，且活动条件满足时，赠金模块创建 <code>credit_record</code> 明细，MT 成功后更新为 <code>finish</code>。这是下游资金副作用，不是每次认证都写</td>
+      </tr>
+  </tbody>
+</table>
+<p>权限证据：<a href="/Users/jalen/www/local/gtc_admin/app/admin/controller/BaseController.php:249">后台公共权限</a>、<a href="/Users/jalen/www/local/gtc_admin/app/service/kyc/KycReviewListService.php:247">KYC 客户数据范围</a>。下游证据：<a href="/Users/jalen/www/local/gtcuser/app/Service/crm/PayService.php:119">支付通道筛选</a>、<a href="/Users/jalen/www/local/gtc_admin/app/service/KycRegulatoryTypeReferenceService.php:33">监管类型引用检查</a>、<a href="/Users/jalen/www/local/gtc_admin/app/service/MtService.php:509">MT 资料同步</a>、<a href="/Users/jalen/www/local/gtcuser/app/Service/crm/MemberMtloginService.php:495">活动补发入口</a>、<a href="/Users/jalen/www/local/gtcuser/app/Service/crm/MemberMtloginService.php:690">赠金明细写入</a>。</p>
+<p>支付／出金之后创建支付订单、提现单等属于相应资金流程；<strong>仅通过 KYC 不会自动新建充值／提现订单</strong>。上表特意列出的 <code>t_fund_detail</code> 是已经追到实际调用的活动补发例外，不应遗漏。</p>
+<h4 id="1225-仍存在的旧能力和兼容表">12.2.5 仍存在的旧能力和兼容表</h4>
+<table>
+  <thead>
+      <tr>
+          <th>表</th>
+          <th>实际定位到的用途</th>
+          <th>阅读时如何处理</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>t_kyc_member_status</code></td>
+          <td><code>member_id</code> 主键，<code>baseinfo/realauth/exam/contract/address</code> 等旧分项状态；客户端当前提交仍可能写，<code>reSign</code> 读取旧协议状态；后台模型更新方法已废弃</td>
+          <td>不用它替代当前方案最新明细来判整体通过；“旧”不等于完全无调用</td>
+      </tr>
+      <tr>
+          <td><code>t_kyc_member_information</code></td>
+          <td>旧的 key/value 基本信息：<code>member_id/key/value</code>，会员＋key 唯一。客户侧仍保留 <code>submit_information_form/personal_info</code> 写入、旧认证监听读取</td>
+          <td>与新流程的 <code>kyc_user_content.kyc_content</code> 是两套存储；修改旧信息不等于新表单已提交或通过</td>
+      </tr>
+      <tr>
+          <td><code>t_kyc_member_questions</code></td>
+          <td>旧问卷答案模型：<code>member_id/form_id/question_id/question/answer/other_answer/score</code> 等，旧 <code>question_list</code> 读取</td>
+          <td>两端字典未找到建表定义；当前主 <code>saveinfo</code> 将问卷答案存入提交 JSON，未追到该旧表在现行提交入口的写入，不能把它画成主流程必写表</td>
+      </tr>
+      <tr>
+          <td><code>t_kyc_member_log</code></td>
+          <td>后台历史 <code>admin_kyc_status</code> 强制调整记录，含会员、操作者、状态、理由、IP</td>
+          <td>不是普通审核所有事件的流水；普通审核主要更新提交明细，并由审计中间件留痕</td>
+      </tr>
+      <tr>
+          <td><code>t_kyc_level</code></td>
+          <td><code>country_list/level_name</code> 的旧国家—认证等级映射，后台仍有维护接口，旧事件订阅链也会使用</td>
+          <td>当前客户侧链接优先按方案多渠道参数／专用地址等级处理，不能只查此表判断所有客户的渠道与等级</td>
+      </tr>
+      <tr>
+          <td><code>t_identify_config</code></td>
+          <td>共享认证配置：<code>bussiness_type/min_amount/country_list/kyc_id</code> 等；<code>IdentifyBase::checkIfNeedIdentify</code> 用于出金是否需要验证</td>
+          <td>直接 KYC 身份／证件启动分支不经过出金阈值判断，不能把金额阈值画成所有 KYC 的前置条件</td>
+      </tr>
+      <tr>
+          <td><code>t_identify_sn</code></td>
+          <td>后台旧 ZOLOZ 工具生成 <code>bizId</code> 时用主键判重并插入编号</td>
+          <td>当前客户侧 <code>IdentifyBase</code> 使用雪花 ID，没有同样的写表步骤；后台旧工具仍保留读写。不是认证结果表</td>
+      </tr>
+      <tr>
+          <td><code>t_user_reg_apply_score</code></td>
+          <td>后台历史注册申请评分规则，由 <code>scorelist/scoresave</code> 维护</td>
+          <td>与当前五类表单的自动通过逻辑分开，不推断新问卷自动计算风险分数</td>
+      </tr>
+  </tbody>
+</table>
+<p>证据：<a href="/Users/jalen/www/local/gtcuser/app/Service/crm/KycService.php:1420">旧基本信息保存</a>、<a href="/Users/jalen/www/local/gtcuser/app/Service/crm/KycService.php:3025">旧个人信息更新</a>、<a href="/Users/jalen/www/local/gtcuser/app/Model/crm/KycMemberQuestions.php:28">旧问卷模型</a>、<a href="/Users/jalen/www/local/gtcuser/app/Http/Api/Controller/V1/KYCController.php:57">旧接口保留</a>、<a href="/Users/jalen/www/local/gtc_admin/app/admin/controller/Kyc.php:2228">旧强制调整及日志</a>、<a href="/Users/jalen/www/local/gtc_admin/extend/Identify/IdentifyBase.php:120">后台旧编号工具</a>、<a href="/Users/jalen/www/local/gtc_admin/app/subscribe/KycFormDataSubscribe.php:5">旧等级订阅链</a>。</p>
+<h3 id="123-每个业务动作到底读哪些表写哪些表">12.3 每个业务动作到底读哪些表、写哪些表</h3>
+<p>这里列业务数据读写；公共权限、配置和访问审计不在每行重复。<code>t_kyc_user_content</code> 简称“提交明细”；箭头表示动作结果，不表示 SQL 外键。</p>
+<table>
+  <thead>
+      <tr>
+          <th>动作／入口</th>
+          <th>主要读取 R</th>
+          <th>主要新增／修改 W</th>
+          <th>状态及副作用</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>配置监管类型、模板与方案</td>
+          <td>监管字典、表单及分类、现有方案；删除监管类型还检查会员扩展／通道引用</td>
+          <td><code>t_kyc_regulatory_type</code>、<code>t_system_form</code>、<code>t_system_form_detail</code>、<code>t_kyc_setting</code>；相关配置审计和翻译缓存</td>
+          <td>改的是规则及模板，不直接把客户标认证成功</td>
+      </tr>
+      <tr>
+          <td>国家关联</td>
+          <td><code>t_country</code>、个人／企业方案</td>
+          <td><code>t_kyc_setting.country_list</code>、配置审计</td>
+          <td>保存时可从其他同类方案中移出该国家；不是另写关系表，也不等于批量重分配已有会员</td>
+      </tr>
+      <tr>
+          <td>注册分配／后台换方案</td>
+          <td>会员、按国家及个人／企业匹配的规则、监管类型</td>
+          <td><code>t_member.kyc_id</code>；适用时 <code>t_member_other.kyc_regulatory_type_id</code>；后台换方案还刷新整体和汇总</td>
+          <td>全部通过的会员，后台换方案入口拒绝；旧方案提交历史保留</td>
+      </tr>
+      <tr>
+          <td>加载本人／后台资料</td>
+          <td>会员、规则、表单头／题目／分类、提交明细；通过档案优先读 <code>t_member_other</code> 快照；按需读附件</td>
+          <td>通常读取</td>
+          <td>页面展示的历史兼容档案，不一定等于当前整体计算使用的数据集合</td>
+      </tr>
+      <tr>
+          <td>上传材料</td>
+          <td>hash 去重记录、上传安全配置</td>
+          <td>走 <code>AttachmentService</code> 时写 <code>t_mine_attachment</code>；通用上传接口再写 <code>t_attach</code>；文件体进对象存储</td>
+          <td>上传接口返回 URL；之后才由表单提交把 URL 写进答案</td>
+      </tr>
+      <tr>
+          <td>暂存 <code>stashInfoGtc</code></td>
+          <td>模板、会员、规则、已有同项记录；地址文件名读附件</td>
+          <td>提交明细草稿；刷新会员及列表汇总，未走统一最新标记维护方法</td>
+          <td>0；已有待审／通过时通常直接返回；已整体通过不允许再次暂存</td>
+      </tr>
+      <tr>
+          <td>正式提交 <code>saveInfoGtc</code></td>
+          <td>模板必填／选项、会员、规则、证件绑定规则；地址额外读独立 POA 及历史地址、附件</td>
+          <td>新提交明细和题目快照，维护最新标记，旧 0／1 记录标 -1；兼容写 <code>t_kyc_member_status</code>；刷新会员及汇总</td>
+          <td>人工为 1；个人自动 1／3／4 类可直接 9。自动通过按流程进入全部通过判断</td>
+      </tr>
+      <tr>
+          <td>签署协议（正式提交内）</td>
+          <td>协议题目的 <code>extra/desc</code>、会员签名所需资料</td>
+          <td>生成并上传 PDF；写 <code>t_contract_agreements</code>、<code>t_member_security_activity</code>；新答案保存签署 URL</td>
+          <td>协议 <code>status=2</code> 是签署完成；KYC 单项仍可能待审 1，两者不等价</td>
+      </tr>
+      <tr>
+          <td>发起三方 <code>kyc_link</code></td>
+          <td>会员、规则的多渠道参数、<code>t_kyc_member_other</code></td>
+          <td>IDwise 可给现有待处理明细写 <code>journey_id</code>；ZOLOZ 写 <code>t_identify</code></td>
+          <td>返回链接不是通过；当前 <code>markLatestKycLinkContent</code> 中审核方式赋值被注释，不能假定发起链接就更新了方式字段</td>
+      </tr>
+      <tr>
+          <td>Sumsub 完成回调／主动刷新</td>
+          <td>会员、规则、明细、国家；外部申请人／审核步骤／文件</td>
+          <td>身份／地址明细答案、文件 URL、审核方式及 9/-1；按内容更新会员和敏感影子；全部通过处理</td>
+          <td>第三方拒绝、本地绑定上限不满足、取资料失败都需分开判断；不使用 <code>t_identify</code> 统一保存全部 Sumsub 结果</td>
+      </tr>
+      <tr>
+          <td>IDwise 回调／人工改判</td>
+          <td>会员、规则、旅程匹配明细；外部完整旅程、文档／人脸结果</td>
+          <td>缺记录时可建默认待审明细，再同步答案、文件、旅程和状态；更新会员／适用扩展资料</td>
+          <td><code>Updated Journey</code> 的 Approve 只处理匹配旅程等条件的驳回项，不代表全部 KYC 自动通过</td>
+      </tr>
+      <tr>
+          <td>ZOLOZ 轮询</td>
+          <td><code>t_identify</code> 最近 24 小时等条件会话、会员、规则、身份明细</td>
+          <td>更新会话结果与缓存标记；转存图片、写附件；更新明细、会员，兼容旧分项状态</td>
+          <td><code>Success/Fail/InProcess</code> 分支；缓存标记不等于会员整体 9</td>
+      </tr>
+      <tr>
+          <td>人工通过 <code>visit_kyc</code></td>
+          <td>明细及模板、会员、国家／姓名规则、敏感查询及证件绑定限制</td>
+          <td>事务内写明细 9、会员资料、敏感影子及证件图片；刷新会员／汇总，全部通过时归档扩展资料</td>
+          <td>提交后适用时 MT 同步、单项通知、整体通知及赠金补发调用；成功响应触发资料审计</td>
+      </tr>
+      <tr>
+          <td>人工拒绝 <code>kyc_reject</code></td>
+          <td>明细、会员、模板标题／国家语言；原状态 9 时校验谷歌码</td>
+          <td>事务内写明细 -1／原因／审核人，匹配协议置 -1，刷新会员和汇总</td>
+          <td>之后尝试拒绝通知，成功响应触发资料审计</td>
+      </tr>
+      <tr>
+          <td>后台编辑 <code>saveinfo</code></td>
+          <td>明细、模板、会员、国家；地址额度／附件</td>
+          <td>修改原提交答案；原 -1→1 且方式 manual；原 9 可保持9；通过资料按实际字段同步会员及图片，刷新整体</td>
+          <td>不等于重新走了一次人工通过，也不能保证重建完整档案快照／重发全部通知</td>
+      </tr>
+      <tr>
+          <td>客户撤回 <code>cancelInfo</code></td>
+          <td>本人提交记录及状态</td>
+          <td>仅将符合条件的待审记录改为草稿0</td>
+          <td>此方法未直接刷新整体；不要在流程图上声称这一步同时重算所有汇总</td>
+      </tr>
+      <tr>
+          <td>客户重提 <code>resubmitKycInfo</code></td>
+          <td>本人的驳回明细、当前方案、表单、协议字段</td>
+          <td>事务内复制新草稿、更新最新标记、递增 <code>t_kyc_member_other</code> 编号；随后刷新会员／汇总</td>
+          <td>原 -1 保留，新草稿0；清空审核原因／人／时间／旅程，协议需重新签</td>
+      </tr>
+      <tr>
+          <td>仅刷新整体</td>
+          <td>会员、当前方案、启用模板、最新明细</td>
+          <td><code>t_member</code>、<code>t_kyc_member_summary</code></td>
+          <td>见第 5.3 节，不自动等于归档＋通知</td>
+      </tr>
+      <tr>
+          <td>全部通过业务处理</td>
+          <td>上述资料、监管字典、签署协议及题目标题</td>
+          <td>会员及 <code>t_member_other</code> 快照／监管类型；通知执行时写邮件日志</td>
+          <td>后台与客户侧副作用不同，见第 12.5 节</td>
+      </tr>
+      <tr>
+          <td>后台新增独立 POA</td>
+          <td>会员、国家、附件、已有独立 POA 与 KYC 地址历史</td>
+          <td><code>t_address_proof</code>；幂等键唯一，保存时直接9</td>
+          <td>不把它写成新 KYC 地址提交，不重写会员整体状态</td>
+      </tr>
+      <tr>
+          <td>支付通道可用性</td>
+          <td><code>t_wallet</code>、会员／扩展监管类型；<code>t_address_proof</code> 或 KYC 地址历史</td>
+          <td>认证查询本身不写 KYC 数据</td>
+          <td>KYC、POA、国家／监管限制分别校验；后续资金订单由资金流程创建</td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="124-表与表怎样关联核心关系图">12.4 表与表怎样关联：核心关系图</h3>
+<p>以下画的是<strong>代码中的逻辑关联</strong>，不是数据库已建立并强制检查的外键。省略部分公共字段，完整用途见逐表表格。</p>
+<div class="mermaid">flowchart TB
+    RT[&#34;t_kyc_regulatory_type&lt;br/&gt;PK id&#34;] --&gt;|id 对应 kyc_regulatory_type_id| SET[&#34;t_kyc_setting&lt;br/&gt;PK id；form_id 为模板 ID 集合&#34;]
+    SET --&gt;|id 对应会员当前 kyc_id；一个方案可分配多会员| MEM[&#34;t_member&lt;br/&gt;PK id；kyc_status 为整体结果&#34;]
+    SET --&gt;|form_id 按逗号拆分；应用层集合关系| FORM[&#34;t_system_form&lt;br/&gt;PK id；form_type 为业务分类&#34;]
+    FORM --&gt;|一表单多题目；detail.form_id| DETAIL[&#34;t_system_form_detail&lt;br/&gt;PK id；field 对应答案 key&#34;]
+    TYPE[&#34;t_system_form_type&lt;br/&gt;id／pid／key&#34;] --&gt;|form.form_type| FORM
+    TYPE --&gt;|detail.data_type：字段分类| DETAIL
+    MEM --&gt;|id 对应 kyc_member_id；一人多次提交| CONTENT[&#34;t_kyc_user_content&lt;br/&gt;PK kyc_id；答案 JSON＋单项状态&#34;]
+    SET --&gt;|id 对应 content.kyc_config_id| CONTENT
+    FORM --&gt;|id 对应 content.form_id| CONTENT
+    MEM --&gt;|member_id 唯一；0 或 1 行| OTHER[&#34;t_member_other&lt;br/&gt;证件图片／敏感影子／监管类型／档案引用&#34;]
+    RT --&gt;|id 对应 other.kyc_regulatory_type_id| OTHER
+    MEM --&gt;|member_id 唯一；0 或 1 行| SUM[&#34;t_kyc_member_summary&lt;br/&gt;最后申请／审核摘要&#34;]
+    MEM --&gt;|member_id 唯一；0 或 1 行| LINK[&#34;t_kyc_member_other&lt;br/&gt;按渠道保存重提 business_id&#34;]
+    OTHER -.快照 JSON 引用通过的提交记录.-&gt; CONTENT</div>
+<p>关键关联解释：</p>
+<ol>
+<li>一个方案可以选择多张不同类型表单；相同模板也可以被不同方案选择。由于 <code>form_id</code> 是 CSV 字符串，这种关联由应用代码拆分，不是规范的关系中间表。</li>
+<li>会员每次提交保存当时的 <code>kyc_config_id</code>。换方案后历史记录不会自动变成新方案记录；整体计算限定当前方案和启用表单。</li>
+<li>同一“会员＋方案＋表单”有多条提交历史。当前客户侧正式创建／重提等路径维护 <code>is_last</code>，待审列表用它；暂存 <code>stashInfoGtc</code> 直接 <code>updateOrCreate</code>，没有调用统一最新标记方法。整体服务按最大 <code>kyc_id</code> 选最新。两种取最新方式不应被误认成两套独立业务状态。</li>
+<li><code>kyc_form_detail_snapshot</code> 在提交明细 JSON 文本中；<code>kyc_profile_snapshot</code> 在会员扩展表 JSON 文本中；<strong>没有两张独立的快照表</strong>。</li>
+<li>一人一行指数据字典／脚本中的唯一键设计，不表示注册瞬间必定已经生成全部附表记录。</li>
+</ol>
+<p>协议、文件、第三方会话与 POA 的关联单独看：</p>
+<div class="mermaid">flowchart TB
+    MEM[&#34;t_member.id&#34;] --&gt;|member_id| AGR[&#34;t_contract_agreements&lt;br/&gt;KYC type=3；status=2 已签署&#34;]
+    FORM[&#34;t_system_form.id&#34;] --&gt;|model_id：这里是表单 ID| AGR
+    DETAIL[&#34;t_system_form_detail.id&#34;] --&gt;|form_detail_id| AGR
+    AGR --&gt;|id／uuid 对应 activity_id／activity_uuid| ACT[&#34;t_member_security_activity&lt;br/&gt;activity_type 区分签署业务&#34;]
+    AGR -.签署 URL 同时保存到答案字段.-&gt; CONTENT[&#34;t_kyc_user_content.kyc_content&lt;br/&gt;front_img／back_img／proof_ddress 等 URL&#34;]
+    MEM --&gt;|user_id：上传归属| ATT[&#34;t_attach&lt;br/&gt;原文件名＋savepath&#34;]
+    FILE[&#34;OSS／对象存储&lt;br/&gt;图片、地址文件、签署 PDF 本体&#34;] --&gt;|上传组件元数据；非所有路径都写| MINE[&#34;t_mine_attachment&lt;br/&gt;hash 唯一／url／storage_path&#34;]
+    ATT -.按路径查名称，不是提交外键.-&gt; CONTENT
+    CONTENT -.URL 引用.-&gt; FILE
+    MEM --&gt;|member_id| ID[&#34;t_identify&lt;br/&gt;ZOLOZ bizId／transactionId／结果&#34;]
+    MEM --&gt;|member_id| POA[&#34;t_address_proof&lt;br/&gt;独立 POA；不含 form_id／kyc_config_id&#34;]
+    POA -.proof_file URL 引用.-&gt; FILE
+    CONTENT --&gt;|地址表单历史作为一种来源| VIEW[地址证明合并展示／支付 POA 校验]
+    POA --&gt;|独立证明作为另一种来源| VIEW</div>
+<p>Sumsub 的申请人编号、IDwise 的 <code>journey_id</code>、ZOLOZ 的 <code>transactionId</code> 是不同系统的标识；不能靠同名 ID 相等来关联，也没有一张已确认统一保存三家全部原始回调的 MySQL 表。部分原始返回保存在 ZOLOZ 会话字段或应用日志中，日志文件／Redis 与业务表应分别排查。</p>
+<h3 id="125-审核事务全部通过副作用和失败位置">12.5 审核事务、全部通过副作用和失败位置</h3>
+<p>人工通过的数据库处理与外部副作用分开理解：</p>
+<div class="mermaid">flowchart TB
+    A[&#34;R 明细、会员、模板、国家／姓名规则&lt;br/&gt;R t_member_other 敏感索引和资料&#34;] --&gt; B{待审及权限／字段校验通过？}
+    B --&gt;|否| ERR[返回失败；不视为审核成功]
+    B --&gt;|是| TX1
+    subgraph TX[后台人工通过的数据库事务]
+        TX1[&#34;W t_member：普通资料&lt;br/&gt;敏感字段统一服务写主表兼容值&lt;br/&gt;及 t_member_other 密文／HMAC&#34;] --&gt; TX2[&#34;按需 W t_member_other.front/back&lt;br/&gt;W t_kyc_user_content：9＋审核人／时间&#34;]
+        TX2 --&gt; TX3[&#34;刷新整体、列表汇总&lt;br/&gt;W t_member、t_kyc_member_summary&#34;]
+        TX3 --&gt; TX4[&#34;满足全部通过时保存档案及监管类型&lt;br/&gt;W t_member_other&#34;]
+    end
+    TX4 --&gt; COMMIT{数据库提交成功？}
+    COMMIT --&gt;|失败| ROLLBACK[回滚数据库事务，返回操作失败]
+    COMMIT --&gt;|成功| POST[&#34;适用时同步外部 MT&lt;br/&gt;尝试单项／监管变更／整体通知&lt;br/&gt;整体成功处理还调用活动补发&#34;]
+    POST --&gt; LOG[&#34;成功响应有 changed_fields&lt;br/&gt;中间件 W t_modify_operation_logs&#34;]</div>
+<p>这里的 HMAC 是 <strong>Hash-based Message Authentication Code，基于密钥的消息认证码</strong>。项目把它用于手机号／证件号的精确匹配索引，不能从 HMAC 直接还原原值；密文用于受控还原。<strong>当前统一服务仍保留主表兼容明文，并非手机号和证件号已经彻底从主表清除。</strong> 表单答案、第三方返回等也有独立存储边界，不能据影子字段存在就认定全链路全部加密。</p>
+<p>全部通过后的通知与赠金链路：</p>
+<div class="mermaid">flowchart TB
+    PASS[当前必需项目全部通过] --&gt; SRC{由哪端进入完整成功处理？}
+    SRC --&gt;|客户侧 checkUserKycStatus| CLIENT[&#34;W t_member：整体9、Iscertified=1&lt;br/&gt;W t_member_other：快照／监管类型&#34;]
+    SRC --&gt;|后台 check_user_kyc_status| ADMIN[&#34;刷新 W t_member、t_kyc_member_summary&lt;br/&gt;W t_member_other：快照／监管类型&#34;]
+    ADMIN --&gt; GIFT[后台 sendKycSuccessNotify&lt;br/&gt;调用 grantActivityCreditByMemberId]
+    GIFT --&gt; GC{活动有效、参与记录未发、账号等条件满足？}
+    GC --&gt;|否| GNO[不发放／等待排查；KYC 结果已独立保存]
+    GC --&gt;|是| GW[&#34;赠金模块 W t_fund_detail：review&lt;br/&gt;调用外部 MT Credit&#34;]
+    GW --&gt; GM{MT 成功？}
+    GM --&gt;|是| GOK[&#34;W t_fund_detail：finish&lt;br/&gt;W t_activity_user：amount／give_time／状态等&#34;]
+    GM --&gt;|否| GFAIL[补发失败；检查资金明细及外部结果]
+    CLIENT --&gt; NOTE[&#34;整理已签署协议链接&lt;br/&gt;R t_contract_agreements＋t_system_form_detail&#34;]
+    ADMIN --&gt; NOTE
+    NOTE --&gt; EVENT[&#34;客户侧通知事件 → SendMemberEmailJob&lt;br/&gt;后台通过 option/memberAuditNotify 转入&#34;]
+    EVENT --&gt; MAIL[&#34;R t_mail_template、t_mail_template_lang&lt;br/&gt;R t_mail_config；可回退公共配置&lt;br/&gt;按客户语言选择内容&#34;]
+    MAIL --&gt; SEND[SMTP 发送；队列消费者需正常运行]
+    SEND --&gt; ML[&#34;W t_mail_log&lt;br/&gt;目标成功／拒绝模板另 W t_mail_send_log&lt;br/&gt;Sent 是发送受理结果&#34;]</div>
+<p>图里的赠金与通知是后台成功方法包含的两类调用；不是一个跨数据库、MT、邮件的整体原子事务。当前后台方法把赠金请求放在组装成功邮件之前，同处一个异常捕获块：若前面的远端请求抛异常，后面的成功邮件可能没有执行；远端返回业务失败也不意味着本地审核已回滚。客户侧成功分支没有相同的直接赠金调用，不能照搬后台顺序。</p>
+<p>需要知道的失败／补偿边界：</p>
+<ul>
+<li><strong>协议签署早于提交明细事务。</strong> <code>saveInfoGtc</code> 在循环处理协议字段时先生成并上传 PDF、写协议与安全活动，随后才进入保存提交明细的事务；后续校验或保存失败，不应假设前面的文件与签署记录自动一起回滚。签署成功记录与有效 KYC 提交要联查。</li>
+<li><strong>外部文件、MT、邮件不参加 MySQL 回滚。</strong> 文件已上传、MT 更新失败、通知入队但未发送等都应分别核实，不能只看接口一次响应。</li>
+<li><strong>重复触发不是完整幂等保证。</strong> 代码有最新记录标记、独立 POA 幂等键、ZOLOZ 缓存、活动 <code>give_time</code> 等防重复措施，但不能据此宣称所有回调／并发／外部资金操作都具备完整幂等或自动补偿；本文未做真实并发测试。</li>
+<li><strong>配置变更不会天然批量刷新所有旧客户。</strong> 当前规则编辑改变了后续计算输入；只有相应客户状态刷新或其他专门处理运行后，存储的整体结果才会按新条件更新，不能把规则保存画成全量客户重新认证已完成。</li>
+<li><strong>通知类型还存在实现差异。</strong> 后台可能发送 <code>customer_agreement_review</code> 和 <code>kyc_regulatory_type_change_notify</code>；当前客户侧 <code>approvedNotification</code> 的允许分支中，协议类型被注释，监管类型变更未列入，默认会抛“notification type not supported”。因此文档只写“尝试通知”，实际送达需核对当前部署和测试结果。客户侧监管同步仓库里的变更通知调用也被注释。</li>
+</ul>
+<p>证据：<a href="/Users/jalen/www/local/gtc_admin/app/admin/controller/Kyc.php:1458">人工通过事务及提交后处理</a>、<a href="/Users/jalen/www/local/gtc_admin/app/service/KycService.php:552">后台成功处理与赠金调用顺序</a>、<a href="/Users/jalen/www/local/gtcuser/app/Service/crm/KycService.php:2918">客户侧成功处理</a>、<a href="/Users/jalen/www/local/gtcuser/app/Service/Notification/EmailNotificationEventService.php:159">客户侧通知允许范围</a>、<a href="/Users/jalen/www/local/gtcuser/app/Repository/crm/MemberOtherRepository.php:56">客户侧监管同步通知注释</a>、<a href="/Users/jalen/www/local/gtcuser/app/Service/crm/MemberSensitiveGateway.php:98">敏感字段写入边界</a>。</p>
+<h3 id="126-从数据库看一个客户现在卡在哪">12.6 从数据库看一个客户现在卡在哪</h3>
+<p>排查应以明确的测试客户 ID 为范围，使用项目现成详情接口或受控查询；这里不执行查询，也不提供全表扫描脚本。</p>
+<ol>
+<li><strong>没有表单</strong>：看会员 <code>kyc_id</code>，对应方案是否存在、方案 <code>form_id</code> 是否包含启用模板，以及国家／个人企业关联是否匹配。不要先查旧 <code>kyc_level</code> 下结论。</li>
+<li><strong>页面显示待审</strong>：按“会员＋当前方案＋表单”定位最新 <code>kyc_user_content</code>；核对状态、提交时间、<code>journey_id</code>、审核方式、原因及题目快照。待审列表还依赖 <code>is_last</code>，标记与实际最新记录不一致可能影响待办展示。</li>
+<li><strong>第三方说通过、本地没通过</strong>：核对业务编号是否是当前渠道递增版本；IDwise 旅程是否匹配；ZOLOZ 看会话、结果与缓存；再查本地字段／绑定数量校验是否拒绝、文件或同步是否异常。第三方状态不能替代本地落库结果。</li>
+<li><strong>所有项目看似通过、整体不是9</strong>：确认看的是当前方案所有启用项目的最新记录，而不是历史通过行；区分“实时计算值”和主表保存值，核对入口是否已执行刷新。</li>
+<li><strong>整体9但档案／通知不一致</strong>：检查是否只走状态刷新或历史强制调整，是否执行完整成功处理；档案查 <code>member_other</code>，协议查签署状态与模型关联，通知查队列和邮件日志；不要用汇总表是否有审核人来判断全部副作用完成。</li>
+<li><strong>地址证明通过仍不能支付</strong>：分别检查 <code>hasValidPoa</code>、通道的 POA/KYC 开关、会员整体状态、国家及监管类型限制。独立 POA9 不等于整体 KYC9。</li>
+<li><strong>KYC9但赠金未到</strong>：先确认是哪个成功入口；再看活动有效期／<code>require_kyc</code>／默认组、参与记录和 <code>give_time</code>、交易账号、资金明细与 MT 结果。不要重复执行真实补发来试错。</li>
+</ol>
+<p><code>member_id</code>、<code>kyc_member_id</code>、当前方案和具体记录 ID 是主要定位条件。日志类表应再限制时间范围与分页；本次没有新增或运行大表 SQL，也没有做生产执行计划或性能结论。</p>
+<h3 id="127-代码两端字典与脚本的已确认差异">12.7 代码、两端字典与脚本的已确认差异</h3>
+<table>
+  <thead>
+      <tr>
+          <th>对象</th>
+          <th>已发现的证据</th>
+          <th>文档采用的口径</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>t_kyc_user_content.is_last</code></td>
+          <td>当前客户侧维护、后台待审查询使用；两端本地字典未列出</td>
+          <td>按代码解释功能，字段／索引是否已部署待核实；不能只按字典声称没有此机制</td>
+      </tr>
+      <tr>
+          <td><code>t_kyc_member_other</code></td>
+          <td>客户侧模型与重提代码使用；客户侧 <code>scripts/v2.17.0/v2.17.0.sql</code> 有建表和会员唯一键；两端字典未列出</td>
+          <td>明确列为当前重提附表，不将其误并到 <code>t_member_other</code></td>
+      </tr>
+      <tr>
+          <td><code>t_kyc_member_questions</code></td>
+          <td>客户侧旧模型／旧列表读取存在；两端字典未找到建表</td>
+          <td>只描述确认的旧接口依赖，不虚构索引、生产表存在性或现行主流程写入</td>
+      </tr>
+      <tr>
+          <td><code>t_address_proof.address_country_code</code></td>
+          <td>独立 POA 当前代码使用；客户侧 v2.17.0 建表脚本有定义，两端字典该表未列出</td>
+          <td>列出实际字段用途，同时标注结构差异</td>
+      </tr>
+      <tr>
+          <td><code>t_wallet.requires_poa</code></td>
+          <td>当前支付／后台通道代码使用；两端字典未列出；客户侧 v2.17.0 还有 <code>AFTER requires_poa</code> 的字段变更引用</td>
+          <td>按代码解释 POA 门禁，不据此认定发布结构完整</td>
+      </tr>
+      <tr>
+          <td><code>t_kyc_regulatory_type.status/remark/created_by/updated_by</code></td>
+          <td>当前管理 Service／模型使用；两端字典该表未完整列出；客户侧 v2.19.0 监管类型管理脚本有 ALTER</td>
+          <td>解释当前管理能力，部署前要核对实际结构</td>
+      </tr>
+      <tr>
+          <td><code>t_mail_send_log</code>、<code>t_member_other.email_lang</code></td>
+          <td>当前客户侧邮件代码使用，客户侧字典已列；后台字典未列</td>
+          <td>说明两端字典版本差异；发件跟踪与语言偏好按客户侧实现解释</td>
+      </tr>
+      <tr>
+          <td><code>is_last</code> 的维护入口</td>
+          <td>正式提交／重提／默认表单走统一维护；暂存直接 <code>updateOrCreate</code>，未调用该方法</td>
+          <td>不把所有写明细动作都画成必然同步最新标记；新草稿标记需结合实际字段默认值验证</td>
+      </tr>
+      <tr>
+          <td>KYC 状态注释／旧枚举</td>
+          <td>明细字典注释未写草稿0，客户侧旧枚举还有步骤含义</td>
+          <td>单项以0/1/-1/9、整体以0/1/2/9的当前服务为准，不按旧注释套用</td>
+      </tr>
+  </tbody>
+</table>
+<p>结构补证：<a href="/Users/jalen/www/local/gtcuser/scripts/v2.17.0/v2.17.0.sql:130">重提附表建表</a>、<a href="/Users/jalen/www/local/gtcuser/scripts/v2.17.0/v2.17.0.sql:57">POA 发布结构</a>、<a href="/Users/jalen/www/local/gtcuser/scripts/v2.19.0/3235-%E6%96%B0%E5%A2%9E%20KYC%20%E7%9B%91%E7%AE%A1%E7%B1%BB%E5%9E%8B%E7%AE%A1%E7%90%86%E5%8A%9F%E8%83%BD.sql:1">监管类型管理结构变更</a>、<a href="/Users/jalen/www/local/gtcuser/docs/%E6%95%B0%E6%8D%AE%E5%AD%97%E5%85%B8.sql:2794">客户侧邮件追踪字典</a>、<a href="/Users/jalen/www/local/gtcuser/scripts/v2.19.0/3300-%E5%AE%A2%E6%88%B7%E9%80%9A%E7%9F%A5%E9%82%AE%E4%BB%B6%E5%8F%91%E9%80%81%E8%AE%B0%E5%BD%95%E5%8F%8A%E8%A1%8C%E4%B8%BA%E8%BF%BD%E8%B8%AA%E5%85%B3%E8%81%94%E6%94%B9%E9%80%A0.sql:1">邮件追踪发布脚本</a>。</p>
+<p>这些是本地文件之间的差异，<strong>没有连接数据库验证生产缺表／缺列</strong>；也没有修改字典或执行发布脚本。</p>
+<h3 id="128-推荐阅读代码的顺序">12.8 推荐阅读代码的顺序</h3>
 <ol>
 <li>先读两端 <code>KycOverallStatusService</code>，掌握“整体通过”的唯一正常口径。</li>
 <li>再读客户侧 <code>saveInfoGtc</code>、<code>stashInfoGtc</code>、<code>resubmitKycInfo</code>，理解提交、草稿和重提。</li>
@@ -1128,7 +1716,14 @@
 </ol>
 <p>注意后台有两个名字相同的 Service：<code>app\service\KycService</code> 负责本地 KYC 业务；<code>app\service\kyc\KycService</code> 负责第三方客户端封装等能力。客户侧主业务则在 <code>App\Service\crm\KycService</code>，是另一个项目的类。</p>
 <h2 id="13-本次校验与可执行的后续核对顺序">13. 本次校验与可执行的后续核对顺序</h2>
-<p>本次通过静态阅读交叉核对了前端 API、控制器、Service、Model／Repository、事件及定时任务、相关公共函数、配置项名称和数据字典。未修改 PHP 文件，未运行会启动应用或连接数据库的命令，也未执行真实审核、第三方回调或文件上传。</p>
+<p>本次在原梳理上追加静态审计：交叉核对前端 API、控制器、Service、Model／Repository、事件及定时任务、相关公共函数、配置项名称、两端数据字典和有关发布脚本；补齐核心状态、重提编号、协议／文件、通知／审计、权限、独立 POA、活动补发与旧能力的表归属。未修改 PHP 文件，未运行会启动应用或连接数据库的命令，也未执行真实审核、第三方回调或文件上传。</p>
+<p>本次文档校验：</p>
+<ul>
+<li>92 处本地代码／结构引用均检查了文件存在和行号范围。</li>
+<li>49 个相关表名与两端字典对照；未在字典出现的 <code>t_kyc_member_other</code>、<code>t_kyc_member_questions</code> 已分别注明脚本补证或结构待核实。</li>
+<li>9 张 Mermaid 图按本站使用的 11.17.2 版本完成解析、渲染及截图检查，包含读写表标记、状态、异常分支及逻辑关联。</li>
+<li>隔离的 Hugo Markdown 页面渲染通过，文档 diff 无空白错误。完整站点构建因本机 Hugo 不是 Extended 版本、无法处理现有 SASS 主题而未通过；未更改站点主题或运行环境。</li>
+</ul>
 <p>若需要把这份说明进一步验证成某个实际环境的操作手册，按下面顺序进行：</p>
 <ol>
 <li>在测试环境核对启用规则、国家关联、个人／企业方案、当前模板和可见菜单。</li>
