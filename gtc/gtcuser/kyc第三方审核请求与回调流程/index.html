@@ -1,0 +1,1928 @@
+
+<!DOCTYPE html>
+<html
+  lang="zh-cn"
+  data-figures=""
+  
+    class="page"
+  
+  
+  >
+  <head>
+<title>Kyc第三方审核请求与回调流程 | 李建林个人知识库</title>
+<meta charset="utf-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+
+
+
+
+<meta property="og:locale" content="zh-cn" />
+
+<meta property="og:type" content="article">
+<meta name="description" content="KYC 第三方审核请求与回调流程
+
+本文承接 kycdsf.md 中的旧 /api/kyc/* 主链路，继续说明 Sumsub、IDWise、Zoloz 的请求构造、认证链接生成、审核结果回传和本地落库过程。
+结论以当前仓库代码为准；本次只新增分析文档，未修改业务代码，也未调用真实第三方接口。文中的密钥、Token、证 …" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:creator" content="">
+<meta name="twitter:title" content="" />
+<meta name="twitter:image" content="https://jianlin-li.github.io/images/thumbnail.png"/>
+<meta property="og:url" content="https://jianlin-li.github.io/gtc/gtcuser/kyc%E7%AC%AC%E4%B8%89%E6%96%B9%E5%AE%A1%E6%A0%B8%E8%AF%B7%E6%B1%82%E4%B8%8E%E5%9B%9E%E8%B0%83%E6%B5%81%E7%A8%8B/" />
+<meta property="og:title" content="" />
+<meta property="og:description" content="KYC 第三方审核请求与回调流程
+
+本文承接 kycdsf.md 中的旧 /api/kyc/* 主链路，继续说明 Sumsub、IDWise、Zoloz 的请求构造、认证链接生成、审核结果回传和本地落库过程。
+结论以当前仓库代码为准；本次只新增分析文档，未修改业务代码，也未调用真实第三方接口。文中的密钥、Token、证 …" />
+<meta property="og:image" content="https://jianlin-li.github.io/images/thumbnail.png" />
+
+<link rel="apple-touch-icon" sizes="180x180" href="https://jianlin-li.github.io/icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://jianlin-li.github.io/icons/favicon-32x32.png">
+<link rel="manifest" href="https://jianlin-li.github.io/icons/site.webmanifest">
+
+<link rel="canonical" href="https://jianlin-li.github.io/gtc/gtcuser/kyc%E7%AC%AC%E4%B8%89%E6%96%B9%E5%AE%A1%E6%A0%B8%E8%AF%B7%E6%B1%82%E4%B8%8E%E5%9B%9E%E8%B0%83%E6%B5%81%E7%A8%8B/">
+
+
+
+<link rel="preload" href="https://jianlin-li.github.io/css/styles.dc38388a8f0b890e788bd3a99b7495d14e7d5ac4359ed3b49abeb778497863b284ad4cc7e496ef58c84139295f9bafed82f5a41345eda86bd2d429cccb7c2596.css" integrity = "sha512-3Dg4io8LiQ54i9Opm3SV0U59WsQ1ntO0mr63eEl4Y7KErUzH5JbvWMhBOSlfm6/tgvWkE0XtqGvS1CnMy3wllg==" as="style" crossorigin="anonymous">
+
+
+
+<link rel="preload" href="https://jianlin-li.github.io/zh-cn/js/bundle.e4e0e4fbe8acb50d7f973828f4138cdbea727800047fc93f9abbd6751e8f3422d6ef193f98da36fdb8488219c25692d73da89480f46abc8421a4ee3526dd6c23.js" as="script" integrity=
+"sha512-5ODk&#43;&#43;istQ1/lzgo9BOM2&#43;pyeAAEf8k/mrvWdR6PNCLW7xk/mNo2/bhIghnCVpLXPaiUgPRqvIQhpO41Jt1sIw==" crossorigin="anonymous">
+
+
+<link rel="stylesheet" type="text/css" href="https://jianlin-li.github.io/css/styles.dc38388a8f0b890e788bd3a99b7495d14e7d5ac4359ed3b49abeb778497863b284ad4cc7e496ef58c84139295f9bafed82f5a41345eda86bd2d429cccb7c2596.css" integrity="sha512-3Dg4io8LiQ54i9Opm3SV0U59WsQ1ntO0mr63eEl4Y7KErUzH5JbvWMhBOSlfm6/tgvWkE0XtqGvS1CnMy3wllg==" crossorigin="anonymous">
+
+
+
+<style>
+  .post_body .mermaid {
+    overflow-x: auto;
+    margin: 1.5rem 0;
+  }
+
+  .post_body .mermaid svg {
+    min-width: 100%;
+    width: 100%;
+    height: auto;
+    max-width: none;
+  }
+
+  .post_body .mermaid svg[aria-roledescription="flowchart"],
+  .post_body .mermaid svg[aria-roledescription="flowchart-v2"] {
+    --gtc-flowchart-node-fill: #e7f2ff;
+    --gtc-flowchart-node-border: #d4e4f7;
+    --gtc-flowchart-node-text: #1683e8;
+    --gtc-flowchart-line: #b8bec6;
+    --gtc-flowchart-cluster-border: #e7e9ed;
+  }
+
+  .post_body .mermaid svg[aria-roledescription="flowchart"] .node rect,
+  .post_body .mermaid svg[aria-roledescription="flowchart-v2"] .node rect {
+    fill: var(--gtc-flowchart-node-fill);
+    stroke: var(--gtc-flowchart-node-border);
+    rx: 12px;
+    ry: 12px;
+  }
+
+  .post_body .mermaid svg[aria-roledescription="flowchart"] .node polygon,
+  .post_body .mermaid svg[aria-roledescription="flowchart-v2"] .node polygon {
+    fill: #ffffff !important;
+    stroke: var(--gtc-flowchart-node-text) !important;
+    stroke-dasharray: 3 3 !important;
+  }
+
+  .post_body .mermaid svg[aria-roledescription="flowchart"] .node .label,
+  .post_body .mermaid svg[aria-roledescription="flowchart-v2"] .node .label,
+  .post_body .mermaid svg[aria-roledescription="flowchart"] .nodeLabel,
+  .post_body .mermaid svg[aria-roledescription="flowchart-v2"] .nodeLabel {
+    color: var(--gtc-flowchart-node-text);
+    fill: var(--gtc-flowchart-node-text);
+  }
+
+  .post_body .mermaid svg[aria-roledescription="flowchart"] .edgePath path,
+  .post_body .mermaid svg[aria-roledescription="flowchart-v2"] .edgePath path {
+    stroke: var(--gtc-flowchart-line);
+    stroke-width: 1.2px;
+  }
+
+  .post_body .mermaid svg[aria-roledescription="flowchart"] .edgeLabel,
+  .post_body .mermaid svg[aria-roledescription="flowchart-v2"] .edgeLabel {
+    background-color: #ffffff;
+    color: var(--gtc-flowchart-node-text);
+  }
+
+  .post_body .mermaid svg[aria-roledescription="flowchart"] .edgeLabel rect,
+  .post_body .mermaid svg[aria-roledescription="flowchart-v2"] .edgeLabel rect {
+    fill: #ffffff;
+  }
+
+  .post_body .mermaid svg[aria-roledescription="flowchart"] .cluster rect,
+  .post_body .mermaid svg[aria-roledescription="flowchart-v2"] .cluster rect {
+    fill: #ffffff;
+    stroke: var(--gtc-flowchart-cluster-border);
+  }
+
+  .post_body .mermaid svg[aria-roledescription="flowchart"] .cluster text,
+  .post_body .mermaid svg[aria-roledescription="flowchart-v2"] .cluster text {
+    fill: #4b5563;
+  }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11.17.2/dist/mermaid.min.js" crossorigin="anonymous" defer></script>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    if (!window.mermaid) {
+      return;
+    }
+
+    window.mermaid.initialize({
+      startOnLoad: false,
+      securityLevel: "strict",
+      theme: "base",
+      themeVariables: {
+        primaryColor: "#e7f2ff",
+        primaryTextColor: "#1683e8",
+        primaryBorderColor: "#d4e4f7",
+        lineColor: "#b8bec6",
+        secondaryColor: "#ffffff",
+        tertiaryColor: "#ffffff",
+        clusterBkg: "#ffffff",
+        clusterBorder: "#e7e9ed",
+        edgeLabelBackground: "#ffffff",
+        fontFamily: "-apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif"
+      },
+      flowchart: {
+        curve: "linear",
+        nodeSpacing: 34,
+        rankSpacing: 44,
+        padding: 12,
+        subGraphTitleMargin: {
+          top: 12,
+          bottom: 18
+        },
+        htmlLabels: true
+      }
+    });
+    window.mermaid.run({ querySelector: ".mermaid" });
+  });
+</script>
+
+
+  </head>
+  <body
+    data-code="7"
+    data-lines="true"
+    id="documentTop"
+    data-lang="zh-cn"
+  >
+
+<header class="nav_header" >
+  <nav class="nav"><a href='https://jianlin-li.github.io/' class="nav_brand nav_item" title="李建林个人知识库">
+  <img src="https://jianlin-li.github.io/logos/logo.png" class="logo" alt="李建林个人知识库">
+  <div class="nav_close">
+    <div><svg class="icon">
+  <title>open-menu</title>
+  <use xlink:href="#open-menu"></use>
+</svg>
+<svg class="icon">
+  <title>closeme</title>
+  <use xlink:href="#closeme"></use>
+</svg>
+</div>
+  </div>
+</a>
+
+    <div class='nav_body nav_body_left'>
+      
+      
+      
+        
+
+  <div class="nav_parent">
+    <a href="https://jianlin-li.github.io/" class="nav_item" title="首页">首页 </a>
+  </div>
+  <div class="nav_parent">
+    <a href="https://jianlin-li.github.io/archives/" class="nav_item" title="归档">归档 </a>
+  </div>
+  <div class="nav_parent">
+    <a href="https://jianlin-li.github.io/categories/" class="nav_item" title="分类">分类 </a>
+  </div>
+  <div class="nav_parent">
+    <a href="https://jianlin-li.github.io/tags/" class="nav_item" title="标签">标签 </a>
+  </div>
+  <div class="nav_parent">
+    <a href="https://jianlin-li.github.io/about/" class="nav_item" title="关于">关于 </a>
+  </div>
+      
+<div class='follow'>
+  <a href="https://github.com/JianLin-Li">
+    <svg class="icon">
+  <title>github</title>
+  <use xlink:href="#github"></use>
+</svg>
+
+  </a>
+  <a href="http://local.gitlab.com">
+    <svg class="icon">
+  <title>gitlab</title>
+  <use xlink:href="#gitlab"></use>
+</svg>
+
+  </a>
+<div class="color_mode">
+  <input type="checkbox" class="color_choice" id="mode">
+</div>
+
+</div>
+
+    </div>
+  </nav>
+</header>
+
+    <main><div class="grid-inverse wrap content">
+  <article class="post_content">
+    <p class="gtc-breadcrumb"><a href="/gtc/">GTC 文档归档</a> / gtcuser</p>
+    <h1 class="post_title">Kyc第三方审核请求与回调流程</h1>
+    <div class="post_meta gtc-meta">
+      <span class="post_date">
+        2026-11-13
+      </span>
+      <span>项目：gtcuser</span>
+    </div>
+    
+    <div class="post_body">
+      <h1 id="kyc-第三方审核请求与回调流程">KYC 第三方审核请求与回调流程</h1>
+<blockquote>
+<p>本文承接 <code>kycdsf.md</code> 中的旧 <code>/api/kyc/*</code> 主链路，继续说明 Sumsub、IDWise、Zoloz 的请求构造、认证链接生成、审核结果回传和本地落库过程。</p>
+<p>结论以当前仓库代码为准；本次只新增分析文档，未修改业务代码，也未调用真实第三方接口。文中的密钥、Token、证件资料均使用占位符或字段名表示。</p>
+</blockquote>
+<h2 id="一先给结论">一、先给结论</h2>
+<ol>
+<li>三个渠道都从 <code>POST /api/kyc/kyc_link</code> 进入，由 <code>KycService::kycFormDataSave()</code> 按 <code>form_type + audit_method</code> 分流。</li>
+<li><strong>Sumsub 当前主链路不是先创建 applicant，再创建链接</strong>，而是直接请求 WebSDK Link 接口，以 <code>externalUserId + levelName</code> 让 Sumsub 建立或定位认证上下文。</li>
+<li><strong>IDWise 创建的是 Journey 验证链接</strong>。第三方返回原始 URL 和 <code>journey_id</code> 后，本地会把 URL 转成本站短链，并把 <code>journey_id</code> 作为 <code>transactionId</code> 返回给前端。</li>
+<li><strong>Zoloz 先写本地 <code>t_identify</code>，再调用 initialize</strong>。它返回 <code>transactionId + clientCfg</code>，本地分别生成 H5 长链和本站 <code>zoloz_redict</code> 跳转链。</li>
+<li>Sumsub 和 IDWise 的 Webhook 更像是“审核已完成通知”：收到通知后，本地还会再次调用第三方查询接口，获取申请人/Journey 的完整结果，不会只凭 Webhook 中的 <code>GREEN</code> 或 <code>Complete</code> 直接落库。</li>
+<li><strong>Zoloz 没有走服务器结果 Webhook</strong>。<code>completeCallbackUrl</code>、<code>interruptCallbackUrl</code> 是前端完成/中断跳转地址；真正审核结果由 <code>ZolozTask</code> 定时调用 <code>checkresult</code> 拉取。</li>
+<li>三个渠道最后都落到 <code>t_kyc_user_content</code>，身份对应 <code>form_type=2</code>，地址对应 <code>form_type=5</code>；单张表单通过后，再统一计算整个会员的 KYC 总状态。</li>
+<li>Sumsub、IDWise 重提时可能使用 <code>memberId_N</code> 作为第三方业务 ID；回调时再去掉 <code>_N</code> 找回本地会员。Zoloz 使用独立的雪花 <code>bizId + transactionId</code>，不是这套 <code>memberId_N</code> 规则。</li>
+</ol>
+<h2 id="二统一入口与渠道分流">二、统一入口与渠道分流</h2>
+<h3 id="21-接口入口">2.1 接口入口</h3>
+<p><code>KYCController::kycLink()</code> 接收：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="ln">1</span><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl">  <span class="nt">&#34;form_type&#34;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">3</span><span class="cl">  <span class="nt">&#34;audit_method&#34;</span><span class="p">:</span> <span class="s2">&#34;sumsub&#34;</span>
+</span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><ul>
+<li><code>form_type=2</code>：身份认证。</li>
+<li><code>form_type=5</code>：地址证明。</li>
+<li><code>audit_method</code>：<code>sumsub</code>、<code>idwise</code> 或 <code>zoloz</code>。</li>
+<li>接口有 <code>TokenMiddleware</code>，会员 ID 来自当前登录上下文，不由请求体指定。</li>
+</ul>
+<p>代码位置：</p>
+<ul>
+<li><code>app/Http/Api/Controller/V1/KYCController.php:184</code>：路由和参数接收。</li>
+<li><code>app/Service/crm/KycService.php:2826</code>：统一业务分流。</li>
+</ul>
+<h3 id="22-发起前的共同检查">2.2 发起前的共同检查</h3>
+<p><code>kycFormDataSave()</code> 依次执行：</p>
+<ol>
+<li>查询会员，会员不存在则报错。</li>
+<li>企业会员直接返回空数组，不走这里的第三方自动审核。</li>
+<li>根据 <code>member.kyc_id</code> 查询 <code>t_kyc_setting</code>。</li>
+<li>从 <code>audit_method_json</code> 取出全部 <code>kyc_channel</code>，检查本次 <code>audit_method</code> 是否被允许。</li>
+<li>读取本次渠道的第三方业务 ID。</li>
+<li>只有 <code>auto=1</code> 且 <code>form_type</code> 为 2 或 5 时才进入相应分支。</li>
+</ol>
+<div class="mermaid">flowchart TD
+    A[&#34;POST /api/kyc/kyc_link&#34;] --&gt; B[&#34;TokenMiddleware 获取 memberId&#34;]
+    B --&gt; C[&#34;kycFormDataSave(memberId, formType, auditMethod)&#34;]
+    C --&gt; D{&#34;会员存在且为个人会员？&#34;}
+    D -- &#34;否&#34; --&gt; E[&#34;报错或返回空数组&#34;]
+    D -- &#34;是&#34; --&gt; F[&#34;读取 t_kyc_setting&#34;]
+    F --&gt; G{&#34;audit_method 在 audit_method_json 中？&#34;}
+    G -- &#34;否&#34; --&gt; H[&#34;auth_method_not_exist&#34;]
+    G -- &#34;是&#34; --&gt; I{&#34;auto=1 且 formType=2/5？&#34;}
+    I -- &#34;否&#34; --&gt; J[&#34;返回空数组&#34;]
+    I -- &#34;是&#34; --&gt; K{&#34;audit_method&#34;}
+    K -- &#34;sumsub&#34; --&gt; L[&#34;生成 Sumsub WebSDK Link&#34;]
+    K -- &#34;idwise&#34; --&gt; M[&#34;创建 IDWise Journey Link&#34;]
+    K -- &#34;zoloz 且 formType=2&#34; --&gt; N[&#34;初始化 Zoloz 实名交易&#34;]
+    K -- &#34;zoloz 且 formType=5&#34; --&gt; J</div>
+<h3 id="23-level_name-的取值并不完全相同">2.3 <code>level_name</code> 的取值并不完全相同</h3>
+<table>
+  <thead>
+      <tr>
+          <th>场景</th>
+          <th>实际取值</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Sumsub 身份认证</td>
+          <td>当前渠道在 <code>t_kyc_setting.audit_method_json</code> 中的 <code>level_name</code>；缺失时回退到旧的 <code>t_kyc_setting.level_name</code></td>
+      </tr>
+      <tr>
+          <td>Sumsub 独立地址认证</td>
+          <td>全局 <code>kyc.kyc_service_config.Sumsub.location</code>，不是当前渠道 JSON 中的 <code>level_name</code></td>
+      </tr>
+      <tr>
+          <td>IDWise 身份、地址认证</td>
+          <td>当前渠道 JSON 中的 <code>level_name</code>，作为 IDWise <code>flow_id</code>；缺失时回退旧字段</td>
+      </tr>
+      <tr>
+          <td>Zoloz</td>
+          <td>不使用 <code>level_name</code>，由 <code>kyc.kyc_identy</code> 决定 Real ID 或证件识别</td>
+      </tr>
+  </tbody>
+</table>
+<p>对应代码：<code>app/Service/crm/KycService.php:1046</code>、<code>app/Service/crm/KycService.php:1073</code>、<code>app/Service/crm/KycService.php:2867</code>、<code>app/Service/crm/KycService.php:2894</code>。</p>
+<h3 id="24-返回给前端的结构">2.4 返回给前端的结构</h3>
+<p>身份分支统一返回：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="ln">1</span><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl">  <span class="nt">&#34;kycUrl&#34;</span><span class="p">:</span> <span class="s2">&#34;认证或跳转地址&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">3</span><span class="cl">  <span class="nt">&#34;h5&#34;</span><span class="p">:</span> <span class="s2">&#34;H5 地址&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">4</span><span class="cl">  <span class="nt">&#34;transactionId&#34;</span><span class="p">:</span> <span class="s2">&#34;第三方交易号；Sumsub 为空&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">5</span><span class="cl">  <span class="nt">&#34;type&#34;</span><span class="p">:</span> <span class="s2">&#34;1=Zoloz，2=Sumsub，3=IDWise&#34;</span>
+</span></span><span class="line"><span class="ln">6</span><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>地址分支只返回 <code>kycUrl、h5、transactionId</code>，没有 <code>type</code>。</p>
+<hr>
+<h2 id="三sumsub请求如何构造">三、Sumsub：请求如何构造</h2>
+<h3 id="31-请求时序">3.1 请求时序</h3>
+<div class="mermaid">sequenceDiagram
+    autonumber
+    participant FE as 前端
+    participant C as KYCController
+    participant S as KycService
+    participant A as KycApiService
+    participant SC as SumsubClient
+    participant SS as Sumsub
+
+    FE-&gt;&gt;C: POST /api/kyc/kyc_link&lt;br/&gt;form_type &#43; audit_method=sumsub
+    C-&gt;&gt;S: kycFormDataSave(memberId, formType, auditMethod)
+    S-&gt;&gt;S: 校验规则并取得 businessId、levelName
+    S-&gt;&gt;A: getWebSdkLink(businessId, levelName, &#34;&#34;, lang)
+    A-&gt;&gt;SC: getWebSdkLink(...)
+    SC-&gt;&gt;SC: 规范化语言、拼接 path/query、生成 HMAC 签名
+    SC-&gt;&gt;SS: POST /resources/sdkIntegrations/levels/{levelName}/websdkLink
+    SS--&gt;&gt;SC: {&#34;url&#34;: &#34;https://...&#34;}
+    SC--&gt;&gt;S: 第三方 WebSDK URL
+    S--&gt;&gt;FE: kycUrl/h5=URL，transactionId=&#34;&#34;
+    FE-&gt;&gt;SS: 打开 WebSDK URL，提交身份或地址材料</div>
+<h3 id="32-第三方-http-请求">3.2 第三方 HTTP 请求</h3>
+<p>代码位置：</p>
+<ul>
+<li><code>app/Common/Lib/Kyc/KycApiService.php:92</code>：Sumsub 客户端入口。</li>
+<li><code>app/Common/Lib/Kyc/lib/SumsubClient.php:81</code>：WebSDK URL 构造。</li>
+<li><code>app/Common/Lib/Kyc/lib/SumsubClient.php:284</code>：签名头和请求发送。</li>
+<li><code>app/Common/Lib/Kyc/lib/SumsubClient.php:309</code>：HMAC 签名原文。</li>
+</ul>
+<p>请求形态：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-http" data-lang="http"><span class="line"><span class="ln">1</span><span class="cl"><span class="err">POST {base_url}/resources/sdkIntegrations/levels/{levelName}/websdkLink?ttlInSecs=1800&amp;externalUserId={businessId}&amp;lang={lang}
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="err">Content-Type: application/json
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="err">X-App-Token: {app_token}
+</span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="err">X-App-Access-Ts: {timestamp}
+</span></span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="err">X-App-Access-Sig: {hmac_signature}
+</span></span></span></code></pre></div><p>请求体为空。主要参数含义：</p>
+<table>
+  <thead>
+      <tr>
+          <th>参数</th>
+          <th>来源与作用</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>levelName</code></td>
+          <td>身份来自规则渠道配置；独立地址来自全局 <code>location</code>；进入客户端后做 <code>rawurlencode</code></td>
+      </tr>
+      <tr>
+          <td><code>ttlInSecs=1800</code></td>
+          <td>WebSDK 链接有效期，代码固定为 1800 秒</td>
+      </tr>
+      <tr>
+          <td><code>externalUserId</code></td>
+          <td>本地 <code>businessId</code>，首次通常是 <code>memberId</code>，重提后可能是 <code>memberId_N</code></td>
+      </tr>
+      <tr>
+          <td><code>lang</code></td>
+          <td>当前系统语言，经 <code>normalizeSdkLang()</code> 转成 Sumsub 支持的语言码</td>
+      </tr>
+      <tr>
+          <td><code>externalActionId</code></td>
+          <td>当前 <code>kyc_link</code> 主链路传空，不出现在最终 query 中</td>
+      </tr>
+  </tbody>
+</table>
+<p>签名算法：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">signature = HMAC_SHA256(
+</span></span><span class="line"><span class="ln">2</span><span class="cl">    timestamp + UPPERCASE(HTTP_METHOD) + requestUri + requestBody,
+</span></span><span class="line"><span class="ln">3</span><span class="cl">    secret_key
+</span></span><span class="line"><span class="ln">4</span><span class="cl">)
+</span></span></code></pre></div><p>其中：</p>
+<ul>
+<li><code>requestUri</code> 包含路径和 query。</li>
+<li>当前生成链接的 <code>requestBody</code> 为空字符串。</li>
+<li>签名使用 <code>secret_key</code>，<code>app_token</code> 放在 <code>X-App-Token</code>。</li>
+<li>Guzzle 使用配置中的 <code>base_url</code> 发送请求；只接受 HTTP 200/201 为成功。</li>
+</ul>
+<p><strong>配置来源有一个容易忽略的点：</strong></p>
+<ul>
+<li><code>app_token、secret_key</code> 由 <code>KycApiService::getKycFactory()</code> 从 <code>crm.kyc_service_config.Sumsub</code> 读取并注入客户端，见 <code>app/Common/Lib/Kyc/KycApiService.php:49</code>。</li>
+<li><code>base_url、webhook_secret_key</code> 由 <code>SumsubClient</code> 自己从 <code>kyc.kyc_service_config.Sumsub</code> 读取，见 <code>app/Common/Lib/Kyc/lib/SumsubClient.php:33</code>。</li>
+<li>因此 outbound 请求签名和 inbound Webhook 验签不是完全来自同一个配置数组。</li>
+</ul>
+<h3 id="33-当前主链路没有显式调用-createapplicant">3.3 当前主链路没有显式调用 <code>createApplicant</code></h3>
+<p><code>SumsubClient</code> 虽然提供 <code>createApplicant()</code>，但当前 <code>kyc_link</code> 链路没有调用它；Controller 和 Service 中旧的申请人创建代码也已注释。因此理解当前流程时，应以“直接生成 WebSDK Link”为准，不要把旧流程拼接进来。</p>
+<h3 id="34-回调地址不在该请求中">3.4 回调地址不在该请求中</h3>
+<p>生成 WebSDK Link 的请求没有传服务器 Webhook URL。Sumsub 必须能把审核事件发送到：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">POST /api/kyc/kyc_webhook
+</span></span></code></pre></div><p>该地址需要由 Sumsub 侧的 Webhook 配置保证，而不是由 <code>kyc_link</code> 请求动态指定。</p>
+<hr>
+<h2 id="四sumsub回调和落库逻辑">四、Sumsub：回调和落库逻辑</h2>
+<h3 id="41-webhook-入口与验签">4.1 Webhook 入口与验签</h3>
+<p>入口：<code>KYCController::kycCallback()</code>，见 <code>app/Http/Api/Controller/V1/KYCController.php:323</code>。</p>
+<p>该接口没有会员 <code>TokenMiddleware</code>，依靠 Sumsub Webhook 摘要验证来源：</p>
+<ol>
+<li>读取原始请求体，并在可 seek 时 rewind，保证后续还能再次读取。</li>
+<li>从 <code>x-payload-digest-alg</code> 读取算法。</li>
+<li>支持 <code>HMAC_SHA1_HEX、HMAC_SHA256_HEX、HMAC_SHA512_HEX</code>。</li>
+<li>用 <code>webhook_secret_key</code> 对<strong>原始请求体</strong>计算 HMAC。</li>
+<li>与 <code>x-payload-digest</code> 比较，不一致则抛出 <code>Invalid signature</code>。</li>
+<li>验签通过后才 <code>json_decode</code>。</li>
+</ol>
+<p>代码：<code>app/Common/Lib/Kyc/lib/SumsubClient.php:236</code>。</p>
+<h3 id="42-事件过滤">4.2 事件过滤</h3>
+<p>Controller 只处理：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">type = applicantReviewed 或 applicantActionReviewed
+</span></span><span class="line"><span class="ln">2</span><span class="cl">且 reviewStatus = completed
+</span></span></code></pre></div><p>其他事件验签后不再进入业务处理。满足条件后调用：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">SumsubService::handleSumsubReviewedWebhook()
+</span></span></code></pre></div><h3 id="43-完整回调时序">4.3 完整回调时序</h3>
+<div class="mermaid">sequenceDiagram
+    autonumber
+    participant SS as Sumsub
+    participant C as KYCController
+    participant SC as SumsubClient
+    participant S as SumsubService
+    participant K as KycService
+    participant DB as 本地数据库
+
+    SS-&gt;&gt;C: POST /api/kyc/kyc_webhook
+    C-&gt;&gt;SC: callback(rawBody &#43; digest headers)
+    SC-&gt;&gt;SC: 按声明算法计算 HMAC 并验签
+    SC--&gt;&gt;C: 解码后的 Webhook 数据
+    C-&gt;&gt;C: 过滤事件类型和 completed
+    C-&gt;&gt;S: handleSumsubReviewedWebhook(data)
+    S-&gt;&gt;S: externalUserId 还原 memberId
+    S-&gt;&gt;S: 仅接受 reviewAnswer=GREEN/RED&lt;br/&gt;按 memberId 加锁
+    S-&gt;&gt;DB: 查询会员；总 KYC 已为 9 则跳过
+    S-&gt;&gt;SS: getApplicantsInfo(businessId)
+    SS--&gt;&gt;S: 申请人详情和 applicantId
+    S-&gt;&gt;SS: getApplicantRequiredIdDocsStatus(applicantId)
+    SS--&gt;&gt;S: IDENTITY / PROOF_OF_RESIDENCE 各步骤结果
+    alt 整体 RED
+        S-&gt;&gt;K: 分别拒绝命中的身份/地址表单
+    else 整体 GREEN
+        S-&gt;&gt;K: 同步步骤为 GREEN 的身份/地址表单
+    end
+    K-&gt;&gt;SS: 下载本次步骤的证件或地址材料
+    K-&gt;&gt;DB: 更新 kyc_user_content、会员资料、材料文件
+    K-&gt;&gt;K: checkUserKycStatus()
+    K-&gt;&gt;DB: 刷新会员 KYC 总状态及全通过副作用
+    C--&gt;&gt;SS: success</div>
+<p>核心代码：</p>
+<ul>
+<li><code>app/Service/Kyc/SumsubService.php:110</code>：业务 ID 还原、结果过滤、会员级锁、全通过跳过。</li>
+<li><code>app/Service/Kyc/SumsubService.php:148</code>：补拉申请人详情和步骤状态。</li>
+<li><code>app/Service/Kyc/SumsubService.php:240</code>：识别 <code>IDENTITY、IDENTITY2、PROOF_OF_RESIDENCE...</code> 等步骤。</li>
+<li><code>app/Service/Kyc/SumsubService.php:462</code>：整体 RED 时按步骤拒绝。</li>
+<li><code>app/Service/crm/KycService.php:344</code>：身份通过落库。</li>
+<li><code>app/Service/crm/KycService.php:458</code>：地址通过落库。</li>
+<li><code>app/Service/crm/KycService.php:1105</code>、<code>app/Service/crm/KycService.php:998</code>：身份/地址驳回落库。</li>
+</ul>
+<h3 id="44-green-和-red-的实际判断">4.4 GREEN 和 RED 的实际判断</h3>
+<h4 id="整体-green">整体 GREEN</h4>
+<p>本地不会只处理一个 <code>idDocs[0]</code> 就结束，而是：</p>
+<ol>
+<li>调 <code>getApplicantsInfo(businessId)</code> 获取申请人完整资料。</li>
+<li>调 <code>getApplicantRequiredIdDocsStatus(applicantId)</code> 获取每个步骤的结果。</li>
+<li>找出 <code>IDENTITY</code> 系列步骤中 <code>reviewResult.reviewAnswer=GREEN</code> 的项。</li>
+<li>按步骤的 <code>idDocType + country</code> 从申请人历史资料中匹配本次证件。</li>
+<li>找出 <code>PROOF_OF_RESIDENCE</code> 系列中结果为 GREEN 的项，匹配地址或地址证件。</li>
+<li>分别同步身份和地址，因此一个组合 Journey 可以同时完成两张本地表单。</li>
+<li>至少同步成功一项后调用 <code>checkUserKycStatus()</code>。</li>
+</ol>
+<h4 id="整体-red">整体 RED</h4>
+<ul>
+<li>从 Webhook 的整体 <code>reviewResult</code>、步骤 <code>reviewResult</code>、图片级 <code>imageReviewResults</code> 中提取拒绝原因。</li>
+<li>优先把 <code>rejectLabels</code> 映射为本地用户提示，其次使用 <code>moderationComment/clientComment</code>，最后使用通用拒绝提示。</li>
+<li><code>IDENTITY</code> 存在则拒绝身份；<code>PROOF_OF_RESIDENCE</code> 存在则拒绝地址。</li>
+<li>驳回时也会合并第三方已解析的 <code>kyc_content</code>，并尝试保存相应材料。</li>
+<li>最后调用 <code>checkUserKycStatus()</code>。</li>
+</ul>
+<h3 id="45-回调后还会发起哪些-sumsub-请求">4.5 回调后还会发起哪些 Sumsub 请求</h3>
+<table>
+  <thead>
+      <tr>
+          <th>请求</th>
+          <th>用途</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>GET /resources/applicants/-;externalUserId={businessId}/one</code></td>
+          <td>获取申请人资料、<code>applicantId</code></td>
+      </tr>
+      <tr>
+          <td><code>GET /resources/applicants/{applicantId}/requiredIdDocsStatus</code></td>
+          <td>获取身份/地址各步骤审核结果和本次图片 ID</td>
+      </tr>
+      <tr>
+          <td><code>GET /resources/applicants/{applicantId}/metadata/resources</code></td>
+          <td>获取材料资源元数据</td>
+      </tr>
+      <tr>
+          <td><code>GET /resources/inspections/{applicantId}/resources/{imageId}</code></td>
+          <td>下载具体材料内容</td>
+      </tr>
+  </tbody>
+</table>
+<p>这些请求也统一经过 <code>sendRequest()</code>，使用与生成链接相同的 Sumsub HMAC 请求签名。</p>
+<h3 id="46-我已完成主动刷新是另一条补偿链路">4.6 “我已完成”主动刷新是另一条补偿链路</h3>
+<p><code>POST /api/kyc/refresh_kyc_info</code> 会主动查询 Sumsub，不经过 Webhook 验签：</p>
+<ul>
+<li>入口：<code>app/Http/Api/Controller/V1/KYCController.php:307</code>。</li>
+<li>主逻辑：<code>app/Service/crm/KycService.php:3112</code>。</li>
+<li>查询 applicant 和 status 后，GREEN 走 <code>kycAuditReviewedAllNew()</code>，RED 走 <code>kycAuditReviewedRejected()</code>。</li>
+<li>它和 Webhook 成功/拒绝处理共用 <code>sumsubKycSync_{memberId}</code> 锁，降低并发重复落库概率。</li>
+</ul>
+<p>注意：主动刷新能否执行还受个人会员、<code>auto=1</code>、旧单渠道字段 <code>kyc_channel=sumsub</code>、存在未通过表单等条件限制，见 <code>app/Service/crm/KycService.php:3255</code>。</p>
+<hr>
+<h2 id="五idwise请求如何构造">五、IDWise：请求如何构造</h2>
+<h3 id="51-请求时序">5.1 请求时序</h3>
+<div class="mermaid">sequenceDiagram
+    autonumber
+    participant FE as 前端
+    participant K as KycService
+    participant A as KycApiService
+    participant IC as IdwiseClient
+    participant IW as IDWise
+    participant U as ShortURLService
+    participant DB as 本地数据库
+
+    FE-&gt;&gt;K: audit_method=idwise，form_type=2/5
+    K-&gt;&gt;K: businessId &#43; flowId
+    K-&gt;&gt;A: getIdwiseWebSdkLink(businessId, flowId)
+    A-&gt;&gt;IC: getWebSdkLink(reference_no=businessId, flow_id=flowId)
+    IC-&gt;&gt;IC: Basic Auth &#43; JSON body
+    IC-&gt;&gt;IW: POST /journey/v2/verification-links
+    IW--&gt;&gt;IC: url &#43; journey_id
+    IC--&gt;&gt;A: 原始 URL &#43; journey_id
+    A-&gt;&gt;U: 将原始 URL 保存为短链
+    U-&gt;&gt;DB: 写 short_url，remark 保存 journey_id/externalUserId
+    U--&gt;&gt;A: /api/open/short_url_redirect?short_code=...
+    A--&gt;&gt;K: 短链 &#43; journey_id
+    K-&gt;&gt;DB: 将 journey_id 写到最新待处理表单
+    K--&gt;&gt;FE: kycUrl/h5=本站短链，transactionId=journey_id，type=3</div>
+<h3 id="52-第三方-http-请求">5.2 第三方 HTTP 请求</h3>
+<p>代码：</p>
+<ul>
+<li><code>app/Common/Lib/Kyc/lib/IdwiseClient.php:46</code>：创建验证链接。</li>
+<li><code>app/Common/Lib/Kyc/lib/IdwiseClient.php:92</code>：Basic 认证和 HTTP 发送。</li>
+<li><code>app/Common/Lib/Kyc/KycApiService.php:103</code>：短链包装。</li>
+</ul>
+<p>请求：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-http" data-lang="http"><span class="line"><span class="ln">1</span><span class="cl"><span class="err">POST {base_url}/journey/v2/verification-links
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="err">Content-Type: application/json
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="err">Authorization: Basic base64(api_key:api_secret)
+</span></span></span></code></pre></div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="ln">1</span><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl">  <span class="nt">&#34;flow_id&#34;</span><span class="p">:</span> <span class="s2">&#34;规则中当前 IDWise 渠道的 level_name&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">3</span><span class="cl">  <span class="nt">&#34;reference_no&#34;</span><span class="p">:</span> <span class="s2">&#34;memberId 或 memberId_N&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">4</span><span class="cl">  <span class="nt">&#34;validity_duration&#34;</span><span class="p">:</span> <span class="mi">30</span>
+</span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>其他实际行为：</p>
+<ul>
+<li><code>flow_id</code> 为空会报 <code>KYC Level not found</code>。</li>
+<li>请求超时时间显式设置为 10 秒。</li>
+<li>只接受 HTTP 200。</li>
+<li>请求体没有传服务器 Webhook 地址；IDWise 侧需要配置 <code>POST /api/kyc/idwise_kyc_webhook</code>。</li>
+</ul>
+<h3 id="53-本地短链不是新的第三方认证">5.3 本地短链不是新的第三方认证</h3>
+<p>第三方返回的 <code>url</code> 会写入 <code>short_url.long_url</code>，前端拿到的是：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">{PC_SITE_URL}api/open/short_url_redirect?short_code={short_code}
+</span></span></code></pre></div><p>访问该短链后，<code>ShortUrlController</code> 再 302 到 IDWise 原始 URL。代码：</p>
+<ul>
+<li><code>app/Service/crm/ShortURLService.php:16</code></li>
+<li><code>app/Http/Api/Controller/Open/ShortUrlController.php:28</code></li>
+</ul>
+<p><code>journey_id</code> 会同时：</p>
+<ul>
+<li>作为 <code>transactionId</code> 返回前端；</li>
+<li>写入短链记录的 <code>remark</code>；</li>
+<li>通过 <code>markLatestKycLinkContent()</code> 写到最新身份/地址表单的 <code>journey_id</code>，供后续人工审核回调核对。</li>
+</ul>
+<hr>
+<h2 id="六idwisewebhook-和落库逻辑">六、IDWise：Webhook 和落库逻辑</h2>
+<h3 id="61-入口和来源校验">6.1 入口和来源校验</h3>
+<p>入口：<code>POST /api/kyc/idwise_kyc_webhook</code>，见 <code>app/Http/Api/Controller/V1/KYCController.php:402</code>。</p>
+<p>处理过程：</p>
+<ol>
+<li>Controller 读取并 rewind 原始 body。</li>
+<li><code>KycService::idwiseCallback()</code> 创建 <code>IdwiseClient</code> 并调用其 <code>callback()</code>。</li>
+<li><code>IdwiseClient::callback()</code> 比较请求 <code>Authorization</code> 与代码中配置的固定 Bearer 凭证。</li>
+<li>不一致抛出 <code>Invalid signature</code>；一致则解析 JSON。</li>
+</ol>
+<p>代码：<code>app/Common/Lib/Kyc/lib/IdwiseClient.php:136</code>。</p>
+<p>这里不是对原始 body 做 HMAC，也不是使用创建 Journey 时的 Basic 凭证，而是单独的 Webhook Bearer 校验。本文不展示具体凭证值。</p>
+<h3 id="62-finished-journey">6.2 Finished Journey</h3>
+<p>Webhook 中主要使用：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">body.referenceNo  -&gt; 还原本地 memberId
+</span></span><span class="line"><span class="ln">2</span><span class="cl">body.journeyId    -&gt; 再查完整 Journey
+</span></span><span class="line"><span class="ln">3</span><span class="cl">body.systemDecision
+</span></span><span class="line"><span class="ln">4</span><span class="cl">event
+</span></span></code></pre></div><p>分支：</p>
+<table>
+  <thead>
+      <tr>
+          <th><code>event / systemDecision</code></th>
+          <th>实际处理</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>Finished Journey / Incomplete</code></td>
+          <td>不处理</td>
+      </tr>
+      <tr>
+          <td><code>Finished Journey / Complete</code></td>
+          <td>查询完整 Journey，再按 documents 判断</td>
+      </tr>
+      <tr>
+          <td><code>Finished Journey / Refer</code></td>
+          <td>同样查询完整 Journey，不直接整体拒绝</td>
+      </tr>
+      <tr>
+          <td><code>Finished Journey / Rejected</code></td>
+          <td>同样查询完整 Journey</td>
+      </tr>
+      <tr>
+          <td><code>Updated Journey</code></td>
+          <td>进入 IDWise 后台人工审核结果处理</td>
+      </tr>
+  </tbody>
+</table>
+<p>完整 Journey 查询：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-http" data-lang="http"><span class="line"><span class="ln">1</span><span class="cl"><span class="err">GET {base_url}/journey/v2/get/{journeyId}
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="err">Authorization: Basic ...
+</span></span></span></code></pre></div><p>代码：<code>app/Common/Lib/Kyc/lib/IdwiseClient.php:68</code>。</p>
+<h3 id="63-回调时序">6.3 回调时序</h3>
+<div class="mermaid">sequenceDiagram
+    autonumber
+    participant IW as IDWise
+    participant C as KYCController
+    participant K as KycService
+    participant IC as IdwiseClient
+    participant DB as 本地数据库
+
+    IW-&gt;&gt;C: POST /api/kyc/idwise_kyc_webhook
+    C-&gt;&gt;K: idwiseCallback(request)
+    K-&gt;&gt;IC: callback(request)
+    IC-&gt;&gt;IC: 校验 Bearer Authorization
+    IC--&gt;&gt;K: event &#43; body
+    K-&gt;&gt;K: referenceNo 还原 memberId
+    alt Finished Journey 且 decision 非 Incomplete
+        K-&gt;&gt;IC: getJourneyResult(journeyId)
+        IC-&gt;&gt;IW: GET /journey/v2/get/{journeyId}
+        IW--&gt;&gt;K: documents、selfie、rules 等完整结果
+        loop 每个 document
+            K-&gt;&gt;K: 判断步骤是否通过并提取失败原因
+            alt ID Document
+                K-&gt;&gt;K: 检查 selfie；同步身份或驳回身份
+            else Proof of Address
+                K-&gt;&gt;K: 同步地址或驳回地址
+            end
+        end
+    else Updated Journey
+        K-&gt;&gt;IC: getJourneyResult(journeyId)
+        K-&gt;&gt;K: 仅处理人工 Approve 的 stepId=10/30
+    else Incomplete 或其他事件
+        K-&gt;&gt;K: 不处理
+    end
+    K-&gt;&gt;IC: 按需下载证件/地址图片
+    K-&gt;&gt;DB: 更新表单、会员资料和材料
+    K-&gt;&gt;K: checkUserKycStatus()
+    C--&gt;&gt;IW: success</div>
+<p>核心代码：</p>
+<ul>
+<li><code>app/Service/crm/KycService.php:3392</code>：事件分派。</li>
+<li><code>app/Service/crm/KycService.php:3458</code>：完整 Journey 和 documents 处理。</li>
+<li><code>app/Service/crm/KycService.php:3577</code>：单步骤通过条件。</li>
+<li><code>app/Service/crm/KycService.php:3593</code>：驳回原因提取。</li>
+<li><code>app/Service/crm/KycService.php:3701</code>、<code>app/Service/crm/KycService.php:3813</code>：身份/地址通过落库。</li>
+<li><code>app/Service/crm/KycService.php:4105</code>：后台人工审核通过处理。</li>
+</ul>
+<h3 id="64-单个-document-的通过条件">6.4 单个 document 的通过条件</h3>
+<p>代码要求两个条件同时成立：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">validation_result.validation_outcome = Passed
+</span></span><span class="line"><span class="ln">2</span><span class="cl">且 has_passed_rules = true
+</span></span></code></pre></div><p>身份步骤 <code>step_title=ID Document</code> 还有人脸检查：</p>
+<ul>
+<li>如果返回了 <code>selfie.status</code>，且该状态不是 <code>Complete</code>，即使证件 document 通过，也会按人脸核验失败拒绝身份。</li>
+<li>地址步骤使用 <code>step_title=Proof of Address</code>。</li>
+</ul>
+<p>驳回原因来源：</p>
+<ol>
+<li>文件校验失败：读取 <code>validation_result.validation_checks</code> 中未通过项。</li>
+<li>规则失败：根据 <code>documents.step_id</code> 去顶层 <code>rule_results</code> 找引用该步骤的失败规则。</li>
+<li>保存 <code>message</code> 到 <code>kyc_replay</code>，保存校验/规则名到 <code>reject_check_type</code>。</li>
+</ol>
+<h3 id="65-旅程级-refer-的兜底">6.5 旅程级 Refer 的兜底</h3>
+<p>当完整结果没有 <code>documents</code>，且 <code>system_decision=Refer</code> 时：</p>
+<ul>
+<li>根据当前规则需要哪些身份/地址表单，以及本地各表单最新状态，判断应拒绝身份还是地址。</li>
+<li>能定位到表单则写入通用驳回原因。</li>
+<li>无法定位则只记录日志。</li>
+</ul>
+<p>代码：<code>app/Service/crm/KycService.php:3474</code> 和 <code>app/Service/crm/KycService.php:4045</code>。</p>
+<h3 id="66-idwise-后台人工审核通过">6.6 IDWise 后台人工审核通过</h3>
+<p><code>Updated Journey</code> 不等于无条件通过。代码要求：</p>
+<ol>
+<li><code>manualReviewDetails.reviewedSteps</code> 非空。</li>
+<li>当前步骤 <code>decision=Approve</code>。</li>
+<li><code>stepId=10</code> 映射身份，<code>stepId=30</code> 映射地址。</li>
+<li>本地最新对应表单必须是已驳回状态。</li>
+<li>本地旧记录如果已有 <code>journey_id</code>，必须与本次回调一致。</li>
+<li>再从完整 Journey 中取对应 document，并检查关键 OCR 字段是否完整。</li>
+<li>满足条件后复用正常身份/地址通过落库方法。</li>
+</ol>
+<h3 id="67-材料下载">6.7 材料下载</h3>
+<p>IDWise 结果中的 <code>front_image_path/back_image_path</code> 不是直接当成本地文件 URL，而是继续调用：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-http" data-lang="http"><span class="line"><span class="ln">1</span><span class="cl"><span class="err">GET {base_url}/journey/image/{imagePath}
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="err">Authorization: Basic ...
+</span></span></span></code></pre></div><p>取得文件内容后，再上传本地/OSS，并写回 <code>kyc_content</code> 的证件正反面或地址证明字段。代码：<code>app/Common/Lib/Kyc/lib/IdwiseClient.php:80</code>、<code>app/Service/crm/KycService.php:3976</code>。</p>
+<hr>
+<h2 id="七zoloz请求如何构造">七、Zoloz：请求如何构造</h2>
+<h3 id="71-先选择-real-id-还是证件识别">7.1 先选择 Real ID 还是证件识别</h3>
+<p>Zoloz 只支持这里的身份认证 <code>form_type=2</code>：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">kyc.kyc_identy = doc -&gt; IdentifyBase::BUSSINESS_TYPE_DOC
+</span></span><span class="line"><span class="ln">2</span><span class="cl">                     -&gt; ZolozTool::idrecognition()
+</span></span><span class="line"><span class="ln">3</span><span class="cl">                     -&gt; /api/v1/zoloz/idrecognition/initialize
+</span></span><span class="line"><span class="ln">4</span><span class="cl">
+</span></span><span class="line"><span class="ln">5</span><span class="cl">其他值             -&gt; IdentifyBase::BUSSINESS_TYPE_IDENTY
+</span></span><span class="line"><span class="ln">6</span><span class="cl">                     -&gt; ZolozTool::realid()
+</span></span><span class="line"><span class="ln">7</span><span class="cl">                     -&gt; /api/v1/zoloz/realid/initialize
+</span></span></code></pre></div><p>代码：<code>app/Service/crm/KycService.php:2854</code>、<code>app/Common/Lib/Identify/IdentifyBase.php:58</code>。</p>
+<h3 id="72-本地业务记录先于第三方请求">7.2 本地业务记录先于第三方请求</h3>
+<p><code>IdentifyBase</code> 在调用第三方前生成雪花 <code>bizId</code>，并写入 <code>t_identify</code>：</p>
+<table>
+  <thead>
+      <tr>
+          <th>字段</th>
+          <th>内容</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>bizId</code></td>
+          <td>本地生成的唯一业务号</td>
+      </tr>
+      <tr>
+          <td><code>member_id</code></td>
+          <td>本地会员 ID</td>
+      </tr>
+      <tr>
+          <td><code>bussiness_type</code></td>
+          <td>1=人脸实名，3=证件实名</td>
+      </tr>
+      <tr>
+          <td><code>type</code></td>
+          <td>1=Real ID，3=DOC</td>
+      </tr>
+      <tr>
+          <td><code>identify_type</code></td>
+          <td>1=Zoloz</td>
+      </tr>
+      <tr>
+          <td><code>business_result</code></td>
+          <td>初始为空</td>
+      </tr>
+      <tr>
+          <td><code>created_time/updated_time</code></td>
+          <td>当前时间</td>
+      </tr>
+  </tbody>
+</table>
+<p>代码：<code>app/Common/Lib/Identify/IdentifyBase.php:115</code>。表结构和 <code>bizId</code> 唯一索引见 <code>docs/数据字典.sql:2444</code>。</p>
+<h3 id="73-初始化请求时序">7.3 初始化请求时序</h3>
+<div class="mermaid">sequenceDiagram
+    autonumber
+    participant FE as 前端
+    participant K as KycService
+    participant B as IdentifyBase
+    participant Z as ZolozTool
+    participant DB as t_identify
+    participant ZO as Zoloz
+
+    FE-&gt;&gt;K: audit_method=zoloz，form_type=2
+    K-&gt;&gt;B: identify(tool=1, memberInfo, businessType)
+    B-&gt;&gt;B: 生成雪花 bizId
+    B-&gt;&gt;DB: 创建本地认证记录
+    B-&gt;&gt;Z: realid(bizId,...) 或 idrecognition(bizId,...)
+    Z-&gt;&gt;Z: 组装 JSON body 和 RSA 签名
+    Z-&gt;&gt;ZO: POST realid/initialize 或 idrecognition/initialize
+    ZO--&gt;&gt;Z: transactionId &#43; clientCfg &#43; result
+    Z-&gt;&gt;DB: 保存 transactionId 和 H5 长链
+    Z--&gt;&gt;K: url=本站 zoloz_redict，h5=Zoloz H5，transactionId
+    K--&gt;&gt;FE: kycUrl/h5/transactionId/type=1
+    FE-&gt;&gt;ZO: 通过 H5 提交认证材料</div>
+<h3 id="74-两种-initialize-请求体">7.4 两种 initialize 请求体</h3>
+<p>Real ID：<code>app/Common/Lib/Identify/ZolozTool.php:154</code></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl">  <span class="nt">&#34;bizId&#34;</span><span class="p">:</span> <span class="s2">&#34;本地雪花 bizId&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl">  <span class="nt">&#34;metaInfo&#34;</span><span class="p">:</span> <span class="s2">&#34;MOB_H5&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl">  <span class="nt">&#34;flowType&#34;</span><span class="p">:</span> <span class="s2">&#34;H5_REALIDLITE_KYC&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl">  <span class="nt">&#34;autoDocCategory&#34;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&#34;由配置拆分&#34;</span><span class="p">],</span>
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">  <span class="nt">&#34;userId&#34;</span><span class="p">:</span> <span class="s2">&#34;本地 memberId&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl">  <span class="nt">&#34;h5ModeConfig&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl">    <span class="nt">&#34;completeCallbackUrl&#34;</span><span class="p">:</span> <span class="s2">&#34;前端成功跳转地址&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">    <span class="nt">&#34;interruptCallbackUrl&#34;</span><span class="p">:</span> <span class="s2">&#34;前端中断跳转地址&#34;</span>
+</span></span><span class="line"><span class="ln">10</span><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="ln">11</span><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>证件识别：<code>app/Common/Lib/Identify/ZolozTool.php:463</code></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl">  <span class="nt">&#34;bizId&#34;</span><span class="p">:</span> <span class="s2">&#34;本地雪花 bizId&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl">  <span class="nt">&#34;metaInfo&#34;</span><span class="p">:</span> <span class="s2">&#34;MOB_H5&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl">  <span class="nt">&#34;userId&#34;</span><span class="p">:</span> <span class="s2">&#34;本地 memberId&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl">  <span class="nt">&#34;autoDocCategory&#34;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&#34;由配置拆分&#34;</span><span class="p">],</span>
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">  <span class="nt">&#34;h5ModeConfig&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl">    <span class="nt">&#34;completeCallbackUrl&#34;</span><span class="p">:</span> <span class="s2">&#34;前端成功跳转地址&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl">    <span class="nt">&#34;interruptCallbackUrl&#34;</span><span class="p">:</span> <span class="s2">&#34;前端中断跳转地址&#34;</span>
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">  <span class="p">},</span>
+</span></span><span class="line"><span class="ln">10</span><span class="cl">  <span class="nt">&#34;productConfig&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">11</span><span class="cl">    <span class="nt">&#34;spoofMode&#34;</span><span class="p">:</span> <span class="s2">&#34;STANDARD&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">12</span><span class="cl">    <span class="nt">&#34;allowExpiredDocument&#34;</span><span class="p">:</span> <span class="s2">&#34;N&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">13</span><span class="cl">    <span class="nt">&#34;deeperMode&#34;</span><span class="p">:</span> <span class="s2">&#34;STANDARD&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">14</span><span class="cl">    <span class="nt">&#34;enableOCR&#34;</span><span class="p">:</span> <span class="s2">&#34;Y&#34;</span>
+</span></span><span class="line"><span class="ln">15</span><span class="cl">  <span class="p">},</span>
+</span></span><span class="line"><span class="ln">16</span><span class="cl">  <span class="nt">&#34;operationMode&#34;</span><span class="p">:</span> <span class="s2">&#34;STANDARD&#34;</span>
+</span></span><span class="line"><span class="ln">17</span><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><h3 id="75-rsa-请求签名">7.5 RSA 请求签名</h3>
+<p>公共发送方法：<code>app/Common/Lib/Identify/ZolozTool.php:523</code>。</p>
+<p>请求头：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-http" data-lang="http"><span class="line"><span class="ln">1</span><span class="cl"><span class="err">Content-Type: application/json; charset=UTF-8
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="err">Accept: application/json
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="err">Client-Id: {client_id}
+</span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="err">Request-Time: {ISO8601 time}
+</span></span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="err">Signature: algorithm=RSA256, keyVersion=v1, signature={signature}
+</span></span></span></code></pre></div><p>签名原文：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">POST {path}
+</span></span><span class="line"><span class="ln">2</span><span class="cl">{client_id}.{Request-Time}.{jsonData}
+</span></span></code></pre></div><p>即第一行是 HTTP 方法和路径，第二行是 <code>client_id、请求时间、完整 JSON body</code> 用点号连接。处理步骤：</p>
+<ol>
+<li>使用配置的商户私钥做 <code>SHA256withRSA</code> 签名。</li>
+<li>对二进制签名做 Base64。</li>
+<li>再做 URL encode 后放入 <code>Signature</code> 头。</li>
+</ol>
+<p>这里读取的是私钥文件路径配置，文档不展示证书内容。</p>
+<h3 id="76-initialize-成功后的两个-url">7.6 initialize 成功后的两个 URL</h3>
+<p>第三方成功返回 <code>transactionId + clientCfg</code> 后：</p>
+<ul>
+<li><code>h5</code>：Zoloz 对应产品 H5 地址，拼接 <code>?clientcfg={urlencode(clientCfg)}</code>。</li>
+<li><code>kycUrl/url</code>：本站 <code>/api/kyc/zoloz_redict?bizId={本地bizId}</code>。</li>
+<li><code>transactionId</code>：Zoloz 返回的交易号，同时保存到 <code>t_identify.transactionId</code>。</li>
+<li><code>t_identify.url</code>：保存上面的 Zoloz H5 长链。</li>
+</ul>
+<p><code>zoloz_redict</code> 只是根据 <code>bizId</code> 查出 <code>t_identify.url</code> 并 302 跳转，见 <code>app/Http/Api/Controller/V1/KYCController.php:95</code>。<strong>它不是审核结果回调。</strong></p>
+<hr>
+<h2 id="八zoloz没有服务器结果-webhook实际是定时轮询">八、Zoloz：没有服务器结果 Webhook，实际是定时轮询</h2>
+<h3 id="81-定时任务">8.1 定时任务</h3>
+<p>任务：<code>app/Task/KycTask/ZolozTask.php:12</code>。</p>
+<ul>
+<li>Cron：每分钟的第 40 秒执行一次。</li>
+<li>只有 <code>BASE_CRONTAB</code> 开启才启用。</li>
+<li><code>singleton=true</code>，避免同一个任务并发执行。</li>
+<li>查询 <code>t_identify</code> 的条件：
+<ul>
+<li><code>has_cached=0</code>；</li>
+<li><code>identify_type=1</code>，即 Zoloz；</li>
+<li><code>transactionId</code> 非空；</li>
+<li><code>created_time &gt;= 当前时间 - 24小时</code>；</li>
+<li><code>type != 0</code>。</li>
+</ul>
+</li>
+</ul>
+<p>代码注释写“每次处理一小时的数据”，但实际条件是 <strong>24 小时</strong>，应以代码为准。</p>
+<h3 id="82-结果查询">8.2 结果查询</h3>
+<p>根据本地 <code>type</code> 选择：</p>
+<table>
+  <thead>
+      <tr>
+          <th>本地类型</th>
+          <th>第三方接口</th>
+          <th>结果字段</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Real ID</td>
+          <td><code>POST /api/v1/zoloz/realid/checkresult</code></td>
+          <td><code>ekycResult</code></td>
+      </tr>
+      <tr>
+          <td>DOC</td>
+          <td><code>POST /api/v1/zoloz/idrecognition/checkresult</code></td>
+          <td><code>extInfo.recognitionResult</code>，Y 转为 Success，其他转为 Fail</td>
+      </tr>
+  </tbody>
+</table>
+<p>请求使用原交易的 <code>transactionId</code>；请求自身的 <code>bizId</code> 是本次 checkresult 新生成的业务号。结果查询仍复用 Zoloz 的 RSA 签名发送方法。</p>
+<p>代码：</p>
+<ul>
+<li><code>app/Common/Lib/Identify/IdentifyBase.php:93</code></li>
+<li><code>app/Common/Lib/Identify/ZolozTool.php:193</code></li>
+<li><code>app/Common/Lib/Identify/ZolozTool.php:408</code></li>
+</ul>
+<h3 id="83-轮询时序和落库">8.3 轮询时序和落库</h3>
+<div class="mermaid">sequenceDiagram
+    autonumber
+    participant T as ZolozTask
+    participant DB as t_identify
+    participant B as IdentifyBase
+    participant Z as ZolozTool
+    participant ZO as Zoloz
+    participant K as KycService
+    participant KDB as KYC/会员表
+
+    loop 每分钟第 40 秒
+        T-&gt;&gt;DB: 查询 24 小时内、has_cached=0 的 Zoloz 交易
+        loop 每条交易
+            T-&gt;&gt;B: identify_result(transactionId)
+            B-&gt;&gt;DB: 按 transactionId 找本地认证记录
+            B-&gt;&gt;Z: realid_checkresult 或 idrecognition_checkresult
+            Z-&gt;&gt;ZO: POST checkresult(transactionId)
+            ZO--&gt;&gt;Z: 审核结果、OCR、材料等
+            Z-&gt;&gt;DB: 保存 resultStatus/resultCode/ekycResult/OCR 等
+            Z--&gt;&gt;T: business_result
+            alt Success
+                T-&gt;&gt;K: kycAuditReviewedNew(externalUserId,bizId,Success)
+                K-&gt;&gt;KDB: 身份通过，保存 OCR 和材料
+            else Fail
+                T-&gt;&gt;K: kycAuditReviewedNew(externalUserId,bizId,Fail)
+                K-&gt;&gt;KDB: 身份驳回
+            else InProcess 或空
+                T-&gt;&gt;T: 不写 KYC 最终结果
+            end
+            alt business_result 为终态且非空
+                T-&gt;&gt;DB: has_cached=1
+            end
+        end
+    end</div>
+<p>本地结果处理：<code>app/Service/crm/KycService.php:1195</code>。</p>
+<ul>
+<li><code>Success</code>：读取本次 <code>bizId</code> 对应的 <code>t_identify.extIdInfo/cert*</code> 字段，映射国家、姓名、证件号、生日、证件类型和图片；检查证件号是否被其他会员使用；更新会员身份资料和身份表单。</li>
+<li><code>Fail</code>：写入通用身份驳回原因。</li>
+<li>两种终态最后都会调用 <code>checkUserKycStatus()</code>。</li>
+<li><code>InProcess</code> 或空结果不会设置 <code>has_cached=1</code>，后续任务还会继续查询。</li>
+</ul>
+<h3 id="84-zoloz-的两个-callbackurl-不要误解">8.4 Zoloz 的两个 CallbackUrl 不要误解</h3>
+<p>initialize 请求中的：</p>
+<ul>
+<li><code>completeCallbackUrl</code></li>
+<li><code>interruptCallbackUrl</code></li>
+</ul>
+<p>只是 Zoloz H5 完成后或中断后的前端跳转配置。当前 KYC 结果进入本地数据库的路径是：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">ZolozTask -&gt; checkresult -&gt; kycAuditReviewedNew -&gt; t_kyc_user_content
+</span></span></code></pre></div><p>不是：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">completeCallbackUrl -&gt; 本地审核成功
+</span></span></code></pre></div><hr>
+<h2 id="九三个渠道共用的本地落库过程">九、三个渠道共用的本地落库过程</h2>
+<h3 id="91-第三方业务-id-如何找回会员">9.1 第三方业务 ID 如何找回会员</h3>
+<table>
+  <thead>
+      <tr>
+          <th>渠道</th>
+          <th>发起时的关联字段</th>
+          <th>回调/轮询后的会员定位</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Sumsub</td>
+          <td><code>externalUserId = memberId 或 memberId_N</code></td>
+          <td><code>parseKycBusinessMemberId()</code> 去掉 <code>_N</code></td>
+      </tr>
+      <tr>
+          <td>IDWise</td>
+          <td><code>reference_no = memberId 或 memberId_N</code></td>
+          <td>同上；另用 <code>journeyId</code> 查询完整结果</td>
+      </tr>
+      <tr>
+          <td>Zoloz</td>
+          <td><code>t_identify.member_id + bizId + transactionId</code></td>
+          <td>定时任务直接取 <code>t_identify.member_id</code>，再用 <code>bizId</code> 找 OCR 结果</td>
+      </tr>
+  </tbody>
+</table>
+<p><code>memberId_N</code> 的生成和还原代码：</p>
+<ul>
+<li><code>app/Service/crm/KycService.php:4385</code>：读取当前业务 ID。</li>
+<li><code>app/Service/crm/KycService.php:4413</code>：驳回重提时递增。</li>
+<li><code>app/Service/crm/KycService.php:4465</code>：还原会员 ID。</li>
+<li>存储位置：<code>t_kyc_member_other.kyc_link_json</code>，结构见 <code>scripts/v2.17.0/v2.17.0.sql:130</code>。</li>
+</ul>
+<h3 id="92-驳回重提为什么需要-memberid_n">9.2 驳回重提为什么需要 <code>memberId_N</code></h3>
+<div class="mermaid">flowchart LR
+    A[&#34;首次认证&lt;br/&gt;externalUserId/reference_no = memberId&#34;] --&gt; B[&#34;第三方驳回&#34;]
+    B --&gt; C[&#34;POST /api/kyc/resubmitinfo&#34;]
+    C --&gt; D[&#34;复制一条新的本地待提交记录&lt;br/&gt;保留原驳回记录&#34;]
+    D --&gt; E[&#34;t_kyc_member_other 中该渠道序号 &#43;1&#34;]
+    E --&gt; F[&#34;再次 kyc_link&lt;br/&gt;externalUserId/reference_no = memberId_1&#34;]
+    F --&gt; G[&#34;再次驳回重提&lt;br/&gt;memberId_2&#34;]
+    G --&gt; H[&#34;回调时去掉 _N&lt;br/&gt;仍定位到原 memberId&#34;]</div>
+<p>这样可避免 Sumsub/IDWise 重提时复用同一个第三方用户引用。Zoloz 每次初始化都会生成新的本地雪花 <code>bizId</code>，主流程不使用该值作为 Zoloz 请求标识。</p>
+<h3 id="93-如何定位具体表单">9.3 如何定位具体表单</h3>
+<p>身份、地址结果分别固定使用：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">身份 -&gt; FormTypesEnum::Realauth = 2
+</span></span><span class="line"><span class="ln">2</span><span class="cl">地址 -&gt; FormTypesEnum::Address  = 5
+</span></span></code></pre></div><p>优先查询最新 <code>t_kyc_user_content</code>：</p>
+<ul>
+<li>常见条件是 <code>member + form_type + 当前 kyc_config_id</code>，按 <code>kyc_id</code> 倒序。</li>
+<li>IDWise 地址成功分支使用 <code>getKycUserContent(memberId, 5)</code>，该方法只按 <code>member + form_type</code> 查最新记录，没有附加 <code>kyc_config_id</code>，见 <code>app/Repository/crm/KycUserContentRepository.php:42</code>。</li>
+<li>查询代码集中在 <code>app/Repository/crm/KycUserContentRepository.php:42</code> 和 <code>:53</code>。</li>
+</ul>
+<p>处理前的共同防护 <code>callbackContentCheck()</code>：</p>
+<ul>
+<li>当前记录已经 <code>kyc_status=9</code>：跳过，避免重复通过处理。</li>
+<li>当前记录是 <code>kyc_status=1</code> 且 <code>kyc_audit_method=manual</code>：跳过，避免第三方回调覆盖人工待审核记录。</li>
+</ul>
+<p>代码：<code>app/Service/crm/KycService.php:3684</code>。</p>
+<p>没有记录，或最新记录状态不是 0/1 时，<code>createDefaultUserContent()</code> 会：</p>
+<ol>
+<li>读取会员当前 <code>kyc_id</code>。</li>
+<li>读取规则 <code>form_id</code> 列表。</li>
+<li>找出列表中 <code>form_type</code> 匹配且 <code>status=1</code> 的 <code>t_system_form</code>。</li>
+<li>新建 <code>t_kyc_user_content</code>，初始 <code>kyc_status=1</code>。</li>
+<li>写入 <code>form_id、kyc_config_id、kyc_audit_method、journey_id</code> 和表单快照。</li>
+<li>维护同一会员、配置、表单维度的新记录 <code>is_last=1</code>，旧记录置为 0。</li>
+</ol>
+<p>代码：<code>app/Service/crm/KycService.php:4265</code>。</p>
+<h3 id="94-通过和驳回分别写什么">9.4 通过和驳回分别写什么</h3>
+<table>
+  <thead>
+      <tr>
+          <th>结果</th>
+          <th><code>t_kyc_user_content</code> 主要变化</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>通过</td>
+          <td><code>kyc_status=9</code>，写 <code>kyc_visit_time</code>、实际审核渠道、第三方解析内容，按渠道写 <code>journey_id</code>，下载并保存材料</td>
+      </tr>
+      <tr>
+          <td>驳回</td>
+          <td><code>kyc_status=-1</code>，写 <code>kyc_replay</code>、<code>reject_check_type</code>、<code>kyc_visit_time</code>、实际审核渠道，保留可解析内容和材料</td>
+      </tr>
+      <tr>
+          <td>审核中</td>
+          <td>本链路使用的表单状态通常为 1；生成链接本身不会把最终审核结果写成通过</td>
+      </tr>
+  </tbody>
+</table>
+<p>身份通过还可能：</p>
+<ul>
+<li>更新会员姓名、真实姓名、first/last name、证件号、生日、证件类型、国籍。</li>
+<li>检查证件号是否重复，重复则转为驳回。</li>
+<li>姓名变化时触发重新签署逻辑。</li>
+<li>更新 <code>t_kyc_member_status.realauth=9</code>。</li>
+</ul>
+<p>地址通过会：</p>
+<ul>
+<li>更新国家、省份、城市、地址、邮编或地址证明日期等可得字段。</li>
+<li>同步居住国家。</li>
+<li>更新 <code>t_kyc_member_status.address=9</code>。</li>
+</ul>
+<h3 id="95-单表单通过不等于整个会员-kyc-通过">9.5 单表单通过不等于整个会员 KYC 通过</h3>
+<p>最终统一进入 <code>KycService::checkUserKycStatus()</code>：<code>app/Service/crm/KycService.php:2926</code>。</p>
+<div class="mermaid">flowchart TD
+    A[&#34;第三方身份/地址表单处理完成&#34;] --&gt; B[&#34;checkUserKycStatus(memberId)&#34;]
+    B --&gt; C[&#34;KycOverallStatusService 读取当前规则全部有效表单&#34;]
+    C --&gt; D[&#34;每个 form_id 只取 kyc_id 最大的最新记录&#34;]
+    D --&gt; E{&#34;全部必需表单最新状态&#34;}
+    E -- &#34;全部 9&#34; --&gt; F[&#34;member.kyc_status=9&lt;br/&gt;Iscertified=1&#34;]
+    F --&gt; G[&#34;保存全通过快照、同步 MT 姓名和监管类型、发送通过通知&#34;]
+    E -- &#34;全部已提交，且均为 9/-1，至少一个 -1&#34; --&gt; H[&#34;member.kyc_status=2 未认证&lt;br/&gt;Iscertified=0&#34;]
+    E -- &#34;仍有 0/1 或未提交表单&#34; --&gt; I[&#34;member.kyc_status=1 进行中&lt;br/&gt;Iscertified=0&#34;]
+    E -- &#34;没有任何已提交记录&#34; --&gt; J[&#34;member.kyc_status=0 未提交&#34;]</div>
+<p>总状态计算代码：<code>app/Service/Kyc/KycOverallStatusService.php:47</code>。这里只看<strong>当前会员 KYC 规则中仍启用的表单</strong>，历史配置或已停用表单不参与全通过判断。</p>
+<hr>
+<h2 id="十幂等异常和回调响应的实际行为">十、幂等、异常和回调响应的实际行为</h2>
+<table>
+  <thead>
+      <tr>
+          <th>渠道</th>
+          <th>防重复/并发措施</th>
+          <th>处理异常后的 HTTP 行为</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Sumsub</td>
+          <td><code>sumsubKycSync_{memberId}</code> 锁；会员总状态 9 跳过；表单 9 或人工待审核跳过</td>
+          <td>验签失败会抛错；验签后的业务处理异常被 Controller 捕获并记录，最后仍返回 success</td>
+      </tr>
+      <tr>
+          <td>IDWise</td>
+          <td>表单 9 或人工待审核跳过；人工审核还核对驳回状态和 journey_id</td>
+          <td>Bearer 校验和业务处理都在 Controller 的 try/catch 内，异常被记录后仍返回 success</td>
+      </tr>
+      <tr>
+          <td>Zoloz</td>
+          <td>定时任务 singleton；终态写 <code>has_cached=1</code>；表单 9 或人工待审核跳过</td>
+          <td>没有第三方 Webhook 应答；任务外层捕获异常并记录</td>
+      </tr>
+  </tbody>
+</table>
+<p>需要特别注意：</p>
+<ol>
+<li><strong>Sumsub 的会员级锁不代表 IDWise 也有相同锁。</strong> 当前 IDWise 回调没有看到相同的会员锁或按 <code>eventId</code> 去重。</li>
+<li>Sumsub/IDWise 业务失败仍 success，意味着第三方不一定能根据 HTTP 失败响应识别“本地处理失败并重试”。排查时不能只看 Webhook HTTP 200，还要看渠道日志和本地表单状态。</li>
+<li><code>ZolozTask</code> 的 try/catch 包住整个批次；某条记录抛出异常时，会中断本次后续记录处理，未成功的记录等待后续任务再试。</li>
+<li><code>markLatestKycLinkContent()</code> 的方法注释提到写实际审核方式，但当前 <code>kyc_audit_method</code> 赋值被注释，实际只会在 <code>journeyId</code> 非空时保存 <code>journey_id</code>，见 <code>app/Service/crm/KycService.php:4351</code>。实际审核渠道主要在结果落库时写入。</li>
+<li>Zoloz 成功和拒绝分支写入的是 <strong><code>kyc_audit_method='zolzo'</code></strong>，不是配置和请求分支使用的 <code>zoloz</code>，见 <code>app/Service/crm/KycService.php:1283</code>、<code>:1340</code>、<code>:1348</code>。按审核渠道排查历史数据时需要考虑这个现存拼写。</li>
+<li>当前代码会记录部分 Webhook 原始 body、认证详情或凭证头。本文仅描述行为，不复制其中的敏感信息。</li>
+</ol>
+<hr>
+<h2 id="十一渠道对比速查">十一、渠道对比速查</h2>
+<table>
+  <thead>
+      <tr>
+          <th>对比项</th>
+          <th>Sumsub</th>
+          <th>IDWise</th>
+          <th>Zoloz</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>本地入口</td>
+          <td><code>/api/kyc/kyc_link</code></td>
+          <td>同左</td>
+          <td>同左，仅身份</td>
+      </tr>
+      <tr>
+          <td>发起接口</td>
+          <td><code>sdkIntegrations/.../websdkLink</code></td>
+          <td><code>/journey/v2/verification-links</code></td>
+          <td>`realid</td>
+      </tr>
+      <tr>
+          <td>第三方用户引用</td>
+          <td><code>externalUserId</code></td>
+          <td><code>reference_no</code></td>
+          <td><code>userId=memberId</code>，另有本地 <code>bizId</code></td>
+      </tr>
+      <tr>
+          <td>认证等级</td>
+          <td><code>levelName</code></td>
+          <td><code>flow_id</code></td>
+          <td><code>kyc_identy + autoDocCategory</code></td>
+      </tr>
+      <tr>
+          <td>请求认证</td>
+          <td>App Token + 时间戳 + HMAC SHA256</td>
+          <td>Basic Auth</td>
+          <td>Client-Id + RSA256 签名</td>
+      </tr>
+      <tr>
+          <td>前端拿到的链接</td>
+          <td>第三方 WebSDK URL</td>
+          <td>本站短链，再跳 IDWise</td>
+          <td>本站跳链或 Zoloz H5</td>
+      </tr>
+      <tr>
+          <td>本地交易 ID</td>
+          <td>无，<code>transactionId=''</code></td>
+          <td><code>journey_id</code></td>
+          <td>Zoloz <code>transactionId</code></td>
+      </tr>
+      <tr>
+          <td>审核结果入口</td>
+          <td><code>/api/kyc/kyc_webhook</code></td>
+          <td><code>/api/kyc/idwise_kyc_webhook</code></td>
+          <td><code>ZolozTask</code> 定时轮询</td>
+      </tr>
+      <tr>
+          <td>结果来源校验</td>
+          <td>原始 body HMAC digest</td>
+          <td>固定 Bearer Authorization</td>
+          <td>服务端签名查询，不接收结果 Webhook</td>
+      </tr>
+      <tr>
+          <td>收到通知后是否补查</td>
+          <td>是，查 applicant + steps + 材料</td>
+          <td>是，查 Journey + 图片</td>
+          <td>是，checkresult 本身就是结果查询</td>
+      </tr>
+      <tr>
+          <td>身份/地址同时处理</td>
+          <td>支持按步骤分别处理</td>
+          <td>支持按 documents 分别处理</td>
+          <td>此链路只处理身份</td>
+      </tr>
+      <tr>
+          <td>最终落库</td>
+          <td><code>t_kyc_user_content</code></td>
+          <td>同左</td>
+          <td>同左，另有 <code>t_identify</code></td>
+      </tr>
+  </tbody>
+</table>
+<h2 id="十二按问题定位代码的最短路径">十二、按问题定位代码的最短路径</h2>
+<h3 id="要看请求参数在哪里拼">要看“请求参数在哪里拼”</h3>
+<ul>
+<li>统一分流：<code>app/Service/crm/KycService.php:2826</code></li>
+<li>Sumsub URL：<code>app/Common/Lib/Kyc/lib/SumsubClient.php:81</code></li>
+<li>Sumsub 签名：<code>app/Common/Lib/Kyc/lib/SumsubClient.php:284</code></li>
+<li>IDWise body：<code>app/Common/Lib/Kyc/lib/IdwiseClient.php:46</code></li>
+<li>IDWise Basic：<code>app/Common/Lib/Kyc/lib/IdwiseClient.php:92</code></li>
+<li>Zoloz 本地业务单：<code>app/Common/Lib/Identify/IdentifyBase.php:115</code></li>
+<li>Zoloz body：<code>app/Common/Lib/Identify/ZolozTool.php:154</code>、<code>:463</code></li>
+<li>Zoloz RSA：<code>app/Common/Lib/Identify/ZolozTool.php:523</code>、<code>:603</code></li>
+</ul>
+<h3 id="要看第三方结果在哪里回来">要看“第三方结果在哪里回来”</h3>
+<ul>
+<li>Sumsub：<code>app/Http/Api/Controller/V1/KYCController.php:323</code></li>
+<li>IDWise：<code>app/Http/Api/Controller/V1/KYCController.php:402</code></li>
+<li>Zoloz：<code>app/Task/KycTask/ZolozTask.php:23</code>，不是 Controller Webhook</li>
+</ul>
+<h3 id="要看结果在哪里写本地表单">要看“结果在哪里写本地表单”</h3>
+<ul>
+<li>Sumsub 分派：<code>app/Service/Kyc/SumsubService.php:110</code></li>
+<li>IDWise 分派：<code>app/Service/crm/KycService.php:3392</code></li>
+<li>Zoloz 分派：<code>app/Service/crm/KycService.php:1195</code></li>
+<li>身份通过：<code>app/Service/crm/KycService.php:344</code> 或 <code>:3701</code></li>
+<li>地址通过：<code>app/Service/crm/KycService.php:458</code> 或 <code>:3813</code></li>
+<li>身份/地址驳回：<code>app/Service/crm/KycService.php:1105</code>、<code>:998</code></li>
+<li>没有本地表单时创建：<code>app/Service/crm/KycService.php:4265</code></li>
+<li>会员总状态：<code>app/Service/crm/KycService.php:2926</code>、<code>app/Service/Kyc/KycOverallStatusService.php:47</code></li>
+</ul>
+
+    </div>
+  </article>
+  
+    
+<aside class="sidebar">
+  <section class="sidebar_inner">
+    <br>
+    
+  
+  <div class="search">
+    <input type="search" class="search_field form_field" placeholder='搜索内容...' id="find" autocomplete="off" data-scope='gtc'>
+    <label for="find" class="search_label"><svg class="icon">
+  <title>search</title>
+  <use xlink:href="#search"></use>
+</svg>
+
+    </label>
+    
+    <div class="search_results results"></div>
+  </div>
+
+        <div class="author_header">
+          <img src="https://jianlin-li.github.io/images/fish-head.png" alt="李建林 photo">
+          <h2>李建林</h2>
+        </div>
+      <div class="author_bio">
+        PHP, Go, MySQL, Redis, RabbitMQ, Elasticsearch, Docker, Kubernetes, Shell
+      </div>
+      <a href='https://jianlin-li.github.io/about/' class="button mt-1" role="button" title='阅读更多'>阅读更多</a>
+
+    
+    <h2 class="mt-4">精选文章</h2>
+    <ul>
+      <li>
+        <a href="https://jianlin-li.github.io/post/jiagou-elk-stack/" class="nav-link" title="架构-使用ELK Stack在本地Macbookpro搭建一套日志收集并且可视化系统">架构-使用ELK Stack在本地Macbookpro搭建一套日志收集并且可视化系统</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/jiagou-prometheus-grafana/" class="nav-link" title="架构-Prometheus&#43;Grafana">架构-Prometheus+Grafana</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/jiagou-cicd-jenkins-argo/" class="nav-link" title="架构-基于JenKins的CI/CD平台之Argo CD">架构-基于JenKins的CI/CD平台之Argo CD</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/jiagou-cicd-jenkins/" class="nav-link" title="架构-基于JenKins的CI/CD平台">架构-基于JenKins的CI/CD平台</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/k8s_review_12/" class="nav-link" title="Kubernetes的知识库-12">Kubernetes的知识库-12</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/k8s_review_11/" class="nav-link" title="Kubernetes的知识库-11">Kubernetes的知识库-11</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/k8s_review_10/" class="nav-link" title="Kubernetes的知识库-10">Kubernetes的知识库-10</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/k8s_review_9/" class="nav-link" title="Kubernetes的知识库-9">Kubernetes的知识库-9</a>
+      </li>
+    </ul>
+    <h2 class="mt-4">最新文章</h2>
+    <ul class="flex-column">
+      <li>
+        <a href="https://jianlin-li.github.io/post/k8s_review_8/" class="nav-link" title="Kubernetes的知识库-8">Kubernetes的知识库-8</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/k8s_review_7/" class="nav-link" title="Kubernetes的知识库-7">Kubernetes的知识库-7</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/k8s_review_6/" class="nav-link" title="Kubernetes的知识库-6">Kubernetes的知识库-6</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/k8s_review_5/" class="nav-link" title="Kubernetes的知识库-5">Kubernetes的知识库-5</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/k8s_review_4/" class="nav-link" title="Kubernetes的知识库-4">Kubernetes的知识库-4</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/k8s_review_3/" class="nav-link" title="Kubernetes的知识库-3">Kubernetes的知识库-3</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/k8s_review_2/" class="nav-link" title="Kubernetes的知识库-2">Kubernetes的知识库-2</a>
+      </li>
+      <li>
+        <a href="https://jianlin-li.github.io/post/k8s_review_1/" class="nav-link" title="Kubernetes的知识库-1">Kubernetes的知识库-1</a>
+      </li>
+    </ul>
+    <div>
+      <h2 class="mt-4 taxonomy" id="categories-section">分类</h2>
+      <nav class="tags_nav">
+        <a href='https://jianlin-li.github.io/categories/kubernetes/' class="post_tag button button_translucent" title="kubernetes">
+          KUBERNETES
+          <span class="button_tally">13</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/categories/php%E8%AF%AD%E8%A8%80/' class="post_tag button button_translucent" title="php语言">
+          PHP语言
+          <span class="button_tally">7</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/categories/%E6%9E%B6%E6%9E%84/' class="post_tag button button_translucent" title="架构">
+          架构
+          <span class="button_tally">7</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/categories/go%E8%AF%AD%E8%A8%80/' class="post_tag button button_translucent" title="go语言">
+          GO语言
+          <span class="button_tally">6</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/categories/elasticsearch/' class="post_tag button button_translucent" title="elasticsearch">
+          ELASTICSEARCH
+          <span class="button_tally">5</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/categories/redis/' class="post_tag button button_translucent" title="redis">
+          REDIS
+          <span class="button_tally">5</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/categories/mysql/' class="post_tag button button_translucent" title="mysql">
+          MYSQL
+          <span class="button_tally">4</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/categories/rabbitmq/' class="post_tag button button_translucent" title="rabbitmq">
+          RABBITMQ
+          <span class="button_tally">4</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/categories/ci/cd/' class="post_tag button button_translucent" title="ci/cd">
+          CI/CD
+          <span class="button_tally">2</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/categories/git/' class="post_tag button button_translucent" title="git">
+          GIT
+          <span class="button_tally">2</span>
+        </a>
+        
+        
+        <br>
+        <div class="post_tags_toggle button">所有分类</div>
+        <div class="post_tags">
+          <div class="tags_list">
+            
+            <a href='https://jianlin-li.github.io/categories/argo/' class=" post_tag button button_translucent" data-position=1 title="argo">ARGO<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/centos7/' class=" post_tag button button_translucent" data-position=1 title="centos7">CENTOS7<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/ci/cd/' class=" post_tag button button_translucent" data-position=2 title="ci/cd">CI/CD<span class="button_tally">2</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/c%E8%AF%AD%E8%A8%80/' class=" post_tag button button_translucent" data-position=1 title="c语言">C语言<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/devops/' class=" post_tag button button_translucent" data-position=1 title="devops">DEVOPS<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/docker/' class=" post_tag button button_translucent" data-position=1 title="docker">DOCKER<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/elasticsearch/' class=" post_tag button button_translucent" data-position=5 title="elasticsearch">ELASTICSEARCH<span class="button_tally">5</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/elk/' class=" post_tag button button_translucent" data-position=1 title="elk">ELK<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/git/' class=" post_tag button button_translucent" data-position=2 title="git">GIT<span class="button_tally">2</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/go%E8%AF%AD%E8%A8%80/' class=" post_tag button button_translucent" data-position=6 title="go语言">GO语言<span class="button_tally">6</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/grafana/' class=" post_tag button button_translucent" data-position=1 title="grafana">GRAFANA<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/gtc/' class=" post_tag button button_translucent" data-position=2 title="gtc">GTC<span class="button_tally">2</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/gtcadmin/' class=" post_tag button button_translucent" data-position=1 title="gtcadmin">GTCADMIN<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/gtcuser/' class=" post_tag button button_translucent" data-position=1 title="gtcuser">GTCUSER<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/hugo/' class=" post_tag button button_translucent" data-position=1 title="hugo">HUGO<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/jenkins/' class=" post_tag button button_translucent" data-position=2 title="jenkins">JENKINS<span class="button_tally">2</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/kubernetes/' class=" post_tag button button_translucent" data-position=13 title="kubernetes">KUBERNETES<span class="button_tally">13</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/mkcert/' class=" post_tag button button_translucent" data-position=1 title="mkcert">MKCERT<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/mysql/' class=" post_tag button button_translucent" data-position=4 title="mysql">MYSQL<span class="button_tally">4</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/nginx/' class=" post_tag button button_translucent" data-position=1 title="nginx">NGINX<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/php%E8%AF%AD%E8%A8%80/' class=" post_tag button button_translucent" data-position=7 title="php语言">PHP语言<span class="button_tally">7</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/prometheus/' class=" post_tag button button_translucent" data-position=1 title="prometheus">PROMETHEUS<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/rabbitmq/' class=" post_tag button button_translucent" data-position=4 title="rabbitmq">RABBITMQ<span class="button_tally">4</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/redis/' class=" post_tag button button_translucent" data-position=5 title="redis">REDIS<span class="button_tally">5</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/shell/' class=" post_tag button button_translucent" data-position=2 title="shell">SHELL<span class="button_tally">2</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/web%E6%9C%8D%E5%8A%A1%E5%99%A8/' class=" post_tag button button_translucent" data-position=1 title="web服务器">WEB服务器<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/%E6%9C%AC%E5%9C%B0%E7%8E%AF%E5%A2%83/' class=" post_tag button button_translucent" data-position=2 title="本地环境">本地环境<span class="button_tally">2</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/%E5%A4%8D%E4%B9%A0/' class=" post_tag button button_translucent" data-position=1 title="复习">复习<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/%E5%8D%8E%E5%BE%AE%E4%B8%96%E7%BA%AA/' class=" post_tag button button_translucent" data-position=1 title="华微世纪">华微世纪<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/%E6%9E%B6%E6%9E%84/' class=" post_tag button button_translucent" data-position=7 title="架构">架构<span class="button_tally">7</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/%E6%95%99%E7%A8%8B/' class=" post_tag button button_translucent" data-position=1 title="教程">教程<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/%E8%A7%86%E9%A2%91/' class=" post_tag button button_translucent" data-position=1 title="视频">视频<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/%E4%B9%A6%E7%B1%8D/' class=" post_tag button button_translucent" data-position=1 title="书籍">书籍<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/%E7%AE%97%E6%B3%95/' class=" post_tag button button_translucent" data-position=1 title="算法">算法<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/categories/%E8%87%AA%E7%AD%BE%E5%90%8D%E8%AF%81%E4%B9%A6/' class=" post_tag button button_translucent" data-position=1 title="自签名证书">自签名证书<span class="button_tally">1</span>
+            </a>
+            
+            <div class="tags_sort"><span title="sort alphabetically">[A~Z]</span><span title="sort by count">[0~9]</span>
+            </div>
+            <span class="tags_hide"><svg class="icon">
+            <use xlink:href="#closeme"></use>
+          </svg></span>
+          </div>
+        </div>
+      </nav>
+    </div>
+    <div>
+      <h2 class="mt-4 taxonomy" id="tags-section">标签</h2>
+      <nav class="tags_nav">
+        <a href='https://jianlin-li.github.io/tags/kubernetes/' class="post_tag button button_translucent" title="kubernetes">
+          KUBERNETES
+          <span class="button_tally">13</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/tags/php/' class="post_tag button button_translucent" title="php">
+          PHP
+          <span class="button_tally">7</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/tags/go/' class="post_tag button button_translucent" title="go">
+          GO
+          <span class="button_tally">6</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/tags/elasticsearch/' class="post_tag button button_translucent" title="elasticsearch">
+          ELASTICSEARCH
+          <span class="button_tally">5</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/tags/redis/' class="post_tag button button_translucent" title="redis">
+          REDIS
+          <span class="button_tally">5</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/tags/mysql/' class="post_tag button button_translucent" title="mysql">
+          MYSQL
+          <span class="button_tally">4</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/tags/rabbitmq/' class="post_tag button button_translucent" title="rabbitmq">
+          RABBITMQ
+          <span class="button_tally">4</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/tags/devops/' class="post_tag button button_translucent" title="devops">
+          DEVOPS
+          <span class="button_tally">3</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/tags/ci/cd/' class="post_tag button button_translucent" title="ci/cd">
+          CI/CD
+          <span class="button_tally">2</span>
+        </a>
+        
+        <a href='https://jianlin-li.github.io/tags/git/' class="post_tag button button_translucent" title="git">
+          GIT
+          <span class="button_tally">2</span>
+        </a>
+        
+        
+        <br>
+        <div class="post_tags_toggle button">所有标签</div>
+        <div class="post_tags">
+          <div class="tags_list">
+            
+            <a href='https://jianlin-li.github.io/tags/argo/' class=" post_tag button button_translucent" data-position=1 title="argo">ARGO<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/centos7/' class=" post_tag button button_translucent" data-position=1 title="centos7">CENTOS7<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/ci/cd/' class=" post_tag button button_translucent" data-position=2 title="ci/cd">CI/CD<span class="button_tally">2</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/c%E8%AF%AD%E8%A8%80/' class=" post_tag button button_translucent" data-position=1 title="c语言">C语言<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/devops/' class=" post_tag button button_translucent" data-position=3 title="devops">DEVOPS<span class="button_tally">3</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/docker/' class=" post_tag button button_translucent" data-position=1 title="docker">DOCKER<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/elasticsearch/' class=" post_tag button button_translucent" data-position=5 title="elasticsearch">ELASTICSEARCH<span class="button_tally">5</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/elk/' class=" post_tag button button_translucent" data-position=1 title="elk">ELK<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/emoji/' class=" post_tag button button_translucent" data-position=1 title="emoji">EMOJI<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/git/' class=" post_tag button button_translucent" data-position=2 title="git">GIT<span class="button_tally">2</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/go/' class=" post_tag button button_translucent" data-position=6 title="go">GO<span class="button_tally">6</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/grafana/' class=" post_tag button button_translucent" data-position=1 title="grafana">GRAFANA<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/gtc/' class=" post_tag button button_translucent" data-position=2 title="gtc">GTC<span class="button_tally">2</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/gtcadmin/' class=" post_tag button button_translucent" data-position=1 title="gtcadmin">GTCADMIN<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/gtcuser/' class=" post_tag button button_translucent" data-position=1 title="gtcuser">GTCUSER<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/hosts/' class=" post_tag button button_translucent" data-position=1 title="hosts">HOSTS<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/hugo/' class=" post_tag button button_translucent" data-position=1 title="hugo">HUGO<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/jenkins/' class=" post_tag button button_translucent" data-position=2 title="jenkins">JENKINS<span class="button_tally">2</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/kubernetes/' class=" post_tag button button_translucent" data-position=13 title="kubernetes">KUBERNETES<span class="button_tally">13</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/markdown/' class=" post_tag button button_translucent" data-position=1 title="markdown">MARKDOWN<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/math/' class=" post_tag button button_translucent" data-position=1 title="math">MATH<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/mkcert/' class=" post_tag button button_translucent" data-position=1 title="mkcert">MKCERT<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/mysql/' class=" post_tag button button_translucent" data-position=4 title="mysql">MYSQL<span class="button_tally">4</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/nginx/' class=" post_tag button button_translucent" data-position=1 title="nginx">NGINX<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/notices/' class=" post_tag button button_translucent" data-position=1 title="notices">NOTICES<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/openstreetmap/' class=" post_tag button button_translucent" data-position=1 title="openstreetmap">OPENSTREETMAP<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/php/' class=" post_tag button button_translucent" data-position=7 title="php">PHP<span class="button_tally">7</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/prometheus/' class=" post_tag button button_translucent" data-position=1 title="prometheus">PROMETHEUS<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/rabbitmq/' class=" post_tag button button_translucent" data-position=4 title="rabbitmq">RABBITMQ<span class="button_tally">4</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/redis/' class=" post_tag button button_translucent" data-position=5 title="redis">REDIS<span class="button_tally">5</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/shell/' class=" post_tag button button_translucent" data-position=2 title="shell">SHELL<span class="button_tally">2</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/sql/' class=" post_tag button button_translucent" data-position=1 title="sql">SQL<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/web%E6%9C%8D%E5%8A%A1%E5%99%A8/' class=" post_tag button button_translucent" data-position=1 title="web服务器">WEB服务器<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/%E6%9C%AC%E5%9C%B0%E7%8E%AF%E5%A2%83/' class=" post_tag button button_translucent" data-position=1 title="本地环境">本地环境<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/%E5%A4%8D%E4%B9%A0/' class=" post_tag button button_translucent" data-position=1 title="复习">复习<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/%E6%95%99%E7%A8%8B/' class=" post_tag button button_translucent" data-position=1 title="教程">教程<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/%E4%B9%B1%E7%A0%81/' class=" post_tag button button_translucent" data-position=1 title="乱码">乱码<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/%E8%A7%86%E9%A2%91/' class=" post_tag button button_translucent" data-position=1 title="视频">视频<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/%E4%B9%A6%E7%B1%8D/' class=" post_tag button button_translucent" data-position=1 title="书籍">书籍<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/%E7%AE%97%E6%B3%95/' class=" post_tag button button_translucent" data-position=1 title="算法">算法<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6/' class=" post_tag button button_translucent" data-position=1 title="主从复制">主从复制<span class="button_tally">1</span>
+            </a>
+            
+            
+            <a href='https://jianlin-li.github.io/tags/%E8%87%AA%E7%AD%BE%E5%90%8D%E8%AF%81%E4%B9%A6/' class=" post_tag button button_translucent" data-position=1 title="自签名证书">自签名证书<span class="button_tally">1</span>
+            </a>
+            
+            <div class="tags_sort"><span title="sort alphabetically">[A~Z]</span><span title="sort by count">[0~9]</span>
+            </div>
+            <span class="tags_hide"><svg class="icon">
+            <use xlink:href="#closeme"></use>
+          </svg></span>
+          </div>
+        </div>
+      </nav>
+    </div>
+  </section>
+</aside>
+
+  
+</div>
+
+<style>
+  .gtc-breadcrumb {
+    margin-bottom: 12px;
+    font-size: 0.9em;
+    opacity: 0.75;
+  }
+
+  .gtc-meta {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+</style>
+    </main><svg width="0" height="0" class="hidden">
+  <symbol viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" id="facebook">
+    <path d="M437 0H75C33.648 0 0 33.648 0 75v362c0 41.352 33.648 75 75 75h151V331h-60v-90h60v-61c0-49.629 40.371-90 90-90h91v90h-91v61h91l-15 90h-76v181h121c41.352 0 75-33.648 75-75V75c0-41.352-33.648-75-75-75zm0 0"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18.001 18.001" id="twitter">
+    <path d="M15.891 4.013c.808-.496 1.343-1.173 1.605-2.034a8.68 8.68 0 0 1-2.351.861c-.703-.756-1.593-1.14-2.66-1.14-1.043 0-1.924.366-2.643 1.078a3.56 3.56 0 0 0-1.076 2.605c0 .309.039.585.117.819-3.076-.105-5.622-1.381-7.628-3.837-.34.601-.51 1.213-.51 1.846 0 1.301.549 2.332 1.645 3.089-.625-.053-1.176-.211-1.645-.47 0 .929.273 1.705.82 2.388a3.623 3.623 0 0 0 2.115 1.291c-.312.08-.641.118-.979.118-.312 0-.533-.026-.664-.083.23.757.664 1.371 1.291 1.841a3.652 3.652 0 0 0 2.152.743C4.148 14.173 2.625 14.69.902 14.69c-.422 0-.721-.006-.902-.038 1.697 1.102 3.586 1.649 5.676 1.649 2.139 0 4.029-.542 5.674-1.626 1.645-1.078 2.859-2.408 3.639-3.974a10.77 10.77 0 0 0 1.172-4.892v-.468a7.788 7.788 0 0 0 1.84-1.921 8.142 8.142 0 0 1-2.11.593z"
+      ></path>
+  </symbol>
+  <symbol aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" id="mail">
+    <path  d="M502.3 190.8c3.9-3.1 9.7-.2 9.7 4.7V400c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V195.6c0-5 5.7-7.8 9.7-4.7 22.4 17.4 52.1 39.5 154.1 113.6 21.1 15.4 56.7 47.8 92.2 47.6 35.7.3 72-32.8 92.3-47.6 102-74.1 131.6-96.3 154-113.7zM256 320c23.2.4 56.6-29.2 73.4-41.4 132.7-96.3 142.8-104.7 173.4-128.7 5.8-4.5 9.2-11.5 9.2-18.9v-19c0-26.5-21.5-48-48-48H48C21.5 64 0 85.5 0 112v19c0 7.4 3.4 14.3 9.2 18.9 30.6 23.9 40.7 32.4 173.4 128.7 16.8 12.2 50.2 41.8 73.4 41.4z"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" id="calendar">
+    <path d="M452 40h-24V0h-40v40H124V0H84v40H60C26.916 40 0 66.916 0 100v352c0 33.084 26.916 60 60 60h392c33.084 0 60-26.916 60-60V100c0-33.084-26.916-60-60-60zm20 412c0 11.028-8.972 20-20 20H60c-11.028 0-20-8.972-20-20V188h432v264zm0-304H40v-48c0-11.028 8.972-20 20-20h24v40h40V80h264v40h40V80h24c11.028 0 20 8.972 20 20v48z"></path>
+    <path d="M76 230h40v40H76zm80 0h40v40h-40zm80 0h40v40h-40zm80 0h40v40h-40zm80 0h40v40h-40zM76 310h40v40H76zm80 0h40v40h-40zm80 0h40v40h-40zm80 0h40v40h-40zM76 390h40v40H76zm80 0h40v40h-40zm80 0h40v40h-40zm80 0h40v40h-40zm80-80h40v40h-40z"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" id="github">
+    <path d="M255.968 5.329C114.624 5.329 0 120.401 0 262.353c0 113.536 73.344 209.856 175.104 243.872 12.8 2.368 17.472-5.568 17.472-12.384 0-6.112-.224-22.272-.352-43.712-71.2 15.52-86.24-34.464-86.24-34.464-11.616-29.696-28.416-37.6-28.416-37.6-23.264-15.936 1.728-15.616 1.728-15.616 25.696 1.824 39.2 26.496 39.2 26.496 22.848 39.264 59.936 27.936 74.528 21.344 2.304-16.608 8.928-27.936 16.256-34.368-56.832-6.496-116.608-28.544-116.608-127.008 0-28.064 9.984-51.008 26.368-68.992-2.656-6.496-11.424-32.64 2.496-68 0 0 21.504-6.912 70.4 26.336 20.416-5.696 42.304-8.544 64.096-8.64 21.728.128 43.648 2.944 64.096 8.672 48.864-33.248 70.336-26.336 70.336-26.336 13.952 35.392 5.184 61.504 2.56 68 16.416 17.984 26.304 40.928 26.304 68.992 0 98.72-59.84 120.448-116.864 126.816 9.184 7.936 17.376 23.616 17.376 47.584 0 34.368-.32 62.08-.32 70.496 0 6.88 4.608 14.88 17.6 12.352C438.72 472.145 512 375.857 512 262.353 512 120.401 397.376 5.329 255.968 5.329z"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 212 212" id="gitlab">
+    <path d="M12.3 74.7h54L43.3 3c-1-3.6-6.4-3.6-7.6 0L12.3 74.8z" />
+    <path d="M12.3 74.7L.5 111c-1 3.2 0 6.8 3 8.8l101.6 74-92.5-119z"/>
+    <path d="M105 193.7l-38.6-119h-54l92.7 119z"/>
+    <path d="M105 193.7l38.7-119H66.4l38.7 119z"/>
+    <path d="M105 193.7l38.7-119H198l-93 119z"/>
+    <path d="M198 74.7l11.6 36.2c1 3 0 6.6-3 8.6l-101.5 74 93-119z"/>
+    <path d="M198 74.7h-54.3L167 3c1.2-3.6 6.4-3.6 7.6 0L198 74.8z"/>
+  </symbol>
+  <symbol viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" id="rss">
+    <circle cx="3.429" cy="20.571" r="3.429"></circle>
+    <path d="M11.429 24h4.57C15.999 15.179 8.821 8.001 0 8v4.572c6.302.001 11.429 5.126 11.429 11.428z"></path>
+    <path d="M24 24C24 10.766 13.234 0 0 0v4.571c10.714 0 19.43 8.714 19.43 19.429z"></path>
+  </symbol>
+  <symbol viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" id="linkedin">
+    <path d="M437 0H75C33.648 0 0 33.648 0 75v362c0 41.352 33.648 75 75 75h362c41.352 0 75-33.648 75-75V75c0-41.352-33.648-75-75-75zM181 406h-60V196h60zm0-240h-60v-60h60zm210 240h-60V286c0-16.54-13.46-30-30-30s-30 13.46-30 30v120h-60V196h60v11.309C286.719 202.422 296.93 196 316 196c40.691.043 75 36.547 75 79.688zm0 0"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 612 612" id="to-top">
+    <path d="M604.501 440.509L325.398 134.956c-5.331-5.357-12.423-7.627-19.386-7.27-6.989-.357-14.056 1.913-19.387 7.27L7.499 440.509c-9.999 10.024-9.999 26.298 0 36.323s26.223 10.024 36.222 0l262.293-287.164L568.28 476.832c9.999 10.024 26.222 10.024 36.221 0 9.999-10.023 9.999-26.298 0-36.323z"></path>
+  </symbol>
+  <symbol viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" id="carly">
+    <path d="M504.971 239.029L448 182.059V84c0-46.317-37.682-84-84-84h-44c-13.255 0-24 10.745-24 24s10.745 24 24 24h44c19.851 0 36 16.149 36 36v108c0 6.365 2.529 12.47 7.029 16.971L454.059 256l-47.029 47.029A24.002 24.002 0 0 0 400 320v108c0 19.851-16.149 36-36 36h-44c-13.255 0-24 10.745-24 24s10.745 24 24 24h44c46.318 0 84-37.683 84-84v-98.059l56.971-56.971c9.372-9.372 9.372-24.568 0-33.941zM112 192V84c0-19.851 16.149-36 36-36h44c13.255 0 24-10.745 24-24S205.255 0 192 0h-44c-46.318 0-84 37.683-84 84v98.059l-56.971 56.97c-9.373 9.373-9.373 24.568 0 33.941L64 329.941V428c0 46.317 37.682 84 84 84h44c13.255 0 24-10.745 24-24s-10.745-24-24-24h-44c-19.851 0-36-16.149-36-36V320c0-6.365-2.529-12.47-7.029-16.971L57.941 256l47.029-47.029A24.002 24.002 0 0 0 112 192z"></path>
+  </symbol>
+  <symbol viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" id="copy">
+    <path d="M23 2.75A2.75 2.75 0 0 0 20.25 0H8.75A2.75 2.75 0 0 0 6 2.75v13.5A2.75 2.75 0 0 0 8.75 19h11.5A2.75 2.75 0 0 0 23 16.25zM18.25 14.5h-7.5a.75.75 0 0 1 0-1.5h7.5a.75.75 0 0 1 0 1.5zm0-3h-7.5a.75.75 0 0 1 0-1.5h7.5a.75.75 0 0 1 0 1.5zm0-3h-7.5a.75.75 0 0 1 0-1.5h7.5a.75.75 0 0 1 0 1.5z"></path>
+    <path d="M8.75 20.5a4.255 4.255 0 0 1-4.25-4.25V2.75c0-.086.02-.166.025-.25H3.75A2.752 2.752 0 0 0 1 5.25v16A2.752 2.752 0 0 0 3.75 24h12a2.752 2.752 0 0 0 2.75-2.75v-.75z"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512.001 512.001" id="closeme">
+    <path d="M284.286 256.002L506.143 34.144c7.811-7.811 7.811-20.475 0-28.285-7.811-7.81-20.475-7.811-28.285 0L256 227.717 34.143 5.859c-7.811-7.811-20.475-7.811-28.285 0-7.81 7.811-7.811 20.475 0 28.285l221.857 221.857L5.858 477.859c-7.811 7.811-7.811 20.475 0 28.285a19.938 19.938 0 0 0 14.143 5.857 19.94 19.94 0 0 0 14.143-5.857L256 284.287l221.857 221.857c3.905 3.905 9.024 5.857 14.143 5.857s10.237-1.952 14.143-5.857c7.811-7.811 7.811-20.475 0-28.285L284.286 256.002z"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" id="open-menu">
+    <path d="M492 236H20c-11.046 0-20 8.954-20 20s8.954 20 20 20h472c11.046 0 20-8.954 20-20s-8.954-20-20-20zm0-160H20C8.954 76 0 84.954 0 96s8.954 20 20 20h472c11.046 0 20-8.954 20-20s-8.954-20-20-20zm0 320H20c-11.046 0-20 8.954-20 20s8.954 20 20 20h472c11.046 0 20-8.954 20-20s-8.954-20-20-20z"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" id="instagram">
+    <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" id=youtube>
+    <path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" id="stackoverflow">
+    <path d="M21 27v-8h3v11H0V19h3v8h18z"></path><path d="M17.1.2L15 1.8l7.9 10.6 2.1-1.6L17.1.2zm3.7 14.7L10.6 6.4l1.7-2 10.2 8.5-1.7 2zM7.2 12.3l12 5.6 1.1-2.4-12-5.6-1.1 2.4zm-1.8 6.8l13.56 1.96.17-2.38-13.26-2.55-.47 2.97zM19 25H5v-3h14v3z"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" id="xing">
+    <path d="M18.188 0c-.517 0-.741.325-.927.66 0 0-7.455 13.224-7.702 13.657.015.024 4.919 9.023 4.919 9.023.17.308.436.66.967.66h3.454c.211 0 .375-.078.463-.22.089-.151.089-.346-.009-.536l-4.879-8.916c-.004-.006-.004-.016 0-.022L22.139.756c.095-.191.097-.387.006-.535C22.056.078 21.894 0 21.686 0h-3.498zM3.648 4.74c-.211 0-.385.074-.473.216-.09.149-.078.339.02.531l2.34 4.05c.004.01.004.016 0 .021L1.86 16.051c-.099.188-.093.381 0 .529.085.142.239.234.45.234h3.461c.518 0 .766-.348.945-.667l3.734-6.609-2.378-4.155c-.172-.315-.434-.659-.962-.659H3.648v.016z"/>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 71 55" id="discord">
+    <path d="M60.1045 4.8978C55.5792 2.8214 50.7265 1.2916 45.6527 0.41542C45.5603 0.39851 45.468 0.440769 45.4204 0.525289C44.7963 1.6353 44.105 3.0834 43.6209 4.2216C38.1637 3.4046 32.7345 3.4046 27.3892 4.2216C26.905 3.0581 26.1886 1.6353 25.5617 0.525289C25.5141 0.443589 25.4218 0.40133 25.3294 0.41542C20.2584 1.2888 15.4057 2.8186 10.8776 4.8978C10.8384 4.9147 10.8048 4.9429 10.7825 4.9795C1.57795 18.7309 -0.943561 32.1443 0.293408 45.3914C0.299005 45.4562 0.335386 45.5182 0.385761 45.5576C6.45866 50.0174 12.3413 52.7249 18.1147 54.5195C18.2071 54.5477 18.305 54.5139 18.3638 54.4378C19.7295 52.5728 20.9469 50.6063 21.9907 48.5383C22.0523 48.4172 21.9935 48.2735 21.8676 48.2256C19.9366 47.4931 18.0979 46.6 16.3292 45.5858C16.1893 45.5041 16.1781 45.304 16.3068 45.2082C16.679 44.9293 17.0513 44.6391 17.4067 44.3461C17.471 44.2926 17.5606 44.2813 17.6362 44.3151C29.2558 49.6202 41.8354 49.6202 53.3179 44.3151C53.3935 44.2785 53.4831 44.2898 53.5502 44.3433C53.9057 44.6363 54.2779 44.9293 54.6529 45.2082C54.7816 45.304 54.7732 45.5041 54.6333 45.5858C52.8646 46.6197 51.0259 47.4931 49.0921 48.2228C48.9662 48.2707 48.9102 48.4172 48.9718 48.5383C50.038 50.6034 51.2554 52.5699 52.5959 54.435C52.6519 54.5139 52.7526 54.5477 52.845 54.5195C58.6464 52.7249 64.529 50.0174 70.6019 45.5576C70.6551 45.5182 70.6887 45.459 70.6943 45.3942C72.1747 30.0791 68.2147 16.7757 60.1968 4.9823C60.1772 4.9429 60.1437 4.9147 60.1045 4.8978ZM23.7259 37.3253C20.2276 37.3253 17.3451 34.1136 17.3451 30.1693C17.3451 26.225 20.1717 23.0133 23.7259 23.0133C27.308 23.0133 30.1626 26.2532 30.1066 30.1693C30.1066 34.1136 27.28 37.3253 23.7259 37.3253ZM47.3178 37.3253C43.8196 37.3253 40.9371 34.1136 40.9371 30.1693C40.9371 26.225 43.7636 23.0133 47.3178 23.0133C50.9 23.0133 53.7545 26.2532 53.6986 30.1693C53.6986 34.1136 50.9 37.3253 47.3178 37.3253Z"/>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 17 18" id="mastodon">
+    <path
+    fill="#ffffff"
+    d="m 15.054695,9.8859583 c -0.22611,1.1632697 -2.02517,2.4363497 -4.09138,2.6830797 -1.0774504,0.12856 -2.1382704,0.24673 -3.2694704,0.19484 -1.84996,-0.0848 -3.30971,-0.44157 -3.30971,-0.44157 0,0.1801 0.0111,0.35157 0.0333,0.51194 0.24051,1.82571 1.81034,1.93508 3.29737,1.98607 1.50088,0.0514 2.8373104,-0.37004 2.8373104,-0.37004 l 0.0617,1.35686 c 0,0 -1.0498104,0.56374 -2.9199404,0.66742 -1.03124,0.0567 -2.3117,-0.0259 -3.80308,-0.42069 -3.23454998,-0.85613 -3.79081998,-4.304 -3.87592998,-7.8024197 -0.026,-1.03871 -0.01,-2.01815 -0.01,-2.83732 0,-3.57732 2.34385998,-4.62587996 2.34385998,-4.62587996 1.18184,-0.54277 3.20976,-0.77101 5.318,-0.7882499985409 h 0.0518 C 9.8267646,0.01719834 11.856025,0.24547834 13.037775,0.78824834 c 0,0 2.34377,1.04855996 2.34377,4.62587996 0,0 0.0294,2.63937 -0.32687,4.47183"/>
+ <path
+    fill="#000000"
+    d="m 12.616925,5.6916583 v 4.3315297 h -1.71607 V 5.8189683 c 0,-0.88624 -0.37289,-1.33607 -1.1187604,-1.33607 -0.82467,0 -1.23799,0.53361 -1.23799,1.58875 v 2.30122 h -1.70594 v -2.30122 c 0,-1.05514 -0.4134,-1.58875 -1.23808,-1.58875 -0.74587,0 -1.11876,0.44983 -1.11876,1.33607 v 4.2042197 h -1.71607 V 5.6916583 c 0,-0.88527 0.22541,-1.58876 0.67817,-2.10922 0.46689,-0.52047 1.07833,-0.78727 1.83735,-0.78727 0.87816,0 1.54317,0.33752 1.98288,1.01267 l 0.42744,0.71655 0.42753,-0.71655 c 0.43961,-0.67515 1.10463,-1.01267 1.9828704,-1.01267 0.75893,0 1.37037,0.2668 1.83735,0.78727 0.45268,0.52046 0.67808,1.22395 0.67808,2.10922"/>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 530" id="bluesky" >
+    <path d="m135.72 44.03c66.496 49.921 138.02 151.14 164.28 205.46 26.262-54.316 97.782-155.54 164.28-205.46 47.98-36.021 125.72-63.892 125.72 24.795 0 17.712-10.155 148.79-16.111 170.07-20.703 73.984-96.144 92.854-163.25 81.433 117.3 19.964 147.14 86.092 82.697 152.22-122.39 125.59-175.91-31.511-189.63-71.766-2.514-7.3797-3.6904-10.832-3.7077-7.8964-0.0174-2.9357-1.1937 0.51669-3.7077 7.8964-13.714 40.255-67.233 197.36-189.63 71.766-64.444-66.128-34.605-132.26 82.697-152.22-67.108 11.421-142.55-7.4491-163.25-81.433-5.9562-21.282-16.111-152.36-16.111-170.07 0-88.687 77.742-60.816 125.72-24.795z"/>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" id="ko-fi">
+    <path fill="#ffffff" d="M4.5,9.8527H32.7947a0,0,0,0,1,0,0v19.225a9.07,9.07,0,0,1-9.07,9.07H13.57a9.07,9.07,0,0,1-9.07-9.07V9.8527A0,0,0,0,1,4.5,9.8527Z"/>
+    <path fill="#000000" d="M12.197,25.9493l6.45,6.45,6.45-6.45a8.2,8.2,0,0,0,2.4016-5.798h0a4.5082,4.5082,0,0,0-4.212-4.5459,4.4262,4.4262,0,0,0-4.64,4.4209,4.4261,4.4261,0,0,0-4.64-4.4209,4.5082,4.5082,0,0,0-4.212,4.5459h0A8.2,8.2,0,0,0,12.197,25.9493Z"/>
+    <path fill="#ffffff" d="M32.7947,9.8527H35.73a7.77,7.77,0,0,1,0,15.5394H32.7947"/>
+  </svg>
+  </symbol>
+</svg>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha512-aOFyMMzZF7l7ei3vOKgQiRhZnYqk9YC/uMzl4T0j5N5D3Kul+QAFU8ssENDRMAqr/lxDOjMF69dSYJ8HYqY+WQ==" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" integrity="sha512-UPFOadao2nEorjtjl0xUTtN3w20Ja143UPEU6EyJ1mi5MB2bDtMkiWmqGDqi47xNLB5z1dy31GKJDEWhjUJFiQ==" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" integrity="sha512-YJVxTjqttjsU3cSvaTRqsSl0wbRgZUNF+NGGCgto/MUbIvaLdXQzGTCQu4CvyJZbZctgflVB0PXw9LLmTWm5/w==" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
+<footer class="footer">
+  <div class="footer_inner wrap pale">
+    <img src='https://jianlin-li.github.io/icons/apple-touch-icon.png' class="icon icon_2 transparent" alt="Copyright © 1989–2025, 李建林 ">
+    <p>Copyright&nbsp;1989-&nbsp;<span class="year"></span>&nbsp;COPYRIGHT © 1989–2025, 李建林 . All Rights Reserved</p><a class="to_top" href="#documentTop">
+  <svg class="icon">
+  <title>to-top</title>
+  <use xlink:href="#to-top"></use>
+</svg>
+
+</a>
+
+  </div>
+</footer>
+
+<script type="text/javascript" src="https://jianlin-li.github.io/zh-cn/js/bundle.e4e0e4fbe8acb50d7f973828f4138cdbea727800047fc93f9abbd6751e8f3422d6ef193f98da36fdb8488219c25692d73da89480f46abc8421a4ee3526dd6c23.js" integrity="sha512-5ODk&#43;&#43;istQ1/lzgo9BOM2&#43;pyeAAEf8k/mrvWdR6PNCLW7xk/mNo2/bhIghnCVpLXPaiUgPRqvIQhpO41Jt1sIw==" crossorigin="anonymous"></script>
+
+  <script src="https://jianlin-li.github.io/js/search.min.4c2b0421d128bbd7c43fc7d662fb5dfd8e439c60ee92c900a26d72d9c3271d2256f5bac9f6f919cddfd55101e9272898716cbb3381b4360bf43a66a5f7664f54.js"></script>
+
+  </body>
+</html>
